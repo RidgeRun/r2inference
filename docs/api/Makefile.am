@@ -7,3 +7,8 @@
 # RidgeRun, LLC.  The user is free to modify the source code after obtaining
 # a software license from RidgeRun.  All source code changes must be provided
 # back to RidgeRun without any encumbrance.
+
+@RR_DOCS_RULES@
+
+MOSTLYCLEANFILES=$(RR_DOCS_CLEANFILES)
+all-local: docs-run

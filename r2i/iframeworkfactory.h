@@ -9,4 +9,26 @@
  * back to RidgeRun without any encumbrance.
 */
 
-#include <r2i/iframeworkfactory.h>
+#ifndef R2I_IFRAMEWORKFACTORY_H
+#define R2I_IFRAMEWORKFACTORY_H
+
+/**
+ * R2Inference Namespace
+ */
+namespace r2i {
+
+/**
+ * Abstract factory to create framework related objects
+ */
+class IFrameworkFactory {
+
+ public:
+    /**
+     * Create a model loader.
+     */
+    virtual void MakeLoader () = 0;
+};
+
+}
+
+#endif // R2I_IFRAMEWORKFACTORY_H
