@@ -7,23 +7,3 @@
 # RidgeRun, LLC.  The user is free to modify the source code after obtaining
 # a software license from RidgeRun.  All source code changes must be provided
 # back to RidgeRun without any encumbrance.
-
-# Initialize autoconf.
-AC_PREREQ([2.69])
-AC_INIT([RidgeRun inference library],[0.1.0],[https://github.com/RidgeRun/r2inference/issues],[r2inference])
-
-# Initialize automake.
-AM_INIT_AUTOMAKE([1.14 no-dist-gzip dist-xz tar-ustar foreign])
-
-# Checks for programs.
-AC_PROG_CXX
-AC_PROG_CPP
-AC_PROG_LN_S
-
-# Output files, please keep in alphabetical order
-AC_CONFIG_FILES([
-Makefile
-])
-
-AC_OUTPUT
-

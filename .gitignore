@@ -11,3 +11,5 @@ config.*
 configure
 install-sh
 missing
+Makefile
+Makefile.in
