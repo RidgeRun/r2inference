@@ -13,13 +13,17 @@ ACLOCAL_AMFLAGS = -I m4 -I common/m4
 
 SUBDIRS = 		\
 	r2i		\
-	docs		\
-	examples
+	docs
 
 if ENABLE_TESTS
 SUBDIRS += tests
 endif
 
+if ENABLE_EXAMPLES
+SUBDIRS += examples
+endif
+
 DIST_SUBDIRS =		\
 	$(SUBDIRS)	\
-	tests
+	tests		\
+	examples
