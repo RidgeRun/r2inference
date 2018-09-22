@@ -26,3 +26,6 @@ m4/
 *.la
 *.lo
 *.o
+
+# Git conflict files
+.merge_file_*
