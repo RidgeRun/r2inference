@@ -32,6 +32,7 @@ Makefile
 docs/Makefile
 docs/api/Makefile
 docs/uml/Makefile
+examples/Makefile
 r2i/Makefile
 tests/Makefile
 tests/acceptance/Makefile

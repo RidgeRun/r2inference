@@ -7,19 +7,3 @@
 # RidgeRun, LLC.  The user is free to modify the source code after obtaining
 # a software license from RidgeRun.  All source code changes must be provided
 # back to RidgeRun without any encumbrance.
-
-# Keep in sync with configure.ac
-ACLOCAL_AMFLAGS = -I m4 -I common/m4
-
-SUBDIRS = 		\
-	r2i		\
-	docs		\
-	examples
-
-if ENABLE_TESTS
-SUBDIRS += tests
-endif
-
-DIST_SUBDIRS =		\
-	$(SUBDIRS)	\
-	tests
