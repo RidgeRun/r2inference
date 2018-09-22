@@ -20,6 +20,9 @@ AC_PROG_CXX
 AC_PROG_CPP
 AC_PROG_LN_S
 
+# Keep in sync with top Makefile.am
+AC_SUBST(ACLOCAL_AMFLAGS, "-I m4 -I common/m4")
+
 # Output files, please keep in alphabetical order
 AC_CONFIG_FILES([
 Makefile
