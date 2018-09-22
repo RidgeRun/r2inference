@@ -18,21 +18,27 @@ AM_INIT_AUTOMAKE([1.14 no-dist-gzip dist-xz tar-ustar foreign])
 # Initialize libtool
 LT_INIT
 
-# Make sure we are trying to build the correct area
-AC_CONFIG_SRCDIR([r2i/r2i.h])
-
 # Checks for programs.
 AC_PROG_CXX
 AC_PROG_CPP
 AC_PROG_LN_S
 
-# Keep in sync with top Makefile.am
-AC_CONFIG_MACRO_DIRS([m4 common/m4])
-
 # Allow the user to fine-tune project build
 RR_ENABLE_TESTS
 RR_ENABLE_EXAMPLES
 RR_ENABLE_DOCS
+
+# Grab the project version number
+RR_VERSION
+
+# Make sure we are trying to build the correct area
+AC_CONFIG_SRCDIR([r2i/r2i.h])
+
+# Keep in sync with top Makefile.am
+AC_CONFIG_MACRO_DIRS([m4 common/m4])
+
+# Generate a header with useful definitions
+AC_CONFIG_HEADER([config.h])
 
 # Output files, please keep in alphabetical order
 AC_CONFIG_FILES([

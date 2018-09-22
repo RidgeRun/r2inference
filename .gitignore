@@ -19,6 +19,7 @@ ltmain.sh
 m4/
 .deps/
 .libs/
+stamp-h*
 
 # Build outputs
 .deps/
@@ -29,3 +30,6 @@ m4/
 
 # Git conflict files
 .merge_file_*
+
+# Do not ignore our M4 macros
+!common/m4
