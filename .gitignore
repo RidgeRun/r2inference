@@ -13,3 +13,16 @@ install-sh
 missing
 Makefile
 Makefile.in
+depcomp
+libtool
+ltmain.sh
+m4/
+.deps/
+.libs/
+
+# Build outputs
+.deps/
+.libs/
+*.la
+*.lo
+*.o

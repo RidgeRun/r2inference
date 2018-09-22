@@ -15,13 +15,19 @@ AC_INIT([RidgeRun inference library],[0.1.0],[https://github.com/RidgeRun/r2infe
 # Initialize automake.
 AM_INIT_AUTOMAKE([1.14 no-dist-gzip dist-xz tar-ustar foreign])
 
+# Initialize libtool
+LT_INIT
+
+# Make sure we are trying to build the correct area
+AC_CONFIG_SRCDIR([r2i/r2i.h])
+
 # Checks for programs.
 AC_PROG_CXX
 AC_PROG_CPP
 AC_PROG_LN_S
 
 # Keep in sync with top Makefile.am
-AC_SUBST(ACLOCAL_AMFLAGS, "-I m4 -I common/m4")
+AC_CONFIG_MACRO_DIRS([m4 common/m4])
 
 # Allow the user to fine-tune project build
 RR_ENABLE_TESTS

@@ -8,3 +8,12 @@
 # a software license from RidgeRun.  All source code changes must be provided
 # back to RidgeRun without any encumbrance.
 
+lib_LTLIBRARIES = libr2inference.la
+
+# Define a custom area for our headers
+r2iincludedir = $(includedir)/r2i
+
+libr2inference_la_SOURCES = r2i.c
+
+r2iinclude_HEADERS = r2i.h
+
