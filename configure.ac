@@ -30,6 +30,10 @@ docs/Makefile
 docs/api/Makefile
 docs/uml/Makefile
 r2i/Makefile
+tests/Makefile
+tests/acceptance/Makefile
+tests/unit/Makefile
+tests/unit/r2i/Makefile
 ])
 
 AC_OUTPUT
