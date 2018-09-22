@@ -24,13 +24,33 @@ AC_DEFUN([RR_ENABLE_DOCS],[
     AS_HELP_STRING([--disable-docs], [Disable documentation]))
 
   AS_IF([test "x$enable_docs" != "xno"],[
-    AC_CHECK_PROGS(DOXYGEN_BIN,[doxygen],[
-      AC_MSG_ERROR([No installation of Doxygen found. In Debian based systems you may install it by running:])
-      AC_MSG_ERROR([~$ sudo apt-get install doxygen])
-      AC_MSG_ERROR([Additionally, you may disable testing support by using "--disable-docs".])
-      ])
-      
+    ifdef([DX_INIT_DOXYGEN],[
+      DX_HTML_FEATURE(ON)
+      DX_CHM_FEATURE(OFF)
+      DX_CHI_FEATURE(OFF)
+      DX_MAN_FEATURE(OFF)
+      DX_RTF_FEATURE(OFF)
+      DX_XML_FEATURE(OFF)
+      DX_PDF_FEATURE(OFF)
+      DX_PS_FEATURE(OFF)
+
+      define([DOXYFILE], m4_default([$1], [${top_srcdir}/common/Doxyfile]))
+      DX_INIT_DOXYGEN([AC_PACKAGE_TARNAME],[DOXYFILE],[out])
+
+      RR_DOCS_RULES="
+$DX_RULES
+
+RR_DOCS_CLEANFILES=\$(DX_CLEANFILES)
+docs-run: doxygen-doc
+"
+      AC_SUBST(RR_DOCS_RULES)
+      AM_SUBST_NOTMAKE(RR_DOCS_RULES)
     ],[
+      AC_MSG_ERROR([No installation of Doxygen found. In Debian based systems you may install it by running:
+      ~$ sudo apt-get install doxygen
+Additionally, you may disable testing support by using "--disable-docs".])
+    ])
+  ],[
     AC_MSG_NOTICE([Documentation support disabled!])
   ])
 
