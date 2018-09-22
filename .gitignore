@@ -2,3 +2,34 @@
 *~
 *.bak
 \#*
+
+# Autotools cruft
+aclocal.m4
+autom4te.cache/
+compile
+config.*
+configure
+install-sh
+missing
+Makefile
+Makefile.in
+depcomp
+libtool
+ltmain.sh
+m4/
+.deps/
+.libs/
+stamp-h*
+
+# Build outputs
+.deps/
+.libs/
+*.la
+*.lo
+*.o
+
+# Git conflict files
+.merge_file_*
+
+# Do not ignore our M4 macros
+!common/m4
