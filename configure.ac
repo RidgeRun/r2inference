@@ -26,7 +26,7 @@ AC_PROG_LN_S
 # Allow the user to fine-tune project build
 RR_ENABLE_TESTS
 RR_ENABLE_EXAMPLES
-RR_ENABLE_DOCS
+RR_ENABLE_DOCS([\${top_srcdir}/r2i])
 
 # Grab the project version number
 RR_VERSION

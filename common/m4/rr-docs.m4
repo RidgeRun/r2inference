@@ -34,8 +34,11 @@ AC_DEFUN([RR_ENABLE_DOCS],[
       DX_PDF_FEATURE(OFF)
       DX_PS_FEATURE(OFF)
 
-      define([DOXYFILE], m4_default([$1], [${top_srcdir}/common/Doxyfile]))
+      define([DOXYFILE], m4_default([$2], [${top_srcdir}/common/Doxyfile]))
+      define([SOURCEDIR], m4_default([$1], [\${top_srcdir}]))
+
       DX_INIT_DOXYGEN([AC_PACKAGE_TARNAME],[DOXYFILE],[out])
+      DX_ENV_APPEND(SRCDIR, [SOURCEDIR])
 
       RR_DOCS_RULES="
 $DX_RULES
