@@ -23,6 +23,9 @@ AC_PROG_LN_S
 # Keep in sync with top Makefile.am
 AC_SUBST(ACLOCAL_AMFLAGS, "-I m4 -I common/m4")
 
+# Allow the user to disable tests
+RR_ENABLE_TESTS
+
 # Output files, please keep in alphabetical order
 AC_CONFIG_FILES([
 Makefile
