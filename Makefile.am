@@ -11,9 +11,8 @@
 # Keep in sync with configure.ac
 ACLOCAL_AMFLAGS = -I m4 -I common/m4
 
-SUBDIRS = 		\
-	r2i		\
-	docs
+SUBDIRS =	\
+	r2i
 
 if ENABLE_TESTS
 SUBDIRS += tests
@@ -23,7 +22,12 @@ if ENABLE_EXAMPLES
 SUBDIRS += examples
 endif
 
+if ENABLE_DOCS
+SUBDIRS += docs
+endif
+
 DIST_SUBDIRS =		\
 	$(SUBDIRS)	\
 	tests		\
-	examples
+	examples	\
+	docs

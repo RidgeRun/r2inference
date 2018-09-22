@@ -26,6 +26,7 @@ AC_SUBST(ACLOCAL_AMFLAGS, "-I m4 -I common/m4")
 # Allow the user to fine-tune project build
 RR_ENABLE_TESTS
 RR_ENABLE_EXAMPLES
+RR_ENABLE_DOCS
 
 # Output files, please keep in alphabetical order
 AC_CONFIG_FILES([
