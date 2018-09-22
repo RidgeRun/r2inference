@@ -8,9 +8,6 @@
 # a software license from RidgeRun.  All source code changes must be provided
 # back to RidgeRun without any encumbrance.
 
-# Keep in sync with configure.ac
-ACLOCAL_AMFLAGS = -I m4 -I common/m4
-
 SUBDIRS = 	\
-	r2i	\
-	docs
+	api	\
+	uml

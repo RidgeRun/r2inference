@@ -26,6 +26,9 @@ AC_SUBST(ACLOCAL_AMFLAGS, "-I m4 -I common/m4")
 # Output files, please keep in alphabetical order
 AC_CONFIG_FILES([
 Makefile
+docs/Makefile
+docs/api/Makefile
+docs/uml/Makefile
 r2i/Makefile
 ])
 
