@@ -13,7 +13,9 @@ lib_LTLIBRARIES = libr2inference-@RR_PACKAGE_VERSION@.la
 # Define a custom area for our headers
 r2iincludedir = $(includedir)/r2inference-$(RR_PACKAGE_VERSION)/r2i
 
-libr2inference_@RR_PACKAGE_VERSION@_la_SOURCES = r2i.c
+libr2inference_@RR_PACKAGE_VERSION@_la_SOURCES = r2i.cc
+libr2inference_@RR_PACKAGE_VERSION@_la_CPPFLAGS = -I$(top_srcdir)
+
 
 r2iinclude_HEADERS = r2i.h
 

@@ -2,6 +2,7 @@
 *~
 *.bak
 \#*
+*.orig
 
 # Autotools cruft
 aclocal.m4
@@ -30,6 +31,9 @@ stamp-h*
 
 # Git conflict files
 .merge_file_*
+
+# Doxygen outputs
+docs/api/out/
 
 # Do not ignore our M4 macros
 !common/m4
