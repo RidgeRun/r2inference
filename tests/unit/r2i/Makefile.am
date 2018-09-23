@@ -7,3 +7,18 @@
 # RidgeRun, LLC.  The user is free to modify the source code after obtaining
 # a software license from RidgeRun.  All source code changes must be provided
 # back to RidgeRun without any encumbrance.
+
+TESTS=tests
+check_PROGRAMS=$(TESTS)
+LOG_DRIVER=$(top_builddir)/common/rr-test-driver.py
+
+AM_CXXFLAGS=$(TESTS_CFLAGS)
+AM_CFLAGS=$(TESTS_CFLAGS)
+
+AM_LDFLAGS=$(TESTS_LIBS) $(top_builddir)/r2i/libr2inference-@RR_PACKAGE_VERSION@.la
+
+tests_SOURCES =		\
+	tests.cc 	\
+	r2i.cc
+
+CLEANFILES = cpputest_*.xml
