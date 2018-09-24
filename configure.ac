@@ -27,6 +27,7 @@ AC_PROG_LN_S
 RR_ENABLE_TESTS
 RR_ENABLE_EXAMPLES
 RR_ENABLE_DOCS([\${top_srcdir}/r2i])
+RR_ENABLE_CODE_COVERAGE
 
 # Grab the project version number
 RR_VERSION

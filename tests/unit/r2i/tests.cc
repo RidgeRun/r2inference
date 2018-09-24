@@ -9,16 +9,10 @@
  * back to RidgeRun without any encumbrance.
 */
 
-#ifndef R2I_R2I_H
-#define R2I_R2I_H
+#include <CppUTest/CommandLineTestRunner.h>
 
-#include <r2i/iframeworkfactory.h>
-
-namespace r2i
+int
+main (int ac, char ** av)
 {
-
-void init ();
-
-};
-
-#endif //R2I_R2I_H
+  return CommandLineTestRunner::RunAllTests (ac, av);
+}

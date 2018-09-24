@@ -9,16 +9,24 @@
  * back to RidgeRun without any encumbrance.
 */
 
-#ifndef R2I_R2I_H
-#define R2I_R2I_H
+#include <CppUTest/TestHarness.h>
+#include <r2i/r2i.h>
 
-#include <r2i/iframeworkfactory.h>
-
-namespace r2i
+TEST_GROUP (R2Inference)
 {
+  void setup() {
+  }
 
-void init ();
-
+  void teardown() {
+  }
 };
 
-#endif //R2I_R2I_H
+TEST (R2Inference, FirstTest)
+{
+  r2i::init ();
+}
+
+TEST (R2Inference, SecondTest)
+{
+  r2i::init ();
+}

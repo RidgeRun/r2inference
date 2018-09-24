@@ -160,10 +160,11 @@ class testcase(object):
 
 class testrunner(object):
 
-    def __init__(self, testname, logfile, trsfile):
+    def __init__(self, testname, singleprocess, logfile, trsfile):
         self.testname = testname
         self.logfile = logfile
         self.trsfile = trsfile
+        self.singleprocess = singleprocess
         self.results = testresults(filename=None)
 
     def run(self):
@@ -173,9 +174,12 @@ class testrunner(object):
 
     def runtests(self):
         with open(self.logfile, mode='w') as log_file:
-            subprocess.call(['./{name}'.format(name=self.testname),
-                             '-v', '-p', '-ojunit'],
-                            stdout=log_file, stderr=subprocess.STDOUT)
+            args = ['./{name}'.format(name=self.testname), '-v', '-ojunit'];
+
+            if self.singleprocess:
+                args.append (self.singleprocess)
+
+            subprocess.call(args, stdout=log_file, stderr=subprocess.STDOUT)
 
     def parse(self):
         xmlfiles = glob.glob('cpputest_*.xml')
@@ -196,6 +200,7 @@ if __name__ == '__main__':
     parser.add_argument('--test-name')
     parser.add_argument('--enable-hard-errors')
     parser.add_argument('--expect-failure')
+    parser.add_argument('--single-process')
     parser.add_argument('cmd_args', nargs=argparse.REMAINDER)
     args = parser.parse_args()
     if len(args.cmd_args) > 1 and args.cmd_args[0] == '--':
@@ -208,6 +213,11 @@ if __name__ == '__main__':
     else:
         usecolor = False
 
-    runner = testrunner(testfilename, args.log_file, args.trs_file)
+    if args.single_process == 'yes':
+        singleprocess = ''
+    else:
+        singleprocess = '-p'
+
+    runner = testrunner(testfilename, singleprocess, args.log_file, args.trs_file)
     runner.run()
     print(runner.results.get_report(mode=MODE.MODE_SIMPLE, color=usecolor))

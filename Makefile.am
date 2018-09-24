@@ -31,3 +31,5 @@ DIST_SUBDIRS =		\
 	tests		\
 	examples	\
 	docs
+
+@CODE_COVERAGE_RULES@

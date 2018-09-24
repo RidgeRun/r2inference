@@ -37,3 +37,17 @@ docs/api/out/
 
 # Do not ignore our M4 macros
 !common/m4
+
+# Coverage cruft
+RidgeRun inference library-0.1.0-coverage*
+aminclude_static.am
+*.gcno
+*.gcda
+*.gcno
+
+# Tests 
+test-driver
+*.xml
+*.log
+*.trs
+tests/unit/r2i/tests
