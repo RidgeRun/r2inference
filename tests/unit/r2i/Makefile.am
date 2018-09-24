@@ -10,15 +10,33 @@
 
 TESTS=tests
 check_PROGRAMS=$(TESTS)
-LOG_DRIVER=$(top_builddir)/common/rr-test-driver.py
 
-AM_CXXFLAGS=$(TESTS_CFLAGS)
-AM_CFLAGS=$(TESTS_CFLAGS)
+if ENABLE_CODE_COVERAGE
+SINGLE_PROCESS=--single-process yes
+else
+SINGLE_PROCESS=
+endif
 
-AM_LDFLAGS=$(TESTS_LIBS) $(top_builddir)/r2i/libr2inference-@RR_PACKAGE_VERSION@.la
+LOG_DRIVER=$(top_builddir)/common/rr-test-driver.py $(SINGLE_PROCESS)
 
-tests_SOURCES =		\
-	tests.cc 	\
+AM_CXXFLAGS = 				\
+	$(TESTS_CFLAGS) 		\
+	$(CODE_COVERAGE_CXXFLAGS)
+
+AM_CFLAGS = 				\
+	$(TESTS_CFLAGS)			\
+	$(CODE_COVERAGE_CFLAGS)
+
+AM_CPPFLAGS = 				\
+	$(CODE_COVERAGE_CPPFLAGS)
+
+AM_LDFLAGS=				\
+	$(TESTS_LIBS) 			\
+	$(CODE_COVERAGE_LIBS) 		\
+	$(top_builddir)/r2i/libr2inference-@RR_PACKAGE_VERSION@.la
+
+tests_SOURCES =				\
+	tests.cc 			\
 	r2i.cc
 
 CLEANFILES = cpputest_*.xml

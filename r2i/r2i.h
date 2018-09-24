@@ -9,4 +9,16 @@
  * back to RidgeRun without any encumbrance.
 */
 
+#ifndef R2I_R2I_H
+#define R2I_R2I_H
+
 #include <r2i/iframeworkfactory.h>
+
+namespace r2i
+{
+
+void init ();
+
+};
+
+#endif //R2I_R2I_H

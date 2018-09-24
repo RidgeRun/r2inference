@@ -10,6 +10,7 @@
 */
 
 #include <CppUTest/TestHarness.h>
+#include <r2i/r2i.h>
 
 TEST_GROUP (R2Inference)
 {
@@ -22,10 +23,10 @@ TEST_GROUP (R2Inference)
 
 TEST (R2Inference, FirstTest)
 {
-
+  r2i::init ();
 }
 
 TEST (R2Inference, SecondTest)
 {
-
+  r2i::init ();
 }
