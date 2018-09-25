@@ -12,23 +12,70 @@
 #ifndef R2I_IFRAMEWORKFACTORY_H
 #define R2I_IFRAMEWORKFACTORY_H
 
+#include <r2i/iloader.h>
+#include <r2i/imodel.h>
+#include <r2i/iengine.h>
+#include <r2i/iparameters.h>
+#include <r2i/frameworkmeta.h>
+
+#include <vector>
+#include <string>
+
 /**
  * R2Inference Namespace
  */
 namespace r2i {
-
-/**
- * Abstract factory to create framework related objects
- */
-class IFrameworkFactory {
-
+  /**
+   *  IFrameworkFactory class implements the interface to abstract factory to
+   *  create framework related objects
+   */
+  
+  class IFrameworkFactory {
+    
  public:
     /**
-     * Create a model loader.
+     * \brief Method to autodetect a Framework factory available on the system 
+     * \param error a RuntimeError with a description of an error.
+     * \return a valid Frameworkfactory.
      */
-    virtual void MakeLoader () = 0;
-};
+    static r2i::IFrameworkFactory Autodetect(RuntimeError &error){};
 
+    /**
+     * \brief Method to check all the available Frameworks on system .
+     * \param error a RuntimeError with a description of an error.
+     * \return List of supported Frameworks.
+     */
+    static std::vector<r2i::IFrameworkFactory> List(RuntimeError &error) {};
+    
+    /**
+     * \brief Method to create a ILoader based on a particular Framework
+     * \param error a RuntimeError with a description of an error.
+     * \return a valid Loader for the Framework.
+     */
+    virtual r2i::ILoader MakeLoader (RuntimeError &error) {};
+    /**
+     * \brief Method to get a valid IEngine based on a particular Framework
+     * \param error a RuntimeError with a description of an error.
+     * \return a valid IEngine for the framework.
+     */
+    
+    virtual r2i::IEngine MakeEngine (RuntimeError &error) {};
+    /**
+     * \brief Method to get the valid IParameters on a particular Framework
+     * \param error a RuntimeError with a description of an error.
+     * \return a valid Parameters of a framework.
+     */
+    
+    virtual r2i::IParameters MakeParameters (RuntimeError &error) {};
+    /**
+     * \brief Method to get the Metadata of particular Framework
+     * \param error a RuntimeError with a description of an error.
+     * \return valid Metadata of a Framework.
+     */
+    
+    virtual r2i::FrameworkMeta GetDescription(RuntimeError &error) {};
+  };
+  
 }
 
 #endif // R2I_IFRAMEWORKFACTORY_H
