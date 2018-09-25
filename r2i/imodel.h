@@ -17,7 +17,7 @@
  */
 namespace r2i {
   /**
-   *! IModel class implements the interface to Abstracts a framework model
+   * IModel class implements the interface to abstract a framework model
    */
   class IModel {
 
