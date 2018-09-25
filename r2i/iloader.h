@@ -34,7 +34,7 @@ namespace r2i {
      * \param error a RuntimeError with a description of an error.
      * \return a validated IModel for an IEngine.
      */
-    virtual r2i::IModel Load (const std::string &in_path, r2i::RuntimeError &error) = 0;
+    virtual r2i::IModel Load (const std::string &in_path, r2i::RuntimeError &error) {};
     
   };
   
