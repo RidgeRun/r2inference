@@ -13,6 +13,10 @@
 #define R2I_R2I_H
 
 #include <r2i/iframeworkfactory.h>
+#include <r2i/iloader.h>
+#include <r2i/iengine.h>
+#include <r2i/iparameters.h>
+#include <r2i/iprediction.h>
 
 namespace r2i
 {
