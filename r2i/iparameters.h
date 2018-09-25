@@ -41,7 +41,7 @@ namespace r2i {
      */    
 
     virtual void Configure (r2i::IEngine in_engine, r2i::IModel in_model,
-                            RuntimeError &error ) = 0;
+                            RuntimeError &error ) {};
 
     /**
      * \brief Method to get the result of a string based parameter.
