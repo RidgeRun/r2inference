@@ -9,20 +9,20 @@
  * back to RidgeRun without any encumbrance.
 */
 
-#ifndef R2I_R2I_H
-#define R2I_R2I_H
+#ifndef R2I_IMODEL_H
+#define R2I_IMODEL_H
 
-#include <r2i/iframeworkfactory.h>
-#include <r2i/iloader.h>
-#include <r2i/iengine.h>
-#include <r2i/iparameters.h>
-#include <r2i/iprediction.h>
+/**
+ * R2Inference Namespace
+ */
+namespace r2i {
+  /**
+   * IModel class implements the interface to abstract a framework model
+   */
+  class IModel {
 
-namespace r2i
-{
+  };
+  
+}
 
-void init ();
-
-};
-
-#endif //R2I_R2I_H
+#endif // R2I_IMODEL_H
