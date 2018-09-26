@@ -45,8 +45,15 @@ log()
 log_info()
 {
     msg=$@
-    
+
     log "INFO" $msg
+}
+
+log_info_stderr()
+{
+    msg=$@
+
+    log_info $msg 1>&2
 }
 
 log_warning()
