@@ -20,17 +20,21 @@ endif
 LOG_DRIVER=$(top_builddir)/common/rr-test-driver.py $(SINGLE_PROCESS)
 
 AM_CXXFLAGS = 				\
+	$(RR_CFLAGS)			\
 	$(TESTS_CFLAGS) 		\
 	$(CODE_COVERAGE_CXXFLAGS)
 
 AM_CFLAGS = 				\
+	$(RR_CFLAGS)			\
 	$(TESTS_CFLAGS)			\
 	$(CODE_COVERAGE_CFLAGS)
 
 AM_CPPFLAGS = 				\
+	$(RR_CPPFLAGS)			\
 	$(CODE_COVERAGE_CPPFLAGS)
 
 AM_LDFLAGS=				\
+	$(RR_LIBS)			\
 	$(TESTS_LIBS) 			\
 	$(CODE_COVERAGE_LIBS) 		\
 	$(top_builddir)/r2i/libr2inference-@RR_PACKAGE_VERSION@.la

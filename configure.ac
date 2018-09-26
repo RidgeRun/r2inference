@@ -19,9 +19,10 @@ AM_INIT_AUTOMAKE([1.14 no-dist-gzip dist-xz tar-ustar foreign])
 LT_INIT
 
 # Checks for programs.
-AC_PROG_CXX
-AC_PROG_CPP
 AC_PROG_LN_S
+
+# Initialize our build utils
+RR_INIT
 
 # Allow the user to fine-tune project build
 RR_ENABLE_TESTS
