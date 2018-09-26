@@ -31,7 +31,7 @@ check_for_tool()
     ret=1
     if command -v $indent_tool >/dev/null 2>&1; then
       current_version="$($indent_tool --version | head -n1 | cut -d" " -f4)"
-      if [ "$(printf '%s\n' "$indent_tool_version" "$current_version" | sort -V | head -n1)" == "$indent_tool_version" ] ; then
+      if [ "$(printf '%s\n' "$indent_tool_version" "$current_version" | sort -V | head -n1)" = "$indent_tool_version" ] ; then
         ret=0
       fi
     fi
