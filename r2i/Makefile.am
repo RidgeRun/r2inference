@@ -16,16 +16,19 @@ r2iincludedir = $(includedir)/r2inference-$(RR_PACKAGE_VERSION)/r2i
 libr2inference_@RR_PACKAGE_VERSION@_la_SOURCES = r2i.cc
 
 libr2inference_@RR_PACKAGE_VERSION@_la_CPPFLAGS = 	\
-	-I$(top_srcdir) 				\
+	$(RR_CPPFLAGS)					\
 	$(CODE_COVERAGE_CPPFLAGS)
 
 libr2inference_@RR_PACKAGE_VERSION@_la_CFLAGS = 	\
+	$(RR_CFLAGS)					\
 	$(CODE_COVERAGE_CFLAGS)
 
 libr2inference_@RR_PACKAGE_VERSION@_la_CXXFLAGS = 	\
+	$(RR_CXXFLAGS)					\
 	$(CODE_COVERAGE_CXXFLAGS)
 
 libr2inference_@RR_PACKAGE_VERSION@_la_LIBADD = 	\
+	$(RR_LIBS)					\
 	$(CODE_COVERAGE_LIBS)
 
 r2iinclude_HEADERS = r2i.h
