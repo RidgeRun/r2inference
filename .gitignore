@@ -51,3 +51,6 @@ test-driver
 *.log
 *.trs
 tests/unit/r2i/tests
+
+# rr-build-utils configuration files
+.rrconfig
