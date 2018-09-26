@@ -1,0 +1,82 @@
+# Copyright (C) 2018 RidgeRun, LLC (http://www.ridgerun.com)
+# All Rights Reserved.
+#
+# The contents of this software are proprietary and confidential to RidgeRun,
+# LLC.  No part of this program may be photocopied, reproduced or translated
+# into another programming language without prior written consent of
+# RidgeRun, LLC.  The user is free to modify the source code after obtaining
+# a software license from RidgeRun.  All source code changes must be provided
+# back to RidgeRun without any encumbrance.
+
+# This is a sample configuration file for rr-build-utils. To use it,
+# you would typicall copy it in the root of you project renamed as
+# ".rrconfig". The configuration file can, however, be at any level in
+# the file system, so that multiple projects can share a same
+# configuration file.
+#
+# ~$ cd $PROJECT_ROOT
+# ~$ cp common/rrconfig.sample ./.rrconfig
+
+##############################
+########## INDENTER ##########
+##############################
+
+# Set this variable if you would like to choose a different profile
+# for the C source files. Check rr-indent.sh to see the supported
+# profiles and defaults
+#INDENT_PROFILE_C=gstreamer
+
+# Set this variable if you would like to choose a different profile
+# for the C header files. Check rr-indent.sh to see the supported
+# profiles and defaults
+#INDENT_PROFILE_H=gstreamer
+
+# Set this variable if you would like to choose a different profile
+# for the C++ source files. Check rr-indent.sh to see the supported
+# profiles and defaults
+#INDENT_PROFILE_CXX=google
+
+# Set this variable if you would like to choose a different profile
+# for the C++ header files. Check rr-indent.sh to see the supported
+# profiles and defaults
+#INDENT_PROFILE_HXX=google
+
+# Set this variable if you would like to choose a different extension
+# pattern matching for the C source files. Check rr-indent.sh to see
+# the supported profiles and defaults
+#INDENT_PATTERN_C=*.c
+
+# Set this variable if you would like to choose a different extension
+# pattern matching for the C header files. Check rr-indent.sh to see
+# the supported profiles and defaults
+#INDENT_PATTERN_H=*.h
+
+# Set this variable if you would like to choose a different extension
+# pattern matching for the C++ source files. Check rr-indent.sh to see
+# the supported profiles and defaults
+#INDENT_PATTERN_CXX=@(*.cc|*.cpp|*.c++)
+
+# Set this variable if you would like to choose a different extension
+# pattern matching for the C++ header files. Check rr-indent.sh to see
+# the supported profiles and defaults
+#INDENT_PATTERN_HXX=@(*.hpp|*.h++)
+
+# Set this variable if you would like to choose a different set of 
+# astyle flags for the C source files. This variable takes precedence
+# over the profile.
+#INDENT_FLAGS_C=--style=kr
+
+# Set this variable if you would like to choose a different set of 
+# astyle flags for the C header files. This variable takes precedence
+# over the profile.
+#INDENT_FLAGS_H=--style=kr
+
+# Set this variable if you would like to choose a different set of 
+# astyle flags for the C++ source files. This variable takes precedence
+# over the profile.
+#INDENT_FLAGS_CXX=--style=google
+
+# Set this variable if you would like to choose a different set of 
+# astyle flags for the C++ header files. This variable takes precedence
+# over the profile.
+#INDENT_FLAGS_HXX=--style=google
