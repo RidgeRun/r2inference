@@ -8,22 +8,23 @@
 # a software license from RidgeRun.  All source code changes must be provided
 # back to RidgeRun without any encumbrance.
 #
-# Perform a check for a feature and install property to disable it
+# Allow the user to enable/disable the construction of examples
 #
 # RR_ENABLE_EXAMPLES
 #
-# This macro installs a configure option to enable/disable support for examples.
+# This macro installs a configure option to enable/disable support for examples
+# building.
 #
 # This macro will set the ENABLE_EXAMPLES makefile conditional to use in
-# the project. 
+# the project.
 #
-
 AC_DEFUN([RR_ENABLE_EXAMPLES],[
   AC_ARG_ENABLE([examples],
     AS_HELP_STRING([--disable-examples], [Disable project examples]))
-  AS_IF([test "x$enable_examples" != "xno"],[
-  	AC_MSG_NOTICE([Examples support enabled!])],[
-  	AC_MSG_NOTICE([Examples support disabled!])
+
+  AS_IF([test "x$enable_examples" = "xno"],[
+    AC_MSG_NOTICE([Examples disabled!])
   ])
+
   AM_CONDITIONAL([ENABLE_EXAMPLES], [test "x$enable_examples" != "xno"])
 ])
