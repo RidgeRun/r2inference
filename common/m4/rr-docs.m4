@@ -24,7 +24,6 @@ AC_DEFUN([RR_ENABLE_DOCS],[
     AS_HELP_STRING([--disable-docs], [Disable documentation]))
 
   AS_IF([test "x$enable_docs" != "xno"],[
-    ifdef([DX_INIT_DOXYGEN],[
       DX_HTML_FEATURE(ON)
       DX_CHM_FEATURE(OFF)
       DX_CHI_FEATURE(OFF)
@@ -48,11 +47,12 @@ docs-run: doxygen-doc
 "
       AC_SUBST(RR_DOCS_RULES)
       AM_SUBST_NOTMAKE(RR_DOCS_RULES)
-    ],[
+
+    if test -z "$DX_DOXYGEN"; then
       AC_MSG_ERROR([No installation of Doxygen found. In Debian based systems you may install it by running:
       ~$ sudo apt-get install doxygen
 Additionally, you may disable testing support by using "--disable-docs".])
-    ])
+    fi
   ],[
     AC_MSG_NOTICE([Documentation support disabled!])
   ])
