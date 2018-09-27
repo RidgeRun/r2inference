@@ -9,20 +9,39 @@
  * back to RidgeRun without any encumbrance.
 */
 
-#ifndef R2I_R2I_H
-#define R2I_R2I_H
+#ifndef R2I_FRAMEWORKMETA_H
+#define R2I_FRAMEWORKMETA_H
 
-#include <r2i/iengine.h>
-#include <r2i/iframeworkfactory.h>
-#include <r2i/iloader.h>
-#include <r2i/iparameters.h>
-#include <r2i/iprediction.h>
+#include <string>
 
+/**
+ * R2Inference Namespace
+ */
 namespace r2i
 {
+/**
+ * Implements the placeholder for framework information.
+ */
+class FrameworkMeta
+{
 
-void init ();
+public:
+  /**
+   * A string to identify the name of the framework
+   */
+  const std::string name;
 
+  /**
+  * A string with a description for the framework
+  */
+  const std::string description;
+
+  /**
+  * A string with the version descriptor for the framework
+  */
+  const std::string version;
 };
 
-#endif //R2I_R2I_H
+}
+
+#endif // R2I_FRAMEWORKMETA_H

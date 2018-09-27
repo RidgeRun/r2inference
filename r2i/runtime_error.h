@@ -9,20 +9,39 @@
  * back to RidgeRun without any encumbrance.
 */
 
-#ifndef R2I_R2I_H
-#define R2I_R2I_H
+#ifndef R2I_RUNTIMEERROR_H
+#define R2I_RUNTIMEERROR_H
 
-#include <r2i/iengine.h>
-#include <r2i/iframeworkfactory.h>
-#include <r2i/iloader.h>
-#include <r2i/iparameters.h>
-#include <r2i/iprediction.h>
+#include <string>
 
+/**
+ * R2Inference Namespace
+ */
 namespace r2i
 {
+/**
+ *  Implements the error handling class for r2i library.
+ */
+class RuntimeError
+{
 
-void init ();
+public:
+  /**
+   * \brief Cleans the RuntimeError result from any previous operation.
+   */
+  void Clean();
 
+  /**
+  * A string with a description of the error.
+  */
+  const std::string description;
+
+  /**
+  * A code for the error.
+  */
+  int code;
 };
 
-#endif //R2I_R2I_H
+}
+
+#endif // R2I_RUNTIMEERROR_H
