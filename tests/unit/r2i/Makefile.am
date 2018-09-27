@@ -8,8 +8,10 @@
 # a software license from RidgeRun.  All source code changes must be provided
 # back to RidgeRun without any encumbrance.
 
+if ENABLE_TESTS
 TESTS=tests
 check_PROGRAMS=$(TESTS)
+endif # ENABLE_TESTS
 
 if ENABLE_CODE_COVERAGE
 SINGLE_PROCESS=--single-process yes
