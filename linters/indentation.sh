@@ -13,24 +13,25 @@
 LOGGER_PROJECT_TAG="LINT INDNT"; . common/logger.sh
 
 indent_tool="common/rr-indent.sh"
-indent_extensions="-e \.c$ -e \.cpp$ -e \.cc$ -e \.C$ -e \.cxx$ -e \.c\+\+$"
+indent_extensions="-e \.c$ -e \.cpp$ -e \.cc$ -e \.C$ -e \.cxx$ -e \.c\+\+$ -e \.h$ -e \.hpp$ -e \.h\+\+$"
 
 check_file_indentation()
 {
     original=$1
+    original_name=$2
     indented=`mktemp /tmp/${original}.XXXXXX` || exit 1
 
-    if test -z "$file"; then
+    if test -z "$original"; then
         log_error "No file provided to lint"
         exit 1;
     fi
 
-    if ! test -e "$file"; then
-        log_error "Unable to lint $file: No such file or directory"
+    if ! test -e "$original"; then
+        log_error "Unable to lint $original: No such file or directory"
         exit 1;
     fi
 
-    $indent_tool < $original > $indented || exit 1
+    INDENT_FORCE_EXTENSION=$original_name $indent_tool < $original > $indented || exit 1
     diff -u -p "${original}" "${indented}"
     ret=$?
 
@@ -54,7 +55,7 @@ check_project_indentation()
         # revision in the index (and not the checked out version).
         to_commit=`git checkout-index --temp ${file} | cut -f 1`
 
-        check_file_indentation $to_commit
+        check_file_indentation $to_commit $file
         r=$?
         rm "${to_commit}"
 

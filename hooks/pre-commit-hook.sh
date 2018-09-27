@@ -22,6 +22,8 @@ main()
   if [ -z "${DISABLE_LINTERS}" ] ; then
     $indent_linter || exit 1
     $tests_linter || exit 1
+  else
+    log_info "Disabling linters? Shame on you!!!"
   fi
 }
 
