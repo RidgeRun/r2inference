@@ -28,6 +28,9 @@ void Parameters::Configure (std::shared_ptr<r2i::IEngine> in_engine,
     error.Set (RuntimeError::Code::NULL_PARAMETER, "Received null model");
     return;
   }
+
+  this->engine = in_engine;
+  this->model = in_model;
 }
 
 std::shared_ptr<r2i::IEngine> Parameters::GetEngine (RuntimeError &error) {

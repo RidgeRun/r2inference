@@ -67,7 +67,7 @@ TEST (NcsdkParameters, ConfigureGetNullEngine) {
   totest = params.GetEngine (error);
   LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.code);
 
-  CHECK (nullptr == totest);
+  POINTERS_EQUAL (nullptr, totest.get ());
 }
 
 TEST (NcsdkParameters, ConfigureGetNullModel) {
@@ -76,5 +76,21 @@ TEST (NcsdkParameters, ConfigureGetNullModel) {
   totest = params.GetModel (error);
   LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.code);
 
-  CHECK (nullptr == totest);
+  POINTERS_EQUAL (nullptr, totest.get ());
+}
+
+TEST (NcsdkParameters, ConfigureGetEngineModel) {
+  std::shared_ptr<r2i::IEngine> enginetotest;
+  std::shared_ptr<r2i::IModel> modeltotest;
+
+  params.Configure (engine, model, error);
+  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.code);
+
+  enginetotest = params.GetEngine (error);
+  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.code);
+  POINTERS_EQUAL (engine.get(), enginetotest.get());
+
+  modeltotest = params.GetModel (error);
+  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.code);
+  POINTERS_EQUAL (model.get(), modeltotest.get());
 }
