@@ -19,11 +19,9 @@ namespace ncsdk {
 
 class Parameters : public IParameters {
  public:
-  virtual void
-  Configure (std::shared_ptr<r2i::IEngine> in_engine,
-             std::shared_ptr<r2i::IModel> in_model,
-             RuntimeError &error) override {};
-
+  virtual void Configure (std::shared_ptr<r2i::IEngine> in_engine,
+                          std::shared_ptr<r2i::IModel> in_model,
+                          RuntimeError &error) override;
 
   virtual void Get (const std::string in_parameter, int &value,
                     r2i::RuntimeError &error ) override;

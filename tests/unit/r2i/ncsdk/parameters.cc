@@ -46,3 +46,14 @@ TEST (NcsdkParameters, Configure) {
 
   params.Configure (engine, model, error);
 }
+
+TEST (NcsdkParameters, ConfigureNullEngine) {
+  r2i::RuntimeError error;
+  r2i::ncsdk::Parameters params;
+  std::shared_ptr<r2i::IModel> model (new MockModel);
+
+  error.Clean ();
+  params.Configure (nullptr, model, error);
+
+  LONGS_EQUAL (r2i::RuntimeError::Code::NULL_PARAMETER, error.code);
+}

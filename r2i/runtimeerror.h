@@ -24,20 +24,45 @@ namespace r2i {
 class RuntimeError {
 
  public:
+
+  /**
+   * Numerical code describing the different errors. See the
+   * description field for more contextual information at runtime.
+   */
+  enum Code {
+    /**
+    * Everything went okay
+    */
+    EOK,
+
+    /**
+     * A mandatory parameter was passed in as null
+     */
+    NULL_PARAMETER,
+  };
+
   /**
    * \brief Cleans the RuntimeError result from any previous operation.
    */
   void Clean();
 
   /**
+   * \brief Configures an error with a given code and description
+   *
+   * \param code The code to set in the error
+   * \param description A human readable description for the error
+   */
+  void Set (Code code, const std::string &description);
+
+  /**
   * A string with a description of the error.
   */
-  const std::string description;
+  std::string description;
 
   /**
   * A code for the error.
   */
-  int code;
+  Code code;
 };
 
 }
