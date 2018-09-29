@@ -22,7 +22,7 @@ endif
 LOG_DRIVER=$(top_builddir)/common/rr-test-driver.py $(SINGLE_PROCESS)
 
 AM_CXXFLAGS = 				\
-	$(RR_CXXFLAGS)			\
+	$(RR_CFLAGS)			\
 	$(TESTS_CFLAGS) 		\
 	$(CODE_COVERAGE_CXXFLAGS)
 
@@ -43,8 +43,6 @@ AM_LDFLAGS=				\
 
 tests_SOURCES =				\
 	tests.cc 			\
-	r2i.cc
+	parameters.cc
 
 CLEANFILES = cpputest_*.xml
-
-SUBDIRS = ncsdk

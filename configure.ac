@@ -54,6 +54,7 @@ tests/Makefile
 tests/acceptance/Makefile
 tests/unit/Makefile
 tests/unit/r2i/Makefile
+tests/unit/r2i/ncsdk/Makefile
 ])
 
 AC_OUTPUT
