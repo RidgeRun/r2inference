@@ -50,6 +50,7 @@ docs/api/Makefile
 docs/uml/Makefile
 examples/Makefile
 r2i/Makefile
+r2i/ncsdk/Makefile
 tests/Makefile
 tests/acceptance/Makefile
 tests/unit/Makefile
