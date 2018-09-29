@@ -30,6 +30,19 @@ void Parameters::Configure (std::shared_ptr<r2i::IEngine> in_engine,
   }
 }
 
+std::shared_ptr<r2i::IEngine> Parameters::GetEngine (RuntimeError &error) {
+  error.Clean ();
+
+  return this->engine;
+}
+
+
+std::shared_ptr<r2i::IModel> Parameters::GetModel (RuntimeError &error) {
+  error.Clean ();
+
+  return this->model;
+}
+
 void Parameters::Get (const std::string in_parameter, int &value,
                       r2i::RuntimeError &error ) {}
 
