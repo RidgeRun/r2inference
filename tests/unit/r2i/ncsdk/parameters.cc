@@ -31,40 +31,31 @@ class MockModel : public r2i::IModel {
 };
 
 TEST_GROUP (NcsdkParameters) {
-  void setup() {
+  r2i::RuntimeError error;
+  r2i::ncsdk::Parameters params;
+  std::shared_ptr<r2i::IEngine> engine;
+  std::shared_ptr<r2i::IModel> model;
+
+  void setup () {
+    engine = std::make_shared<MockEngine> ();
+    model = std::make_shared<MockModel> ();
   }
 
-  void teardown() {
+  void teardown () {
   }
 };
 
 TEST (NcsdkParameters, Configure) {
-  r2i::RuntimeError error;
-  r2i::ncsdk::Parameters params;
-  std::shared_ptr<r2i::IEngine> engine (new MockEngine);
-  std::shared_ptr<r2i::IModel> model (new MockModel);
-
   params.Configure (engine, model, error);
+  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.code);
 }
 
 TEST (NcsdkParameters, ConfigureNullEngine) {
-  r2i::RuntimeError error;
-  r2i::ncsdk::Parameters params;
-  std::shared_ptr<r2i::IModel> model (new MockModel);
-
-  error.Clean ();
   params.Configure (nullptr, model, error);
-
   LONGS_EQUAL (r2i::RuntimeError::Code::NULL_PARAMETER, error.code);
 }
 
 TEST (NcsdkParameters, ConfigureNullModel) {
-  r2i::RuntimeError error;
-  r2i::ncsdk::Parameters params;
-  std::shared_ptr<r2i::IEngine> engine (new MockEngine);
-
-  error.Clean ();
   params.Configure (engine, nullptr, error);
-
   LONGS_EQUAL (r2i::RuntimeError::Code::NULL_PARAMETER, error.code);
 }
