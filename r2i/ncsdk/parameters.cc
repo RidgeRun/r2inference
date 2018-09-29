@@ -17,9 +17,15 @@ namespace ncsdk {
 void Parameters::Configure (std::shared_ptr<r2i::IEngine> in_engine,
                             std::shared_ptr<r2i::IModel> in_model,
                             RuntimeError &error) {
+  error.Clean ();
 
   if (nullptr == in_engine) {
     error.Set (RuntimeError::Code::NULL_PARAMETER, "Received null engine");
+    return;
+  }
+
+  if (nullptr == in_model) {
+    error.Set (RuntimeError::Code::NULL_PARAMETER, "Received null model");
     return;
   }
 }
