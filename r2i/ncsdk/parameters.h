@@ -36,7 +36,7 @@ class Parameters : public IParameters {
   virtual void Set (const std::string in_parameter, const std::string &in_value,
                     RuntimeError &error ) override;
 
-  virtual void Set (const std::string in_parameter, int in_value,
+  virtual void Set (const std::string &in_parameter, int in_value,
                     RuntimeError &error ) override;
 
  private:
