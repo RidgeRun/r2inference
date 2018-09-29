@@ -37,6 +37,7 @@ TEST_GROUP (NcsdkParameters) {
   std::shared_ptr<r2i::IModel> model;
 
   void setup () {
+    error.Set (r2i::RuntimeError::Code::NULL_PARAMETER, "");
     engine = std::make_shared<MockEngine> ();
     model = std::make_shared<MockModel> ();
   }
@@ -58,4 +59,22 @@ TEST (NcsdkParameters, ConfigureNullEngine) {
 TEST (NcsdkParameters, ConfigureNullModel) {
   params.Configure (engine, nullptr, error);
   LONGS_EQUAL (r2i::RuntimeError::Code::NULL_PARAMETER, error.code);
+}
+
+TEST (NcsdkParameters, ConfigureGetNullEngine) {
+  std::shared_ptr<r2i::IEngine> totest;
+
+  totest = params.GetEngine (error);
+  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.code);
+
+  CHECK (nullptr == totest);
+}
+
+TEST (NcsdkParameters, ConfigureGetNullModel) {
+  std::shared_ptr<r2i::IModel> totest;
+
+  totest = params.GetModel (error);
+  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.code);
+
+  CHECK (nullptr == totest);
 }

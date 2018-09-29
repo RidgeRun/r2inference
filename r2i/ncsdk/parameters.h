@@ -23,6 +23,10 @@ class Parameters : public IParameters {
                           std::shared_ptr<r2i::IModel> in_model,
                           RuntimeError &error) override;
 
+  virtual std::shared_ptr<r2i::IEngine> GetEngine (RuntimeError &error) override;
+
+  virtual std::shared_ptr<r2i::IModel> GetModel (RuntimeError &error) override;
+
   virtual void Get (const std::string in_parameter, int &value,
                     r2i::RuntimeError &error ) override;
 
@@ -34,6 +38,10 @@ class Parameters : public IParameters {
 
   virtual void Set (const std::string in_parameter, int in_value,
                     RuntimeError &error ) override;
+
+ private:
+  std::shared_ptr<IEngine> engine;
+  std::shared_ptr<IModel> model;
 };
 
 } // namespace ncsdk

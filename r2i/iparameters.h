@@ -43,6 +43,20 @@ class IParameters {
                           RuntimeError &error ) = 0;
 
   /**
+   * \brief Gets the IEngine currently configured, if any.
+   * \param error [out] RuntimeError with a description of an error.
+   * \return A shared pointer to the engine currently configured.
+   */
+  virtual std::shared_ptr<r2i::IEngine> GetEngine (RuntimeError &error ) = 0;
+
+  /**
+   * \brief Gets the IModel currently configured, if any.
+   * \param error [out] RuntimeError with a description of an error.
+   * \return A shared pointer to the model currently configured.
+   */
+  virtual std::shared_ptr<r2i::IModel> GetModel (RuntimeError &error ) = 0;
+
+  /**
    * \brief Queries an integer parameter.
    * \param in_parameter Name of the parameter to get a value
    * \param value [out] Return value of the parameter to query
