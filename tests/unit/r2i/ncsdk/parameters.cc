@@ -10,6 +10,7 @@
 */
 
 #include <CppUTest/TestHarness.h>
+#include <mvnc.h>
 #include <r2i/r2i.h>
 #include <r2i/ncsdk/parameters.h>
 
@@ -30,6 +31,25 @@ class MockEngine : public r2i::IEngine {
 class MockModel : public r2i::IModel {
 };
 
+/* Stubs for MVNC */
+int stubint = -1;
+bool shoulderror = false;
+ncStatus_t ncGlobalSetOption(int option, const void *data,
+                             unsigned int dataLength) {
+  switch (option) {
+    case (NC_RW_LOG_LEVEL): {
+      stubint = *((int *)data);
+      LONGS_EQUAL (sizeof (int), dataLength);
+      break;
+    }
+    default: {
+      FAIL ("Unkown flag");
+    }
+  }
+
+  return shoulderror ? NC_INVALID_PARAMETERS : NC_OK;
+}
+
 TEST_GROUP (NcsdkParameters) {
   r2i::RuntimeError error;
   r2i::ncsdk::Parameters params;
@@ -37,6 +57,8 @@ TEST_GROUP (NcsdkParameters) {
   std::shared_ptr<r2i::IModel> model;
 
   void setup () {
+    stubint = -1;
+    shoulderror = false;
     error.Set (r2i::RuntimeError::Code::NULL_PARAMETER, "");
     engine = std::make_shared<MockEngine> ();
     model = std::make_shared<MockModel> ();
@@ -93,4 +115,28 @@ TEST (NcsdkParameters, ConfigureGetEngineModel) {
   modeltotest = params.GetModel (error);
   LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.code);
   POINTERS_EQUAL (model.get(), modeltotest.get());
+}
+
+TEST (NcsdkParameters, SetGlobalInt) {
+  int expected = 2;
+
+  params.Set ("log-level", expected, error);
+  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.code);
+
+  LONGS_EQUAL (expected, stubint);
+}
+
+TEST (NcsdkParameters, SetGlobalIntNotFound) {
+  params.Set ("not-found", 0, error);
+  LONGS_EQUAL (r2i::RuntimeError::Code::INVALID_FRAMEWORK_PARAMETER, error.code);
+
+  // Test that stub is not called
+  LONGS_EQUAL (-1, stubint);
+}
+
+TEST (NcsdkParameters, SetGlobalIntError) {
+  shoulderror = true;
+
+  params.Set ("log-level", 0, error);
+  LONGS_EQUAL (r2i::RuntimeError::Code::INVALID_FRAMEWORK_PARAMETER, error.code);
 }

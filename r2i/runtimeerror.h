@@ -39,6 +39,16 @@ class RuntimeError {
      * A mandatory parameter was passed in as null
      */
     NULL_PARAMETER,
+
+    /**
+     * Trying to access an invalid framework parameter
+     */
+    INVALID_FRAMEWORK_PARAMETER,
+
+    /**
+     * An unknown error has ocurred
+     */
+    UNKNOWN_ERROR,
   };
 
   /**

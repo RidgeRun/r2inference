@@ -14,7 +14,8 @@ noinst_LTLIBRARIES = libncsdk.la
 ncsdkincludedir = $(includedir)/r2inference-$(RR_PACKAGE_VERSION)/r2i/ncsdk
 
 libncsdk_la_SOURCES =			\
-	parameters.cc
+	parameters.cc			\
+	statuscodes.cc
 
 libncsdk_la_CPPFLAGS = 			\
 	$(RR_CPPFLAGS)			\

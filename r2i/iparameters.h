@@ -89,7 +89,7 @@ class IParameters {
    * \param in_value New value to set for in_parameter
    * \param error [out] RuntimeError with a description of an error.
    */
-  virtual void Set (const std::string in_parameter, int in_value,
+  virtual void Set (const std::string &in_parameter, int in_value,
                     RuntimeError &error ) = 0;
 };
 
