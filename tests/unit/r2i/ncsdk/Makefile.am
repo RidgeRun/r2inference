@@ -43,8 +43,6 @@ AM_LDFLAGS=				\
 
 tests_SOURCES =				\
 	tests.cc 			\
-	r2i.cc
+	parameters.cc
 
 CLEANFILES = cpputest_*.xml
-
-SUBDIRS = ncsdk

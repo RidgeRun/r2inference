@@ -38,8 +38,8 @@ class IParameters {
    * \param in_model IModel compatible with the IFrameworkFactory.
    * \param error [out] RuntimeError with a description of an error.
    */
-  virtual void Configure (std::unique_ptr<r2i::IEngine> in_engine,
-                          std::unique_ptr<r2i::IModel> in_model,
+  virtual void Configure (std::shared_ptr<r2i::IEngine> in_engine,
+                          std::shared_ptr<r2i::IModel> in_model,
                           RuntimeError &error ) = 0;
 
   /**
