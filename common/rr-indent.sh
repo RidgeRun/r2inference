@@ -9,7 +9,7 @@
 # a software license from RidgeRun.  All source code changes must be provided
 # back to RidgeRun without any encumbrance.
 
-common/config.sh
+. common/config.sh
 LOGGER_PROJECT_TAG="INDENT"; . common/logger.sh
 
 # Used for configurable pattern matching
