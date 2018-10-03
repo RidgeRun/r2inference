@@ -12,7 +12,7 @@
 #ifndef R2I_IPREDICTION_H
 #define R2I_IPREDICTION_H
 
-#include <r2i/runtime_error.h>
+#include <r2i/runtimeerror.h>
 
 /**
  * R2Inference Namespace

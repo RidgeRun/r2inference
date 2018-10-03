@@ -15,7 +15,7 @@
 #include <r2i/iframe.h>
 #include <r2i/imodel.h>
 #include <r2i/iprediction.h>
-#include <r2i/runtime_error.h>
+#include <r2i/runtimeerror.h>
 
 #include <memory>
 #include <string>
