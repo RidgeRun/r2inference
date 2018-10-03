@@ -24,16 +24,14 @@
 /**
  * R2Inference Namespace
  */
-namespace r2i
-{
+namespace r2i {
 /**
  *  Implements the interface to abstract factory to create framework related
  * objects.
  */
-class IFrameworkFactory
-{
+class IFrameworkFactory {
 
-public:
+ public:
   /**
    * \brief Creates an ILoader based on a particular Framework
    * \param error [out] RuntimeError with a description of an error.

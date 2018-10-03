@@ -15,13 +15,11 @@
 /**
  * R2Inference Namespace
  */
-namespace r2i
-{
+namespace r2i {
 /**
  * Implements the interface to abstract a framework model
  */
-class IModel
-{
+class IModel {
 
 };
 

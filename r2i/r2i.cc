@@ -12,6 +12,5 @@
 #include "r2i.h"
 
 void
-r2i::init ()
-{
+r2i::init () {
 }

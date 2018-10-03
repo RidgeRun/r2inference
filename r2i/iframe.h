@@ -15,14 +15,12 @@
 /**
  * R2Inference Namespace
  */
-namespace r2i
-{
+namespace r2i {
 /**
  * Implements the interface to abstract the input data to evaluate
  * using an IModel.
  */
-class IFrame
-{
+class IFrame {
 
 };
 

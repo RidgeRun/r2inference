@@ -18,8 +18,7 @@
 #include <r2i/iparameters.h>
 #include <r2i/iprediction.h>
 
-namespace r2i
-{
+namespace r2i {
 
 void init ();
 

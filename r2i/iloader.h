@@ -21,16 +21,14 @@
 /**
  * R2Inference Namespace
  */
-namespace r2i
-{
+namespace r2i {
 /**
  *  Implements the interface to validate a IModel implementation
  *  for an IEngine implementation
  */
-class ILoader
-{
+class ILoader {
 
-public:
+ public:
   /**
    * \brief Checks consistency of a trained model.
    * \param in_path A string of the absolute path to a model for evaluation.
@@ -38,7 +36,7 @@ public:
    * \return A validated IModel for an IEngine or nullptr in case of error.
    */
   virtual std::unique_ptr<r2i::IModel> Load (const std::string &in_path,
-    r2i::RuntimeError &error) = 0;
+      r2i::RuntimeError &error) = 0;
 };
 
 }

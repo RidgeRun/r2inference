@@ -17,15 +17,13 @@
 /**
  * R2Inference Namespace
  */
-namespace r2i
-{
+namespace r2i {
 /**
  *  Implements the error handling class for r2i library.
  */
-class RuntimeError
-{
+class RuntimeError {
 
-public:
+ public:
   /**
    * \brief Cleans the RuntimeError result from any previous operation.
    */

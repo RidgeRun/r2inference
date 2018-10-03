@@ -17,15 +17,13 @@
 /**
  * R2Inference Namespace
  */
-namespace r2i
-{
+namespace r2i {
 /**
  * Implements the placeholder for framework information.
  */
-class FrameworkMeta
-{
+class FrameworkMeta {
 
-public:
+ public:
   /**
    * A string to identify the name of the framework
    */

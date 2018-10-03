@@ -17,16 +17,14 @@
 /**
  * R2Inference Namespace
  */
-namespace r2i
-{
+namespace r2i {
 /**
  * Implements the interface to abstract the result of evaluation
  * an IFrame on an IModel.
  */
 
-class IPrediction
-{
-public:
+class IPrediction {
+ public:
   /**
    * \brief Gets the prediction for a particular index.
    * \param index Index for a value on the prediction matrix.

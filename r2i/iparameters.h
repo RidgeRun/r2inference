@@ -22,18 +22,16 @@
 /**
  * R2Inference Namespace
  */
-namespace r2i
-{
+namespace r2i {
 /**
  *  Implements the interface to abstract IFrameworkFactory parameters. This
  *  interface can be use to set and get parameters available in a framework
  *  factory.
  */
 
-class IParameters
-{
+class IParameters {
 
-public:
+ public:
   /**
    * \brief Sets an IEngine and IModel as targets for the parameters accessors.
    * \param in_engine IEngine available for a IFrameworkFactory.
@@ -41,8 +39,8 @@ public:
    * \param error [out] RuntimeError with a description of an error.
    */
   virtual void Configure (std::unique_ptr<r2i::IEngine> in_engine,
-    std::unique_ptr<r2i::IModel> in_model,
-    RuntimeError &error ) = 0;
+                          std::unique_ptr<r2i::IModel> in_model,
+                          RuntimeError &error ) = 0;
 
   /**
    * \brief Queries an integer parameter.
@@ -51,7 +49,7 @@ public:
    * \param error [out] RuntimeError with a description of an error.
    */
   virtual void Get (const std::string in_parameter, int &value,
-    r2i::RuntimeError &error ) = 0;
+                    r2i::RuntimeError &error ) = 0;
 
   /**
    * \brief Queries a string parameter.
@@ -60,7 +58,7 @@ public:
    * \param error [out] RuntimeError with a description of an error.
    */
   virtual void Get (const std::string in_parameter, const std::string &value,
-    r2i::RuntimeError &error ) = 0;
+                    r2i::RuntimeError &error ) = 0;
 
   /**
    * \brief Sets a string parameter.
@@ -69,7 +67,7 @@ public:
    * \param error [out] RuntimeError with a description of an error.
    */
   virtual void Set (const std::string in_parameter, const std::string &in_value,
-    RuntimeError &error ) = 0;
+                    RuntimeError &error ) = 0;
 
   /**
    * \brief Sets an integer parameter.
@@ -78,7 +76,7 @@ public:
    * \param error [out] RuntimeError with a description of an error.
    */
   virtual void Set (const std::string in_parameter, int in_value,
-    RuntimeError &error ) = 0;
+                    RuntimeError &error ) = 0;
 };
 
 }
