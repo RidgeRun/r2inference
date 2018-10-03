@@ -22,7 +22,7 @@ endif
 LOG_DRIVER=$(top_builddir)/common/rr-test-driver.py $(SINGLE_PROCESS)
 
 AM_CXXFLAGS = 				\
-	$(RR_CFLAGS)			\
+	$(RR_CXXFLAGS)			\
 	$(TESTS_CFLAGS) 		\
 	$(CODE_COVERAGE_CXXFLAGS)
 
