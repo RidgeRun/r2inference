@@ -60,7 +60,17 @@ get_parameters_from_profile()
 
     case $profile in
 	google)
-        echo "--style=google "
+        echo " \
+        --style=google \
+        -s2 \
+        -xG \
+        -S \
+        -O \
+        -o \
+        -k3 \
+        -H \
+        -p \
+        --max-code-length=80 "
 	;;
 
 	gstreamer)
