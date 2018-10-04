@@ -88,7 +88,7 @@ AM_CONDITIONAL([HAVE_$1], [test x$HAVE_[$1] = xyes])
 AC_DEFUN([RR_OUTPUT_FEATURES], [
 
 
-if test x$RR_FEATURES_SELECTED = x; then
+if test "x$RR_FEATURES_SELECTED" = "x"; then
 	printf "configure: *** Please select the features to use with at least one of the following options:\n"
 	( for i in $RR_FEATURES_ENABLE; do printf '\t'$i'\n'; done ) | sort
 	AC_MSG_ERROR(No features selected)
