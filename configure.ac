@@ -42,6 +42,10 @@ AC_CONFIG_MACRO_DIRS([m4 common/m4])
 # Generate a header with useful definitions
 AC_CONFIG_HEADER([config.h])
 
+# Check for NCSDK
+RR_CHECK_FEATURE_LIB(NCSDK, NCSDK Installation,
+                      mvnc, ncGlobalSetOption, mvnc.h,  yes)
+
 # Output files, please keep in alphabetical order
 AC_CONFIG_FILES([
 Makefile
@@ -60,3 +64,4 @@ tests/unit/r2i/ncsdk/Makefile
 
 AC_OUTPUT
 
+RR_OUTPUT_FEATURES([R2Inference])
