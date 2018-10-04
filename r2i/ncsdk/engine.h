@@ -12,31 +12,39 @@
 #ifndef R2I_NCSDK_ENGINE_H
 #define R2I_NCSDK_ENGINE_H
 
-#include <functional>
-#include <string>
-#include <unordered_map>
-
 #include <r2i/iengine.h>
 
-namespace r2i {
-namespace ncsdk {
+namespace r2i
+{
+namespace ncsdk
+{
 
-class Engine : public IEngine {
- public:
-  void SetModel (const r2i::IModel &in_model,
-                 r2i::RuntimeError &error) {}
+class Engine : public IEngine
+{
+public:
 
-  void Start (r2i::RuntimeError &error) {}
+  virtual void SetModel (std::shared_ptr<r2i::IModel> in_model,
+    r2i::RuntimeError &error) override;
 
-  void Stop (r2i::RuntimeError &error) {}
+  virtual void Start (r2i::RuntimeError &error) override;
 
-  std::unique_ptr<r2i::IPrediction> Predict (const r2i::IFrame &in_frame,
-      r2i::RuntimeError &error) {
-    return nullptr;
-  }
+  virtual void Stop (r2i::RuntimeError &error) override;
+
+  virtual std::unique_ptr<r2i::IPrediction> Predict (std::shared_ptr<r2i::IFrame>
+    in_frame, r2i::RuntimeError &error) override;
+
+private:
+  std::shared_ptr<r2i::IModel> model;
+  std::shared_ptr<struct ncDeviceHandle_t> movidius_device;
+  std::shared_ptr<struct ncGraphHandle_t> model_handle;
+  std::shared_ptr<struct ncFifoHandle_t> input_buffers;
+  std::shared_ptr<struct ncFifoHandle_t>  output_buffers;
+  struct ncTensorDescriptor_t input_descriptor;
+  struct ncTensorDescriptor_t output_descriptor;
+
+
 };
 
-} // namespace ncsdk
-} // namespace r2i
-
+}
+}
 #endif //R2I_NCSDK_ENGINE_H

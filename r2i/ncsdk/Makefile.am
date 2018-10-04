@@ -39,5 +39,6 @@ libncsdk_la_LIBADD = 			\
 ncsdkinclude_HEADERS =			\
 	parameters.h			\
 	model.h				\
-	loader.h
+	loader.h			\
+	engine.h
 

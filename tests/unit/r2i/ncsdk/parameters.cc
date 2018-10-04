@@ -18,14 +18,14 @@
 #include <CppUTest/TestHarness.h>
 
 class MockEngine : public r2i::IEngine {
-  void SetModel (const r2i::IModel &in_model,
+  void SetModel (std::shared_ptr<r2i::IModel>,
                  r2i::RuntimeError &error) override {}
 
   void Start (r2i::RuntimeError &error) override {}
 
   void Stop (r2i::RuntimeError &error) override {}
 
-  std::unique_ptr<r2i::IPrediction> Predict (const r2i::IFrame &in_frame,
+  std::unique_ptr<r2i::IPrediction> Predict (std::shared_ptr<r2i::IFrame>,
       r2i::RuntimeError &error) override {
     return nullptr;
   }
