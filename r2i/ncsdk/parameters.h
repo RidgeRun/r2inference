@@ -12,6 +12,9 @@
 #ifndef R2I_NCSDK_PARAMETERS_H
 #define R2I_NCSDK_PARAMETERS_H
 
+#include <string>
+#include <unordered_map>
+
 #include <r2i/iparameters.h>
 
 namespace r2i {
@@ -26,12 +29,12 @@ class Parameters : public IParameters {
 
   std::shared_ptr<r2i::IModel> GetModel ( ) override;
 
-  RuntimeError Get (const std::string in_parameter, int &value) override;
+  RuntimeError Get (const std::string &in_parameter, int &value) override;
 
-  RuntimeError Get (const std::string in_parameter,
-                    const std::string &value) override;
+  RuntimeError Get (const std::string &in_parameter,
+                    std::string &value) override;
 
-  RuntimeError Set (const std::string in_parameter,
+  RuntimeError Set (const std::string &in_parameter,
                     const std::string &in_value) override;
 
   RuntimeError Set (const std::string &in_parameter, int in_value) override;
@@ -39,6 +42,12 @@ class Parameters : public IParameters {
  private:
   std::shared_ptr<IEngine> engine;
   std::shared_ptr<IModel> model;
+
+  RuntimeError SetParameter (const std::unordered_map<std::string, int> &map,
+                             const std::string &in_parameter,
+                             const std::string &type,
+                             const void *target,
+                             unsigned int target_size);
 };
 
 } // namespace ncsdk

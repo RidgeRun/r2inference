@@ -9,8 +9,8 @@
  * back to RidgeRun without any encumbrance.
 */
 
+#include <functional>
 #include <mvnc.h>
-#include <unordered_map>
 
 #include "r2i/ncsdk/parameters.h"
 #include "r2i/ncsdk/statuscodes.h"
@@ -21,6 +21,9 @@ namespace ncsdk {
 static const std::unordered_map<std::string, int> parameter_int_map ({
   {"log-level", NC_RW_LOG_LEVEL},
   {"api-version", NC_RO_API_VERSION},
+});
+
+static const std::unordered_map<std::string, int> parameter_string_map ({
 });
 
 RuntimeError Parameters::Configure (std::shared_ptr<r2i::IEngine> in_engine,
@@ -52,39 +55,49 @@ std::shared_ptr<r2i::IModel> Parameters::GetModel () {
   return this->model;
 }
 
-RuntimeError Parameters::Get (const std::string in_parameter, int &value) {
+RuntimeError Parameters::Get (const std::string &in_parameter, int &value) {
   RuntimeError error;
 
   return error;
 }
 
-RuntimeError Parameters::Get (const std::string in_parameter,
-                              const std::string &value) {
+RuntimeError Parameters::Get (const std::string &in_parameter,
+                              std::string &value) {
   RuntimeError error;
 
   return error;
 }
 
-RuntimeError Parameters::Set (const std::string in_parameter,
+
+
+RuntimeError Parameters::Set (const std::string &in_parameter,
                               const std::string &in_value) {
-  RuntimeError error;
-
-  return error;
+  return this->SetParameter (parameter_string_map, in_parameter, "string",
+                             in_value.c_str(), in_value.size() + 1);
 }
 
 RuntimeError Parameters::Set (const std::string &in_parameter, int in_value) {
+  return this->SetParameter (parameter_int_map, in_parameter, "int", &in_value,
+                             sizeof (in_value));
+}
+
+RuntimeError Parameters::SetParameter (const
+                                       std::unordered_map<std::string, int> &map,
+                                       const std::string &in_parameter,
+                                       const std::string &type,
+                                       const void *target,
+                                       unsigned int target_size) {
   RuntimeError error;
 
-  auto search = parameter_int_map.find (in_parameter);
+  auto search = map.find (in_parameter);
 
-  if (parameter_int_map.end () == search) {
+  if (map.end () == search) {
     error.Set (RuntimeError::Code::INVALID_FRAMEWORK_PARAMETER, "Parameter \""
-               + in_parameter + "\" does not exist or is not of integer type");
+               + in_parameter + "\" does not exist or is not of " + type + " type");
     return error;
   }
 
-  ncStatus_t ret = ncGlobalSetOption(search->second, &in_value,
-                                     sizeof (in_value));
+  ncStatus_t ret = ncGlobalSetOption (search->second, target, target_size);
   if (NC_OK != ret) {
     error.Set (RuntimeError::Code::INVALID_FRAMEWORK_PARAMETER,
                GetStringFromStatus (ret, error));

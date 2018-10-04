@@ -59,7 +59,7 @@ class IParameters {
    * \param value [out] Return value of the parameter to query
    * \return RuntimeError with a description of an error.
    */
-  virtual RuntimeError Get (const std::string in_parameter, int &value) = 0;
+  virtual RuntimeError Get (const std::string &in_parameter, int &value) = 0;
 
   /**
    * \brief Queries a string parameter.
@@ -67,8 +67,8 @@ class IParameters {
    * \param value [out] Return value of the parameter to query
    * \return RuntimeError with a description of an error.
    */
-  virtual RuntimeError Get (const std::string in_parameter,
-                            const std::string &value) = 0;
+  virtual RuntimeError Get (const std::string &in_parameter,
+                            std::string &value) = 0;
 
   /**
    * \brief Sets a string parameter.
@@ -76,7 +76,7 @@ class IParameters {
    * \param in_value New value to set for in_parameter
    * \return RuntimeError with a description of an error.
    */
-  virtual RuntimeError Set (const std::string in_parameter,
+  virtual RuntimeError Set (const std::string &in_parameter,
                             const std::string &in_value) = 0;
 
   /**
