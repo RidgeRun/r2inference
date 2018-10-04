@@ -15,6 +15,7 @@ ncsdkincludedir = $(includedir)/r2inference-$(RR_PACKAGE_VERSION)/r2i/ncsdk
 
 libncsdk_la_SOURCES =			\
 	parameters.cc			\
+	model.cc			\
 	statuscodes.cc
 
 libncsdk_la_CPPFLAGS = 			\
@@ -31,7 +32,10 @@ libncsdk_la_CXXFLAGS = 			\
 
 libncsdk_la_LIBADD = 			\
 	$(RR_LIBS)			\
+	$(NCSDK_LIBS)			\
 	$(CODE_COVERAGE_LIBS)
 
-ncsdkinclude_HEADERS = parameters.h
+ncsdkinclude_HEADERS =			\
+	parameters.h			\
+	model.h
 
