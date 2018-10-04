@@ -12,6 +12,7 @@
 #ifndef R2I_NCSDK_PARAMETERS_H
 #define R2I_NCSDK_PARAMETERS_H
 
+#include <functional>
 #include <string>
 #include <unordered_map>
 
@@ -48,6 +49,23 @@ class Parameters : public IParameters {
                              const std::string &type,
                              const void *target,
                              unsigned int target_size);
+
+  RuntimeError GetParameter (const std::unordered_map<std::string, int> &map,
+                             const std::string &in_parameter,
+                             const std::string &type,
+                             void *target,
+                             unsigned int *target_size);
+
+  typedef std::function<ncStatus_t(int param, void *target, unsigned int *target_size)>
+  param_apply;
+
+  RuntimeError InteractWithParameter (const
+                                      std::unordered_map<std::string, int> &map,
+                                      const std::string &in_parameter,
+                                      const std::string &type,
+                                      void *target,
+                                      unsigned int *target_size,
+                                      param_apply apply);
 };
 
 } // namespace ncsdk

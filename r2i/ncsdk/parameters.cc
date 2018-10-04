@@ -9,7 +9,8 @@
  * back to RidgeRun without any encumbrance.
 */
 
-#include <functional>
+#include <cstring>
+#include <memory>
 #include <mvnc.h>
 
 #include "r2i/ncsdk/parameters.h"
@@ -24,6 +25,7 @@ static const std::unordered_map<std::string, int> parameter_int_map ({
 });
 
 static const std::unordered_map<std::string, int> parameter_string_map ({
+  {"mock-param", -1}, //For testing purposes
 });
 
 RuntimeError Parameters::Configure (std::shared_ptr<r2i::IEngine> in_engine,
@@ -56,19 +58,20 @@ std::shared_ptr<r2i::IModel> Parameters::GetModel () {
 }
 
 RuntimeError Parameters::Get (const std::string &in_parameter, int &value) {
-  RuntimeError error;
+  unsigned int value_size = sizeof (value);
 
-  return error;
+  return this->GetParameter (parameter_int_map, in_parameter, "int", &value,
+                             &value_size);
 }
 
 RuntimeError Parameters::Get (const std::string &in_parameter,
                               std::string &value) {
-  RuntimeError error;
+  unsigned int value_size = value.size();
 
-  return error;
+  return this->GetParameter (parameter_string_map, in_parameter, "int",
+                             &(value[0]),
+                             &value_size);
 }
-
-
 
 RuntimeError Parameters::Set (const std::string &in_parameter,
                               const std::string &in_value) {
@@ -81,12 +84,10 @@ RuntimeError Parameters::Set (const std::string &in_parameter, int in_value) {
                              sizeof (in_value));
 }
 
-RuntimeError Parameters::SetParameter (const
-                                       std::unordered_map<std::string, int> &map,
-                                       const std::string &in_parameter,
-                                       const std::string &type,
-                                       const void *target,
-                                       unsigned int target_size) {
+RuntimeError Parameters::InteractWithParameter (const
+    std::unordered_map<std::string, int> &map, const std::string &in_parameter,
+    const std::string &type, void *target, unsigned int *target_size,
+    param_apply apply) {
   RuntimeError error;
 
   auto search = map.find (in_parameter);
@@ -97,13 +98,46 @@ RuntimeError Parameters::SetParameter (const
     return error;
   }
 
-  ncStatus_t ret = ncGlobalSetOption (search->second, target, target_size);
+  ncStatus_t ret = apply (search->second, target, target_size);
   if (NC_OK != ret) {
     error.Set (RuntimeError::Code::INVALID_FRAMEWORK_PARAMETER,
                GetStringFromStatus (ret, error));
   }
 
   return error;
+}
+
+RuntimeError Parameters::SetParameter (const
+                                       std::unordered_map<std::string, int> &map,
+                                       const std::string &in_parameter,
+                                       const std::string &type,
+                                       const void *target, unsigned int
+                                       target_size) {
+
+  param_apply apply = [] (int param, void *target,
+  unsigned int *target_size) -> ncStatus_t {
+    return ncGlobalSetOption (param, target, *target_size);
+  };
+
+  /* Allow this const cast-away to favor code reusability, we are the
+     only ones who interact with target in the provided lambda
+  */
+  return this->InteractWithParameter (map, in_parameter, type,
+                                      const_cast<void *> (target), &target_size, apply);
+}
+
+RuntimeError Parameters::GetParameter (const
+                                       std::unordered_map<std::string, int> &map,
+                                       const std::string &in_parameter,
+                                       const std::string &type, void *target,
+                                       unsigned int *target_size) {
+  param_apply apply = [] (int param, void *target,
+  unsigned int *target_size) -> ncStatus_t {
+    return ncGlobalGetOption (param, target, target_size);
+  };
+
+  return this->InteractWithParameter (map, in_parameter, type, target,
+                                      target_size, apply);
 }
 
 }
