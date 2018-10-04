@@ -25,7 +25,7 @@ AC_DEFUN([RR_ENABLE_TESTS],[
 
   AS_IF([test "x$enable_tests" != "xno"],[
     PKG_CHECK_MODULES([CPPUTEST],[cpputest],[
-      AC_SUBST(CPPUTEST_CFLAGS, ["-include CppUTest/MemoryLeakDetectorNewMacros.h"])
+      AC_SUBST(CPPUTEST_CFLAGS)
       AC_SUBST(CPPUTEST_LIBS)
     ],[
     AC_MSG_ERROR([ 

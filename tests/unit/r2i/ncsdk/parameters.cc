@@ -9,10 +9,12 @@
  * back to RidgeRun without any encumbrance.
 */
 
-#include <CppUTest/TestHarness.h>
 #include <mvnc.h>
 #include <r2i/r2i.h>
 #include <r2i/ncsdk/parameters.h>
+
+#include <CppUTest/MemoryLeakDetectorNewMacros.h>
+#include <CppUTest/TestHarness.h>
 
 class MockEngine : public r2i::IEngine {
   void SetModel (const r2i::IModel &in_model,
