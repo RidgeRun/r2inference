@@ -36,61 +36,56 @@ class IParameters {
    * \brief Sets an IEngine and IModel as targets for the parameters accessors.
    * \param in_engine IEngine available for a IFrameworkFactory.
    * \param in_model IModel compatible with the IFrameworkFactory.
-   * \param error [out] RuntimeError with a description of an error.
+   * \return RuntimeError with a description of an error.
    */
-  virtual void Configure (std::shared_ptr<r2i::IEngine> in_engine,
-                          std::shared_ptr<r2i::IModel> in_model,
-                          RuntimeError &error ) = 0;
+  virtual RuntimeError Configure (std::shared_ptr<r2i::IEngine> in_engine,
+                                  std::shared_ptr<r2i::IModel> in_model) = 0;
 
   /**
    * \brief Gets the IEngine currently configured, if any.
-   * \param error [out] RuntimeError with a description of an error.
    * \return A shared pointer to the engine currently configured.
    */
-  virtual std::shared_ptr<r2i::IEngine> GetEngine (RuntimeError &error ) = 0;
+  virtual std::shared_ptr<r2i::IEngine> GetEngine () = 0;
 
   /**
    * \brief Gets the IModel currently configured, if any.
-   * \param error [out] RuntimeError with a description of an error.
    * \return A shared pointer to the model currently configured.
    */
-  virtual std::shared_ptr<r2i::IModel> GetModel (RuntimeError &error ) = 0;
+  virtual std::shared_ptr<r2i::IModel> GetModel ( ) = 0;
 
   /**
    * \brief Queries an integer parameter.
    * \param in_parameter Name of the parameter to get a value
    * \param value [out] Return value of the parameter to query
-   * \param error [out] RuntimeError with a description of an error.
+   * \return RuntimeError with a description of an error.
    */
-  virtual void Get (const std::string in_parameter, int &value,
-                    r2i::RuntimeError &error ) = 0;
+  virtual RuntimeError Get (const std::string in_parameter, int &value) = 0;
 
   /**
    * \brief Queries a string parameter.
    * \param in_parameter Name of the parameter to get a value
    * \param value [out] Return value of the parameter to query
-   * \param error [out] RuntimeError with a description of an error.
+   * \return RuntimeError with a description of an error.
    */
-  virtual void Get (const std::string in_parameter, const std::string &value,
-                    r2i::RuntimeError &error ) = 0;
+  virtual RuntimeError Get (const std::string in_parameter,
+                            const std::string &value) = 0;
 
   /**
    * \brief Sets a string parameter.
    * \param in_parameter  Name of the parameter to set a value
    * \param in_value New value to set for in_parameter
-   * \param error [out] RuntimeError with a description of an error.
+   * \return RuntimeError with a description of an error.
    */
-  virtual void Set (const std::string in_parameter, const std::string &in_value,
-                    RuntimeError &error ) = 0;
+  virtual RuntimeError Set (const std::string in_parameter,
+                            const std::string &in_value) = 0;
 
   /**
    * \brief Sets an integer parameter.
    * \param in_parameter Name of the parameter to set a value
    * \param in_value New value to set for in_parameter
-   * \param error [out] RuntimeError with a description of an error.
+   * \return RuntimeError with a description of an error.
    */
-  virtual void Set (const std::string &in_parameter, int in_value,
-                    RuntimeError &error ) = 0;
+  virtual RuntimeError Set (const std::string &in_parameter, int in_value) = 0;
 };
 
 }

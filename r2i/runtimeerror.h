@@ -52,9 +52,22 @@ class RuntimeError {
   };
 
   /**
+   * \brief Creates a new error and initializes it to OK
+   */
+  RuntimeError ();
+
+  /**
+   * \brief Creates and initializes a new error.
+   *
+   * \param code The code to set in the error
+   * \param description A human readable description for the error
+   */
+  RuntimeError (Code code, const std::string &description);
+
+  /**
    * \brief Cleans the RuntimeError result from any previous operation.
    */
-  void Clean();
+  void Clean ();
 
   /**
    * \brief Configures an error with a given code and description
@@ -65,13 +78,17 @@ class RuntimeError {
   void Set (Code code, const std::string &description);
 
   /**
-  * A string with a description of the error.
-  */
-  std::string description;
+   * Returns a human readable description of the error
+   */
+  const std::string GetDescription ();
 
   /**
-  * A code for the error.
-  */
+   * Returns the code configured in the error
+   */
+  Code GetCode ();
+
+ private:
+  std::string description;
   Code code;
 };
 
