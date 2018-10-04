@@ -19,25 +19,22 @@ namespace ncsdk {
 
 class Parameters : public IParameters {
  public:
-  virtual void Configure (std::shared_ptr<r2i::IEngine> in_engine,
-                          std::shared_ptr<r2i::IModel> in_model,
-                          RuntimeError &error) override;
+  RuntimeError Configure (std::shared_ptr<r2i::IEngine> in_engine,
+                          std::shared_ptr<r2i::IModel> in_model) override;
 
-  virtual std::shared_ptr<r2i::IEngine> GetEngine (RuntimeError &error) override;
+  std::shared_ptr<r2i::IEngine> GetEngine () override;
 
-  virtual std::shared_ptr<r2i::IModel> GetModel (RuntimeError &error) override;
+  std::shared_ptr<r2i::IModel> GetModel ( ) override;
 
-  virtual void Get (const std::string in_parameter, int &value,
-                    r2i::RuntimeError &error ) override;
+  RuntimeError Get (const std::string in_parameter, int &value) override;
 
-  virtual void Get (const std::string in_parameter, const std::string &value,
-                    r2i::RuntimeError &error ) override;
+  RuntimeError Get (const std::string in_parameter,
+                    const std::string &value) override;
 
-  virtual void Set (const std::string in_parameter, const std::string &in_value,
-                    RuntimeError &error ) override;
+  RuntimeError Set (const std::string in_parameter,
+                    const std::string &in_value) override;
 
-  virtual void Set (const std::string &in_parameter, int in_value,
-                    RuntimeError &error ) override;
+  RuntimeError Set (const std::string &in_parameter, int in_value) override;
 
  private:
   std::shared_ptr<IEngine> engine;

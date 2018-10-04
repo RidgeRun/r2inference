@@ -51,7 +51,6 @@ ncStatus_t ncGlobalSetOption(int option, const void *data,
 }
 
 TEST_GROUP (NcsdkParameters) {
-  r2i::RuntimeError error;
   r2i::ncsdk::Parameters params;
   std::shared_ptr<r2i::IEngine> engine;
   std::shared_ptr<r2i::IModel> model;
@@ -59,7 +58,6 @@ TEST_GROUP (NcsdkParameters) {
   void setup () {
     stubint = -1;
     shoulderror = false;
-    error.Set (r2i::RuntimeError::Code::NULL_PARAMETER, "");
     engine = std::make_shared<MockEngine> ();
     model = std::make_shared<MockModel> ();
   }
@@ -69,74 +67,81 @@ TEST_GROUP (NcsdkParameters) {
 };
 
 TEST (NcsdkParameters, Configure) {
-  params.Configure (engine, model, error);
-  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.code);
+  r2i::RuntimeError error;
+
+  error = params.Configure (engine, model);
+  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
 }
 
 TEST (NcsdkParameters, ConfigureNullEngine) {
-  params.Configure (nullptr, model, error);
-  LONGS_EQUAL (r2i::RuntimeError::Code::NULL_PARAMETER, error.code);
+  r2i::RuntimeError error;
+
+  error = params.Configure (nullptr, model);
+  LONGS_EQUAL (r2i::RuntimeError::Code::NULL_PARAMETER, error.GetCode ());
 }
 
 TEST (NcsdkParameters, ConfigureNullModel) {
-  params.Configure (engine, nullptr, error);
-  LONGS_EQUAL (r2i::RuntimeError::Code::NULL_PARAMETER, error.code);
+  r2i::RuntimeError error;
+
+  error = params.Configure (engine, nullptr);
+  LONGS_EQUAL (r2i::RuntimeError::Code::NULL_PARAMETER, error.GetCode ());
 }
 
 TEST (NcsdkParameters, ConfigureGetNullEngine) {
   std::shared_ptr<r2i::IEngine> totest;
 
-  totest = params.GetEngine (error);
-  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.code);
-
+  totest = params.GetEngine ();
   POINTERS_EQUAL (nullptr, totest.get ());
 }
 
 TEST (NcsdkParameters, ConfigureGetNullModel) {
   std::shared_ptr<r2i::IModel> totest;
 
-  totest = params.GetModel (error);
-  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.code);
-
+  totest = params.GetModel ();
   POINTERS_EQUAL (nullptr, totest.get ());
 }
 
 TEST (NcsdkParameters, ConfigureGetEngineModel) {
+  r2i::RuntimeError error;
   std::shared_ptr<r2i::IEngine> enginetotest;
   std::shared_ptr<r2i::IModel> modeltotest;
 
-  params.Configure (engine, model, error);
-  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.code);
+  error = params.Configure (engine, model);
+  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
 
-  enginetotest = params.GetEngine (error);
-  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.code);
+  enginetotest = params.GetEngine ();
   POINTERS_EQUAL (engine.get(), enginetotest.get());
 
-  modeltotest = params.GetModel (error);
-  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.code);
+  modeltotest = params.GetModel ();
   POINTERS_EQUAL (model.get(), modeltotest.get());
 }
 
 TEST (NcsdkParameters, SetGlobalInt) {
+  r2i::RuntimeError error;
   int expected = 2;
 
-  params.Set ("log-level", expected, error);
-  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.code);
+  error = params.Set ("log-level", expected);
+  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
 
   LONGS_EQUAL (expected, stubint);
 }
 
 TEST (NcsdkParameters, SetGlobalIntNotFound) {
-  params.Set ("not-found", 0, error);
-  LONGS_EQUAL (r2i::RuntimeError::Code::INVALID_FRAMEWORK_PARAMETER, error.code);
+  r2i::RuntimeError error;
+
+  error = params.Set ("not-found", 0);
+  LONGS_EQUAL (r2i::RuntimeError::Code::INVALID_FRAMEWORK_PARAMETER,
+               error.GetCode ());
 
   // Test that stub is not called
   LONGS_EQUAL (-1, stubint);
 }
 
 TEST (NcsdkParameters, SetGlobalIntError) {
+  r2i::RuntimeError error;
   shoulderror = true;
 
-  params.Set ("log-level", 0, error);
-  LONGS_EQUAL (r2i::RuntimeError::Code::INVALID_FRAMEWORK_PARAMETER, error.code);
+  error = params.Set ("log-level", 0);
+  LONGS_EQUAL (r2i::RuntimeError::Code::INVALID_FRAMEWORK_PARAMETER,
+               error.GetCode ());
 }

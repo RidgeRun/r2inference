@@ -12,14 +12,31 @@
 #include "r2i/runtimeerror.h"
 
 namespace r2i {
+const std::string ok_string = "Everything went OK";
+
+RuntimeError::RuntimeError ()
+  : description(ok_string), code(Code::EOK) {
+}
+
+RuntimeError::RuntimeError (Code code, const std::string &description)
+  : description(description), code(code) {
+}
 
 void RuntimeError::Clean () {
-  this->Set (Code::EOK, "Everything OK");
+  this->Set (Code::EOK, ok_string);
 }
 
 void RuntimeError::Set (Code code, const std::string &description) {
   this->code = code;
   this->description = description;
+}
+
+const std::string RuntimeError::GetDescription () {
+  return this->description;
+}
+
+RuntimeError::Code RuntimeError::GetCode () {
+  return this->code;
 }
 
 }
