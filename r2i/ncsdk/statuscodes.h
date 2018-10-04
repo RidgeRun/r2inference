@@ -9,39 +9,21 @@
  * back to RidgeRun without any encumbrance.
 */
 
-#ifndef R2I_RUNTIMEERROR_H
-#define R2I_RUNTIMEERROR_H
+#ifndef R2I_NCSDK_STATUSCODES_H
+#define R2I_NCSDK_STATUSCODES_H
 
+#include <mvnc.h>
 #include <string>
 
-/**
- * R2Inference Namespace
- */
-namespace r2i
-{
-/**
- *  Implements the error handling class for r2i library.
- */
-class RuntimeError
-{
+#include <r2i/runtimeerror.h>
 
-public:
-  /**
-   * \brief Cleans the RuntimeError result from any previous operation.
-   */
-  void Clean();
+namespace r2i {
+namespace ncsdk {
 
-  /**
-  * A string with a description of the error.
-  */
-  const std::string description;
+const std::string GetStringFromStatus (ncStatus_t status,
+                                       r2i::RuntimeError &error);
 
-  /**
-  * A code for the error.
-  */
-  int code;
-};
+} // namespace ncsdk
+} // namespace r2k
 
-}
-
-#endif // R2I_RUNTIMEERROR_H
+#endif //R2I_NCSDK_STATUSCODES_H

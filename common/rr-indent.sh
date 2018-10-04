@@ -9,7 +9,7 @@
 # a software license from RidgeRun.  All source code changes must be provided
 # back to RidgeRun without any encumbrance.
 
-common/config.sh
+. common/config.sh
 LOGGER_PROJECT_TAG="INDENT"; . common/logger.sh
 
 # Used for configurable pattern matching
@@ -60,7 +60,17 @@ get_parameters_from_profile()
 
     case $profile in
 	google)
-        echo "--style=google "
+        echo " \
+        --style=google \
+        -s2 \
+        -xG \
+        -S \
+        -O \
+        -o \
+        -k3 \
+        -H \
+        -p \
+        --max-code-length=80 "
 	;;
 
 	gstreamer)
