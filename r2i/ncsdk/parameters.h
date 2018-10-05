@@ -17,6 +17,7 @@
 #include <unordered_map>
 
 #include <r2i/iparameters.h>
+#include <r2i/ncsdk/engine.h>
 
 namespace r2i {
 namespace ncsdk {
@@ -41,7 +42,7 @@ class Parameters : public IParameters {
   RuntimeError Set (const std::string &in_parameter, int in_value) override;
 
  private:
-  std::shared_ptr<IEngine> engine;
+  std::shared_ptr<Engine> engine;
   std::shared_ptr<IModel> model;
 
   RuntimeError SetParameter (const std::unordered_map<std::string, int> &map,

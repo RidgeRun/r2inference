@@ -87,7 +87,7 @@ TEST_GROUP (NcsdkParameters) {
   void setup () {
     stubint = -1;
     shoulderror = false;
-    engine = std::make_shared<MockEngine> ();
+    engine = std::make_shared<r2i::ncsdk::Engine> ();
     model = std::make_shared<MockModel> ();
   }
 
@@ -107,6 +107,14 @@ TEST (NcsdkParameters, ConfigureNullEngine) {
 
   error = params.Configure (nullptr, model);
   LONGS_EQUAL (r2i::RuntimeError::Code::NULL_PARAMETER, error.GetCode ());
+}
+
+TEST (NcsdkParameters, ConfigureInvalidEngine) {
+  r2i::RuntimeError error;
+  std::shared_ptr<MockEngine> engine(new MockEngine);
+
+  error = params.Configure (engine, model);
+  LONGS_EQUAL (r2i::RuntimeError::Code::INCOMPATIBLE_ENGINE, error.GetCode ());
 }
 
 TEST (NcsdkParameters, ConfigureNullModel) {

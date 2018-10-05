@@ -42,7 +42,14 @@ RuntimeError Parameters::Configure (std::shared_ptr<r2i::IEngine> in_engine,
     return error;
   }
 
-  this->engine = in_engine;
+  auto engine = std::dynamic_pointer_cast<Engine, IEngine>(in_engine);
+  if (nullptr == engine) {
+    error.Set (RuntimeError::Code::INCOMPATIBLE_ENGINE,
+               "The provided engine is not an NCSDK engine");
+    return error;
+  }
+
+  this->engine = engine;
   this->model = in_model;
 
   return error;
@@ -140,5 +147,5 @@ RuntimeError Parameters::GetParameter (const
                                       target_size, apply);
 }
 
-}
-}
+} // namespace ncsdk
+} // namespace r2i
