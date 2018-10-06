@@ -36,6 +36,11 @@ class RuntimeError {
     EOK,
 
     /**
+     * API is not being used properly
+     */
+    WRONG_API_USAGE,
+
+    /**
      * A mandatory parameter was passed in as null
      */
     NULL_PARAMETER,
@@ -44,6 +49,11 @@ class RuntimeError {
      * Trying to access an invalid framework parameter
      */
     INVALID_FRAMEWORK_PARAMETER,
+
+    /**
+     * Framework-specific error triggered
+     */
+    FRAMEWORK_ERROR,
 
     /**
      * The provided engine is incompatible with the current operation
