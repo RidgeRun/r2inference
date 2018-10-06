@@ -57,19 +57,15 @@ RuntimeError Model::Stop () {
 }
 
 ncGraphHandle_t *Model::GetHandler () {
-
   return this->graph_handler;
 }
 
-void *Model::GetData () {
+std::shared_ptr<void> Model::GetData () {
   return this->graph_data;
 }
 
-void Model::SetData (void *graph_data) {
-  if (nullptr != this->graph_data)
-    free (this->graph_data);
-
-  this->graph_data = graph_data;
+void Model::SetData (std::shared_ptr<void> graph_data) {
+  this->graph_data.swap (graph_data);
 }
 
 unsigned int Model::GetDataSize () {

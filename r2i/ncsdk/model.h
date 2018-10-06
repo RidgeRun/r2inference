@@ -17,6 +17,7 @@
 
 #include <string>
 #include "mvnc.h"
+#include <memory>
 
 namespace r2i {
 namespace ncsdk {
@@ -29,14 +30,14 @@ class Model : public IModel {
 
   ncGraphHandle_t *GetHandler ();
 
-  void *GetData ();
-  void SetData (void *graph_data);
+  std::shared_ptr<void> GetData ();
+  void SetData (std::shared_ptr<void> graph_data);
   unsigned int GetDataSize ();
   void SetDataSize (unsigned int graph_size);
 
  private:
   ncGraphHandle_t *graph_handler;
-  void *graph_data;
+  std::shared_ptr<void> graph_data;
   unsigned int graph_size;
 };
 

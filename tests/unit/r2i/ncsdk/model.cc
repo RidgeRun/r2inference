@@ -13,6 +13,7 @@
 #include <mvnc.h>
 #include <r2i/r2i.h>
 #include <r2i/ncsdk/model.h>
+#include <memory>
 
 #define SIZE_TEST 100
 
@@ -90,19 +91,17 @@ TEST (NcsdkModel, SetGetDataSize) {
 }
 
 TEST (NcsdkModel, SetGetData) {
-  void *setdata = (void *) malloc (SIZE_TEST);
+  std::shared_ptr<void> setdata(malloc(SIZE_TEST), free);
   model.SetData (setdata);
-  void *getdata = model.GetData();
-  POINTERS_EQUAL (setdata, model.GetData());
-  free (getdata);
+  std::shared_ptr<void> getdata = model.GetData();
+  CHECK (setdata == getdata);
 }
 
 TEST (NcsdkModel, SetGetDataOverride) {
-  void *setdata1 = (void *) malloc (SIZE_TEST);
-  void *setdata2 = (void *) malloc (SIZE_TEST);
+  std::shared_ptr<void> setdata1(malloc(SIZE_TEST), free);
+  std::shared_ptr<void> setdata2(malloc(SIZE_TEST), free);
   model.SetData (setdata1);
   model.SetData (setdata2);
-  void *getdata = model.GetData();
-  POINTERS_EQUAL (setdata2, model.GetData());
-  free (getdata);
+  std::shared_ptr<void> getdata = model.GetData();
+  CHECK (setdata2 == model.GetData());
 }
