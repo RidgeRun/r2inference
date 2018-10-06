@@ -23,21 +23,27 @@ class Engine : public IEngine {
 
   r2i::RuntimeError SetModel (std::shared_ptr<r2i::IModel> in_model) override;
 
-  virtual void Start (r2i::RuntimeError &error) override;
+  r2i::RuntimeError Start () override;
 
   virtual void Stop (r2i::RuntimeError &error) override;
 
   virtual std::unique_ptr<r2i::IPrediction> Predict (std::shared_ptr<r2i::IFrame>
       in_frame, r2i::RuntimeError &error) override;
 
+  enum Status {
+    IDLE,
+    START
+  };
  private:
   std::shared_ptr<Model> model;
   std::shared_ptr<struct ncDeviceHandle_t> movidius_device;
-  std::shared_ptr<struct ncGraphHandle_t> model_handle;
   std::shared_ptr<struct ncFifoHandle_t> input_buffers;
   std::shared_ptr<struct ncFifoHandle_t>  output_buffers;
   struct ncTensorDescriptor_t input_descriptor;
   struct ncTensorDescriptor_t output_descriptor;
+  Status GetStatus ();
+  void SetStatus (Status new_status);
+  Status status;
 
 
 };

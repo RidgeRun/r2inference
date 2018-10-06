@@ -75,6 +75,11 @@ class RuntimeError {
     INCOMPATIBLE_ENGINE,
 
     /**
+     * The Engine is in a invalid state
+     */
+    WRONG_ENGINE_STATE,
+
+    /**
      * An unknown error has ocurred
      */
     UNKNOWN_ERROR,

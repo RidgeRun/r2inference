@@ -20,7 +20,7 @@
 class MockEngine : public r2i::IEngine {
   r2i::RuntimeError SetModel  (std::shared_ptr<r2i::IModel>) override {r2i::RuntimeError error; return error;}
 
-  void Start (r2i::RuntimeError &error) override {}
+  r2i::RuntimeError  Start () override {r2i::RuntimeError error; return error;}
 
   void Stop (r2i::RuntimeError &error) override {}
 

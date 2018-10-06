@@ -34,15 +34,15 @@ class IEngine {
    * \brief Sets a trained IModel to an IEngine evaluation
    *  interface
    * \param in_model Trained IModel for a particular framework.
-   * \param error [out] RuntimeError with a description of an error.
+   * \return RuntimeError with a description of an error.
    */
   virtual r2i::RuntimeError SetModel (std::shared_ptr<r2i::IModel> in_model) = 0;
 
   /**
    * \brief Initializes the IEngine after an IModel was set.
-   * \param error [out] RuntimeError with a description of an error.
+   * \return RuntimeError with a description of an error.
    */
-  virtual void Start (r2i::RuntimeError &error) = 0;
+  virtual r2i::RuntimeError Start () = 0;
 
   /**
    * \brief Deinitializes an IEngine.
