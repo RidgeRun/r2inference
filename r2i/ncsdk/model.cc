@@ -15,7 +15,7 @@
 namespace r2i {
 namespace ncsdk {
 
-RuntimeError Model::Start (const std::string name) {
+RuntimeError Model::Start (const std::string &name) {
   RuntimeError error;
 
   if (name.empty()) {
@@ -23,11 +23,17 @@ RuntimeError Model::Start (const std::string name) {
     return error;
   }
 
-  ncStatus_t ret = ncGraphCreate (name.c_str(), &this->graph_handler);
-  if (NC_OK != ret) {
-    error.Set (RuntimeError::Code::INVALID_FRAMEWORK_PARAMETER,
-               GetStringFromStatus (ret, error));
+  if (nullptr == this->graph_handler) {
+    ncStatus_t ret = ncGraphCreate (name.c_str(), &this->graph_handler);
+    if (NC_OK != ret) {
+      error.Set (RuntimeError::Code::FRAMEWORK_ERROR,
+                 GetStringFromStatus (ret, error));
+    }
+  } else {
+    error.Set (RuntimeError::Code::WRONG_API_USAGE,
+               "Model already started");
   }
+
   return error;
 }
 
@@ -35,15 +41,17 @@ RuntimeError Model::Stop () {
   RuntimeError error;
 
   if (nullptr == this->graph_handler) {
-    error.Set (RuntimeError::Code::NULL_PARAMETER, "Model has not been Started");
+    error.Set (RuntimeError::Code::WRONG_API_USAGE, "Model has not been Started");
     return error;
   }
 
   ncStatus_t ret = ncGraphDestroy (&this->graph_handler);
   if (NC_OK != ret) {
-    error.Set (RuntimeError::Code::INVALID_FRAMEWORK_PARAMETER,
+    error.Set (RuntimeError::Code::FRAMEWORK_ERROR,
                GetStringFromStatus (ret, error));
   }
+
+  this->graph_handler = nullptr;
 
   return error;
 }

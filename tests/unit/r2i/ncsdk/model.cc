@@ -27,17 +27,22 @@ TEST_GROUP (NcsdkModel) {
   }
 };
 
+TEST (NcsdkModel, Start) {
+  error = model.Start ("graph");
+  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode());
+  error = model.Stop();
+}
+
 TEST (NcsdkModel, StartEmptyName) {
-  error.Clean();
   error = model.Start ("");
   LONGS_EQUAL (r2i::RuntimeError::Code::NULL_PARAMETER, error.GetCode());
   error = model.Stop();
 }
 
-TEST (NcsdkModel, Start) {
-  error.Clean();
+TEST (NcsdkModel, DoubleStart) {
   error = model.Start ("graph");
-  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode());
+  error = model.Start ("graph");
+  LONGS_EQUAL (r2i::RuntimeError::Code::WRONG_API_USAGE, error.GetCode());
   error = model.Stop();
 }
 
@@ -47,11 +52,36 @@ TEST (NcsdkModel, GetHandleBeforeStart) {
 }
 
 TEST (NcsdkModel, GetHandleAfterStart) {
-  error.Clean();
   error = model.Start ("graph");
   ncGraphHandle_t *graph_handle = model.GetHandler ();
   CHECK (graph_handle != NULL);
   error = model.Stop();
+}
+
+TEST (NcsdkModel, StopWithStart) {
+  error = model.Start ("graph");
+  error = model.Stop ();
+  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode());
+}
+
+TEST (NcsdkModel, DoubleStop) {
+  error = model.Start ("graph");
+  error = model.Stop ();
+  error = model.Stop ();
+  LONGS_EQUAL (r2i::RuntimeError::Code::WRONG_API_USAGE, error.GetCode());
+}
+
+TEST (NcsdkModel, StopWithoutStart) {
+  error = model.Stop ();
+  LONGS_EQUAL (r2i::RuntimeError::Code::WRONG_API_USAGE, error.GetCode());
+}
+
+TEST (NcsdkModel, StartStopGetHandler) {
+  ncGraphHandle_t *graph_handler;
+  error = model.Start ("graph");
+  error = model.Stop ();
+  graph_handler = model.GetHandler();
+  POINTERS_EQUAL (nullptr, graph_handler);
 }
 
 TEST (NcsdkModel, SetGetDataSize) {
@@ -75,18 +105,4 @@ TEST (NcsdkModel, SetGetDataOverride) {
   void *getdata = model.GetData();
   POINTERS_EQUAL (setdata2, model.GetData());
   free (getdata);
-}
-
-TEST (NcsdkModel, StopWithStart) {
-  error.Clean();
-  error = model.Start ("graph");
-  error.Clean();
-  error = model.Stop ();
-  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode());
-}
-
-TEST (NcsdkModel, StopWithoutStart) {
-  error.Clean();
-  error = model.Stop ();
-  LONGS_EQUAL (r2i::RuntimeError::Code::NULL_PARAMETER, error.GetCode());
 }

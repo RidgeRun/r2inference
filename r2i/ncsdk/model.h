@@ -23,7 +23,7 @@ namespace ncsdk {
 
 class Model : public IModel {
  public:
-  RuntimeError Start (const std::string name);
+  RuntimeError Start (const std::string &name);
 
   RuntimeError Stop ();
 
