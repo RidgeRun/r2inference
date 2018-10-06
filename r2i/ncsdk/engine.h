@@ -13,28 +13,25 @@
 #define R2I_NCSDK_ENGINE_H
 
 #include <r2i/iengine.h>
+#include <r2i/ncsdk/model.h>
 
-namespace r2i
-{
-namespace ncsdk
-{
+namespace r2i {
+namespace ncsdk {
 
-class Engine : public IEngine
-{
-public:
+class Engine : public IEngine {
+ public:
 
-  virtual void SetModel (std::shared_ptr<r2i::IModel> in_model,
-    r2i::RuntimeError &error) override;
+  r2i::RuntimeError SetModel (std::shared_ptr<r2i::IModel> in_model) override;
 
   virtual void Start (r2i::RuntimeError &error) override;
 
   virtual void Stop (r2i::RuntimeError &error) override;
 
   virtual std::unique_ptr<r2i::IPrediction> Predict (std::shared_ptr<r2i::IFrame>
-    in_frame, r2i::RuntimeError &error) override;
+      in_frame, r2i::RuntimeError &error) override;
 
-private:
-  std::shared_ptr<r2i::IModel> model;
+ private:
+  std::shared_ptr<Model> model;
   std::shared_ptr<struct ncDeviceHandle_t> movidius_device;
   std::shared_ptr<struct ncGraphHandle_t> model_handle;
   std::shared_ptr<struct ncFifoHandle_t> input_buffers;

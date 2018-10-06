@@ -18,8 +18,7 @@
 #include <CppUTest/TestHarness.h>
 
 class MockEngine : public r2i::IEngine {
-  void SetModel (std::shared_ptr<r2i::IModel>,
-                 r2i::RuntimeError &error) override {}
+  r2i::RuntimeError SetModel  (std::shared_ptr<r2i::IModel>) override {r2i::RuntimeError error; return error;}
 
   void Start (r2i::RuntimeError &error) override {}
 
@@ -32,6 +31,7 @@ class MockEngine : public r2i::IEngine {
 };
 
 class MockModel : public r2i::IModel {
+  r2i::RuntimeError Start (const std::string name) override {r2i::RuntimeError error; return error;}
 };
 
 /* Stubs for MVNC */

@@ -18,34 +18,35 @@
 
 
 class MockModel : public r2i::IModel {
+  r2i::RuntimeError Start (const std::string name) override {r2i::RuntimeError error; return error;}
 };
 
 /* Stubs for MVNC */
 bool engineerror = false;
 
 TEST_GROUP (NcsdkEngine) {
-    r2i::ncsdk::Engine engine;
-    std::shared_ptr<r2i::IModel> model;
+  r2i::ncsdk::Engine engine;
+  std::shared_ptr<r2i::IModel> model;
 
-    void setup () {
-        engineerror = false;
-        model = std::make_shared<MockModel> ();
-    }
+  void setup () {
+    engineerror = false;
+    model = std::make_shared<r2i::ncsdk::Model> ();
+  }
 
-    void teardown () {
-    }
+  void teardown () {
+  }
 };
 
 TEST (NcsdkEngine, SetModel) {
-    r2i::RuntimeError error;
+  r2i::RuntimeError error;
 
-    engine.SetModel (model,error);
-    LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
+  error = engine.SetModel (model);
+  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
 }
 
 TEST (NcsdkEngine, SetModelNull) {
-    r2i::RuntimeError error;
+  r2i::RuntimeError error;
 
-    engine.SetModel (nullptr,error);
-    LONGS_EQUAL (r2i::RuntimeError::Code::NULL_PARAMETER, error.GetCode ());
+  error = engine.SetModel (nullptr);
+  LONGS_EQUAL (r2i::RuntimeError::Code::NULL_PARAMETER, error.GetCode ());
 }

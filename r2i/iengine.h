@@ -23,23 +23,20 @@
 /**
  * R2Inference Namespace
  */
-namespace r2i
-{
+namespace r2i {
 /**
  *  Implements the interface to evaluate IFrame data in a IModel.
  */
-class IEngine
-{
+class IEngine {
 
-public:
+ public:
   /**
    * \brief Sets a trained IModel to an IEngine evaluation
    *  interface
    * \param in_model Trained IModel for a particular framework.
    * \param error [out] RuntimeError with a description of an error.
    */
-  virtual void SetModel (std::shared_ptr<r2i::IModel> in_model,
-    r2i::RuntimeError &error) = 0;
+  virtual r2i::RuntimeError SetModel (std::shared_ptr<r2i::IModel> in_model) = 0;
 
   /**
    * \brief Initializes the IEngine after an IModel was set.
@@ -62,8 +59,8 @@ public:
    *  on the assigned IModel.
    */
   virtual std::unique_ptr<r2i::IPrediction> Predict (std::shared_ptr<r2i::IFrame>
-    in_frame,
-    r2i::RuntimeError &error) = 0;
+      in_frame,
+      r2i::RuntimeError &error) = 0;
 };
 
 }

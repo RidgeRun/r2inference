@@ -12,6 +12,8 @@
 #ifndef R2I_IMODEL_H
 #define R2I_IMODEL_H
 
+#include <r2i/runtimeerror.h>
+
 /**
  * R2Inference Namespace
  */
@@ -20,6 +22,8 @@ namespace r2i {
  * Implements the interface to abstract a framework model
  */
 class IModel {
+
+  virtual RuntimeError Start (const std::string name) = 0;
 
 };
 

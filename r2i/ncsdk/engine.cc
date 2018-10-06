@@ -19,28 +19,36 @@
 namespace r2i {
 namespace ncsdk {
 
-void Engine::SetModel (std::shared_ptr<r2i::IModel> in_model,
-                       RuntimeError &error) {
+RuntimeError Engine::SetModel (std::shared_ptr<r2i::IModel> in_model) {
 
-    error.Clean ();
+  RuntimeError error;
 
-    if (nullptr == in_model)
-    {
-        error.Set (RuntimeError::Code:: NULL_PARAMETER,
-                   "Model passed as null");
-        return;
-    }
+  if (nullptr == in_model) {
+    error.Set (RuntimeError::Code:: NULL_PARAMETER,
+               "Received null model");
+    return error;
+  }
+  auto model = std::dynamic_pointer_cast<r2i::ncsdk::Model, r2i::IModel>
+               (in_model);
 
-    this->model = in_model;
+  if (nullptr == model) {
+    error.Set (RuntimeError::Code::INCOMPATIBLE_MODEL,
+               "The provided engine is not an NCSDK engine");
+    return error;
+  }
+  this->model = model;
+
+  return error;
 }
 
 void Engine::Start (RuntimeError &error) {}
 
 void Engine::Stop (RuntimeError &error) {}
 
-std::unique_ptr<r2i::IPrediction> Engine::Predict (std::shared_ptr<r2i::IFrame> in_frame,
-        r2i::RuntimeError &error) {
-    return nullptr;
+std::unique_ptr<r2i::IPrediction> Engine::Predict (std::shared_ptr<r2i::IFrame>
+    in_frame,
+    r2i::RuntimeError &error) {
+  return nullptr;
 
 }
 

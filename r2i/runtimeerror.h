@@ -49,6 +49,10 @@ class RuntimeError {
      * Trying to access an invalid framework parameter
      */
     INVALID_FRAMEWORK_PARAMETER,
+    /**
+     * The provided Model is incompatible with the current operation
+     */
+    INCOMPATIBLE_MODEL,
 
     /**
      * Framework-specific error triggered
