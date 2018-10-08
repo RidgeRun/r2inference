@@ -9,36 +9,25 @@
  * back to RidgeRun without any encumbrance.
 */
 
-#ifndef R2I_ILOADER_H
-#define R2I_ILOADER_H
+#ifndef R2I_NCSDK_LOADER_H
+#define R2I_NCSDK_LOADER_H
 
+#include <r2i/iloader.h>
 #include <r2i/imodel.h>
-#include <r2i/runtimeerror.h>
+#include <r2i/ncsdk/model.h>
 
-#include <memory>
-#include <string>
-
-/**
- * R2Inference Namespace
- */
 namespace r2i {
-/**
- *  Implements the interface to validate a IModel implementation
- *  for an IEngine implementation
- */
-class ILoader {
+namespace ncsdk {
 
+class Loader : public ILoader {
  public:
-  /**
-   * \brief Checks consistency of a trained model.
-   * \param in_path A string of the absolute path to a model for evaluation.
-   * \param error [out] RuntimeError with a description of an error.
-   * \return A validated IModel for an IEngine or nullptr in case of error.
-   */
   virtual std::shared_ptr<r2i::IModel> Load (const std::string &in_path,
-      r2i::RuntimeError &error) = 0;
+      r2i::RuntimeError &error) override;
+ private:
+  std::shared_ptr<Model> model;
 };
 
 }
+}
 
-#endif // R2I_ILOADER_H
+#endif //R2I_NCSDK_LOADER_H
