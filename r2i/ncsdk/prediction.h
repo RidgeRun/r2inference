@@ -8,31 +8,25 @@
  * a software license from RidgeRun.  All source code changes must be provided
  * back to RidgeRun without any encumbrance.
 */
+#ifndef R2I_NCSDK_PREDICTION_H
+#define R2I_NCSDK_PREDICTION_H
 
-#ifndef R2I_IMODEL_H
-#define R2I_IMODEL_H
-
+#include <r2i/iprediction.h>
 #include <r2i/runtimeerror.h>
 
-/**
- * R2Inference Namespace
- */
 namespace r2i {
-/**
- * Implements the interface to abstract a framework model
- */
-class IModel {
+namespace ncsdk {
+
+class Prediction: public IPrediction {
  public:
-  /**
-   * \brief Initializes a model with a name.
-   * \param name A string with the name of the model.
-   * \return error RuntimeError with a description of an error.
-   */
+  double At (int index,  r2i::RuntimeError &error) override;
 
-  virtual RuntimeError Start (const std::string &name) = 0;
+  void SetResult (void *data );
 
+ private:
+  void *result;
 };
 
 }
-
-#endif // R2I_IMODEL_H
+}
+#endif // R2I_NCSDK_PREDICTION_H

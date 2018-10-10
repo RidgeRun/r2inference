@@ -8,31 +8,28 @@
  * a software license from RidgeRun.  All source code changes must be provided
  * back to RidgeRun without any encumbrance.
 */
+#ifndef R2I_NCSDK_FRAME_H
+#define R2I_NCSDK_FRAME_H
 
-#ifndef R2I_IMODEL_H
-#define R2I_IMODEL_H
-
+#include <r2i/iframe.h>
 #include <r2i/runtimeerror.h>
 
-/**
- * R2Inference Namespace
- */
 namespace r2i {
-/**
- * Implements the interface to abstract a framework model
- */
-class IModel {
+namespace ncsdk {
+
+class Frame: public IFrame {
  public:
-  /**
-   * \brief Initializes a model with a name.
-   * \param name A string with the name of the model.
-   * \return error RuntimeError with a description of an error.
-   */
+  void *GetData () override;
+  unsigned int GetSize () override;
+  void SetData (void *graph_data);
 
-  virtual RuntimeError Start (const std::string &name) = 0;
-
+ private:
+  void *data;
+  unsigned int graph_size;
 };
 
 }
+}
 
-#endif // R2I_IMODEL_H
+
+#endif //R2I_NCSDK_FRAME_H

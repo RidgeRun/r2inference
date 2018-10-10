@@ -12,31 +12,42 @@
 #ifndef R2I_NCSDK_ENGINE_H
 #define R2I_NCSDK_ENGINE_H
 
-#include <functional>
-#include <string>
-#include <unordered_map>
-
 #include <r2i/iengine.h>
+#include <r2i/ncsdk/model.h>
 
 namespace r2i {
 namespace ncsdk {
 
 class Engine : public IEngine {
  public:
-  void SetModel (const r2i::IModel &in_model,
-                 r2i::RuntimeError &error) {}
 
-  void Start (r2i::RuntimeError &error) {}
+  r2i::RuntimeError SetModel (std::shared_ptr<r2i::IModel> in_model) override;
 
-  void Stop (r2i::RuntimeError &error) {}
+  r2i::RuntimeError Start () override;
 
-  std::unique_ptr<r2i::IPrediction> Predict (const r2i::IFrame &in_frame,
-      r2i::RuntimeError &error) {
-    return nullptr;
-  }
+  r2i::RuntimeError Stop () override;
+
+  std::shared_ptr<r2i::IPrediction> Predict (std::shared_ptr<r2i::IFrame>
+      in_frame, r2i::RuntimeError &error) override;
+
+  enum Status {
+    IDLE,
+    START
+  };
+ private:
+  std::shared_ptr<Model> model;
+  std::shared_ptr<struct ncDeviceHandle_t> movidius_device;
+  std::shared_ptr<struct ncFifoHandle_t> input_buffers;
+  std::shared_ptr<struct ncFifoHandle_t>  output_buffers;
+  struct ncTensorDescriptor_t input_descriptor;
+  struct ncTensorDescriptor_t output_descriptor;
+  Status GetStatus ();
+  void SetStatus (Status new_status);
+  Status status;
+
+
 };
 
-} // namespace ncsdk
-} // namespace r2i
-
+}
+}
 #endif //R2I_NCSDK_ENGINE_H

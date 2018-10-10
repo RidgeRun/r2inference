@@ -49,6 +49,10 @@ class RuntimeError {
      * Trying to access an invalid framework parameter
      */
     INVALID_FRAMEWORK_PARAMETER,
+    /**
+     * The provided Model is incompatible with the current operation
+     */
+    INCOMPATIBLE_MODEL,
 
     /**
      * Framework-specific error triggered
@@ -69,6 +73,11 @@ class RuntimeError {
      * The provided engine is incompatible with the current operation
      */
     INCOMPATIBLE_ENGINE,
+
+    /**
+     * The Engine is in a invalid state
+     */
+    WRONG_ENGINE_STATE,
 
     /**
      * An unknown error has ocurred

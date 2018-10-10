@@ -9,30 +9,23 @@
  * back to RidgeRun without any encumbrance.
 */
 
-#ifndef R2I_IMODEL_H
-#define R2I_IMODEL_H
 
-#include <r2i/runtimeerror.h>
+#include "r2i/ncsdk/frame.h"
+#include "r2i/ncsdk/statuscodes.h"
 
-/**
- * R2Inference Namespace
- */
 namespace r2i {
-/**
- * Implements the interface to abstract a framework model
- */
-class IModel {
- public:
-  /**
-   * \brief Initializes a model with a name.
-   * \param name A string with the name of the model.
-   * \return error RuntimeError with a description of an error.
-   */
+namespace ncsdk {
 
-  virtual RuntimeError Start (const std::string &name) = 0;
-
-};
-
+void *Frame::GetData () {
+  return this->data;
 }
 
-#endif // R2I_IMODEL_H
+unsigned int Frame::GetSize () {
+  return this->graph_size;
+}
+void Frame::SetData (void *data) {
+  this->data = data;
+}
+}
+}
+

@@ -9,30 +9,25 @@
  * back to RidgeRun without any encumbrance.
 */
 
-#ifndef R2I_IMODEL_H
-#define R2I_IMODEL_H
+#include <mvnc.h>
+#include <unordered_map>
 
-#include <r2i/runtimeerror.h>
+#include "r2i/ncsdk/prediction.h"
+#include "r2i/ncsdk/statuscodes.h"
 
-/**
- * R2Inference Namespace
- */
 namespace r2i {
-/**
- * Implements the interface to abstract a framework model
- */
-class IModel {
- public:
-  /**
-   * \brief Initializes a model with a name.
-   * \param name A string with the name of the model.
-   * \return error RuntimeError with a description of an error.
-   */
+namespace ncsdk {
 
-  virtual RuntimeError Start (const std::string &name) = 0;
+double Prediction::At (int index,  RuntimeError &error) {
 
-};
+  return 0.1;
 
 }
 
-#endif // R2I_IMODEL_H
+void Prediction::SetResult (void *data) {
+  this->result = data;
+}
+
+
+}
+}

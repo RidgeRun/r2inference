@@ -44,8 +44,9 @@ AM_LDFLAGS =				\
 
 tests_SOURCES =				\
 	tests.cc 			\
-	parameters.cc                   \
+	parameters.cc 			\
 	model.cc			\
-	loader.cc
+	loader.cc			\
+	engine.cc
 
 CLEANFILES = cpputest_*.xml

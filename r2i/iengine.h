@@ -34,22 +34,21 @@ class IEngine {
    * \brief Sets a trained IModel to an IEngine evaluation
    *  interface
    * \param in_model Trained IModel for a particular framework.
-   * \param error [out] RuntimeError with a description of an error.
+   * \return RuntimeError with a description of an error.
    */
-  virtual void SetModel (const r2i::IModel &in_model,
-                         r2i::RuntimeError &error) = 0;
+  virtual r2i::RuntimeError SetModel (std::shared_ptr<r2i::IModel> in_model) = 0;
 
   /**
    * \brief Initializes the IEngine after an IModel was set.
-   * \param error [out] RuntimeError with a description of an error.
+   * \return RuntimeError with a description of an error.
    */
-  virtual void Start (r2i::RuntimeError &error) = 0;
+  virtual r2i::RuntimeError Start () = 0;
 
   /**
    * \brief Deinitializes an IEngine.
-   * \param error [out] RuntimeError with a description of an error.
+   * \return RuntimeError with a description of an error.
    */
-  virtual void Stop (r2i::RuntimeError &error) = 0;
+  virtual r2i::RuntimeError Stop () = 0;
 
   /**
    * \brief Performs a prediction on a IEngine framework, based on a
@@ -59,7 +58,8 @@ class IEngine {
    * \return IPrediction inference data obtained from evaluating an IFrame
    *  on the assigned IModel.
    */
-  virtual std::unique_ptr<r2i::IPrediction> Predict (const r2i::IFrame &in_frame,
+  virtual std::shared_ptr<r2i::IPrediction> Predict (std::shared_ptr<r2i::IFrame>
+      in_frame,
       r2i::RuntimeError &error) = 0;
 };
 
