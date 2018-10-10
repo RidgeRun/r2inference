@@ -22,7 +22,7 @@ class MockEngine : public r2i::IEngine {
 
   r2i::RuntimeError  Start () override {r2i::RuntimeError error; return error;}
 
-  void Stop (r2i::RuntimeError &error) override {}
+  r2i::RuntimeError Stop () override {r2i::RuntimeError error; return error;}
 
   std::unique_ptr<r2i::IPrediction> Predict (std::shared_ptr<r2i::IFrame>,
       r2i::RuntimeError &error) override {

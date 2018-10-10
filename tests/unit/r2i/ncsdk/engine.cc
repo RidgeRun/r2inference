@@ -203,3 +203,40 @@ TEST (NcsdkEngine, StartEngineFifoError) {
   LONGS_EQUAL (r2i::RuntimeError::Code::FRAMEWORK_ERROR, error.GetCode ());
 
 }
+
+TEST (NcsdkEngine, StartStopEngine) {
+  r2i::RuntimeError error;
+
+  error = engine.SetModel (model);
+  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
+
+  error = engine.Start ();
+  error = engine.Stop ();
+  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
+
+}
+
+
+TEST (NcsdkEngine, StopEngine) {
+  r2i::RuntimeError error;
+
+  error = engine.SetModel (model);
+  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
+
+  error = engine.Stop ();
+  LONGS_EQUAL (r2i::RuntimeError::Code::WRONG_ENGINE_STATE, error.GetCode ());
+
+}
+
+
+TEST (NcsdkEngine, StopStopEngine) {
+  r2i::RuntimeError error;
+
+  error = engine.SetModel (model);
+  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
+
+  error = engine.Stop ();
+  error = engine.Stop ();
+  LONGS_EQUAL (r2i::RuntimeError::Code::WRONG_ENGINE_STATE, error.GetCode ());
+
+}

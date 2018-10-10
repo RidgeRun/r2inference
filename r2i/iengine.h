@@ -46,9 +46,9 @@ class IEngine {
 
   /**
    * \brief Deinitializes an IEngine.
-   * \param error [out] RuntimeError with a description of an error.
+   * \return RuntimeError with a description of an error.
    */
-  virtual void Stop (r2i::RuntimeError &error) = 0;
+  virtual r2i::RuntimeError Stop () = 0;
 
   /**
    * \brief Performs a prediction on a IEngine framework, based on a

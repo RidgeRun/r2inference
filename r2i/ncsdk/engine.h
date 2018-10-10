@@ -25,7 +25,7 @@ class Engine : public IEngine {
 
   r2i::RuntimeError Start () override;
 
-  virtual void Stop (r2i::RuntimeError &error) override;
+  r2i::RuntimeError Stop () override;
 
   virtual std::unique_ptr<r2i::IPrediction> Predict (std::shared_ptr<r2i::IFrame>
       in_frame, r2i::RuntimeError &error) override;

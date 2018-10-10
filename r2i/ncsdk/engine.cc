@@ -186,7 +186,65 @@ create_fail:
   return error;
 }
 
-void Engine::Stop (RuntimeError &error) {}
+RuntimeError Engine::Stop () {
+
+  ncDeviceHandle_t *device_handle;
+  ncFifoHandle_t *input_buffers_ptr;
+  ncFifoHandle_t  *output_buffers_ptr;
+  Status engine_status;
+  RuntimeError error;
+  ncStatus_t ret;
+
+
+  engine_status = this->GetStatus();
+
+  if ( Status:: IDLE == engine_status) {
+    error.Set (RuntimeError::Code:: WRONG_ENGINE_STATE,
+               "Engine in wrong State");
+    return error;
+  }
+
+  if (nullptr == this->model) {
+    error.Set (RuntimeError::Code:: NULL_PARAMETER,
+               "Model not set yet");
+    return error;
+  }
+
+  input_buffers_ptr = this->input_buffers.get();
+  output_buffers_ptr = this->output_buffers.get();
+
+
+  ret = ncFifoDestroy(&output_buffers_ptr);
+
+  if (NC_OK != ret) {
+    error.Set (RuntimeError::Code::FRAMEWORK_ERROR,
+               GetStringFromStatus (ret, error));
+    return error;
+  }
+
+  ret = ncFifoDestroy(&input_buffers_ptr);
+
+  if (NC_OK != ret) {
+    error.Set (RuntimeError::Code::FRAMEWORK_ERROR,
+               GetStringFromStatus (ret, error));
+    return error;
+  }
+
+
+  device_handle = this->movidius_device.get();
+
+  ret = ncDeviceClose(device_handle);
+
+  if (NC_OK != ret) {
+    error.Set (RuntimeError::Code::FRAMEWORK_ERROR,
+               GetStringFromStatus (ret, error));
+    return error;
+  }
+
+  this->SetStatus(Status::IDLE);
+
+  return error;
+}
 
 std::unique_ptr<r2i::IPrediction> Engine::Predict (std::shared_ptr<r2i::IFrame>
     in_frame,
