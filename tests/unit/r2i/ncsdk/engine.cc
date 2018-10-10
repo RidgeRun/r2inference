@@ -13,6 +13,7 @@
 #include <mvnc.h>
 #include <r2i/r2i.h>
 #include <r2i/ncsdk/engine.h>
+#include <r2i/ncsdk/frame.h>
 
 #include <CppUTest/MemoryLeakDetectorNewMacros.h>
 #include <CppUTest/TestHarness.h>
@@ -24,37 +25,15 @@ class MockModel : public r2i::IModel {
 
 /* Stubs for MVNC */
 int stub_int = -1;
-std::string stub_string;
+std::string engine_string;
 bool engineerror = false;
 bool should_error = false;
 bool graph_error_alloc = false;
 bool graph_error_get = false;
+bool graph_error = false;
 bool fifo_error = false;
 bool device_error = false;
 
-ncStatus_t ncGraphGetOption(struct ncGraphHandle_t *graphHandle, int option,
-                            void *data,
-                            unsigned int *dataLength) {
-  switch (option) {
-    case (NC_RO_GRAPH_INPUT_TENSOR_DESCRIPTORS): {
-      *((int *)data) = stub_int;
-      break;
-    }
-    case (NC_RO_GRAPH_OUTPUT_TENSOR_DESCRIPTORS): {
-      *((int *)data) = stub_int;
-      break;
-    }
-    case (-1): {
-      memcpy (data, stub_string.data(), *dataLength);
-      break;
-    }
-    default: {
-      FAIL ("Unkown flag");
-    }
-  }
-
-  return graph_error_get ? NC_INVALID_PARAMETERS : NC_OK;
-}
 
 ncStatus_t ncDeviceCreate(int index,
                           struct ncDeviceHandle_t **deviceHandle) {
@@ -73,10 +52,6 @@ ncStatus_t ncDeviceOpen(struct ncDeviceHandle_t *deviceHandle) {
   return device_error ? NC_INVALID_PARAMETERS : NC_OK;
 }
 
-ncStatus_t ncGraphDestroy(struct ncGraphHandle_t **graphHandle) {
-  return graph_error_alloc ? NC_INVALID_PARAMETERS : NC_OK;
-}
-
 ncStatus_t ncDeviceDestroy(struct ncDeviceHandle_t **deviceHandle) {
   return device_error ? NC_INVALID_PARAMETERS : NC_OK;
 }
@@ -91,25 +66,98 @@ ncStatus_t ncFifoAllocate(struct ncFifoHandle_t *fifo,
   return fifo_error ? NC_INVALID_PARAMETERS : NC_OK;
 }
 
+ncStatus_t ncFifoReadElem(struct ncFifoHandle_t *fifo,
+                          void *outputData,
+                          unsigned int *outputDataLen,
+                          void **userParam) {
+  return fifo_error ? NC_INVALID_DATA_LENGTH : NC_OK;
+}
+
+ncStatus_t ncFifoGetOption(struct ncFifoHandle_t *fifo,
+                           int option,
+                           void *data,
+                           unsigned int *DataLen) {
+  switch (option) {
+    case (NC_RO_FIFO_ELEMENT_DATA_SIZE): {
+      *((int *)data) = 16;
+      break;
+    }
+    case (-1): {
+      memcpy (data, engine_string.data(), *DataLen);
+      break;
+    }
+    default: {
+      FAIL ("Unkown flag");
+    }
+  }
+  return fifo_error ? NC_INVALID_DATA_LENGTH : NC_OK;
+}
+
+ncStatus_t ncFifoWriteElem(struct ncFifoHandle_t *fifo,
+                           const void *inputTensor,
+                           unsigned int *inputTensorLength,
+                           void *userParam) {
+  return fifo_error ? NC_INVALID_DATA_LENGTH : NC_OK;
+}
+
 ncStatus_t ncGraphAllocate(struct ncDeviceHandle_t *deviceHandle,
                            struct ncGraphHandle_t *graphHandle,
                            const void *graphBuffer, unsigned int graphBufferLength) {
   return graph_error_alloc ? NC_INVALID_DATA_LENGTH : NC_OK;
 }
+ncStatus_t ncGraphQueueInference(struct ncGraphHandle_t *graphHandle,
+                                 struct ncFifoHandle_t **fifoIn,
+                                 unsigned int inFifoCount,
+                                 struct ncFifoHandle_t **fifoOut,
+                                 unsigned int outFifoCount) {
+  return graph_error ? NC_INVALID_DATA_LENGTH : NC_OK;
+}
+
+ncStatus_t ncGraphGetOption(struct ncGraphHandle_t *graphHandle, int option,
+                            void *data,
+                            unsigned int *dataLength) {
+  switch (option) {
+    case (NC_RO_GRAPH_INPUT_TENSOR_DESCRIPTORS): {
+      *((int *)data) = stub_int;
+      break;
+    }
+    case (NC_RO_GRAPH_OUTPUT_TENSOR_DESCRIPTORS): {
+      *((int *)data) = stub_int;
+      break;
+    }
+    case (-1): {
+      memcpy (data, engine_string.data(), *dataLength);
+      break;
+    }
+    default: {
+      FAIL ("Unkown flag");
+    }
+  }
+
+  return graph_error_get ? NC_INVALID_PARAMETERS : NC_OK;
+}
+
+ncStatus_t ncGraphDestroy(struct ncGraphHandle_t **graphHandle) {
+  return graph_error_alloc ? NC_INVALID_PARAMETERS : NC_OK;
+}
+
 
 TEST_GROUP (NcsdkEngine) {
   r2i::ncsdk::Engine engine;
   std::shared_ptr<r2i::IModel> model;
   std::shared_ptr<r2i::IModel> inc_model;
+  std::shared_ptr<r2i::IFrame> frame;
 
   void setup () {
     engineerror = false;
     graph_error_alloc = false;
     graph_error_get = false;
+    graph_error = false;
     fifo_error = false;
     device_error = false;
     model = std::make_shared<r2i::ncsdk::Model> ();
     inc_model = std::make_shared<MockModel> ();
+    frame = std::make_shared<r2i::ncsdk::Frame> ();
   }
 
   void teardown () {
@@ -238,5 +286,20 @@ TEST (NcsdkEngine, StopStopEngine) {
   error = engine.Stop ();
   error = engine.Stop ();
   LONGS_EQUAL (r2i::RuntimeError::Code::WRONG_ENGINE_STATE, error.GetCode ());
+
+}
+
+TEST (NcsdkEngine, PredictEngine) {
+  r2i::RuntimeError error;
+  std::shared_ptr<r2i::IPrediction> prediction;
+
+  error = engine.SetModel (model);
+  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
+
+  error = engine.Start ();
+  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
+
+  prediction = engine.Predict (frame, error);
+  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
 
 }

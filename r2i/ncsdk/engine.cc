@@ -12,8 +12,9 @@
 #include <mvnc.h>
 #include <unordered_map>
 
-#include "r2i/iprediction.h"
+#include "r2i/ncsdk/prediction.h"
 #include "r2i/ncsdk/engine.h"
+#include "r2i/ncsdk/frame.h"
 #include "r2i/ncsdk/statuscodes.h"
 
 namespace r2i {
@@ -246,9 +247,110 @@ RuntimeError Engine::Stop () {
   return error;
 }
 
-std::unique_ptr<r2i::IPrediction> Engine::Predict (std::shared_ptr<r2i::IFrame>
+std::shared_ptr<r2i::IPrediction> Engine::Predict (std::shared_ptr<r2i::IFrame>
     in_frame,
     r2i::RuntimeError &error) {
+
+  ncStatus_t ret;
+  unsigned int input_data_size;
+  unsigned int output_data_size;
+  unsigned int output_data_size_byte_length;
+  ncFifoHandle_t *input_buffers_ptr;
+  ncFifoHandle_t *output_buffers_ptr;
+  ncGraphHandle_t *model_handle;
+  void *userParam;
+  void *result;
+  void *data;
+  Status engine_status;
+
+  error.Clean ();
+
+  std::shared_ptr<Prediction> prediction (new r2i::ncsdk::Prediction());
+
+  auto frame = std::dynamic_pointer_cast<r2i::ncsdk::Frame, r2i::IFrame>
+               (in_frame);
+
+  if (nullptr == frame) {
+    error.Set (RuntimeError::Code::INCOMPATIBLE_MODEL,
+               "The provided frame is not an NCSDK frame");
+    goto engine_error;
+  }
+
+  engine_status = this->GetStatus();
+
+  if ( Status:: IDLE == engine_status) {
+    error.Set (RuntimeError::Code:: WRONG_ENGINE_STATE,
+               "Engine in wrong State");
+    goto engine_error;
+  }
+  data = frame->GetData();
+  input_data_size = in_frame->GetSize();
+
+  input_buffers_ptr = this->input_buffers.get();
+  output_buffers_ptr = this->output_buffers.get();
+
+
+  ret = ncFifoWriteElem(input_buffers_ptr, data, &input_data_size, 0);
+
+  if (NC_OK != ret) {
+    error.Set (RuntimeError::Code:: FRAMEWORK_ERROR,
+               " Failed to write element to Fifo");
+    goto exit;
+  }
+
+  //Queue inference
+  model_handle = this->model->GetHandler();
+
+  ret = ncGraphQueueInference(model_handle,
+                              &input_buffers_ptr, 1,
+                              &output_buffers_ptr, 1);
+  if (NC_OK != ret) {
+    error.Set (RuntimeError::Code:: FRAMEWORK_ERROR,
+               " Failed to write element to Fifo");
+    goto exit;
+  }
+
+  //Read Results
+  output_data_size_byte_length = sizeof(unsigned int);
+
+  ret = ncFifoGetOption(output_buffers_ptr, NC_RO_FIFO_ELEMENT_DATA_SIZE,
+                        &output_data_size,
+                        &output_data_size_byte_length);
+  if (NC_OK != ret || output_data_size_byte_length != sizeof(unsigned int)) {
+    error.Set (RuntimeError::Code::FRAMEWORK_ERROR,
+               " Failed to get parameters");
+    goto exit;
+  }
+
+  result = malloc(output_data_size);
+
+  if (nullptr == result) {
+    error.Set (RuntimeError::Code::UNKNOWN_ERROR,
+               "Can't alloc data for inference results");
+    goto engine_error;
+  }
+
+
+  ret = ncFifoReadElem(output_buffers_ptr,
+                       result, &output_data_size,
+                       &userParam);
+  if (NC_OK != ret) {
+    error.Set (RuntimeError::Code::FRAMEWORK_ERROR,
+               " Read Inference result failed!");
+
+    goto read_error;
+
+  }
+
+  prediction->SetResult(result);
+
+
+  return prediction;
+
+read_error:
+  free(result);
+exit:
+engine_error:
   return nullptr;
 
 }
