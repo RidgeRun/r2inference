@@ -56,6 +56,16 @@ class RuntimeError {
     FRAMEWORK_ERROR,
 
     /**
+     * Problem handling a file
+     */
+    FILE_ERROR,
+
+    /**
+     * Allocation or memory management error
+     */
+    MEMORY_ERROR,
+
+    /**
      * The provided engine is incompatible with the current operation
      */
     INCOMPATIBLE_ENGINE,
