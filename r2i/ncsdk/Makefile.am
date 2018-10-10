@@ -17,6 +17,9 @@ libncsdk_la_SOURCES =			\
 	parameters.cc			\
 	model.cc			\
 	loader.cc			\
+	engine.cc			\
+	frame.cc			\
+	prediction.cc			\
 	statuscodes.cc
 
 libncsdk_la_CPPFLAGS = 			\
@@ -40,5 +43,7 @@ ncsdkinclude_HEADERS =			\
 	parameters.h			\
 	model.h				\
 	loader.h			\
-	engine.h
+	engine.h 			\
+	prediction.h			\
+	frame.h
 

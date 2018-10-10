@@ -21,6 +21,19 @@ namespace r2i {
  * using an IModel.
  */
 class IFrame {
+ public:
+  /**
+   * \brief Gets data asigned to a IFrame implementation.
+   * \return a pointer to the data assigned to an IFrame
+   */
+  virtual void *GetData() = 0;
+
+  /**
+   * \brief Gets size of data asigned to a IFrame implementation.
+   * \return a int with the number of bytes of theto the data assigned
+   * to an IFrame
+   */
+  virtual unsigned int GetSize () = 0;
 
 };
 
