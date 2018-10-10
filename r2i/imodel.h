@@ -22,8 +22,14 @@ namespace r2i {
  * Implements the interface to abstract a framework model
  */
 class IModel {
+ public:
+  /**
+   * \brief Initializes a model with a name.
+   * \param name A string with the name of the model.
+   * \return error RuntimeError with a description of an error.
+   */
 
-  virtual RuntimeError Start (const std::string name) = 0;
+  virtual RuntimeError Start (const std::string &name) = 0;
 
 };
 

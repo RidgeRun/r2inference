@@ -20,7 +20,7 @@
 
 
 class MockModel : public r2i::IModel {
-  r2i::RuntimeError Start (const std::string name) override {r2i::RuntimeError error; return error;}
+  r2i::RuntimeError Start (const std::string &name) override {r2i::RuntimeError error; return error;}
 };
 
 /* Stubs for MVNC */
