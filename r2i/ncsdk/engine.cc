@@ -68,7 +68,7 @@ RuntimeError Engine::Start ()  {
   ncFifoHandle_t  *output_buffers_ptr;
   ncStatus_t ret;
   unsigned int model_size;
-  void *model_ptr;
+  std::shared_ptr<void> model_ptr;
   Status engine_status;
   unsigned int descriptor_length;
   RuntimeError error;
@@ -110,7 +110,7 @@ RuntimeError Engine::Start ()  {
   model_handle = this->model->GetHandler();
 
   ret = ncGraphAllocate(device_handle, model_handle,
-                        model_ptr, model_size);
+                        model_ptr.get(), model_size);
 
   if (NC_OK != ret) {
     error.Set (RuntimeError::Code::FRAMEWORK_ERROR,
