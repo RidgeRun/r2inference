@@ -46,6 +46,11 @@ class RuntimeError {
     INVALID_FRAMEWORK_PARAMETER,
 
     /**
+     * The provided engine is incompatible with the current operation
+     */
+    INCOMPATIBLE_ENGINE,
+
+    /**
      * An unknown error has ocurred
      */
     UNKNOWN_ERROR,
