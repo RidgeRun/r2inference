@@ -20,6 +20,30 @@
 namespace r2i {
 namespace ncsdk {
 
+ncDeviceHandle_t *Engine::GetDeviceHandler () {
+  return this->movidius_device;
+}
+
+void Engine::SetDeviceHandler (ncDeviceHandle_t *handler) {
+  this->movidius_device = handler;
+}
+
+ncFifoHandle_t *Engine::GetInputFifoHandler () {
+  return this->input_buffers;
+}
+
+void Engine::SetInputFifoHandler (ncFifoHandle_t *handler) {
+  this->input_buffers = handler;
+}
+
+ncFifoHandle_t *Engine::GetOutputFifoHandler () {
+  return this->output_buffers;
+}
+
+void Engine::SetOutputFifoHandler (ncFifoHandle_t *handler) {
+  this->output_buffers = handler;
+}
+
 RuntimeError Engine::SetModel (std::shared_ptr<r2i::IModel> in_model) {
 
   RuntimeError error;
@@ -137,9 +161,6 @@ RuntimeError Engine::Start ()  {
                GetStringFromStatus (ret, error));
     goto parameters_fail;
   }
-  //Init FIFOs
-  input_buffers_ptr = this->input_buffers.get();
-  output_buffers_ptr = this->output_buffers.get();
 
   //Do we want to keep generic Names for the fifos?
   ret = ncFifoCreate("FifoIn0", NC_FIFO_HOST_WO, &input_buffers_ptr);
@@ -169,6 +190,11 @@ RuntimeError Engine::Start ()  {
     goto output_fifo_fail;
   }
 
+  //Save used pointers
+  this->SetInputFifoHandler(input_buffers_ptr);
+  this->SetOutputFifoHandler(output_buffers_ptr);
+  this->SetDeviceHandler(device_handle);
+
   this->SetStatus(Status::START);
 
   return error;
@@ -190,6 +216,7 @@ create_fail:
 RuntimeError Engine::Stop () {
 
   ncDeviceHandle_t *device_handle;
+  ncGraphHandle_t *model_handle;
   ncFifoHandle_t *input_buffers_ptr;
   ncFifoHandle_t  *output_buffers_ptr;
   Status engine_status;
@@ -211,8 +238,8 @@ RuntimeError Engine::Stop () {
     return error;
   }
 
-  input_buffers_ptr = this->input_buffers.get();
-  output_buffers_ptr = this->output_buffers.get();
+  input_buffers_ptr = this->GetInputFifoHandler();
+  output_buffers_ptr = this->GetOutputFifoHandler();
 
 
   ret = ncFifoDestroy(&output_buffers_ptr);
@@ -231,8 +258,17 @@ RuntimeError Engine::Stop () {
     return error;
   }
 
+  model_handle = this->model->GetHandler();
 
-  device_handle = this->movidius_device.get();
+  ret = ncGraphDestroy(&model_handle);
+
+  if (NC_OK != ret) {
+    error.Set (RuntimeError::Code::FRAMEWORK_ERROR,
+               GetStringFromStatus (ret, error));
+    return error;
+  }
+
+  device_handle = this->GetDeviceHandler();
 
   ret = ncDeviceClose(device_handle);
 
@@ -286,8 +322,8 @@ std::shared_ptr<r2i::IPrediction> Engine::Predict (std::shared_ptr<r2i::IFrame>
   data = frame->GetData();
   input_data_size = in_frame->GetSize();
 
-  input_buffers_ptr = this->input_buffers.get();
-  output_buffers_ptr = this->output_buffers.get();
+  input_buffers_ptr = this->GetInputFifoHandler();;
+  output_buffers_ptr = this->GetOutputFifoHandler();;
 
 
   ret = ncFifoWriteElem(input_buffers_ptr, data, &input_data_size, 0);

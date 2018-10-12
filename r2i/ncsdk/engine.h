@@ -30,17 +30,26 @@ class Engine : public IEngine {
   std::shared_ptr<r2i::IPrediction> Predict (std::shared_ptr<r2i::IFrame>
       in_frame, r2i::RuntimeError &error) override;
 
+  ncDeviceHandle_t *GetDeviceHandler ();
+  void SetDeviceHandler (ncDeviceHandle_t *handler);
+
+  ncFifoHandle_t *GetInputFifoHandler ();
+  void SetInputFifoHandler (ncFifoHandle_t *handler);
+
+  ncFifoHandle_t *GetOutputFifoHandler ();
+  void SetOutputFifoHandler (ncFifoHandle_t *handler);
+
   enum Status {
     IDLE,
     START
   };
  private:
   std::shared_ptr<Model> model;
-  std::shared_ptr<struct ncDeviceHandle_t> movidius_device;
-  std::shared_ptr<struct ncFifoHandle_t> input_buffers;
-  std::shared_ptr<struct ncFifoHandle_t>  output_buffers;
-  struct ncTensorDescriptor_t input_descriptor;
-  struct ncTensorDescriptor_t output_descriptor;
+  ncDeviceHandle_t *movidius_device;
+  ncFifoHandle_t *input_buffers;
+  ncFifoHandle_t *output_buffers;
+  ncTensorDescriptor_t input_descriptor;
+  ncTensorDescriptor_t output_descriptor;
   Status GetStatus ();
   void SetStatus (Status new_status);
   Status status;
