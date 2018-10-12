@@ -19,12 +19,16 @@ namespace ncsdk {
 
 class Prediction: public IPrediction {
  public:
-  double At (int index,  r2i::RuntimeError &error) override;
+  Prediction();
+  double At (unsigned int index,  r2i::RuntimeError &error) override;
 
-  void SetResult (void *data );
+  r2i::RuntimeError SetResult (void *data, unsigned int size);
+  void *GetResultData ();
+  unsigned int GetResultSize ();
 
  private:
-  void *result;
+  void *result_data;
+  unsigned int result_size;
 };
 
 }

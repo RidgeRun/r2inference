@@ -42,11 +42,12 @@ AM_LDFLAGS =				\
 	$(CODE_COVERAGE_LIBS)		\
 	$(top_builddir)/r2i/libr2inference-@RR_PACKAGE_VERSION@.la
 
-tests_SOURCES =				\
+tests_SOURCES =			\
 	tests.cc 			\
-	parameters.cc 			\
+	parameters.cc 		\
 	model.cc			\
 	loader.cc			\
+	prediction.cc			\
 	engine.cc
 
 CLEANFILES = cpputest_*.xml

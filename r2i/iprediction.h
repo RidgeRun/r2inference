@@ -31,7 +31,7 @@ class IPrediction {
    * \param error [out] RuntimeError with a description of an error.
    * \return a double that indicates the prediction at the provided index .
    */
-  virtual double At (int index,  r2i::RuntimeError &error) = 0;
+  virtual double At (unsigned int index,  r2i::RuntimeError &error) = 0;
 };
 
 }
