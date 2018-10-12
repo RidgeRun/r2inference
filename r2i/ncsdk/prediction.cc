@@ -18,16 +18,63 @@
 namespace r2i {
 namespace ncsdk {
 
-double Prediction::At (int index,  RuntimeError &error) {
+Prediction::Prediction () {
+  this->result_data = nullptr;
+  this->result_size = 0;
+}
 
-  return 0.1;
+unsigned int Prediction::GetResultSize () {
+  return this->result_size;
+}
+
+void *Prediction::GetResultData () {
+  return this->result_data;
+}
+
+double Prediction::At (unsigned int index,  RuntimeError &error) {
+
+  unsigned int n_results;
+  float *float_result;
+
+  error.Clean ();
+
+  n_results =  this->GetResultSize() / sizeof(float);
+  if (n_results < index ) {
+    error.Set (RuntimeError::Code::MEMORY_ERROR,
+               "Triying to access an non-existing index");
+    return 0;
+  }
+
+  float_result = (float *) this->GetResultData ();
+
+  if (nullptr == float_result) {
+    error.Set (RuntimeError::Code::NULL_PARAMETER,
+               "Prediction result not set yet");
+    return 0;
+  }
+
+  return float_result[index];
 
 }
 
-void Prediction::SetResult (void *data) {
-  this->result = data;
+RuntimeError Prediction::SetResult (void *data, unsigned int size) {
+  RuntimeError error;
+
+  if (nullptr == data) {
+    error.Set (RuntimeError::Code::NULL_PARAMETER,
+               "Trying to assign a null value as presdiction result");
+    return error;
+  }
+  if (nullptr != this->result_data) {
+    free(this->result_data);
+  }
+  this->result_data = data;
+  this->result_size = size;
+
+  return error;
 }
 
 
 }
 }
+
