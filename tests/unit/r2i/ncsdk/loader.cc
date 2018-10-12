@@ -9,12 +9,13 @@
  * back to RidgeRun without any encumbrance.
 */
 
-#include <CppUTest/TestHarness.h>
 #include <mvnc.h>
 #include <r2i/r2i.h>
 #include <r2i/ncsdk/loader.h>
 #include <r2i/ncsdk/model.h>
 #include <fstream>
+
+#include <CppUTest/TestHarness.h>
 
 TEST_GROUP (NcsdkLoader) {
   r2i::RuntimeError error;
