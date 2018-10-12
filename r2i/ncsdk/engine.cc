@@ -319,8 +319,11 @@ std::shared_ptr<r2i::IPrediction> Engine::Predict (std::shared_ptr<r2i::IFrame>
                "Engine in wrong State");
     goto engine_error;
   }
-  data = frame->GetData();
-  input_data_size = in_frame->GetSize();
+
+  data = frame->GetData().get();
+
+  input_data_size = sizeof(float) * in_frame->GetWidth() *
+                    in_frame->GetHeight() * in_frame->GetFormat() * 3;
 
   input_buffers_ptr = this->GetInputFifoHandler();;
   output_buffers_ptr = this->GetOutputFifoHandler();;

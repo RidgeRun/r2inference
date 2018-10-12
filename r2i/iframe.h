@@ -26,6 +26,7 @@ namespace r2i {
  * using an IModel.
  */
 class IFrame {
+ public:
   /**
    * \brief Configures the frame to pass to the framework
    * \param in_data Pointer to the data to use.
