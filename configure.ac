@@ -53,6 +53,7 @@ docs/Makefile
 docs/api/Makefile
 docs/uml/Makefile
 examples/Makefile
+examples/ncsdk/Makefile
 r2i/Makefile
 r2i/ncsdk/Makefile
 tests/Makefile
