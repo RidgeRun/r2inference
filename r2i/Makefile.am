@@ -8,7 +8,13 @@
 # a software license from RidgeRun.  All source code changes must be provided
 # back to RidgeRun without any encumbrance.
 
-SUBDIRS = ncsdk
+SUBDIRS =
+
+if HAVE_NCSDK
+SUBDIRS += ncsdk
+endif
+
+DIST_SUBDIRS = ncsdk
 
 lib_LTLIBRARIES = libr2inference-@RR_PACKAGE_VERSION@.la
 
@@ -34,10 +40,14 @@ libr2inference_@RR_PACKAGE_VERSION@_la_CXXFLAGS = 	\
 
 libr2inference_@RR_PACKAGE_VERSION@_la_LIBADD = 	\
 	$(RR_LIBS)					\
-	$(CODE_COVERAGE_LIBS)				\
-	$(top_builddir)/r2i/ncsdk/libncsdk.la
+	$(CODE_COVERAGE_LIBS)
 
 r2iinclude_HEADERS =					\
 	r2i.h						\
 	runtimeerror.h					\
 	imageformat.h
+
+if HAVE_NCSDK
+libr2inference_@RR_PACKAGE_VERSION@_la_LIBADD += 	\
+	$(top_builddir)/r2i/ncsdk/libncsdk.la
+endif

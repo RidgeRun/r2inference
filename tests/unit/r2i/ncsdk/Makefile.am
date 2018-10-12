@@ -9,8 +9,12 @@
 # back to RidgeRun without any encumbrance.
 
 if ENABLE_TESTS
+if HAVE_NCSDK
+
 TESTS=tests
 check_PROGRAMS=$(TESTS)
+
+endif # HAVE_NCSDK
 endif # ENABLE_TESTS
 
 if ENABLE_CODE_COVERAGE
