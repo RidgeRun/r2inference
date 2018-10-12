@@ -59,3 +59,8 @@ tests/unit/r2i/ncsdk/tests
 
 # rr-build-utils configuration files
 .rrconfig
+
+# 3rd party tools
+.clang_complete
+cscope.files
+cscope.out
