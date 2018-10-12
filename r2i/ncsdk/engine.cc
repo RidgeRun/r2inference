@@ -87,7 +87,7 @@ RuntimeError Engine::Start ()  {
     return error;
   }
 
-  device_handle = this->movidius_device.get();
+  model->Start ("NSDK");
 
   ret = ncDeviceCreate(0, &device_handle);
 
