@@ -86,6 +86,11 @@ class IParameters {
    * \return RuntimeError with a description of an error.
    */
   virtual RuntimeError Set (const std::string &in_parameter, int in_value) = 0;
+
+  /**
+   * \brief Default destructor
+   */
+  virtual ~IParameters () {};
 };
 
 }
