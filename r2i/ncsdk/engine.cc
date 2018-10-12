@@ -298,6 +298,7 @@ std::shared_ptr<r2i::IPrediction> Engine::Predict (std::shared_ptr<r2i::IFrame>
   void *result;
   void *data;
   Status engine_status;
+  r2i::ImageFormat in_format;
 
   error.Clean ();
 
@@ -322,8 +323,9 @@ std::shared_ptr<r2i::IPrediction> Engine::Predict (std::shared_ptr<r2i::IFrame>
 
   data = frame->GetData().get();
 
+  in_format = in_frame->GetFormat();
   input_data_size = sizeof(float) * in_frame->GetWidth() *
-                    in_frame->GetHeight() * in_frame->GetFormat() * 3;
+                    in_frame->GetHeight() * in_format.GetNumPlanes();
 
   input_buffers_ptr = this->GetInputFifoHandler();;
   output_buffers_ptr = this->GetOutputFifoHandler();;

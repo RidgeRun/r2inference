@@ -13,6 +13,7 @@
 #define R2I_IFRAME_H
 
 #include <r2i/runtimeerror.h>
+#include <r2i/imageformat.h>
 
 #include <memory>
 #include <string>
@@ -36,7 +37,7 @@ class IFrame {
    * \return A RuntimeError with a description of the error.
    */
   virtual RuntimeError Configure (std::shared_ptr<void> in_data, int width,
-                                  int height, int format) = 0;
+                                  int height, r2i::ImageFormat::Code format) = 0;
 
   /**
    * \brief Gets the data set to the Frame.
@@ -58,9 +59,9 @@ class IFrame {
 
   /**
    * \brief Gets the Image format set to the Frame.
-   * \return Integer value with the Image format.
+   * \return Image format.
    */
-  virtual int GetFormat () = 0;
+  virtual ImageFormat GetFormat () = 0;
 };
 
 }

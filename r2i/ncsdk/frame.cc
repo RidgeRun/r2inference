@@ -16,8 +16,9 @@ namespace r2i {
 namespace ncsdk {
 
 RuntimeError Frame::Configure (std::shared_ptr<void> in_data, int width,
-                               int height, int format) {
+                               int height, r2i::ImageFormat::Code format) {
   RuntimeError error;
+  ImageFormat imageformat (format);
 
   if (nullptr == in_data) {
     error.Set (RuntimeError::Code::NULL_PARAMETER, "Received a NULL data pointer");
@@ -37,7 +38,7 @@ RuntimeError Frame::Configure (std::shared_ptr<void> in_data, int width,
   this->frame_data = in_data;
   this->frame_width = width;
   this->frame_height = height;
-  this->frame_format = format;
+  this->frame_format = imageformat;
 
   return error;
 }
@@ -54,7 +55,7 @@ int Frame::GetHeight () {
   return this->frame_height;
 }
 
-int Frame::GetFormat () {
+ImageFormat Frame::GetFormat () {
   return this->frame_format;
 }
 }
