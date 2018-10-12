@@ -30,10 +30,12 @@ libncsdk_la_CPPFLAGS = 			\
 
 libncsdk_la_CFLAGS = 			\
 	$(RR_CFLAGS)			\
+	$(NCSDK_CFLAGS)			\
 	$(CODE_COVERAGE_CFLAGS)
 
 libncsdk_la_CXXFLAGS = 			\
 	$(RR_CXXFLAGS)			\
+	$(NCSDK_CFLAGS)			\
 	$(CODE_COVERAGE_CXXFLAGS)
 
 libncsdk_la_LIBADD = 			\

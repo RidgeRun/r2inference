@@ -27,12 +27,14 @@ LOG_DRIVER=$(top_builddir)/common/rr-test-driver.py $(SINGLE_PROCESS)
 
 AM_CXXFLAGS = 				\
 	$(RR_CXXFLAGS)			\
-	$(TESTS_CFLAGS) 		\
+	$(TESTS_CFLAGS)			\
+	$(NCSDK_CFLAGS)			\
 	$(CODE_COVERAGE_CXXFLAGS)
 
 AM_CFLAGS = 				\
 	$(RR_CFLAGS)			\
 	$(TESTS_CFLAGS)			\
+	$(NCSDK_CFLAGS)			\
 	$(CODE_COVERAGE_CFLAGS)
 
 AM_CPPFLAGS = 				\
