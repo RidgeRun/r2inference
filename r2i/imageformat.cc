@@ -18,39 +18,39 @@ namespace r2i {
 
 static std::unordered_map<int, std::pair<const std::string, int>>
 format_descriptors ({
-  {ImageFormat::Code::RGB, {"RGB", 3}},
-  {ImageFormat::Code::BGR, {"BGR", 3}},
-  {ImageFormat::Code::GRAY, {"Grayscale", 1}},
-  {ImageFormat::Code::UNKNOWN_FORMAT, {"Unknown format", 0}}
+  {ImageFormat::Id::RGB, {"RGB", 3}},
+  {ImageFormat::Id::BGR, {"BGR", 3}},
+  {ImageFormat::Id::GRAY, {"Grayscale", 1}},
+  {ImageFormat::Id::UNKNOWN_FORMAT, {"Unknown format", 0}}
 });
 
 ImageFormat::ImageFormat ()
-  : code(Code::UNKNOWN_FORMAT) {
+  : id(Id::UNKNOWN_FORMAT) {
 }
 
-ImageFormat::ImageFormat (Code code)
-  : code(code) {
+ImageFormat::ImageFormat (Id id)
+  : id(id) {
 }
 
-ImageFormat::Code ImageFormat::GetCode () {
-  return this->code;
+ImageFormat::Id ImageFormat::GetId () {
+  return this->id;
 }
 
-std::pair<const std::string, int> search (ImageFormat::Code code) {
-  auto search = format_descriptors.find (code);
+std::pair<const std::string, int> search (ImageFormat::Id id) {
+  auto search = format_descriptors.find (id);
   if (format_descriptors.end () == search) {
-    search = format_descriptors.find (ImageFormat::Code::UNKNOWN_FORMAT);
+    search = format_descriptors.find (ImageFormat::Id::UNKNOWN_FORMAT);
   }
   return search->second;  
 }
 
 const std::string ImageFormat::GetDescription () {
-  std::pair<const std::string, int> descriptor = search(this->code);
+  std::pair<const std::string, int> descriptor = search(this->id);
   return descriptor.first;
 }
 
 int ImageFormat::GetNumPlanes () {
-  std::pair<const std::string, int> descriptor = search(this->code);
+  std::pair<const std::string, int> descriptor = search(this->id);
   return descriptor.second;
 }
 }

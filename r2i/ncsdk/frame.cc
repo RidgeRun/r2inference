@@ -16,7 +16,7 @@ namespace r2i {
 namespace ncsdk {
 
 RuntimeError Frame::Configure (std::shared_ptr<void> in_data, int width,
-                               int height, r2i::ImageFormat::Code format) {
+                               int height, r2i::ImageFormat::Id format) {
   RuntimeError error;
   ImageFormat imageformat (format);
 

@@ -34,34 +34,34 @@ TEST_GROUP (NcsdkFrame) {
 
 TEST (NcsdkFrame, SetZeroWidth) {
   std::shared_ptr<void> setdata (malloc(SIZE_TEST), free);
-  error = frame.Configure (setdata, 0, HEIGHT_TEST, r2i::ImageFormat::Code::RGB);
+  error = frame.Configure (setdata, 0, HEIGHT_TEST, r2i::ImageFormat::Id::RGB);
   LONGS_EQUAL (r2i::RuntimeError::Code::WRONG_API_USAGE, error.GetCode());
 }
 
 TEST (NcsdkFrame, SetZeroHeight) {
   std::shared_ptr<void> setdata (malloc(SIZE_TEST), free);
-  error = frame.Configure (setdata, WIDTH_TEST, 0, r2i::ImageFormat::Code::RGB);
+  error = frame.Configure (setdata, WIDTH_TEST, 0, r2i::ImageFormat::Id::RGB);
   LONGS_EQUAL (r2i::RuntimeError::Code::WRONG_API_USAGE, error.GetCode());
 }
 
 TEST (NcsdkFrame, SetNegativeWidth) {
   std::shared_ptr<void> setdata (malloc(SIZE_TEST), free);
   error = frame.Configure (setdata, NEGATIVE_TEST, HEIGHT_TEST,
-                           r2i::ImageFormat::Code::RGB);
+                           r2i::ImageFormat::Id::RGB);
   LONGS_EQUAL (r2i::RuntimeError::Code::WRONG_API_USAGE, error.GetCode());
 }
 
 TEST (NcsdkFrame, SetNegativeHeight) {
   std::shared_ptr<void> setdata (malloc(SIZE_TEST), free);
   error = frame.Configure (setdata, WIDTH_TEST, NEGATIVE_TEST,
-                           r2i::ImageFormat::Code::RGB);
+                           r2i::ImageFormat::Id::RGB);
   LONGS_EQUAL (r2i::RuntimeError::Code::WRONG_API_USAGE, error.GetCode());
 }
 
 TEST (NcsdkFrame, SetGetWidth) {
   std::shared_ptr<void> setdata (malloc(SIZE_TEST), free);
   error = frame.Configure (setdata, WIDTH_TEST, HEIGHT_TEST,
-                           r2i::ImageFormat::Code::RGB);
+                           r2i::ImageFormat::Id::RGB);
   auto width = frame.GetWidth ();
   LONGS_EQUAL (WIDTH_TEST, width);
   LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode());
@@ -70,7 +70,7 @@ TEST (NcsdkFrame, SetGetWidth) {
 TEST (NcsdkFrame, SetGetHeight) {
   std::shared_ptr<void> setdata (malloc(SIZE_TEST), free);
   error = frame.Configure (setdata, WIDTH_TEST, HEIGHT_TEST,
-                           r2i::ImageFormat::Code::RGB);
+                           r2i::ImageFormat::Id::RGB);
   auto height = frame.GetHeight ();
   LONGS_EQUAL (WIDTH_TEST, height);
   LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode());
@@ -78,7 +78,7 @@ TEST (NcsdkFrame, SetGetHeight) {
 
 TEST (NcsdkFrame, SetNullData) {
   error = frame.Configure (nullptr, WIDTH_TEST, HEIGHT_TEST,
-                           r2i::ImageFormat::Code::RGB);
+                           r2i::ImageFormat::Id::RGB);
   auto data = frame.GetData ();
   LONGS_EQUAL (r2i::RuntimeError::Code::NULL_PARAMETER, error.GetCode());
 }
@@ -86,23 +86,23 @@ TEST (NcsdkFrame, SetNullData) {
 TEST (NcsdkFrame, SetGetData) {
   std::shared_ptr<void> setdata (malloc(SIZE_TEST), free);
   error = frame.Configure (setdata, WIDTH_TEST, HEIGHT_TEST,
-                           r2i::ImageFormat::Code::RGB);
+                           r2i::ImageFormat::Id::RGB);
   auto data = frame.GetData ();
   POINTERS_EQUAL (setdata.get(), data.get());
 }
 
-TEST (NcsdkFrame, FormatCheckCode) {
+TEST (NcsdkFrame, FormatCheckId) {
   std::shared_ptr<void> setdata (malloc(SIZE_TEST), free);
   error = frame.Configure (setdata, WIDTH_TEST, HEIGHT_TEST,
-                           r2i::ImageFormat::Code::RGB);
+                           r2i::ImageFormat::Id::RGB);
   format = frame.GetFormat();
-  LONGS_EQUAL (format.GetCode(), r2i::ImageFormat::Code::RGB);
+  LONGS_EQUAL (format.GetId(), r2i::ImageFormat::Id::RGB);
 }
 
 TEST (NcsdkFrame, FormatCheckPlanes) {
   std::shared_ptr<void> setdata (malloc(SIZE_TEST), free);
   error = frame.Configure (setdata, WIDTH_TEST, HEIGHT_TEST,
-                           r2i::ImageFormat::Code::RGB);
+                           r2i::ImageFormat::Id::RGB);
   format = frame.GetFormat();
   LONGS_EQUAL (format.GetNumPlanes(), 3);
 }
@@ -110,7 +110,7 @@ TEST (NcsdkFrame, FormatCheckPlanes) {
 TEST (NcsdkFrame, FormatCheckDescription) {
   std::shared_ptr<void> setdata (malloc(SIZE_TEST), free);
   error = frame.Configure (setdata, WIDTH_TEST, HEIGHT_TEST,
-                           r2i::ImageFormat::Code::RGB);
+                           r2i::ImageFormat::Id::RGB);
   format = frame.GetFormat();
   CHECK ("RGB" == format.GetDescription());
 }
@@ -118,7 +118,7 @@ TEST (NcsdkFrame, FormatCheckDescription) {
 TEST (NcsdkFrame, InvalidFormatGetDescription) {
   std::shared_ptr<void> setdata (malloc(SIZE_TEST), free);
   error = frame.Configure (setdata, WIDTH_TEST, HEIGHT_TEST,
-                           r2i::ImageFormat::Code::UNKNOWN_FORMAT);
+                           r2i::ImageFormat::Id::UNKNOWN_FORMAT);
   format = frame.GetFormat();
   CHECK ("Unknown format" == format.GetDescription());
 }
@@ -126,7 +126,7 @@ TEST (NcsdkFrame, InvalidFormatGetDescription) {
 TEST (NcsdkFrame, InvalidFormatGetNumPlanes) {
   std::shared_ptr<void> setdata (malloc(SIZE_TEST), free);
   error = frame.Configure (setdata, WIDTH_TEST, HEIGHT_TEST,
-                           r2i::ImageFormat::Code::UNKNOWN_FORMAT);
+                           r2i::ImageFormat::Id::UNKNOWN_FORMAT);
   format = frame.GetFormat();
   LONGS_EQUAL (format.GetNumPlanes(), 0);
 }

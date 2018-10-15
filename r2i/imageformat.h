@@ -26,10 +26,10 @@ class ImageFormat {
  public:
 
   /**
-   * Numerical code describing the different formats. See the
+   * Numerical id describing the different formats. See the
    * description field for more contextual information at runtime.
    */
-  enum Code {
+  enum Id {
     /**
     * RGB: 3 planes with 8 bits per pixel
     */
@@ -59,14 +59,14 @@ class ImageFormat {
   /**
    * \brief Creates and initializes a format.
    *
-   * \param code The code to set in the format
+   * \param id The id to set in the format
    */
-  ImageFormat (Code code);
+  ImageFormat (Id id);
 
   /**
-   * Returns the code of the format
+   * Returns the id of the format
    */
-  Code GetCode ();
+  Id GetId ();
 
   /**
    * Returns a human readable description of the format
@@ -79,7 +79,7 @@ class ImageFormat {
   int GetNumPlanes ();
 
  private:
-  Code code;
+  Id id;
 };
 
 }

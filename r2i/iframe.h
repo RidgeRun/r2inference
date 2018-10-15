@@ -33,11 +33,11 @@ class IFrame {
    * \param in_data Pointer to the data to use.
    * \param width Image Width.
    * \param height Image Height.
-   * \param format Image format (Defined by each framework)
+   * \param format Image format Id (Defined by each framework)
    * \return A RuntimeError with a description of the error.
    */
   virtual RuntimeError Configure (std::shared_ptr<void> in_data, int width,
-                                  int height, r2i::ImageFormat::Code format) = 0;
+                                  int height, r2i::ImageFormat::Id format) = 0;
 
   /**
    * \brief Gets the data set to the Frame.
