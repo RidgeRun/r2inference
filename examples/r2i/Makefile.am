@@ -8,18 +8,9 @@
 # a software license from RidgeRun.  All source code changes must be provided
 # back to RidgeRun without any encumbrance.
 
-bin_PROGRAMS = example
+DIST_SUBDIRS = ncsdk
+SUBDIRS =
 
-example_CXXFLAGS = 				\
-	$(RR_CXXFLAGS)
-
-example_CPPFLAGS = 				\
-	$(RR_CPPFLAGS)
-
-example_LDFLAGS = 				\
-	$(RR_LIBS)						\
-	$(NCSDK_LIBS)					\
-	$(top_builddir)/r2i/libr2inference-@RR_PACKAGE_VERSION@.la
-
-example_SOURCES = 				\
-	example.cc
+if HAVE_NCSDK
+SUBDIRS += ncsdk
+endif
