@@ -383,8 +383,10 @@ std::shared_ptr<r2i::IPrediction> Engine::Predict (std::shared_ptr<r2i::IFrame>
 
   }
 
-  prediction->SetResult(result);
-
+  error = prediction->SetResult(result, output_data_size);
+  if (RuntimeError::Code::EOK != error.GetCode()) {
+    goto exit;
+  }
 
   return prediction;
 
