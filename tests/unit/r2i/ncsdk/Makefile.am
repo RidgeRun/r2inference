@@ -9,8 +9,12 @@
 # back to RidgeRun without any encumbrance.
 
 if ENABLE_TESTS
+if HAVE_NCSDK
+
 TESTS=tests
 check_PROGRAMS=$(TESTS)
+
+endif # HAVE_NCSDK
 endif # ENABLE_TESTS
 
 if ENABLE_CODE_COVERAGE
@@ -23,12 +27,14 @@ LOG_DRIVER=$(top_builddir)/common/rr-test-driver.py $(SINGLE_PROCESS)
 
 AM_CXXFLAGS = 				\
 	$(RR_CXXFLAGS)			\
-	$(TESTS_CFLAGS) 		\
+	$(TESTS_CFLAGS)			\
+	$(NCSDK_CFLAGS)			\
 	$(CODE_COVERAGE_CXXFLAGS)
 
 AM_CFLAGS = 				\
 	$(RR_CFLAGS)			\
 	$(TESTS_CFLAGS)			\
+	$(NCSDK_CFLAGS)			\
 	$(CODE_COVERAGE_CFLAGS)
 
 AM_CPPFLAGS = 				\

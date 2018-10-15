@@ -61,6 +61,11 @@ class IEngine {
   virtual std::shared_ptr<r2i::IPrediction> Predict (std::shared_ptr<r2i::IFrame>
       in_frame,
       r2i::RuntimeError &error) = 0;
+
+  /**
+   * \brief Default destructor
+   */
+  virtual ~IEngine () {};
 };
 
 }

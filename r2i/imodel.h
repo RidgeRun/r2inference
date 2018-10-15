@@ -31,6 +31,10 @@ class IModel {
 
   virtual RuntimeError Start (const std::string &name) = 0;
 
+  /**
+   * \brief Default destructor
+   */
+  virtual ~IModel () {};
 };
 
 }

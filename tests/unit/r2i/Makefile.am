@@ -8,4 +8,9 @@
 # a software license from RidgeRun.  All source code changes must be provided
 # back to RidgeRun without any encumbrance.
 
-SUBDIRS = ncsdk
+DIST_SUBDIRS = ncsdk
+SUBDIRS =
+
+if HAVE_NCSDK
+SUBDIRS += ncsdk
+endif

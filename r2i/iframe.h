@@ -62,6 +62,11 @@ class IFrame {
    * \return Image format.
    */
   virtual ImageFormat GetFormat () = 0;
+
+  /**
+   * \brief Default destructor
+   */
+  virtual ~IFrame () {};
 };
 
 }

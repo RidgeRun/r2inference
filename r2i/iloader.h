@@ -37,6 +37,11 @@ class ILoader {
    */
   virtual std::shared_ptr<r2i::IModel> Load (const std::string &in_path,
       r2i::RuntimeError &error) = 0;
+
+  /**
+   * \brief Default destructor
+   */
+  virtual ~ILoader () {};
 };
 
 }

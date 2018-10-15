@@ -62,6 +62,11 @@ class IFrameworkFactory {
    */
   virtual std::unique_ptr<r2i::FrameworkMeta> GetDescription (
     RuntimeError &error) = 0;
+
+  /**
+   * \brief Default destructor
+   */
+  virtual ~IFrameworkFactory () {};
 };
 
 }

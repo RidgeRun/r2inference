@@ -16,7 +16,7 @@
 #include <r2i/runtimeerror.h>
 
 #include <string>
-#include "mvnc.h"
+#include <mvnc.h>
 #include <memory>
 
 namespace r2i {

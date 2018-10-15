@@ -8,6 +8,8 @@
 # a software license from RidgeRun.  All source code changes must be provided
 # back to RidgeRun without any encumbrance.
 
+if HAVE_NCSDK
+
 noinst_LTLIBRARIES = libncsdk.la
 
 # Define a custom area for our headers
@@ -28,10 +30,12 @@ libncsdk_la_CPPFLAGS = 			\
 
 libncsdk_la_CFLAGS = 			\
 	$(RR_CFLAGS)			\
+	$(NCSDK_CFLAGS)			\
 	$(CODE_COVERAGE_CFLAGS)
 
 libncsdk_la_CXXFLAGS = 			\
 	$(RR_CXXFLAGS)			\
+	$(NCSDK_CFLAGS)			\
 	$(CODE_COVERAGE_CXXFLAGS)
 
 libncsdk_la_LIBADD = 			\
@@ -47,3 +51,4 @@ ncsdkinclude_HEADERS =			\
 	prediction.h			\
 	frame.h
 
+endif # HAVE_NCSDK

@@ -32,6 +32,11 @@ class IPrediction {
    * \return a double that indicates the prediction at the provided index .
    */
   virtual double At (unsigned int index,  r2i::RuntimeError &error) = 0;
+
+  /**
+   * \brief Default destructor
+   */
+  virtual ~IPrediction () {};
 };
 
 }
