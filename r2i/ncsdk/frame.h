@@ -8,28 +8,36 @@
  * a software license from RidgeRun.  All source code changes must be provided
  * back to RidgeRun without any encumbrance.
 */
+
 #ifndef R2I_NCSDK_FRAME_H
 #define R2I_NCSDK_FRAME_H
 
 #include <r2i/iframe.h>
-#include <r2i/runtimeerror.h>
 
 namespace r2i {
 namespace ncsdk {
 
-class Frame: public IFrame {
+class Frame : public IFrame {
  public:
-  void *GetData () override;
-  unsigned int GetSize () override;
-  void SetData (void *graph_data);
+  virtual RuntimeError Configure (std::shared_ptr<void> in_data, int width,
+                                  int height, r2i::ImageFormat::Id format) override;
+
+  virtual std::shared_ptr<void> GetData () override;
+
+  virtual int GetWidth () override;
+
+  virtual int GetHeight () override;
+
+  virtual ImageFormat GetFormat () override;
 
  private:
-  void *data;
-  unsigned int graph_size;
+  std::shared_ptr<void> frame_data;
+  int frame_width;
+  int frame_height;
+  ImageFormat frame_format;
 };
 
 }
 }
-
 
 #endif //R2I_NCSDK_FRAME_H

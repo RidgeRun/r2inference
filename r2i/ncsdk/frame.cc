@@ -9,23 +9,54 @@
  * back to RidgeRun without any encumbrance.
 */
 
-
 #include "r2i/ncsdk/frame.h"
 #include "r2i/ncsdk/statuscodes.h"
 
 namespace r2i {
 namespace ncsdk {
 
-void *Frame::GetData () {
-  return this->data;
+RuntimeError Frame::Configure (std::shared_ptr<void> in_data, int width,
+                               int height, r2i::ImageFormat::Id format) {
+  RuntimeError error;
+  ImageFormat imageformat (format);
+
+  if (nullptr == in_data) {
+    error.Set (RuntimeError::Code::NULL_PARAMETER, "Received a NULL data pointer");
+    return error;
+  }
+  if (width <= 0) {
+    error.Set (RuntimeError::Code::WRONG_API_USAGE,
+               "Received an invalid image width");
+    return error;
+  }
+  if (height <= 0) {
+    error.Set (RuntimeError::Code::WRONG_API_USAGE,
+               "Received an invalid image height");
+    return error;
+  }
+
+  this->frame_data = in_data;
+  this->frame_width = width;
+  this->frame_height = height;
+  this->frame_format = imageformat;
+
+  return error;
 }
 
-unsigned int Frame::GetSize () {
-  return this->graph_size;
-}
-void Frame::SetData (void *data) {
-  this->data = data;
-}
-}
+std::shared_ptr<void> Frame::GetData () {
+  return this->frame_data;
 }
 
+int Frame::GetWidth () {
+  return this->frame_width;
+}
+
+int Frame::GetHeight () {
+  return this->frame_height;
+}
+
+ImageFormat Frame::GetFormat () {
+  return this->frame_format;
+}
+}
+}

@@ -12,6 +12,12 @@
 #ifndef R2I_IFRAME_H
 #define R2I_IFRAME_H
 
+#include <r2i/runtimeerror.h>
+#include <r2i/imageformat.h>
+
+#include <memory>
+#include <string>
+
 /**
  * R2Inference Namespace
  */
@@ -23,18 +29,39 @@ namespace r2i {
 class IFrame {
  public:
   /**
-   * \brief Gets data asigned to a IFrame implementation.
-   * \return a pointer to the data assigned to an IFrame
+   * \brief Configures the frame to pass to the framework
+   * \param in_data Pointer to the data to use.
+   * \param width Image Width.
+   * \param height Image Height.
+   * \param format Image format Id (Defined by each framework)
+   * \return A RuntimeError with a description of the error.
    */
-  virtual void *GetData() = 0;
+  virtual RuntimeError Configure (std::shared_ptr<void> in_data, int width,
+                                  int height, r2i::ImageFormat::Id format) = 0;
 
   /**
-   * \brief Gets size of data asigned to a IFrame implementation.
-   * \return a int with the number of bytes of theto the data assigned
-   * to an IFrame
+   * \brief Gets the data set to the Frame.
+   * \return A Shared Pointer with the data set to the Frame.
    */
-  virtual unsigned int GetSize () = 0;
+  virtual std::shared_ptr<void> GetData () = 0;
 
+  /**
+   * \brief Gets the Image width set to the Frame.
+   * \return Integer value with the Image width.
+   */
+  virtual int GetWidth () = 0;
+
+  /**
+   * \brief Gets the Image height set to the Frame.
+   * \return Integer value with the Image height.
+   */
+  virtual int GetHeight () = 0;
+
+  /**
+   * \brief Gets the Image format set to the Frame.
+   * \return Image format.
+   */
+  virtual ImageFormat GetFormat () = 0;
 };
 
 }

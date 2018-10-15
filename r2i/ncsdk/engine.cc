@@ -298,6 +298,7 @@ std::shared_ptr<r2i::IPrediction> Engine::Predict (std::shared_ptr<r2i::IFrame>
   void *result;
   void *data;
   Status engine_status;
+  r2i::ImageFormat in_format;
 
   error.Clean ();
 
@@ -319,8 +320,12 @@ std::shared_ptr<r2i::IPrediction> Engine::Predict (std::shared_ptr<r2i::IFrame>
                "Engine in wrong State");
     goto engine_error;
   }
-  data = frame->GetData();
-  input_data_size = in_frame->GetSize();
+
+  data = frame->GetData().get();
+
+  in_format = in_frame->GetFormat();
+  input_data_size = sizeof(float) * in_frame->GetWidth() *
+                    in_frame->GetHeight() * in_format.GetNumPlanes();
 
   input_buffers_ptr = this->GetInputFifoHandler();;
   output_buffers_ptr = this->GetOutputFifoHandler();;
