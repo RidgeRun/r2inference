@@ -18,6 +18,7 @@
 #define WIDTH_TEST 250
 #define HEIGHT_TEST 250
 #define NEGATIVE_TEST -1
+#define INVALID_FORMAT 100
 
 TEST_GROUP (NcsdkFrame) {
   r2i::RuntimeError error;
@@ -113,3 +114,20 @@ TEST (NcsdkFrame, FormatCheckDescription) {
   format = frame.GetFormat();
   CHECK ("RGB" == format.GetDescription());
 }
+
+TEST (NcsdkFrame, InvalidFormatGetDescription) {
+  std::shared_ptr<void> setdata (malloc(SIZE_TEST), free);
+  error = frame.Configure (setdata, WIDTH_TEST, HEIGHT_TEST,
+                           r2i::ImageFormat::Code::UNKNOWN_FORMAT);
+  format = frame.GetFormat();
+  CHECK ("Unknown format" == format.GetDescription());
+}
+
+TEST (NcsdkFrame, InvalidFormatGetNumPlanes) {
+  std::shared_ptr<void> setdata (malloc(SIZE_TEST), free);
+  error = frame.Configure (setdata, WIDTH_TEST, HEIGHT_TEST,
+                           r2i::ImageFormat::Code::UNKNOWN_FORMAT);
+  format = frame.GetFormat();
+  LONGS_EQUAL (format.GetNumPlanes(), 0);
+}
+

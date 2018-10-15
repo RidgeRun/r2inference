@@ -36,15 +36,21 @@ ImageFormat::Code ImageFormat::GetCode () {
   return this->code;
 }
 
+std::pair<const std::string, int> search (ImageFormat::Code code) {
+  auto search = format_descriptors.find (code);
+  if (format_descriptors.end () == search) {
+    search = format_descriptors.find (ImageFormat::Code::UNKNOWN_FORMAT);
+  }
+  return search->second;  
+}
+
 const std::string ImageFormat::GetDescription () {
-  auto search = format_descriptors.find (this->code);
-  auto descriptor = search->second;
+  std::pair<const std::string, int> descriptor = search(this->code);
   return descriptor.first;
 }
 
 int ImageFormat::GetNumPlanes () {
-  auto search = format_descriptors.find (this->code);
-  auto descriptor = search->second;
+  std::pair<const std::string, int> descriptor = search(this->code);
   return descriptor.second;
 }
 }
