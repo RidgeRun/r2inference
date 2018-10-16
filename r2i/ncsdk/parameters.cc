@@ -19,13 +19,29 @@
 namespace r2i {
 namespace ncsdk {
 
-static const std::unordered_map<std::string, int> parameter_int_map ({
+Parameters::Parameters () :
+  parameter_map_global_string ({
+}),
+parameter_map_global_int ({
   {"log-level", NC_RW_LOG_LEVEL},
-  {"api-version", NC_RO_API_VERSION}, //for testing purposes
-});
-
-static const std::unordered_map<std::string, int> parameter_string_map ({
-});
+  {"api-version", NC_RO_API_VERSION},
+}),
+parameter_map_device_int ({
+  {"thermal-throttling-level", NC_RO_DEVICE_THERMAL_THROTTLING_LEVEL},
+  {"device-state", NC_RO_DEVICE_STATE},
+  {"current-memory-used", NC_RO_DEVICE_CURRENT_MEMORY_USED},
+  {"memory-size", NC_RO_DEVICE_MEMORY_SIZE},
+  {"max-fifo-num", NC_RO_DEVICE_MAX_FIFO_NUM},
+  {"allocated-fifo-num", NC_RO_DEVICE_ALLOCATED_FIFO_NUM},
+  {"max-graph-num", NC_RO_DEVICE_MAX_GRAPH_NUM},
+  {"allocated-graph-num", NC_RO_DEVICE_ALLOCATED_GRAPH_NUM},
+  {"option-class-limit", NC_RO_DEVICE_OPTION_CLASS_LIMIT},
+  {"max-executor-num", NC_RO_DEVICE_MAX_EXECUTORS_NUM},
+}),
+parameter_maps_int {
+  {this->parameter_map_global_int, {&r2i::ncsdk::Parameters::SetParameterGlobal, &r2i::ncsdk::Parameters::GetParameterGlobal}}
+} {
+}
 
 RuntimeError Parameters::Configure (std::shared_ptr<r2i::IEngine> in_engine,
                                     std::shared_ptr<r2i::IModel> in_model) {
@@ -66,84 +82,79 @@ std::shared_ptr<r2i::IModel> Parameters::GetModel () {
 RuntimeError Parameters::Get (const std::string &in_parameter, int &value) {
   unsigned int value_size = sizeof (value);
 
-  return this->GetParameter (parameter_int_map, in_parameter, "int", &value,
-                             &value_size);
+  return this->ApplyParameter (this->parameter_maps_int, in_parameter, "int",
+                               &value,
+                               &value_size, AccessorIndex::GET);
 }
 
 RuntimeError Parameters::Get (const std::string &in_parameter,
                               std::string &value) {
   unsigned int value_size = value.size();
 
-  return this->GetParameter (parameter_string_map, in_parameter, "int",
-                             &(value[0]),
-                             &value_size);
+  return this->ApplyParameter (this->parameter_maps_int, in_parameter, "int",
+                               &(value[0]),
+                               &value_size, AccessorIndex::GET);
 }
 
 RuntimeError Parameters::Set (const std::string &in_parameter,
                               const std::string &in_value) {
-  return this->SetParameter (parameter_string_map, in_parameter, "string",
-                             in_value.c_str(), in_value.size() + 1);
+  unsigned int value_size = in_value.size() + 1;
+
+  return this->ApplyParameter (this->parameter_maps_string, in_parameter,
+                               "string", const_cast<char *>(in_value.c_str()),
+                               &value_size, AccessorIndex::SET);
 }
 
 RuntimeError Parameters::Set (const std::string &in_parameter, int in_value) {
-  return this->SetParameter (parameter_int_map, in_parameter, "int", &in_value,
-                             sizeof (in_value));
+  unsigned int value_size = sizeof (in_value);
+
+  return this->ApplyParameter (this->parameter_maps_int, in_parameter, "int",
+                               &in_value,
+                               &value_size, AccessorIndex::SET);
 }
 
-RuntimeError Parameters::InteractWithParameter (const
-    std::unordered_map<std::string, int> &map, const std::string &in_parameter,
-    const std::string &type, void *target, unsigned int *target_size,
-    param_apply apply) {
+RuntimeError Parameters::ApplyParameter (const AccessorVector &vec,
+    const std::string &in_parameter,
+    const std::string &type,
+    void *target,
+    unsigned int *target_size,
+    int accesor_index) {
   RuntimeError error;
 
-  auto search = map.find (in_parameter);
+  for (auto &accessmap : vec) {
+    auto param = accessmap.map.find (in_parameter);
 
-  if (map.end () == search) {
-    error.Set (RuntimeError::Code::INVALID_FRAMEWORK_PARAMETER, "Parameter \""
-               + in_parameter + "\" does not exist or is not of " + type + " type");
-    return error;
+    /* Parameter found in current map, process it */
+    if (param != accessmap.map.end ()) {
+      Accessor apply = accessmap.accessor[accesor_index];
+      int ncparam = param->second;
+
+      ncStatus_t ret = apply (this, ncparam, target, target_size);
+      if (NC_OK != ret) {
+        error.Set (RuntimeError::Code::INVALID_FRAMEWORK_PARAMETER,
+                   GetStringFromStatus (ret, error));
+      }
+
+      return error;
+    }
   }
 
-  ncStatus_t ret = apply (search->second, target, target_size);
-  if (NC_OK != ret) {
-    error.Set (RuntimeError::Code::INVALID_FRAMEWORK_PARAMETER,
-               GetStringFromStatus (ret, error));
-  }
-
+  /* The parameter wasn't found in any map */
+  error.Set (RuntimeError::Code::INVALID_FRAMEWORK_PARAMETER, "Parameter \""
+             + in_parameter + "\" does not exist or is not of " + type + " type");
   return error;
 }
 
-RuntimeError Parameters::SetParameter (const
-                                       std::unordered_map<std::string, int> &map,
-                                       const std::string &in_parameter,
-                                       const std::string &type,
-                                       const void *target, unsigned int
-                                       target_size) {
-
-  param_apply apply = [] (int param, void *target,
-  unsigned int *target_size) -> ncStatus_t {
-    return ncGlobalSetOption (param, target, *target_size);
-  };
-
-  /* Allow this const cast-away to favor code reusability, we are the
-     only ones who interact with target in the provided lambda
-  */
-  return this->InteractWithParameter (map, in_parameter, type,
-                                      const_cast<void *> (target), &target_size, apply);
+ncStatus_t Parameters::SetParameterGlobal (Parameters *self, int param,
+    void *target,
+    unsigned int *target_size) {
+  return ncGlobalSetOption (param, target, *target_size);
 }
 
-RuntimeError Parameters::GetParameter (const
-                                       std::unordered_map<std::string, int> &map,
-                                       const std::string &in_parameter,
-                                       const std::string &type, void *target,
-                                       unsigned int *target_size) {
-  param_apply apply = [] (int param, void *target,
-  unsigned int *target_size) -> ncStatus_t {
-    return ncGlobalGetOption (param, target, target_size);
-  };
-
-  return this->InteractWithParameter (map, in_parameter, type, target,
-                                      target_size, apply);
+ncStatus_t Parameters::GetParameterGlobal (Parameters *self, int param,
+    void *target,
+    unsigned int *target_size) {
+  return ncGlobalGetOption (param, target, target_size);
 }
 
 } // namespace ncsdk
