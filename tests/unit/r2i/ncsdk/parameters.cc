@@ -34,59 +34,12 @@ class MockModel : public r2i::IModel {
   r2i::RuntimeError Start (const std::string &name) override {r2i::RuntimeError error; return error;}
 };
 
-/* Stubs for MVNC */
-int stubint = -1;
-std::string stubstring;
-
-bool shoulderror = false;
-ncStatus_t ncGlobalSetOption(int option, const void *data,
-                             unsigned int dataLength) {
-  switch (option) {
-    case (NC_RW_LOG_LEVEL): {
-      stubint = *((int *)data);
-      LONGS_EQUAL (sizeof (int), dataLength);
-      break;
-    }
-    case (-1): {
-      stubstring = static_cast<const char *>(data);
-      LONGS_EQUAL (dataLength, stubstring.size() + 1);
-      break;
-    }
-    default: {
-      FAIL ("Unkown flag");
-    }
-  }
-
-  return shoulderror ? NC_INVALID_PARAMETERS : NC_OK;
-}
-
-ncStatus_t ncGlobalGetOption(int option, void *data,
-                             unsigned int *dataLength) {
-  switch (option) {
-    case (NC_RO_API_VERSION): {
-      *((int *)data) = stubint;
-      break;
-    }
-    case (-1): {
-      memcpy (data, stubstring.data(), *dataLength);
-      break;
-    }
-    default: {
-      FAIL ("Unkown flag");
-    }
-  }
-
-  return shoulderror ? NC_INVALID_PARAMETERS : NC_OK;
-}
-
 TEST_GROUP (NcsdkParameters) {
   r2i::ncsdk::Parameters params;
   std::shared_ptr<r2i::IEngine> engine;
   std::shared_ptr<r2i::IModel> model;
 
   void setup () {
-    stubint = -1;
-    shoulderror = false;
     engine = std::make_shared<r2i::ncsdk::Engine> ();
     model = std::make_shared<MockModel> ();
   }
@@ -153,14 +106,23 @@ TEST (NcsdkParameters, ConfigureGetEngineModel) {
   POINTERS_EQUAL (model.get(), modeltotest.get());
 }
 
-TEST (NcsdkParameters, SetGlobalInt) {
+TEST (NcsdkParameters, SetGetGlobalInt) {
   r2i::RuntimeError error;
-  int expected = 2;
+  int expected = 123;
+  int target;
+
+  error = params.Get ("log-level", target);
+  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
+
+  expected = target + 1;
 
   error = params.Set ("log-level", expected);
   LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
 
-  LONGS_EQUAL (expected, stubint);
+  error = params.Get ("log-level", target);
+  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
+
+  LONGS_EQUAL (expected, target);
 }
 
 TEST (NcsdkParameters, SetGlobalIntNotFound) {
@@ -169,50 +131,13 @@ TEST (NcsdkParameters, SetGlobalIntNotFound) {
   error = params.Set ("not-found", 0);
   LONGS_EQUAL (r2i::RuntimeError::Code::INVALID_FRAMEWORK_PARAMETER,
                error.GetCode ());
-
-  // Test that stub is not called
-  LONGS_EQUAL (-1, stubint);
 }
 
 TEST (NcsdkParameters, SetGlobalIntError) {
   r2i::RuntimeError error;
-  shoulderror = true;
 
-  error = params.Set ("log-level", 0);
+  /* api-version is read-only */
+  error = params.Set ("api-version", 0);
   LONGS_EQUAL (r2i::RuntimeError::Code::INVALID_FRAMEWORK_PARAMETER,
                error.GetCode ());
-}
-
-TEST (NcsdkParameters, SetGlobalString) {
-  r2i::RuntimeError error;
-  const std::string expected = "expected";
-
-  error = params.Set ("mock-param", expected);
-  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
-
-  STRCMP_EQUAL (expected.c_str(), stubstring.c_str());
-}
-
-TEST (NcsdkParameters, GetGlobalInt) {
-  r2i::RuntimeError error;
-  int expected = 1234;
-  int target;
-
-  stubint = expected;
-  error = params.Get ("api-version", target);
-  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
-
-  LONGS_EQUAL (expected, stubint);
-}
-
-TEST (NcsdkParameters, GetGlobalString) {
-  r2i::RuntimeError error;
-  const std::string expected = "expected";
-  std::string target;
-
-  stubstring = expected;
-  error = params.Get ("mock-param", target);
-  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
-
-  STRCMP_EQUAL (expected.c_str(), stubstring.c_str());
 }

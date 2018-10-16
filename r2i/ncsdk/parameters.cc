@@ -21,11 +21,10 @@ namespace ncsdk {
 
 static const std::unordered_map<std::string, int> parameter_int_map ({
   {"log-level", NC_RW_LOG_LEVEL},
-  {"api-version", NC_RO_API_VERSION},
+  {"api-version", NC_RO_API_VERSION}, //for testing purposes
 });
 
 static const std::unordered_map<std::string, int> parameter_string_map ({
-  {"mock-param", -1}, //For testing purposes
 });
 
 RuntimeError Parameters::Configure (std::shared_ptr<r2i::IEngine> in_engine,
