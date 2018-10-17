@@ -24,7 +24,6 @@ Parameters::Parameters () :
 }),
 parameter_map_global_int ({
   {"log-level", NC_RW_LOG_LEVEL},
-  {"api-version", NC_RO_API_VERSION},
 }),
 parameter_map_device_int ({
   {"thermal-throttling-level", NC_RO_DEVICE_THERMAL_THROTTLING_LEVEL},
@@ -38,9 +37,22 @@ parameter_map_device_int ({
   {"option-class-limit", NC_RO_DEVICE_OPTION_CLASS_LIMIT},
   {"max-executor-num", NC_RO_DEVICE_MAX_EXECUTORS_NUM},
 }),
+parameter_map_fifo_int ({
+  {"input-fifo-type", NC_RW_FIFO_TYPE},
+  {"input-fifo-consumer-count", NC_RW_FIFO_CONSUMER_COUNT},
+  {"input-fifo-data-type", NC_RW_FIFO_DATA_TYPE},
+  {"input-fifo-dont-block", NC_RW_FIFO_DONT_BLOCK},
+  {"input-fifo-capacity", NC_RO_FIFO_CAPACITY},
+  {"input-fifo-read-fill-level", NC_RO_FIFO_READ_FILL_LEVEL},
+  {"input-fifo-write-fill-level", NC_RO_FIFO_WRITE_FILL_LEVEL},
+  {"input-fifo-graph-tensor-descriptor", NC_RO_FIFO_GRAPH_TENSOR_DESCRIPTOR},
+  {"input-fifo-state", NC_RO_FIFO_STATE},
+  {"input-fifo-element-data-size", NC_RO_FIFO_ELEMENT_DATA_SIZE}
+}),
 parameter_maps_int {
   {this->parameter_map_global_int, {&r2i::ncsdk::Parameters::SetParameterGlobal, &r2i::ncsdk::Parameters::GetParameterGlobal}},
-  {this->parameter_map_device_int, {&r2i::ncsdk::Parameters::SetParameterEngine, &r2i::ncsdk::Parameters::GetParameterEngine}}} {
+  {this->parameter_map_device_int, {&r2i::ncsdk::Parameters::SetParameterEngine, &r2i::ncsdk::Parameters::GetParameterEngine}},
+  {this->parameter_map_fifo_int, {&r2i::ncsdk::Parameters::SetParameterInputFifo, &r2i::ncsdk::Parameters::GetParameterInputFifo}}} {
 }
 
 RuntimeError Parameters::Configure (std::shared_ptr<r2i::IEngine> in_engine,
@@ -265,6 +277,77 @@ RuntimeError Parameters::GetParameterEngine (Parameters *self, int param,
   /* Valid handle has already been validated with the method above */
   ncDeviceHandle_t *handle = self->engine->GetDeviceHandler ();
   ncStatus_t ncret = ncDeviceGetOption (handle, param, target, target_size);
+  if (NC_OK != ncret) {
+    error.Set (r2i::RuntimeError::Code::FRAMEWORK_ERROR, GetStringFromStatus (ncret,
+               error));
+    return error;
+  }
+
+  return error;
+}
+
+static RuntimeError ValidateInputFifoAccessorParameters (Parameters *self,
+    void *target, unsigned int *target_size) {
+  RuntimeError error;
+
+  error = ValidateAccessorParameters (self, target, target_size);
+  if (r2i::RuntimeError::Code::EOK != error.GetCode()) {
+    return error;
+  }
+
+  std::shared_ptr<IEngine> engine = self->GetEngine();
+  if (nullptr == engine) {
+    error.Set (r2i::RuntimeError::Code::NULL_PARAMETER,
+               "Parameters not been configured with a valid engine");
+    return error;
+  }
+
+  ncFifoHandle_t *handle = std::dynamic_pointer_cast<Engine, IEngine>
+                           (engine)->GetInputFifoHandler ();
+  if (nullptr == handle) {
+    error.Set (r2i::RuntimeError::Code::NULL_PARAMETER,
+               "No NCSDK input fifo configured");
+    return error;
+  }
+
+  return error;
+}
+
+RuntimeError Parameters::SetParameterInputFifo (Parameters *self, int param,
+    void *target,
+    unsigned int *target_size) {
+  RuntimeError error;
+
+  error = ValidateInputFifoAccessorParameters (self, target, target_size);
+  if (r2i::RuntimeError::Code::EOK != error.GetCode()) {
+    return error;
+  }
+
+  /* Valid handle has already been validated with the method above */
+  ncFifoHandle_t *handle = self->engine->GetInputFifoHandler ();
+  ncStatus_t ncret = ncFifoSetOption (handle, param, target, *target_size);
+  if (NC_OK != ncret) {
+    error.Set (r2i::RuntimeError::Code::FRAMEWORK_ERROR, GetStringFromStatus (ncret,
+               error));
+    return error;
+  }
+
+  return error;
+}
+
+RuntimeError Parameters::GetParameterInputFifo (Parameters *self, int param,
+    void *target,
+    unsigned int *target_size) {
+  RuntimeError error;
+
+  error = ValidateInputFifoAccessorParameters (self, target, target_size);
+  if (r2i::RuntimeError::Code::EOK != error.GetCode()) {
+    return error;
+  }
+
+  /* Valid handle has already been validated with the method above */
+  ncFifoHandle_t *handle = self->engine->GetInputFifoHandler ();
+  ncStatus_t ncret = ncFifoGetOption (handle, param, target, target_size);
   if (NC_OK != ncret) {
     error.Set (r2i::RuntimeError::Code::FRAMEWORK_ERROR, GetStringFromStatus (ncret,
                error));

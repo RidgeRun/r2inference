@@ -11,7 +11,7 @@
 if ENABLE_TESTS
 if HAVE_NCSDK
 
-TESTS=tests
+TESTS=tests parameters
 check_PROGRAMS=$(TESTS)
 
 endif # HAVE_NCSDK
@@ -50,11 +50,12 @@ AM_LDFLAGS =				\
 
 tests_SOURCES =				\
 	tests.cc 			\
-	parameters.cc 			\
 	model.cc			\
 	loader.cc			\
 	engine.cc			\
 	prediction.cc			\
 	frame.cc
+
+parameters_SOURCES = parameters.cc
 
 CLEANFILES = cpputest_*.xml

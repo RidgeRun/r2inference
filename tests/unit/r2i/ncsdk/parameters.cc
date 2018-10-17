@@ -16,6 +16,7 @@
 
 #include <CppUTest/MemoryLeakDetectorNewMacros.h>
 #include <CppUTest/TestHarness.h>
+#include <CppUTest/CommandLineTestRunner.h>
 
 class MockEngine : public r2i::IEngine {
   r2i::RuntimeError SetModel  (std::shared_ptr<r2i::IModel>) override {r2i::RuntimeError error; return error;}
@@ -34,12 +35,121 @@ class MockModel : public r2i::IModel {
   r2i::RuntimeError Start (const std::string &name) override {r2i::RuntimeError error; return error;}
 };
 
+/* Stubs for ncsdk */
+
+extern "C" {
+
+  int ncGlobalOptionInt = -1;
+  bool ncGlobalOptionError = false;
+
+  ncStatus_t ncGlobalGetOption (int param, void *target,
+                                unsigned int *target_size) {
+    CHECK (nullptr != target);
+
+    if (NC_RW_LOG_LEVEL == param) {
+      LONGS_EQUAL (sizeof (int), *target_size);
+      *((int *)target) = ncGlobalOptionInt;
+    } else {
+      FAIL ("Unknown parameter");
+    }
+
+    return NC_OK;
+  }
+
+  ncStatus_t ncGlobalSetOption (int param, const void *target,
+                                unsigned int target_size) {
+    CHECK (nullptr != target);
+
+    if (true == ncGlobalOptionError) {
+      return NC_ERROR;
+    }
+
+    if (NC_RW_LOG_LEVEL == param) {
+      LONGS_EQUAL (sizeof (int), target_size);
+      ncGlobalOptionInt = *((int *)target);
+    } else {
+      FAIL ("Unknown parameter");
+    }
+    return NC_OK;
+  }
+
+  int ncDeviceOptionInt = -1;
+  bool ncDeviceOptionError = false;
+
+  ncStatus_t ncDeviceGetOption (ncDeviceHandle_t *handle, int param, void *target,
+                                unsigned int *target_size) {
+    CHECK (nullptr != target);
+
+    if (NC_RO_DEVICE_STATE == param) {
+      LONGS_EQUAL (sizeof (int), *target_size);
+      *((int *)target) = ncDeviceOptionInt;
+    } else {
+      FAIL ("Unknown parameter");
+    }
+
+    return NC_OK;
+  }
+
+  ncStatus_t ncDeviceSetOption (ncDeviceHandle_t *handle, int param,
+                                const void *target, unsigned int target_size) {
+    CHECK (nullptr != target);
+
+    if (NC_RO_DEVICE_STATE == param) {
+      LONGS_EQUAL (sizeof (int), target_size);
+      ncDeviceOptionInt = *((int *)target);
+    } else {
+      FAIL ("Unknown parameter");
+    }
+
+    return NC_OK;
+  }
+
+  int ncFifoOptionInt = -1;
+  bool ncFifoOptionError = false;
+
+  ncStatus_t ncFifoGetOption (ncFifoHandle_t *handle, int param, void *target,
+                              unsigned int *target_size) {
+    CHECK (nullptr != target);
+
+    if (NC_RO_FIFO_CAPACITY == param) {
+      LONGS_EQUAL (sizeof (int), *target_size);
+      *((int *)target) = ncFifoOptionInt;
+    } else {
+      FAIL ("Unknown parameter");
+    }
+
+    return NC_OK;
+  }
+
+  ncStatus_t ncFifoSetOption (ncFifoHandle_t *handle, int param,
+                              const void *target, unsigned int target_size) {
+    CHECK (nullptr != target);
+
+    if (NC_RO_FIFO_CAPACITY == param) {
+      LONGS_EQUAL (sizeof (int), target_size);
+      ncFifoOptionInt = *((int *)target);
+    } else {
+      FAIL ("Unknown parameter");
+    }
+
+    return NC_OK;
+  }
+
+} // extern C
+
 TEST_GROUP (NcsdkParameters) {
   r2i::ncsdk::Parameters params;
   std::shared_ptr<r2i::IEngine> engine;
   std::shared_ptr<r2i::IModel> model;
 
   void setup () {
+    ncGlobalOptionInt = -1;
+    ncGlobalOptionError = false;
+    ncDeviceOptionInt = -1;
+    ncDeviceOptionError = false;
+    ncFifoOptionInt = -1;
+    ncFifoOptionError = false;
+
     engine = std::make_shared<r2i::ncsdk::Engine> ();
     model = std::make_shared<r2i::ncsdk::Model> ();
   }
@@ -111,6 +221,8 @@ TEST (NcsdkParameters, SetGetGlobalInt) {
   int expected = 123;
   int target;
 
+  ncGlobalOptionInt = 10;
+
   error = params.Get ("log-level", target);
   LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
 
@@ -136,25 +248,117 @@ TEST (NcsdkParameters, SetGlobalIntNotFound) {
 TEST (NcsdkParameters, SetGlobalIntError) {
   r2i::RuntimeError error;
 
-  /* api-version is read-only */
-  error = params.Set ("api-version", 0);
+  ncGlobalOptionError = true;
+
+  error = params.Set ("log-level", 0);
   LONGS_EQUAL (r2i::RuntimeError::Code::FRAMEWORK_ERROR,
                error.GetCode ());
 }
 
-TEST (NcsdkParameters, GetDeviceInt) {
+TEST (NcsdkParameters, SetGetDeviceInt) {
   r2i::RuntimeError error;
+  int expected = 123;
   int target;
+  ncDeviceHandle_t ncdevice;
 
-  error = engine->SetModel (model);
+  auto ncengine = std::dynamic_pointer_cast<r2i::ncsdk::Engine, r2i::IEngine>
+                  (engine);
+  ncengine->SetDeviceHandler (&ncdevice);
+
+  error = params.Configure (engine, model);
   LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
 
-  error = engine->Start ();
+  ncDeviceOptionInt = 10;
+
+  error = params.Get ("device-state", target);
   LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
+
+  expected = target + 1;
+
+  error = params.Set ("device-state", expected);
+  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
+
+  error = params.Get ("device-state", target);
+  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
+
+  LONGS_EQUAL (expected, target);
+}
+
+TEST (NcsdkParameters, GetDeviceNoEngine) {
+  r2i::RuntimeError error;
+  int target = -1;
+
+  error = params.Get ("device-state", target);
+  LONGS_EQUAL (r2i::RuntimeError::Code::NULL_PARAMETER, error.GetCode ());
+
+  LONGS_EQUAL (-1, target);
+}
+
+TEST (NcsdkParameters, GetDeviceNoEngineHandler) {
+  r2i::RuntimeError error;
+  int target = -1;
 
   error = params.Configure (engine, model);
   LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
 
   error = params.Get ("device-state", target);
+  LONGS_EQUAL (r2i::RuntimeError::Code::NULL_PARAMETER, error.GetCode ());
+
+  LONGS_EQUAL (-1, target);
+}
+
+TEST (NcsdkParameters, SetGetInputFifoInt) {
+  r2i::RuntimeError error;
+  int expected = 123;
+  int target;
+  ncFifoHandle_t ncfifo;
+
+  auto ncengine = std::dynamic_pointer_cast<r2i::ncsdk::Engine, r2i::IEngine>
+                  (engine);
+  ncengine->SetInputFifoHandler (&ncfifo);
+
+  error = params.Configure (engine, model);
   LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
+
+  ncFifoOptionInt = 10;
+
+  error = params.Get ("input-fifo-capacity", target);
+  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
+
+  expected = target + 1;
+
+  error = params.Set ("input-fifo-capacity", expected);
+  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
+
+  error = params.Get ("input-fifo-capacity", target);
+  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
+
+  LONGS_EQUAL (expected, target);
+}
+
+TEST (NcsdkParameters, GetFifoNoEngine) {
+  r2i::RuntimeError error;
+  int target = -1;
+
+  error = params.Get ("input-fifo-capacity", target);
+  LONGS_EQUAL (r2i::RuntimeError::Code::NULL_PARAMETER, error.GetCode ());
+
+  LONGS_EQUAL (-1, target);
+}
+
+TEST (NcsdkParameters, GetFifoNoFifoHandler) {
+  r2i::RuntimeError error;
+  int target = -1;
+
+  error = params.Configure (engine, model);
+  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
+
+  error = params.Get ("input-fifo-capacity", target);
+  LONGS_EQUAL (r2i::RuntimeError::Code::NULL_PARAMETER, error.GetCode ());
+
+  LONGS_EQUAL (-1, target);
+}
+
+int main (int ac, char **av) {
+  return CommandLineTestRunner::RunAllTests (ac, av);
 }

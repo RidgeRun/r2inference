@@ -56,6 +56,7 @@ test-driver
 *.trs
 tests/unit/r2i/tests
 tests/unit/r2i/ncsdk/tests
+tests/unit/r2i/ncsdk/parameters
 
 # rr-build-utils configuration files
 .rrconfig
