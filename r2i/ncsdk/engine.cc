@@ -208,8 +208,8 @@ parameters_fail:
 graph_fail:
   ncDeviceClose(device_handle);
 open_fail:
-create_fail:
   ncDeviceDestroy(&device_handle);
+create_fail:
   return error;
 }
 
