@@ -24,13 +24,14 @@ class MODE(object):
 
 class testresults(object):
 
-    print_template = '''TEST RESULTS:
+    print_template = '''TEST RESULTS [{name}]:
 =============
 '''
     repr_template = 'Test Results({ngroups} groups, {ntests} total tests)'
 
-    def __init__(self, filename=None):
+    def __init__(self, filename=None, testname=None):
         self.testgroups = {}
+        self.testname = testname
         if filename:
             self.parse(filename)
 
@@ -61,7 +62,7 @@ class testresults(object):
     def get_report(self, mode=MODE.MODE_SIMPLE, color=False):
         str_repr = ""
         if mode in [MODE.MODE_SIMPLE, MODE.MODE_REPORT]:
-            str_repr += self.print_template
+            str_repr += self.print_template.format(name=self.testname)
         for name, group in self.testgroups.items():
             str_repr += group.get_report(mode=mode, color=color)
         return str_repr
@@ -165,7 +166,8 @@ class testrunner(object):
         self.logfile = logfile
         self.trsfile = trsfile
         self.singleprocess = singleprocess
-        self.results = testresults(filename=None)
+        self.results = testresults(filename=None,testname=testname)
+        self._grouplist = []
 
     def run(self):
         self.runtests()
@@ -178,13 +180,21 @@ class testrunner(object):
 
             if self.singleprocess:
                 args.append (self.singleprocess)
-
             subprocess.call(args, stdout=log_file, stderr=subprocess.STDOUT)
 
     def parse(self):
-        xmlfiles = glob.glob('cpputest_*.xml')
-        for f in xmlfiles:
-            self.results.parse(f)
+        for group in self.grouplist:
+            xmlfile = 'cpputest_{group}.xml'.format(group=group)
+            self.results.parse(xmlfile)
+
+    @property
+    def grouplist(self):
+        if self._grouplist:
+            return self._grouplist
+        args = ['./{name}'.format(name=self.testname), '-lg']
+        self._grouplist = subprocess.check_output(args).split(' ')
+        return self._grouplist
+
 
     def saveresults(self):
         with open(self.trsfile, mode='w') as trs_file:
