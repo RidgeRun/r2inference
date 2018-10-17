@@ -37,7 +37,7 @@ parameter_map_device_int ({
   {"option-class-limit", NC_RO_DEVICE_OPTION_CLASS_LIMIT},
   {"max-executor-num", NC_RO_DEVICE_MAX_EXECUTORS_NUM},
 }),
-parameter_map_fifo_int ({
+parameter_map_input_fifo_int ({
   {"input-fifo-type", NC_RW_FIFO_TYPE},
   {"input-fifo-consumer-count", NC_RW_FIFO_CONSUMER_COUNT},
   {"input-fifo-data-type", NC_RW_FIFO_DATA_TYPE},
@@ -49,10 +49,23 @@ parameter_map_fifo_int ({
   {"input-fifo-state", NC_RO_FIFO_STATE},
   {"input-fifo-element-data-size", NC_RO_FIFO_ELEMENT_DATA_SIZE}
 }),
+parameter_map_output_fifo_int ({
+  {"output-fifo-type", NC_RW_FIFO_TYPE},
+  {"output-fifo-consumer-count", NC_RW_FIFO_CONSUMER_COUNT},
+  {"output-fifo-data-type", NC_RW_FIFO_DATA_TYPE},
+  {"output-fifo-dont-block", NC_RW_FIFO_DONT_BLOCK},
+  {"output-fifo-capacity", NC_RO_FIFO_CAPACITY},
+  {"output-fifo-read-fill-level", NC_RO_FIFO_READ_FILL_LEVEL},
+  {"output-fifo-write-fill-level", NC_RO_FIFO_WRITE_FILL_LEVEL},
+  {"output-fifo-graph-tensor-descriptor", NC_RO_FIFO_GRAPH_TENSOR_DESCRIPTOR},
+  {"output-fifo-state", NC_RO_FIFO_STATE},
+  {"output-fifo-element-data-size", NC_RO_FIFO_ELEMENT_DATA_SIZE}
+}),
 parameter_maps_int {
   {this->parameter_map_global_int, {&r2i::ncsdk::Parameters::SetParameterGlobal, &r2i::ncsdk::Parameters::GetParameterGlobal}},
   {this->parameter_map_device_int, {&r2i::ncsdk::Parameters::SetParameterEngine, &r2i::ncsdk::Parameters::GetParameterEngine}},
-  {this->parameter_map_fifo_int, {&r2i::ncsdk::Parameters::SetParameterInputFifo, &r2i::ncsdk::Parameters::GetParameterInputFifo}}} {
+  {this->parameter_map_input_fifo_int, {&r2i::ncsdk::Parameters::SetParameterInputFifo, &r2i::ncsdk::Parameters::GetParameterInputFifo}},
+  {this->parameter_map_output_fifo_int, {&r2i::ncsdk::Parameters::SetParameterOutputFifo, &r2i::ncsdk::Parameters::GetParameterOutputFifo}}} {
 }
 
 RuntimeError Parameters::Configure (std::shared_ptr<r2i::IEngine> in_engine,
@@ -231,6 +244,19 @@ static RuntimeError ValidateEngineAccessorParameters (Parameters *self,
     return error;
   }
 
+  return error;
+}
+
+static RuntimeError ValidateEngineDeviceAccessorParameters (Parameters *self,
+    void *target, unsigned int *target_size) {
+  RuntimeError error;
+
+  error = ValidateEngineAccessorParameters (self, target, target_size);
+  if (r2i::RuntimeError::Code::EOK != error.GetCode()) {
+    return error;
+  }
+
+  std::shared_ptr<IEngine> engine = self->GetEngine();
   ncDeviceHandle_t *handle = std::dynamic_pointer_cast<Engine, IEngine>
                              (engine)->GetDeviceHandler ();
   if (nullptr == handle) {
@@ -247,7 +273,7 @@ RuntimeError Parameters::SetParameterEngine (Parameters *self, int param,
     unsigned int *target_size) {
   RuntimeError error;
 
-  error = ValidateEngineAccessorParameters (self, target, target_size);
+  error = ValidateEngineDeviceAccessorParameters (self, target, target_size);
   if (r2i::RuntimeError::Code::EOK != error.GetCode()) {
     return error;
   }
@@ -269,7 +295,7 @@ RuntimeError Parameters::GetParameterEngine (Parameters *self, int param,
     unsigned int *target_size) {
   RuntimeError error;
 
-  error = ValidateEngineAccessorParameters (self, target, target_size);
+  error = ValidateEngineDeviceAccessorParameters (self, target, target_size);
   if (r2i::RuntimeError::Code::EOK != error.GetCode()) {
     return error;
   }
@@ -290,17 +316,13 @@ static RuntimeError ValidateInputFifoAccessorParameters (Parameters *self,
     void *target, unsigned int *target_size) {
   RuntimeError error;
 
-  error = ValidateAccessorParameters (self, target, target_size);
+  error = ValidateEngineAccessorParameters (self, target, target_size);
   if (r2i::RuntimeError::Code::EOK != error.GetCode()) {
     return error;
   }
 
+  /* Valid handle has already been validated with the method above */
   std::shared_ptr<IEngine> engine = self->GetEngine();
-  if (nullptr == engine) {
-    error.Set (r2i::RuntimeError::Code::NULL_PARAMETER,
-               "Parameters not been configured with a valid engine");
-    return error;
-  }
 
   ncFifoHandle_t *handle = std::dynamic_pointer_cast<Engine, IEngine>
                            (engine)->GetInputFifoHandler ();
@@ -347,6 +369,73 @@ RuntimeError Parameters::GetParameterInputFifo (Parameters *self, int param,
 
   /* Valid handle has already been validated with the method above */
   ncFifoHandle_t *handle = self->engine->GetInputFifoHandler ();
+  ncStatus_t ncret = ncFifoGetOption (handle, param, target, target_size);
+  if (NC_OK != ncret) {
+    error.Set (r2i::RuntimeError::Code::FRAMEWORK_ERROR, GetStringFromStatus (ncret,
+               error));
+    return error;
+  }
+
+  return error;
+}
+
+static RuntimeError ValidateOutputFifoAccessorParameters (Parameters *self,
+    void *target, unsigned int *target_size) {
+  RuntimeError error;
+
+  error = ValidateEngineAccessorParameters (self, target, target_size);
+  if (r2i::RuntimeError::Code::EOK != error.GetCode()) {
+    return error;
+  }
+
+  /* Valid handle has already been validated with the method above */
+  std::shared_ptr<IEngine> engine = self->GetEngine();
+
+  ncFifoHandle_t *handle = std::dynamic_pointer_cast<Engine, IEngine>
+                           (engine)->GetOutputFifoHandler ();
+  if (nullptr == handle) {
+    error.Set (r2i::RuntimeError::Code::NULL_PARAMETER,
+               "No NCSDK output fifo configured");
+    return error;
+  }
+
+  return error;
+}
+
+RuntimeError Parameters::SetParameterOutputFifo (Parameters *self, int param,
+    void *target,
+    unsigned int *target_size) {
+  RuntimeError error;
+
+  error = ValidateOutputFifoAccessorParameters (self, target, target_size);
+  if (r2i::RuntimeError::Code::EOK != error.GetCode()) {
+    return error;
+  }
+
+  /* Valid handle has already been validated with the method above */
+  ncFifoHandle_t *handle = self->engine->GetOutputFifoHandler ();
+  ncStatus_t ncret = ncFifoSetOption (handle, param, target, *target_size);
+  if (NC_OK != ncret) {
+    error.Set (r2i::RuntimeError::Code::FRAMEWORK_ERROR, GetStringFromStatus (ncret,
+               error));
+    return error;
+  }
+
+  return error;
+}
+
+RuntimeError Parameters::GetParameterOutputFifo (Parameters *self, int param,
+    void *target,
+    unsigned int *target_size) {
+  RuntimeError error;
+
+  error = ValidateOutputFifoAccessorParameters (self, target, target_size);
+  if (r2i::RuntimeError::Code::EOK != error.GetCode()) {
+    return error;
+  }
+
+  /* Valid handle has already been validated with the method above */
+  ncFifoHandle_t *handle = self->engine->GetOutputFifoHandler ();
   ncStatus_t ncret = ncFifoGetOption (handle, param, target, target_size);
   if (NC_OK != ncret) {
     error.Set (r2i::RuntimeError::Code::FRAMEWORK_ERROR, GetStringFromStatus (ncret,

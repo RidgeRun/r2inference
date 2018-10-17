@@ -336,17 +336,7 @@ TEST (NcsdkParameters, SetGetInputFifoInt) {
   LONGS_EQUAL (expected, target);
 }
 
-TEST (NcsdkParameters, GetFifoNoEngine) {
-  r2i::RuntimeError error;
-  int target = -1;
-
-  error = params.Get ("input-fifo-capacity", target);
-  LONGS_EQUAL (r2i::RuntimeError::Code::NULL_PARAMETER, error.GetCode ());
-
-  LONGS_EQUAL (-1, target);
-}
-
-TEST (NcsdkParameters, GetFifoNoFifoHandler) {
+TEST (NcsdkParameters, GetInputFifoNoHandler) {
   r2i::RuntimeError error;
   int target = -1;
 
@@ -354,6 +344,49 @@ TEST (NcsdkParameters, GetFifoNoFifoHandler) {
   LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
 
   error = params.Get ("input-fifo-capacity", target);
+  LONGS_EQUAL (r2i::RuntimeError::Code::NULL_PARAMETER, error.GetCode ());
+
+  LONGS_EQUAL (-1, target);
+}
+
+TEST (NcsdkParameters, SetGetOutputFifoInt) {
+  r2i::RuntimeError error;
+  int expected = 123;
+  int target;
+  ncFifoHandle_t ncfifo;
+
+  auto ncengine = std::dynamic_pointer_cast<r2i::ncsdk::Engine, r2i::IEngine>
+                  (engine);
+  ncengine->SetOutputFifoHandler (&ncfifo);
+
+  error = params.Configure (engine, model);
+  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
+
+  ncFifoOptionInt = 10;
+
+  error = params.Get ("output-fifo-capacity", target);
+  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
+
+  expected = target + 1;
+
+  error = params.Set ("output-fifo-capacity", expected);
+  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
+
+  error = params.Get ("output-fifo-capacity", target);
+  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
+
+  LONGS_EQUAL (expected, target);
+}
+
+TEST (NcsdkParameters, GetOutputFifoNoHandler) {
+  r2i::RuntimeError error;
+  int target = -1;
+
+  error = params.Configure (engine, model);
+  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
+
+  error = params.Get ("output-fifo-capacity", target);
+  fprintf (stderr, "Error is %s\n", error.GetDescription().c_str());
   LONGS_EQUAL (r2i::RuntimeError::Code::NULL_PARAMETER, error.GetCode ());
 
   LONGS_EQUAL (-1, target);

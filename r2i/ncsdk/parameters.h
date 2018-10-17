@@ -84,6 +84,14 @@ class Parameters : public IParameters {
       void *target,
       unsigned int *target_size);
 
+  static RuntimeError SetParameterOutputFifo (Parameters *self, int param,
+      void *target,
+      unsigned int *target_size);
+
+  static RuntimeError GetParameterOutputFifo (Parameters *self, int param,
+      void *target,
+      unsigned int *target_size);
+
   typedef std::function<RuntimeError(Parameters *, int param, void *target,
                                      unsigned int *target_size)> Accessor;
 
@@ -113,7 +121,8 @@ class Parameters : public IParameters {
   const CodeMap parameter_map_global_string;
   const CodeMap parameter_map_global_int;
   const CodeMap parameter_map_device_int;
-  const CodeMap parameter_map_fifo_int;
+  const CodeMap parameter_map_input_fifo_int;
+  const CodeMap parameter_map_output_fifo_int;
   const AccessorVector parameter_maps_int;
   const AccessorVector parameter_maps_string;
 };
