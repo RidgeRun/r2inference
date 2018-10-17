@@ -41,7 +41,7 @@ TEST_GROUP (NcsdkParameters) {
 
   void setup () {
     engine = std::make_shared<r2i::ncsdk::Engine> ();
-    model = std::make_shared<MockModel> ();
+    model = std::make_shared<r2i::ncsdk::Model> ();
   }
 
   void teardown () {
@@ -138,6 +138,23 @@ TEST (NcsdkParameters, SetGlobalIntError) {
 
   /* api-version is read-only */
   error = params.Set ("api-version", 0);
-  LONGS_EQUAL (r2i::RuntimeError::Code::INVALID_FRAMEWORK_PARAMETER,
+  LONGS_EQUAL (r2i::RuntimeError::Code::FRAMEWORK_ERROR,
                error.GetCode ());
+}
+
+TEST (NcsdkParameters, GetDeviceInt) {
+  r2i::RuntimeError error;
+  int target;
+
+  error = engine->SetModel (model);
+  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
+
+  error = engine->Start ();
+  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
+
+  error = params.Configure (engine, model);
+  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
+
+  error = params.Get ("device-state", target);
+  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
 }

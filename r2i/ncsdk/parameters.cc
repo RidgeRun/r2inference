@@ -39,8 +39,8 @@ parameter_map_device_int ({
   {"max-executor-num", NC_RO_DEVICE_MAX_EXECUTORS_NUM},
 }),
 parameter_maps_int {
-  {this->parameter_map_global_int, {&r2i::ncsdk::Parameters::SetParameterGlobal, &r2i::ncsdk::Parameters::GetParameterGlobal}}
-} {
+  {this->parameter_map_global_int, {&r2i::ncsdk::Parameters::SetParameterGlobal, &r2i::ncsdk::Parameters::GetParameterGlobal}},
+  {this->parameter_map_device_int, {&r2i::ncsdk::Parameters::SetParameterEngine, &r2i::ncsdk::Parameters::GetParameterEngine}}} {
 }
 
 RuntimeError Parameters::Configure (std::shared_ptr<r2i::IEngine> in_engine,
@@ -119,7 +119,6 @@ RuntimeError Parameters::ApplyParameter (const AccessorVector &vec,
     void *target,
     unsigned int *target_size,
     int accesor_index) {
-  RuntimeError error;
 
   for (auto &accessmap : vec) {
     auto param = accessmap.map.find (in_parameter);
@@ -129,32 +128,150 @@ RuntimeError Parameters::ApplyParameter (const AccessorVector &vec,
       Accessor apply = accessmap.accessor[accesor_index];
       int ncparam = param->second;
 
-      ncStatus_t ret = apply (this, ncparam, target, target_size);
-      if (NC_OK != ret) {
-        error.Set (RuntimeError::Code::INVALID_FRAMEWORK_PARAMETER,
-                   GetStringFromStatus (ret, error));
-      }
-
-      return error;
+      return apply (this, ncparam, target, target_size);
     }
   }
 
   /* The parameter wasn't found in any map */
-  error.Set (RuntimeError::Code::INVALID_FRAMEWORK_PARAMETER, "Parameter \""
-             + in_parameter + "\" does not exist or is not of " + type + " type");
+  return RuntimeError (RuntimeError::Code::INVALID_FRAMEWORK_PARAMETER,
+                       "Parameter \""
+                       + in_parameter + "\" does not exist or is not of " + type + " type");
+}
+
+static RuntimeError ValidateAccessorParameters (Parameters *self, void *target,
+    unsigned int *target_size) {
+  RuntimeError error;
+
+  if (nullptr == self) {
+    error.Set (r2i::RuntimeError::Code::NULL_PARAMETER,
+               "NULL instance, something really bad is happening");
+    return error;
+  }
+
+  if (nullptr == target) {
+    error.Set (r2i::RuntimeError::Code::NULL_PARAMETER,
+               "NULL target passed to accessor");
+    return error;
+  }
+
+  if (nullptr == target_size) {
+    error.Set (r2i::RuntimeError::Code::NULL_PARAMETER,
+               "NULL size passed to accessor");
+    return error;
+  }
+
   return error;
 }
 
-ncStatus_t Parameters::SetParameterGlobal (Parameters *self, int param,
+RuntimeError Parameters::SetParameterGlobal (Parameters *self, int param,
     void *target,
     unsigned int *target_size) {
-  return ncGlobalSetOption (param, target, *target_size);
+  RuntimeError error;
+
+  error = ValidateAccessorParameters (self, target, target_size);
+  if (r2i::RuntimeError::Code::EOK != error.GetCode()) {
+    return error;
+  }
+
+  ncStatus_t ncret = ncGlobalSetOption (param, target, *target_size);
+  if (NC_OK != ncret) {
+    error.Set (r2i::RuntimeError::Code::FRAMEWORK_ERROR, GetStringFromStatus (ncret,
+               error));
+    return error;
+  }
+
+  return error;
 }
 
-ncStatus_t Parameters::GetParameterGlobal (Parameters *self, int param,
+RuntimeError Parameters::GetParameterGlobal (Parameters *self, int param,
     void *target,
     unsigned int *target_size) {
-  return ncGlobalGetOption (param, target, target_size);
+  RuntimeError error;
+
+  error = ValidateAccessorParameters (self, target, target_size);
+  if (r2i::RuntimeError::Code::EOK != error.GetCode()) {
+    return error;
+  }
+
+  ncStatus_t ncret = ncGlobalGetOption (param, target, target_size);
+  if (NC_OK != ncret) {
+    error.Set (r2i::RuntimeError::Code::FRAMEWORK_ERROR, GetStringFromStatus (ncret,
+               error));
+    return error;
+  }
+
+  return error;
+}
+
+static RuntimeError ValidateEngineAccessorParameters (Parameters *self,
+    void *target, unsigned int *target_size) {
+  RuntimeError error;
+
+  error = ValidateAccessorParameters (self, target, target_size);
+  if (r2i::RuntimeError::Code::EOK != error.GetCode()) {
+    return error;
+  }
+
+  std::shared_ptr<IEngine> engine = self->GetEngine();
+  if (nullptr == engine) {
+    error.Set (r2i::RuntimeError::Code::NULL_PARAMETER,
+               "Parameters not been configured with a valid engine");
+    return error;
+  }
+
+  ncDeviceHandle_t *handle = std::dynamic_pointer_cast<Engine, IEngine>
+                             (engine)->GetDeviceHandler ();
+  if (nullptr == handle) {
+    error.Set (r2i::RuntimeError::Code::NULL_PARAMETER,
+               "No NCSDK device configured");
+    return error;
+  }
+
+  return error;
+}
+
+RuntimeError Parameters::SetParameterEngine (Parameters *self, int param,
+    void *target,
+    unsigned int *target_size) {
+  RuntimeError error;
+
+  error = ValidateEngineAccessorParameters (self, target, target_size);
+  if (r2i::RuntimeError::Code::EOK != error.GetCode()) {
+    return error;
+  }
+
+  /* Valid handle has already been validated with the method above */
+  ncDeviceHandle_t *handle = self->engine->GetDeviceHandler ();
+  ncStatus_t ncret = ncDeviceSetOption (handle, param, target, *target_size);
+  if (NC_OK != ncret) {
+    error.Set (r2i::RuntimeError::Code::FRAMEWORK_ERROR, GetStringFromStatus (ncret,
+               error));
+    return error;
+  }
+
+  return error;
+}
+
+RuntimeError Parameters::GetParameterEngine (Parameters *self, int param,
+    void *target,
+    unsigned int *target_size) {
+  RuntimeError error;
+
+  error = ValidateEngineAccessorParameters (self, target, target_size);
+  if (r2i::RuntimeError::Code::EOK != error.GetCode()) {
+    return error;
+  }
+
+  /* Valid handle has already been validated with the method above */
+  ncDeviceHandle_t *handle = self->engine->GetDeviceHandler ();
+  ncStatus_t ncret = ncDeviceGetOption (handle, param, target, target_size);
+  if (NC_OK != ncret) {
+    error.Set (r2i::RuntimeError::Code::FRAMEWORK_ERROR, GetStringFromStatus (ncret,
+               error));
+    return error;
+  }
+
+  return error;
 }
 
 } // namespace ncsdk

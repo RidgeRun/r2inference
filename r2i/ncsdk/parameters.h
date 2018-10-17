@@ -60,14 +60,24 @@ class Parameters : public IParameters {
                              void *target,
                              unsigned int *target_size);
 
-  static ncStatus_t SetParameterGlobal (Parameters *self, int param, void *target,
-                                        unsigned int *target_size);
+  static RuntimeError SetParameterGlobal (Parameters *self, int param,
+                                          void *target,
+                                          unsigned int *target_size);
 
-  static ncStatus_t GetParameterGlobal (Parameters *self, int param, void *target,
-                                        unsigned int *target_size);
+  static RuntimeError GetParameterGlobal (Parameters *self, int param,
+                                          void *target,
+                                          unsigned int *target_size);
 
-  typedef std::function<ncStatus_t(Parameters *, int param, void *target,
-                                   unsigned int *target_size)> Accessor;
+  static RuntimeError SetParameterEngine (Parameters *self, int param,
+                                          void *target,
+                                          unsigned int *target_size);
+
+  static RuntimeError GetParameterEngine (Parameters *self, int param,
+                                          void *target,
+                                          unsigned int *target_size);
+
+  typedef std::function<RuntimeError(Parameters *, int param, void *target,
+                                     unsigned int *target_size)> Accessor;
 
 
 
