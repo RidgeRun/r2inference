@@ -36,14 +36,14 @@ class IFrame {
    * \param format Image format Id (Defined by each framework)
    * \return A RuntimeError with a description of the error.
    */
-  virtual RuntimeError Configure (std::shared_ptr<void> in_data, int width,
+  virtual RuntimeError Configure (float *in_data, int width,
                                   int height, r2i::ImageFormat::Id format) = 0;
 
   /**
    * \brief Gets the data set to the Frame.
    * \return A Shared Pointer with the data set to the Frame.
    */
-  virtual std::shared_ptr<void> GetData () = 0;
+  virtual float *GetData () = 0;
 
   /**
    * \brief Gets the Image width set to the Frame.

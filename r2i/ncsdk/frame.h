@@ -19,10 +19,10 @@ namespace ncsdk {
 
 class Frame : public IFrame {
  public:
-  virtual RuntimeError Configure (std::shared_ptr<void> in_data, int width,
+  virtual RuntimeError Configure (float *in_data, int width,
                                   int height, r2i::ImageFormat::Id format) override;
 
-  virtual std::shared_ptr<void> GetData () override;
+  float *GetData () override;
 
   virtual int GetWidth () override;
 
@@ -31,7 +31,7 @@ class Frame : public IFrame {
   virtual ImageFormat GetFormat () override;
 
  private:
-  std::shared_ptr<void> frame_data;
+  float *frame_data;
   int frame_width;
   int frame_height;
   ImageFormat frame_format;
