@@ -135,6 +135,37 @@ extern "C" {
     return NC_OK;
   }
 
+  int ncGraphOptionInt = -1;
+  bool ncGraphOptionError = false;
+
+  ncStatus_t ncGraphGetOption (ncGraphHandle_t *handle, int param, void *target,
+                               unsigned int *target_size) {
+    CHECK (nullptr != target);
+
+    if (NC_RW_GRAPH_EXECUTORS_NUM == param) {
+      LONGS_EQUAL (sizeof (int), *target_size);
+      *((int *)target) = ncGraphOptionInt;
+    } else {
+      FAIL ("Unknown parameter");
+    }
+
+    return NC_OK;
+  }
+
+  ncStatus_t ncGraphSetOption (ncGraphHandle_t *handle, int param,
+                               const void *target, unsigned int target_size) {
+    CHECK (nullptr != target);
+
+    if (NC_RW_GRAPH_EXECUTORS_NUM == param) {
+      LONGS_EQUAL (sizeof (int), target_size);
+      ncGraphOptionInt = *((int *)target);
+    } else {
+      FAIL ("Unknown parameter");
+    }
+
+    return NC_OK;
+  }
+
 } // extern C
 
 TEST_GROUP (NcsdkParameters) {
@@ -149,6 +180,8 @@ TEST_GROUP (NcsdkParameters) {
     ncDeviceOptionError = false;
     ncFifoOptionInt = -1;
     ncFifoOptionError = false;
+    ncGraphOptionInt = -1;
+    ncGraphOptionError = false;
 
     engine = std::make_shared<r2i::ncsdk::Engine> ();
     model = std::make_shared<r2i::ncsdk::Model> ();
@@ -387,6 +420,58 @@ TEST (NcsdkParameters, GetOutputFifoNoHandler) {
 
   error = params.Get ("output-fifo-capacity", target);
   fprintf (stderr, "Error is %s\n", error.GetDescription().c_str());
+  LONGS_EQUAL (r2i::RuntimeError::Code::NULL_PARAMETER, error.GetCode ());
+
+  LONGS_EQUAL (-1, target);
+}
+
+TEST (NcsdkParameters, SetGetGraphInt) {
+  r2i::RuntimeError error;
+  int expected = 123;
+  int target;
+  ncGraphHandle_t ncgraph;
+
+  auto ncmodel = std::dynamic_pointer_cast<r2i::ncsdk::Model, r2i::IModel>
+                 (model);
+  ncmodel->SetHandler (&ncgraph);
+
+  error = params.Configure (engine, model);
+  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
+
+  ncGraphOptionInt = 10;
+
+  error = params.Get ("graph-executors-num", target);
+  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
+
+  expected = target + 1;
+
+  error = params.Set ("graph-executors-num", expected);
+  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
+
+  error = params.Get ("graph-executors-num", target);
+  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
+
+  LONGS_EQUAL (expected, target);
+}
+
+TEST (NcsdkParameters, GetGraphNoModel) {
+  r2i::RuntimeError error;
+  int target = -1;
+
+  error = params.Get ("graph-executors-num", target);
+  LONGS_EQUAL (r2i::RuntimeError::Code::NULL_PARAMETER, error.GetCode ());
+
+  LONGS_EQUAL (-1, target);
+}
+
+TEST (NcsdkParameters, GetGraphNoGraphHandler) {
+  r2i::RuntimeError error;
+  int target = -1;
+
+  error = params.Configure (engine, model);
+  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
+
+  error = params.Get ("graph-executors-num", target);
   LONGS_EQUAL (r2i::RuntimeError::Code::NULL_PARAMETER, error.GetCode ());
 
   LONGS_EQUAL (-1, target);

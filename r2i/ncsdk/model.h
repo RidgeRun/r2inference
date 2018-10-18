@@ -29,6 +29,7 @@ class Model : public IModel {
   RuntimeError Stop ();
 
   ncGraphHandle_t *GetHandler ();
+  void SetHandler (ncGraphHandle_t *handler);
 
   std::shared_ptr<void> GetData ();
   void SetData (std::shared_ptr<void> graph_data);

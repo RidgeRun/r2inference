@@ -62,11 +62,20 @@ parameter_map_output_fifo_int ({
   {"output-fifo-state", NC_RO_FIFO_STATE},
   {"output-fifo-element-data-size", NC_RO_FIFO_ELEMENT_DATA_SIZE}
 }),
+parameter_map_graph_int ({
+  {"graph-state", NC_RO_GRAPH_STATE},
+  {"graph-input-count", NC_RO_GRAPH_INPUT_COUNT},
+  {"graph-output-count", NC_RO_GRAPH_OUTPUT_COUNT},
+  {"graph-option-class-limit", NC_RO_GRAPH_OPTION_CLASS_LIMIT},
+  {"graph-time-taken-array-size", NC_RO_GRAPH_TIME_TAKEN_ARRAY_SIZE},
+  {"graph-executors-num", NC_RW_GRAPH_EXECUTORS_NUM}
+}),
 parameter_maps_int {
   {this->parameter_map_global_int, {&r2i::ncsdk::SetParameterGlobal, &r2i::ncsdk::GetParameterGlobal}},
   {this->parameter_map_device_int, {&r2i::ncsdk::SetParameterEngine, &r2i::ncsdk::GetParameterEngine}},
   {this->parameter_map_input_fifo_int, {&r2i::ncsdk::SetParameterInputFifo, &r2i::ncsdk::GetParameterInputFifo}},
-  {this->parameter_map_output_fifo_int, {&r2i::ncsdk::SetParameterOutputFifo, &r2i::ncsdk::GetParameterOutputFifo}}} {
+  {this->parameter_map_output_fifo_int, {&r2i::ncsdk::SetParameterOutputFifo, &r2i::ncsdk::GetParameterOutputFifo}},
+  {this->parameter_map_graph_int, {&r2i::ncsdk::SetParameterGraph, &r2i::ncsdk::GetParameterGraph}}} {
 }
 
 RuntimeError Parameters::Configure (std::shared_ptr<r2i::IEngine> in_engine,

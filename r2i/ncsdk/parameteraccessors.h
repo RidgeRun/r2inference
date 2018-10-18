@@ -42,6 +42,12 @@ RuntimeError GetParameterOutputFifo (Parameters *self, int param,
 RuntimeError SetParameterOutputFifo (Parameters *self, int param,
                                      void *target,
                                      unsigned int *target_size);
+RuntimeError SetParameterGraph (Parameters *self, int param,
+                                void *target,
+                                unsigned int *target_size);
+RuntimeError GetParameterGraph (Parameters *self, int param,
+                                void *target,
+                                unsigned int *target_size);
 
 } // namespace ncsdk
 } // namespace r2k

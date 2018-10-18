@@ -323,5 +323,78 @@ RuntimeError GetParameterOutputFifo (Parameters *self, int param,
   return error;
 }
 
+static RuntimeError ValidateGraphAccessorParameters (Parameters *self,
+    void *target, unsigned int *target_size) {
+  RuntimeError error;
+
+  error = ValidateAccessorParameters (self, target, target_size);
+  if (r2i::RuntimeError::Code::EOK != error.GetCode()) {
+    return error;
+  }
+
+  std::shared_ptr<IModel> model = self->GetModel();
+  if (nullptr == model) {
+    error.Set (r2i::RuntimeError::Code::NULL_PARAMETER,
+               "Parameters not been configured with a valid model");
+    return error;
+  }
+
+  ncGraphHandle_t *handle = std::dynamic_pointer_cast<Model, IModel>
+                            (self->GetModel())->GetHandler ();
+  if (nullptr == handle) {
+    error.Set (r2i::RuntimeError::Code::NULL_PARAMETER,
+               "No NCSDK graph configured");
+    return error;
+  }
+
+  return error;
+}
+
+RuntimeError SetParameterGraph (Parameters *self, int param,
+                                void *target,
+                                unsigned int *target_size) {
+  RuntimeError error;
+
+  error = ValidateGraphAccessorParameters (self, target, target_size);
+  if (r2i::RuntimeError::Code::EOK != error.GetCode()) {
+    return error;
+  }
+
+  /* Valid handle has already been validated with the method above */
+  ncGraphHandle_t *handle = std::dynamic_pointer_cast<Model, IModel>
+                            (self->GetModel())->GetHandler ();
+  ncStatus_t ncret = ncGraphSetOption (handle, param, target, *target_size);
+  if (NC_OK != ncret) {
+    error.Set (r2i::RuntimeError::Code::FRAMEWORK_ERROR, GetStringFromStatus (ncret,
+               error));
+    return error;
+  }
+
+  return error;
+}
+
+RuntimeError GetParameterGraph (Parameters *self, int param,
+                                void *target,
+                                unsigned int *target_size) {
+  RuntimeError error;
+
+  error = ValidateGraphAccessorParameters (self, target, target_size);
+  if (r2i::RuntimeError::Code::EOK != error.GetCode()) {
+    return error;
+  }
+
+  /* Valid handle has already been validated with the method above */
+  ncGraphHandle_t *handle = std::dynamic_pointer_cast<Model, IModel>
+                            (self->GetModel())->GetHandler ();
+  ncStatus_t ncret = ncGraphGetOption (handle, param, target, target_size);
+  if (NC_OK != ncret) {
+    error.Set (r2i::RuntimeError::Code::FRAMEWORK_ERROR, GetStringFromStatus (ncret,
+               error));
+    return error;
+  }
+
+  return error;
+}
+
 } // namespace ncsdk
 } // namespace r2i
