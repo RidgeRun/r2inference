@@ -9,10 +9,13 @@
  * back to RidgeRun without any encumbrance.
 */
 
-#include <CppUTest/TestHarness.h>
+#include <memory>
 #include <r2i/r2i.h>
 #include <r2i/ncsdk/frame.h>
-#include <memory>
+
+#include <CppUTest/CommandLineTestRunner.h>
+#include <CppUTest/MemoryLeakDetectorNewMacros.h>
+#include <CppUTest/TestHarness.h>
 
 #define SIZE_TEST 100
 #define WIDTH_TEST 250
@@ -131,3 +134,6 @@ TEST (NcsdkFrame, InvalidFormatGetNumPlanes) {
   LONGS_EQUAL (format.GetNumPlanes(), 0);
 }
 
+int main (int ac, char **av) {
+  return CommandLineTestRunner::RunAllTests (ac, av);
+}

@@ -56,6 +56,11 @@ test-driver
 *.trs
 tests/unit/r2i/tests
 tests/unit/r2i/ncsdk/tests
+tests/unit/r2i/ncsdk/engine
+tests/unit/r2i/ncsdk/frame
+tests/unit/r2i/ncsdk/loader
+tests/unit/r2i/ncsdk/model
+tests/unit/r2i/ncsdk/prediction
 tests/unit/r2i/ncsdk/parameters
 
 # rr-build-utils configuration files

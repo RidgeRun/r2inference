@@ -14,9 +14,9 @@
 #include <r2i/r2i.h>
 #include <r2i/ncsdk/parameters.h>
 
+#include <CppUTest/CommandLineTestRunner.h>
 #include <CppUTest/MemoryLeakDetectorNewMacros.h>
 #include <CppUTest/TestHarness.h>
-#include <CppUTest/CommandLineTestRunner.h>
 
 class MockEngine : public r2i::IEngine {
   r2i::RuntimeError SetModel  (std::shared_ptr<r2i::IModel>) override {r2i::RuntimeError error; return error;}

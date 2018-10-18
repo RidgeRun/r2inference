@@ -15,6 +15,8 @@
 #include <r2i/ncsdk/model.h>
 #include <fstream>
 
+#include <CppUTest/CommandLineTestRunner.h>
+#include <CppUTest/MemoryLeakDetectorNewMacros.h>
 #include <CppUTest/TestHarness.h>
 
 TEST_GROUP (NcsdkLoader) {
@@ -54,4 +56,8 @@ TEST (NcsdkLoader, LoadEmptyFile) {
 TEST (NcsdkLoader, LoadNonExistentFile) {
   model = loader.Load ("invalid_graph", error);
   LONGS_EQUAL (r2i::RuntimeError::Code::FILE_ERROR, error.GetCode());
+}
+
+int main (int ac, char **av) {
+  return CommandLineTestRunner::RunAllTests (ac, av);
 }

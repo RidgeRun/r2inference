@@ -15,9 +15,9 @@
 #include <r2i/ncsdk/engine.h>
 #include <r2i/ncsdk/frame.h>
 
+#include <CppUTest/CommandLineTestRunner.h>
 #include <CppUTest/MemoryLeakDetectorNewMacros.h>
 #include <CppUTest/TestHarness.h>
-
 
 class MockModel : public r2i::IModel {
   r2i::RuntimeError Start (const std::string &name) override {r2i::RuntimeError error; return error;}
@@ -302,4 +302,8 @@ TEST (NcsdkEngine, PredictEngine) {
   prediction = engine.Predict (frame, error);
   LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
 
+}
+
+int main (int ac, char **av) {
+  return CommandLineTestRunner::RunAllTests (ac, av);
 }
