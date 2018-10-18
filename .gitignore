@@ -70,3 +70,4 @@ tests/unit/r2i/ncsdk/parameters
 .clang_complete
 cscope.files
 cscope.out
+tests/unit/r2i/iframeworkfactory

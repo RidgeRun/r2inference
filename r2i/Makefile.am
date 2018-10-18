@@ -23,6 +23,7 @@ r2iincludedir = $(includedir)/r2inference-$(RR_PACKAGE_VERSION)/r2i
 
 libr2inference_@RR_PACKAGE_VERSION@_la_SOURCES =	\
 	r2i.cc						\
+	iframeworkfactory.cc				\
 	runtimeerror.cc					\
 	imageformat.cc
 
@@ -44,6 +45,7 @@ libr2inference_@RR_PACKAGE_VERSION@_la_LIBADD = 	\
 
 r2iinclude_HEADERS =					\
 	r2i.h						\
+	iframeworkfactory.h				\
 	runtimeerror.h					\
 	imageformat.h
 
