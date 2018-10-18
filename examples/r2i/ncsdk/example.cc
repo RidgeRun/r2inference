@@ -17,7 +17,13 @@
 #include <r2i/ncsdk/model.h>
 #include <r2i/ncsdk/frame.h>
 #include <r2i/ncsdk/prediction.h>
-#include <CImg.h>
+
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
+
+#define STB_IMAGE_RESIZE_IMPLEMENTATION
+#include "stb_image_resize.h"
+
 
 #define GOOGLENET_DIM 224
 
@@ -27,25 +33,54 @@ void print_usage() {
   printf("Usage: example -i [JPG input_image] -m [Model] \n");
 }
 
-std::shared_ptr<void> LoadImage (std::string image_path, int size,
-                                 float *mean) {
-  std::shared_ptr<unsigned char> data (nullptr);
-  unsigned char *img_data;
-  cimg_library::CImg<unsigned char> img(image_path.c_str());
 
-  printf ("Original Image: Width: %d, Height: %d, Depth: %d, Channels: %d \n",
-          img.width(), img.height(), img.depth(), img.spectrum());
+float *LoadImage(const char *path, int reqsize, float *mean) {
+  int width, height, cp, i;
+  unsigned char *img, *imgresized;
+  float *imgfp32;
+  unsigned int imageSize;
 
-  img.resize (GOOGLENET_DIM, GOOGLENET_DIM, true);
+  img = stbi_load(path, &width, &height, &cp, 3);
+  if (!img) {
+    printf("The picture %s could not be loaded\n", path);
+    return 0;
+  }
+  imgresized = (unsigned char *) malloc(3 * reqsize * reqsize);
+  if (!imgresized) {
+    free(img);
+    perror("malloc");
+    return 0;
+  }
+  stbir_resize_uint8(img, width, height, 0, imgresized, reqsize, reqsize, 0, 3);
+  free(img);
 
-  printf ("Resized Image: Width: %d, Height: %d, Depth: %d, Channels: %d \n",
-          img.width(), img.height(), img.depth(), img.spectrum());
+  imageSize = sizeof(*imgfp32) * reqsize * reqsize * 3;
+  imgfp32 = (float *) malloc(imageSize);
 
-  /* TODO: Here we need to apply the mean correction to the image */
-  img_data = img.data();
-  data = std::make_shared<unsigned char> (*img_data);
-  return data;
+  printf("size: %i\n", imageSize);
+  if (!imgfp32) {
+    free(imgresized);
+    perror("malloc");
+    return 0;
+  }
+  for (i = 0; i < reqsize * reqsize * 3; i++)
+    imgfp32[i] = imgresized[i];
+  free(imgresized);
+  for (i = 0; i < reqsize * reqsize; i++) {
+    float blue, green, red;
+    blue = imgfp32[3 * i + 2];
+    green = imgfp32[3 * i + 1];
+    red = imgfp32[3 * i + 0];
+
+    imgfp32[3 * i + 0] = blue - mean[0];
+    imgfp32[3 * i + 1] = green - mean[1];
+    imgfp32[3 * i + 2] = red - mean[2];
+
+  }
+  return imgfp32;
 }
+
+
 
 int main (int argc, char *argv[]) {
   std::shared_ptr<r2i::IModel> model;
@@ -53,23 +88,31 @@ int main (int argc, char *argv[]) {
   r2i::ncsdk::Engine engine;
   r2i::ncsdk::Loader loader;
   std::shared_ptr<r2i::ncsdk::Frame> frame (new r2i::ncsdk::Frame());
-  std::shared_ptr<void> in_data;
   r2i::RuntimeError error;
   std::string model_path;
   std::string image_path;
+  unsigned int Index = 0;
   int option = 0;
+  float *image_data;
 
   if (argc < 2) {
     print_usage();
     exit(EXIT_FAILURE);
   }
-  while ((option = getopt(argc, argv, "i:m:")) != -1) {
+  while ((option = getopt(argc, argv, "i:m:p:")) != -1) {
     switch (option) {
-      case 'i' : image_path = optarg;
+      case 'i' :
+        image_path = optarg;
         break;
-      case 'm' : model_path  = optarg;
+      case 'm' :
+        model_path  = optarg;
         break;
-      default: print_usage();
+      case 'p' :
+        Index  = atoi(optarg);
+        break;
+
+      default:
+        print_usage();
         exit(EXIT_FAILURE);
     }
   }
@@ -89,10 +132,12 @@ int main (int argc, char *argv[]) {
   }
 
   printf("Process Image: %s...\n", image_path.c_str());
-  in_data = LoadImage (image_path, GOOGLENET_DIM, GoogleNetMean);
+  image_data = LoadImage (image_path.c_str(), GOOGLENET_DIM, GoogleNetMean);
+
+  std::shared_ptr<void> in_data = std::make_shared<float *>(image_data);
 
   printf("Configure Frame...\n");
-  error = frame->Configure (in_data, GOOGLENET_DIM, GOOGLENET_DIM,
+  error = frame->Configure (image_data, GOOGLENET_DIM, GOOGLENET_DIM,
                             r2i::ImageFormat::Id::RGB);
   if (r2i::RuntimeError::Code::EOK != error.GetCode()) {
     printf("Frame Configuration Error: %s\n", error.GetDescription().c_str());
@@ -115,7 +160,6 @@ int main (int argc, char *argv[]) {
     exit(EXIT_FAILURE);
   }
 
-  float *out_data = reinterpret_cast<float *>(prediction->GetResultData());
   unsigned int out_size = prediction->GetResultSize();
 
   int numResults = out_size / (int)sizeof(float);
@@ -123,16 +167,11 @@ int main (int argc, char *argv[]) {
   printf("Result size was: %d, which represents %d elements \n", out_size,
          numResults);
 
-  float maxResult = 0.0;
-  int maxIndex = -1;
-  for (int index = 0; index < numResults; index++) {
-    if (out_data[index] > maxResult) {
-      maxResult = out_data[index];
-      maxIndex = index;
-    }
-  }
-  printf("Index of top result is: %d\n", maxIndex);
-  printf("Probability of top result is: %f\n", out_data[maxIndex]);
+
+  double Result = 0.0;
+
+  Result = prediction->At(Index, error);
+  printf("Probability at index %i  is: %lf\n", Index, Result);
 
 
   printf("Stop Engine...\n");
