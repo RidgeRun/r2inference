@@ -9,11 +9,14 @@
  * back to RidgeRun without any encumbrance.
 */
 
-#include <CppUTest/TestHarness.h>
+#include <memory>
 #include <mvnc.h>
 #include <r2i/r2i.h>
 #include <r2i/ncsdk/model.h>
-#include <memory>
+
+#include <CppUTest/CommandLineTestRunner.h>
+#include <CppUTest/MemoryLeakDetectorNewMacros.h>
+#include <CppUTest/TestHarness.h>
 
 #define SIZE_TEST 100
 
@@ -104,4 +107,8 @@ TEST (NcsdkModel, SetGetDataOverride) {
   model.SetData (setdata2);
   std::shared_ptr<void> getdata = model.GetData();
   CHECK (setdata2 == model.GetData());
+}
+
+int main (int ac, char **av) {
+  return CommandLineTestRunner::RunAllTests (ac, av);
 }

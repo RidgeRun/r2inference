@@ -60,6 +60,10 @@ ncGraphHandle_t *Model::GetHandler () {
   return this->graph_handler;
 }
 
+void Model::SetHandler (ncGraphHandle_t *handler) {
+  this->graph_handler = handler;
+}
+
 std::shared_ptr<void> Model::GetData () {
   return this->graph_data;
 }

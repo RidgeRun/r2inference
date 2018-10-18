@@ -9,11 +9,14 @@
  * back to RidgeRun without any encumbrance.
 */
 
-#include <CppUTest/TestHarness.h>
 #include <mvnc.h>
 #include <r2i/r2i.h>
 #include <r2i/ncsdk/prediction.h>
 #include <fstream>
+
+#include <CppUTest/CommandLineTestRunner.h>
+#include <CppUTest/MemoryLeakDetectorNewMacros.h>
+#include <CppUTest/TestHarness.h>
 
 TEST_GROUP (NcsdkPrediction) {
   r2i::ncsdk::Prediction prediction;
@@ -48,4 +51,8 @@ TEST (NcsdkPrediction, PredictionNonExistentIndex) {
   r2i::RuntimeError error;
   prediction.At (4, error);
   LONGS_EQUAL (r2i::RuntimeError::Code::MEMORY_ERROR, error.GetCode());
+}
+
+int main (int ac, char **av) {
+  return CommandLineTestRunner::RunAllTests (ac, av);
 }

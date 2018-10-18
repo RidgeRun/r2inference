@@ -8,10 +8,19 @@
 # a software license from RidgeRun.  All source code changes must be provided
 # back to RidgeRun without any encumbrance.
 
+AM_DEFAULT_SOURCE_EXT = .cc
+
 if ENABLE_TESTS
 if HAVE_NCSDK
 
-TESTS=tests
+TESTS = 		\
+	model		\
+	loader		\
+	engine		\
+	prediction	\
+	frame		\
+	parameters
+
 check_PROGRAMS=$(TESTS)
 
 endif # HAVE_NCSDK
@@ -47,14 +56,5 @@ AM_LDFLAGS =				\
 	$(TESTS_LIBS) 			\
 	$(CODE_COVERAGE_LIBS)		\
 	$(top_builddir)/r2i/libr2inference-@RR_PACKAGE_VERSION@.la
-
-tests_SOURCES =				\
-	tests.cc 			\
-	parameters.cc 			\
-	model.cc			\
-	loader.cc			\
-	engine.cc			\
-	prediction.cc			\
-	frame.cc
 
 CLEANFILES = cpputest_*.xml

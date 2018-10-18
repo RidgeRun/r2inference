@@ -99,7 +99,7 @@ RuntimeError Engine::Start ()  {
 
   engine_status = this->GetStatus();
 
-  if ( Status:: START == engine_status) {
+  if (Status:: START == engine_status) {
     error.Set (RuntimeError::Code:: WRONG_ENGINE_STATE,
                "Engine in wrong State");
     return error;
@@ -167,7 +167,7 @@ RuntimeError Engine::Start ()  {
   if (NC_OK != ret) {
     error.Set (RuntimeError::Code::FRAMEWORK_ERROR,
                GetStringFromStatus (ret, error));
-    goto input_fifo_fail;
+    goto parameters_fail;
   }
   ret = ncFifoAllocate(input_buffers_ptr, device_handle, &this->input_descriptor,
                        2);
@@ -180,7 +180,7 @@ RuntimeError Engine::Start ()  {
   if (NC_OK != ret) {
     error.Set (RuntimeError::Code::FRAMEWORK_ERROR,
                GetStringFromStatus (ret, error));
-    goto output_fifo_fail;
+    goto input_fifo_fail;
   }
   ret = ncFifoAllocate(output_buffers_ptr, device_handle,
                        &this->output_descriptor, 2);
@@ -208,8 +208,8 @@ parameters_fail:
 graph_fail:
   ncDeviceClose(device_handle);
 open_fail:
-create_fail:
   ncDeviceDestroy(&device_handle);
+create_fail:
   return error;
 }
 

@@ -15,9 +15,9 @@
 #include <r2i/ncsdk/engine.h>
 #include <r2i/ncsdk/frame.h>
 
+#include <CppUTest/CommandLineTestRunner.h>
 #include <CppUTest/MemoryLeakDetectorNewMacros.h>
 #include <CppUTest/TestHarness.h>
-
 
 class MockModel : public r2i::IModel {
   r2i::RuntimeError Start (const std::string &name) override {r2i::RuntimeError error; return error;}
@@ -37,32 +37,64 @@ bool device_error = false;
 
 ncStatus_t ncDeviceCreate(int index,
                           struct ncDeviceHandle_t **deviceHandle) {
+  static ncDeviceHandle_t handle;
+
+
+  if (false == should_error) {
+    *deviceHandle = &handle;
+  } else {
+    *deviceHandle = nullptr;
+  }
+
   return should_error ? NC_INVALID_PARAMETERS : NC_OK;
 }
 ncStatus_t ncFifoDestroy(struct ncFifoHandle_t **fifo) {
+  CHECK (*fifo != nullptr);
+  *fifo = nullptr;
+
   return fifo_error ? NC_INVALID_PARAMETERS : NC_OK;
 }
 
 ncStatus_t ncFifoCreate(const char *name, ncFifoType_t type,
                         struct ncFifoHandle_t **fifoHandle) {
+  static ncFifoHandle_t handle;
+  *fifoHandle = &handle;
+
+  if (false == fifo_error) {
+    *fifoHandle = &handle;
+  } else {
+    *fifoHandle = nullptr;
+  }
+
   return fifo_error ? NC_INVALID_PARAMETERS : NC_OK;
 }
 
 ncStatus_t ncDeviceOpen(struct ncDeviceHandle_t *deviceHandle) {
+  CHECK (deviceHandle != nullptr);
+
   return device_error ? NC_INVALID_PARAMETERS : NC_OK;
 }
 
 ncStatus_t ncDeviceDestroy(struct ncDeviceHandle_t **deviceHandle) {
+  CHECK (*deviceHandle != nullptr);
+  *deviceHandle = nullptr;
+
   return device_error ? NC_INVALID_PARAMETERS : NC_OK;
 }
 
 ncStatus_t ncDeviceClose(struct ncDeviceHandle_t *deviceHandle) {
+  CHECK (deviceHandle != nullptr);
+
   return device_error ? NC_INVALID_PARAMETERS : NC_OK;
 }
 
 ncStatus_t ncFifoAllocate(struct ncFifoHandle_t *fifo,
                           struct ncDeviceHandle_t *device,
                           struct ncTensorDescriptor_t *tensorDesc, unsigned int numElem) {
+  CHECK (fifo != nullptr);
+  CHECK (device != nullptr);
+  CHECK (tensorDesc != nullptr);
+
   return fifo_error ? NC_INVALID_PARAMETERS : NC_OK;
 }
 
@@ -70,20 +102,29 @@ ncStatus_t ncFifoReadElem(struct ncFifoHandle_t *fifo,
                           void *outputData,
                           unsigned int *outputDataLen,
                           void **userParam) {
+  CHECK (fifo != nullptr);
+  CHECK (outputData != nullptr);
+  CHECK (outputDataLen != nullptr);
+  CHECK (userParam != nullptr);
+
   return fifo_error ? NC_INVALID_DATA_LENGTH : NC_OK;
 }
 
 ncStatus_t ncFifoGetOption(struct ncFifoHandle_t *fifo,
                            int option,
                            void *data,
-                           unsigned int *DataLen) {
+                           unsigned int *dataLen) {
+  CHECK (fifo != nullptr);
+  CHECK (data != nullptr);
+  CHECK (dataLen != nullptr);
+
   switch (option) {
     case (NC_RO_FIFO_ELEMENT_DATA_SIZE): {
       *((int *)data) = 16;
       break;
     }
     case (-1): {
-      memcpy (data, engine_string.data(), *DataLen);
+      memcpy (data, engine_string.data(), *dataLen);
       break;
     }
     default: {
@@ -97,12 +138,17 @@ ncStatus_t ncFifoWriteElem(struct ncFifoHandle_t *fifo,
                            const void *inputTensor,
                            unsigned int *inputTensorLength,
                            void *userParam) {
+  CHECK (fifo != nullptr);
+
   return fifo_error ? NC_INVALID_DATA_LENGTH : NC_OK;
 }
 
 ncStatus_t ncGraphAllocate(struct ncDeviceHandle_t *deviceHandle,
                            struct ncGraphHandle_t *graphHandle,
                            const void *graphBuffer, unsigned int graphBufferLength) {
+  CHECK (deviceHandle != nullptr);
+  CHECK (graphHandle != nullptr);
+
   return graph_error_alloc ? NC_INVALID_DATA_LENGTH : NC_OK;
 }
 ncStatus_t ncGraphQueueInference(struct ncGraphHandle_t *graphHandle,
@@ -110,12 +156,20 @@ ncStatus_t ncGraphQueueInference(struct ncGraphHandle_t *graphHandle,
                                  unsigned int inFifoCount,
                                  struct ncFifoHandle_t **fifoOut,
                                  unsigned int outFifoCount) {
+  CHECK (graphHandle != nullptr);
+  CHECK (fifoIn != nullptr);
+  CHECK (fifoOut != nullptr);
+
   return graph_error ? NC_INVALID_DATA_LENGTH : NC_OK;
 }
 
 ncStatus_t ncGraphGetOption(struct ncGraphHandle_t *graphHandle, int option,
                             void *data,
                             unsigned int *dataLength) {
+  CHECK (graphHandle != nullptr);
+  CHECK (data != nullptr);
+  CHECK (dataLength != nullptr);
+
   switch (option) {
     case (NC_RO_GRAPH_INPUT_TENSOR_DESCRIPTORS): {
       *((int *)data) = stub_int;
@@ -138,6 +192,9 @@ ncStatus_t ncGraphGetOption(struct ncGraphHandle_t *graphHandle, int option,
 }
 
 ncStatus_t ncGraphDestroy(struct ncGraphHandle_t **graphHandle) {
+  CHECK (graphHandle != nullptr);
+  *graphHandle = nullptr;
+
   return graph_error_alloc ? NC_INVALID_PARAMETERS : NC_OK;
 }
 
@@ -302,4 +359,8 @@ TEST (NcsdkEngine, PredictEngine) {
   prediction = engine.Predict (frame, error);
   LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
 
+}
+
+int main (int ac, char **av) {
+  return CommandLineTestRunner::RunAllTests (ac, av);
 }

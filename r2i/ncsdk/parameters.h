@@ -15,6 +15,7 @@
 #include <functional>
 #include <string>
 #include <unordered_map>
+#include <vector>
 
 #include <r2i/iparameters.h>
 #include <r2i/ncsdk/engine.h>
@@ -24,6 +25,8 @@ namespace ncsdk {
 
 class Parameters : public IParameters {
  public:
+  Parameters ();
+
   RuntimeError Configure (std::shared_ptr<r2i::IEngine> in_engine,
                           std::shared_ptr<r2i::IModel> in_model) override;
 
@@ -57,16 +60,40 @@ class Parameters : public IParameters {
                              void *target,
                              unsigned int *target_size);
 
-  typedef std::function<ncStatus_t(int param, void *target, unsigned int *target_size)>
-  param_apply;
+  typedef std::function<RuntimeError(Parameters *, int param, void *target,
+                                     unsigned int *target_size)> Accessor;
 
-  RuntimeError InteractWithParameter (const
-                                      std::unordered_map<std::string, int> &map,
-                                      const std::string &in_parameter,
-                                      const std::string &type,
-                                      void *target,
-                                      unsigned int *target_size,
-                                      param_apply apply);
+
+
+  typedef std::unordered_map<std::string, int> CodeMap;
+
+  enum AccessorIndex {
+    SET = 0,
+    GET = 1,
+  };
+
+  struct AccessorNode {
+    const CodeMap map;
+    const Accessor accessor[2];
+  };
+
+  typedef std::vector<struct AccessorNode> AccessorVector;
+
+  RuntimeError ApplyParameter (const AccessorVector &vec,
+                               const std::string &in_parameter,
+                               const std::string &type,
+                               void *target,
+                               unsigned int *target_size,
+                               int accesor_index);
+
+  const CodeMap parameter_map_global_string;
+  const CodeMap parameter_map_global_int;
+  const CodeMap parameter_map_device_int;
+  const CodeMap parameter_map_input_fifo_int;
+  const CodeMap parameter_map_output_fifo_int;
+  const CodeMap parameter_map_graph_int;
+  const AccessorVector parameter_maps_int;
+  const AccessorVector parameter_maps_string;
 };
 
 } // namespace ncsdk
