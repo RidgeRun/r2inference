@@ -14,23 +14,27 @@
 #include <functional>
 #include <unordered_map>
 
+#include "config.h"
 #include "ncsdk/frameworkfactory.h"
 
 namespace r2i {
 
-static std::unique_ptr<IFrameworkFactory> MakeNcsdkFactory (
-  RuntimeError &error);
-
-typedef std::function<std::unique_ptr<IFrameworkFactory>(RuntimeError &)>
-MakeFactory;
-const std::unordered_map<int, MakeFactory> frameworks ({
-  {IFrameworkFactory::FrameworkCode::NCSDK, MakeNcsdkFactory},
-});
-
+#ifdef HAVE_NCSDK
 static std::unique_ptr<IFrameworkFactory>
 MakeNcsdkFactory (RuntimeError &error) {
   return std::unique_ptr<ncsdk::FrameworkFactory> (new ncsdk::FrameworkFactory);
 }
+#endif // HAVE_NCSDK
+
+typedef std::function<std::unique_ptr<IFrameworkFactory>(RuntimeError &)>
+MakeFactory;
+const std::unordered_map<int, MakeFactory> frameworks ({
+
+#ifdef HAVE_NCSDK
+  {IFrameworkFactory::FrameworkCode::NCSDK, MakeNcsdkFactory},
+#endif //HAVE_NCSDK
+
+});
 
 std::unique_ptr<IFrameworkFactory>
 IFrameworkFactory::MakeFactory (FrameworkCode code, RuntimeError &error) {
