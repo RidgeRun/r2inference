@@ -14,6 +14,8 @@
 #include <functional>
 #include <unordered_map>
 
+#include "ncsdk/frameworkfactory.h"
+
 namespace r2i {
 
 static std::unique_ptr<IFrameworkFactory> MakeNcsdkFactory (
@@ -27,7 +29,7 @@ const std::unordered_map<int, MakeFactory> frameworks ({
 
 static std::unique_ptr<IFrameworkFactory>
 MakeNcsdkFactory (RuntimeError &error) {
-  return nullptr;
+  return std::unique_ptr<ncsdk::FrameworkFactory> (new ncsdk::FrameworkFactory);
 }
 
 std::unique_ptr<IFrameworkFactory>

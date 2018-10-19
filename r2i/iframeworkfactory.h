@@ -79,11 +79,10 @@ class IFrameworkFactory {
   /**
    * \brief Creates the FrameworkMetadata of particular Framework
    * \param error [out] RuntimeError with a description of an error.
-   * \return valid FrameworkMetadata of a framework or nullptr in case of
-   * error.
+   * \return A FrameworkMetadata of a framework which is valid only if
+   * no error was set.
    */
-  virtual std::unique_ptr<r2i::FrameworkMeta> GetDescription (
-    RuntimeError &error) = 0;
+  virtual r2i::FrameworkMeta GetDescription (RuntimeError &error) = 0;
 
   /**
    * \brief Default destructor

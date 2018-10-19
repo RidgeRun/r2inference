@@ -23,7 +23,8 @@ libncsdk_la_SOURCES =			\
 	engine.cc			\
 	frame.cc			\
 	prediction.cc			\
-	statuscodes.cc
+	statuscodes.cc			\
+	frameworkfactory.cc
 
 libncsdk_la_CPPFLAGS = 			\
 	$(RR_CPPFLAGS)			\
@@ -51,6 +52,7 @@ ncsdkinclude_HEADERS =			\
 	loader.h			\
 	engine.h 			\
 	prediction.h			\
-	frame.h
+	frame.h				\
+	frameworkfactory.h
 
 endif # HAVE_NCSDK

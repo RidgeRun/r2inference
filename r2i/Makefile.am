@@ -47,7 +47,8 @@ r2iinclude_HEADERS =					\
 	r2i.h						\
 	iframeworkfactory.h				\
 	runtimeerror.h					\
-	imageformat.h
+	imageformat.h					\
+	frameworkmeta.h
 
 if HAVE_NCSDK
 libr2inference_@RR_PACKAGE_VERSION@_la_LIBADD += 	\

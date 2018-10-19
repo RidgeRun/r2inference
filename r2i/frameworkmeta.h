@@ -9,8 +9,8 @@
  * back to RidgeRun without any encumbrance.
 */
 
-#ifndef R2I_FRAMEWORKMETA_H
-#define R2I_FRAMEWORKMETA_H
+#ifndef R2I_FRAMEWORK_META_H
+#define R2I_FRAMEWORK_META_H
 
 #include <string>
 
@@ -21,9 +21,7 @@ namespace r2i {
 /**
  * Implements the placeholder for framework information.
  */
-class FrameworkMeta {
-
- public:
+struct FrameworkMeta {
   /**
    * A string to identify the name of the framework
    */
@@ -42,4 +40,4 @@ class FrameworkMeta {
 
 }
 
-#endif // R2I_FRAMEWORKMETA_H
+#endif // R2I_FRAMEWORK_META_H
