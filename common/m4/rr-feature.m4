@@ -70,6 +70,7 @@ if test x$USE_[$1] = xyes; then
     AC_MSG_NOTICE(*** This feature will be used: [$2])
     AC_SUBST([$1_CFLAGS], [])
     AC_SUBST([$1_LIBS], [-l[$3]])
+    AC_DEFINE_UNQUOTED([HAVE_$1], [1], [Support for $1 backend is enabled])
   fi
 else
   HAVE_[$1]=no
