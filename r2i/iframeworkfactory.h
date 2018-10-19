@@ -33,6 +33,28 @@ class IFrameworkFactory {
 
  public:
   /**
+   * Numerical codes identifying supported frameworks. Not that not
+   * all frameworks will be available at runtime. For example, some of
+   * them may be disabled at configure by the user, automatically if
+   * no development where found or if the system doesn't seem to have
+   * to appropriate hardware.
+   */
+  enum FrameworkCode {
+    /**
+     * Intel Movidius Neural Compute software developer kit
+     */
+    NCSDK,
+
+    /**
+     * Number of supported frameworks, mostly for testing purposes.
+     */
+    MAX_FRAMEWORK
+  };
+
+  static std::unique_ptr<IFrameworkFactory> MakeFactory (FrameworkCode code,
+      RuntimeError &error);
+
+  /**
    * \brief Creates an ILoader based on a particular Framework
    * \param error [out] RuntimeError with a description of an error.
    * \return a valid ILoader for the framework or nullptr in case of error.
@@ -57,11 +79,10 @@ class IFrameworkFactory {
   /**
    * \brief Creates the FrameworkMetadata of particular Framework
    * \param error [out] RuntimeError with a description of an error.
-   * \return valid FrameworkMetadata of a framework or nullptr in case of
-   * error.
+   * \return A FrameworkMetadata of a framework which is valid only if
+   * no error was set.
    */
-  virtual std::unique_ptr<r2i::FrameworkMeta> GetDescription (
-    RuntimeError &error) = 0;
+  virtual r2i::FrameworkMeta GetDescription (RuntimeError &error) = 0;
 
   /**
    * \brief Default destructor

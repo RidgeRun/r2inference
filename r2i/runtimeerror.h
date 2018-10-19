@@ -81,6 +81,11 @@ class RuntimeError {
     WRONG_ENGINE_STATE,
 
     /**
+     * The requested framework is not supported in the current system
+     */
+    UNSUPPORTED_FRAMEWORK,
+
+    /**
      * An unknown error has ocurred
      */
     UNKNOWN_ERROR,

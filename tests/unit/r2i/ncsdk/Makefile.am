@@ -19,7 +19,8 @@ TESTS = 		\
 	engine		\
 	prediction	\
 	frame		\
-	parameters
+	parameters	\
+	frameworkfactory
 
 check_PROGRAMS=$(TESTS)
 
