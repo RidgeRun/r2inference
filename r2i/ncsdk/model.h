@@ -36,6 +36,8 @@ class Model : public IModel {
   unsigned int GetDataSize ();
   void SetDataSize (unsigned int graph_size);
 
+  ~Model ();
+
  private:
   ncGraphHandle_t *graph_handler;
   std::shared_ptr<void> graph_data;

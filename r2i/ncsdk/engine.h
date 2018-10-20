@@ -39,6 +39,8 @@ class Engine : public IEngine {
   ncFifoHandle_t *GetOutputFifoHandler ();
   void SetOutputFifoHandler (ncFifoHandle_t *handler);
 
+  ~Engine ();
+
   enum Status {
     IDLE,
     START

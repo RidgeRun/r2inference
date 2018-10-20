@@ -66,7 +66,6 @@ RuntimeError Engine::SetModel (std::shared_ptr<r2i::IModel> in_model) {
     this->model = nullptr;
   }
 
-
   this->model = model;
 
   return error;
@@ -111,7 +110,7 @@ RuntimeError Engine::Start ()  {
     return error;
   }
 
-  model->Start ("NSDK");
+  model->Start ("NCSDK");
 
   ret = ncDeviceCreate(0, &device_handle);
 
@@ -216,7 +215,6 @@ create_fail:
 RuntimeError Engine::Stop () {
 
   ncDeviceHandle_t *device_handle;
-  ncGraphHandle_t *model_handle;
   ncFifoHandle_t *input_buffers_ptr;
   ncFifoHandle_t  *output_buffers_ptr;
   Status engine_status;
@@ -258,9 +256,14 @@ RuntimeError Engine::Stop () {
     return error;
   }
 
-  model_handle = this->model->GetHandler();
+  error = this->model->Stop ();
+  if (RuntimeError::Code::EOK != error.GetCode ()) {
+    return error;
+  }
 
-  ret = ncGraphDestroy(&model_handle);
+  device_handle = this->GetDeviceHandler();
+
+  ret = ncDeviceClose(device_handle);
 
   if (NC_OK != ret) {
     error.Set (RuntimeError::Code::FRAMEWORK_ERROR,
@@ -268,9 +271,7 @@ RuntimeError Engine::Stop () {
     return error;
   }
 
-  device_handle = this->GetDeviceHandler();
-
-  ret = ncDeviceClose(device_handle);
+  ret = ncDeviceDestroy (&device_handle);
 
   if (NC_OK != ret) {
     error.Set (RuntimeError::Code::FRAMEWORK_ERROR,
@@ -398,6 +399,10 @@ engine_error:
 
 }
 
+Engine::~Engine () {
+  this->Stop();
 }
-}
+
+} //namespace ncsdk
+} //namepsace r2i
 
