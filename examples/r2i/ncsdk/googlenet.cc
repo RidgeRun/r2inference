@@ -30,7 +30,7 @@
 float GoogleNetMean[] = {0.40787054 * 255.0, 0.45752458 * 255.0, 0.48109378 * 255.0};
 
 void print_usage() {
-  printf("Usage: example -i [JPG input_image] -m [Model] \n");
+  printf("Usage: example -i [JPG input_image] -m [GoogLeNet Model] \n");
 }
 
 
