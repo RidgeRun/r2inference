@@ -8,13 +8,13 @@
  * a software license from RidgeRun.  All source code changes must be provided
  * back to RidgeRun without any encumbrance.
 */
-#include <iostream>
+
 #include <getopt.h>
+#include <iostream>
+#include <memory>
 #include <string>
+
 #include <r2i/r2i.h>
-#include <r2i/ncsdk/engine.h>
-#include <r2i/ncsdk/loader.h>
-#include <r2i/ncsdk/model.h>
 #include <r2i/ncsdk/frame.h>
 #include <r2i/ncsdk/prediction.h>
 
@@ -24,81 +24,83 @@
 #define STB_IMAGE_RESIZE_IMPLEMENTATION
 #include "stb_image_resize.h"
 
-
 #define GOOGLENET_DIM 224
 
-float GoogleNetMean[] = {0.40787054 * 255.0, 0.45752458 * 255.0, 0.48109378 * 255.0};
+const float GoogleNetMean[] = {0.40787054 * 255.0,
+                               0.45752458 * 255.0,
+                               0.48109378 * 255.0
+                              };
 
-void print_usage() {
-  printf("Usage: example -i [JPG input_image] -m [GoogLeNet Model] \n");
-}
-
-
-float *LoadImage(const char *path, int reqsize, float *mean) {
-  int width, height, cp, i;
-  unsigned char *img, *imgresized;
-  float *imgfp32;
-  unsigned int imageSize;
-
-  img = stbi_load(path, &width, &height, &cp, 3);
-  if (!img) {
-    printf("The picture %s could not be loaded\n", path);
-    return 0;
-  }
-  imgresized = (unsigned char *) malloc(3 * reqsize * reqsize);
-  if (!imgresized) {
-    free(img);
-    perror("malloc");
-    return 0;
-  }
-  stbir_resize_uint8(img, width, height, 0, imgresized, reqsize, reqsize, 0, 3);
-  free(img);
-
-  imageSize = sizeof(*imgfp32) * reqsize * reqsize * 3;
-  imgfp32 = (float *) malloc(imageSize);
-
-  printf("size: %i\n", imageSize);
-  if (!imgfp32) {
-    free(imgresized);
-    perror("malloc");
-    return 0;
-  }
-  for (i = 0; i < reqsize * reqsize * 3; i++)
-    imgfp32[i] = imgresized[i];
-  free(imgresized);
-  for (i = 0; i < reqsize * reqsize; i++) {
-    float blue, green, red;
-    blue = imgfp32[3 * i + 2];
-    green = imgfp32[3 * i + 1];
-    red = imgfp32[3 * i + 0];
-
-    imgfp32[3 * i + 0] = blue - mean[0];
-    imgfp32[3 * i + 1] = green - mean[1];
-    imgfp32[3 * i + 2] = red - mean[2];
-
-  }
-  return imgfp32;
-}
-
-
-
-int main (int argc, char *argv[]) {
-  std::shared_ptr<r2i::IModel> model;
-  std::shared_ptr<r2i::ncsdk::Prediction> prediction;
-  r2i::ncsdk::Engine engine;
-  r2i::ncsdk::Loader loader;
-  std::shared_ptr<r2i::ncsdk::Frame> frame (new r2i::ncsdk::Frame());
+void PrintTopPrediction (std::shared_ptr<r2i::IPrediction> prediction) {
   r2i::RuntimeError error;
-  std::string model_path;
-  std::string image_path;
-  unsigned int Index = 0;
-  int option = 0;
-  float *image_data;
+  int index = 0;
+  double max = -1;
 
-  if (argc < 2) {
-    print_usage();
-    exit(EXIT_FAILURE);
+  auto ncpred =
+    std::dynamic_pointer_cast<r2i::ncsdk::Prediction, r2i::IPrediction>
+    (prediction);
+  int num_labels = ncpred->GetResultSize();
+
+  for (int i = 0; i < num_labels; ++i) {
+    double current = ncpred->At(i, error);
+    if (current > max) {
+      max = current;
+      index = i;
+    }
   }
+
+  std::cout << "Highest probability is label " << index <<
+            " (" << max << ")" << std::endl;
+}
+
+void PrintUsage() {
+  std::cerr << "Usage: example -i [JPG input_image] -m [GoogLeNet Model]" <<
+            std::endl;
+}
+
+std::unique_ptr<float[]> PreProcessImage (const unsigned char *input,
+    int width, int height, int reqwidth,
+    int reqheight, const float *mean) {
+  const int channels = 3;
+  const int scaled_size = channels * reqwidth * reqheight;
+
+  std::unique_ptr<unsigned char[]> scaled (new unsigned char[scaled_size]);
+  std::unique_ptr<float[]> adjusted (new float[scaled_size]);
+
+  stbir_resize_uint8(input, width, height, 0, scaled.get(), reqwidth,
+                     reqheight, 0, channels);
+
+  for (int i = 0; i < scaled_size; i += channels) {
+    // BGR = RGB - Mean
+    adjusted[i + 0] = static_cast<float>(scaled[i + 2]) - mean[0];
+    adjusted[i + 1] = static_cast<float>(scaled[i + 1]) - mean[1];
+    adjusted[i + 2] = static_cast<float>(scaled[i + 0]) - mean[2];
+  }
+
+  return adjusted;
+}
+
+std::unique_ptr<float[]> LoadImage(const std::string &path, int reqwidth,
+                                   int reqheight, const float *mean) {
+  int channels = 3;
+  int width, height, cp;
+
+  unsigned char *img = stbi_load(path.c_str(), &width, &height, &cp, channels);
+  if (!img) {
+    std::cerr << "The picture " << path << " could not be loaded";
+    return nullptr;
+  }
+
+  auto ret = PreProcessImage(img, width, height, reqwidth, reqheight, mean);
+  free (img);
+
+  return ret;
+}
+
+bool ParseArgs (int &argc, char *argv[], std::string &image_path,
+                std::string &model_path, int &index) {
+  int option = 0;
+
   while ((option = getopt(argc, argv, "i:m:p:")) != -1) {
     switch (option) {
       case 'i' :
@@ -108,77 +110,80 @@ int main (int argc, char *argv[]) {
         model_path  = optarg;
         break;
       case 'p' :
-        Index  = atoi(optarg);
+        index  = std::stoi (optarg);
         break;
-
       default:
-        print_usage();
-        exit(EXIT_FAILURE);
+        return false;
     }
   }
 
-  printf("Loading Model: %s ...\n", model_path.c_str());
-  model = loader.Load (model_path, error);
+  return true;
+}
+
+
+int main (int argc, char *argv[]) {
+  std::shared_ptr<r2i::IModel> model;
+  r2i::RuntimeError error;
+  std::shared_ptr<r2i::ncsdk::Frame> frame (new r2i::ncsdk::Frame());
+  std::string model_path;
+  std::string image_path;
+  int Index = 0;
+
+  if (false == ParseArgs (argc, argv, image_path, model_path, Index)) {
+    PrintUsage ();
+    exit (EXIT_FAILURE);
+  }
+
+  if (image_path.empty() || model_path.empty ()) {
+    PrintUsage ();
+    exit (EXIT_FAILURE);
+  }
+
+  auto factory = r2i::IFrameworkFactory::MakeFactory(r2i::FrameworkCode::NCSDK,
+                 error);
+
+  std::cout << "Loading Model: " << model_path << "..." << std::endl;
+  auto loader = factory->MakeLoader (error);
+  model = loader->Load (model_path, error);
   if (r2i::RuntimeError::Code::EOK != error.GetCode()) {
-    printf("Loader Error: %s\n", error.GetDescription().c_str());
+    std::cerr << "Loader error: " << error.GetDescription() << std::endl;
     exit(EXIT_FAILURE);
   }
 
-  printf("Setting Model to Engine...\n");
-  error = engine.SetModel (model);
-  if (r2i::RuntimeError::Code::EOK != error.GetCode()) {
-    printf("Engine SetModel Error: %s\n", error.GetDescription().c_str());
-    exit(EXIT_FAILURE);
-  }
+  std::cout << "Setting model to engine..." << std::endl;
+  auto engine = factory->MakeEngine (error);
+  error = engine->SetModel (model);
 
-  printf("Process Image: %s...\n", image_path.c_str());
-  image_data = LoadImage (image_path.c_str(), GOOGLENET_DIM, GoogleNetMean);
+  std::cout << "Loading image: " << image_path << "..." << std::endl;
+  std::unique_ptr<float[]> image_data =LoadImage (image_path, GOOGLENET_DIM,
+						   GOOGLENET_DIM, GoogleNetMean);
 
-  std::shared_ptr<void> in_data = std::make_shared<float *>(image_data);
-
-  printf("Configure Frame...\n");
-  error = frame->Configure (image_data, GOOGLENET_DIM, GOOGLENET_DIM,
+  std::cout << "Configuring frame..." << std::endl;
+  error = frame->Configure (image_data.get(), GOOGLENET_DIM, GOOGLENET_DIM,
                             r2i::ImageFormat::Id::RGB);
+
+  std::cout << "Starting engine..." << std::endl;
+  error = engine->Start ();
   if (r2i::RuntimeError::Code::EOK != error.GetCode()) {
-    printf("Frame Configuration Error: %s\n", error.GetDescription().c_str());
+    std::cerr << "Engine start error: " << error.GetDescription() << std::endl;
     exit(EXIT_FAILURE);
   }
 
-  printf("Start Engine...\n");
-  error = engine.Start ();
+  std::cout << "Predicting..." << std::endl;
+  auto prediction = engine->Predict (frame, error);
   if (r2i::RuntimeError::Code::EOK != error.GetCode()) {
-    printf("Engine Start Error: %s\n", error.GetDescription().c_str());
+    std::cerr << "Engine prediction error: " << error.GetDescription() << std::endl;
     exit(EXIT_FAILURE);
   }
 
-  printf("Predict...\n");
-  prediction =
-    std::dynamic_pointer_cast<r2i::ncsdk::Prediction, r2i::IPrediction>
-    (engine.Predict (frame, error));
+  PrintTopPrediction (prediction);
+
+  std::cout << "Stopping engine..." << std::endl;
+  error = engine->Stop ();
   if (r2i::RuntimeError::Code::EOK != error.GetCode()) {
-    printf("Engine Prediction Error: %s\n", error.GetDescription().c_str());
+    std::cerr << "Engine stop error: " << error.GetDescription() << std::endl;
     exit(EXIT_FAILURE);
   }
 
-  unsigned int out_size = prediction->GetResultSize();
-
-  int numResults = out_size / (int)sizeof(float);
-
-  printf("Result size was: %d, which represents %d elements \n", out_size,
-         numResults);
-
-
-  double Result = 0.0;
-
-  Result = prediction->At(Index, error);
-  printf("Probability at index %i  is: %lf\n", Index, Result);
-
-
-  printf("Stop Engine...\n");
-  error = engine.Stop ();
-  if (r2i::RuntimeError::Code::EOK != error.GetCode()) {
-    printf("Engine Stop Error: %s\n", error.GetDescription().c_str());
-    exit(EXIT_FAILURE);
-  }
-  return 0;
+  return EXIT_SUCCESS;
 }

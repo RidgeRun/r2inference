@@ -29,9 +29,6 @@ AM_CPPFLAGS = 				\
 AM_LDFLAGS =				\
 	$(RR_LIBS)			\
 	$(CODE_COVERAGE_LIBS)		\
-	-lpthread			\
-	-L/usr/X11R6/lib		\
-	-lX11				\
 	$(top_builddir)/r2i/libr2inference-@RR_PACKAGE_VERSION@.la
 
 endif # ENABLE_EXAMPLES

@@ -28,7 +28,7 @@ MakeNcsdkFactory (RuntimeError &error) {
 
 typedef std::function<std::unique_ptr<IFrameworkFactory>(RuntimeError &)>
 MakeFactory;
-const std::unordered_map<FrameworkCode, MakeFactory> frameworks ({
+const std::unordered_map<int, MakeFactory> frameworks ({
 
 #ifdef HAVE_NCSDK
   {FrameworkCode::NCSDK, MakeNcsdkFactory},
@@ -55,7 +55,8 @@ IFrameworkFactory::List(RuntimeError &error) {
   std::vector<FrameworkMeta> metas;
 
   for (auto &fw : frameworks) {
-    auto factory = IFrameworkFactory::MakeFactory (fw.first, error);
+    auto factory = IFrameworkFactory::MakeFactory (static_cast<FrameworkCode>
+                   (fw.first), error);
     metas.push_back (factory->GetDescription (error));
   }
 
