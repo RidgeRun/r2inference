@@ -96,8 +96,7 @@ void ListFramework (r2i::FrameworkMeta &meta, const std::string graph) {
 
   auto model = loader->Load(graph, error);
   if (r2i::RuntimeError::Code::EOK != error.GetCode()) {
-    std::cerr << "Unable to load model (" << error.GetCode () << "): " <<
-              error.GetDescription () << std::endl;
+    std::cerr << "Unable to load model " << error << std::endl;
     return;
   }
 
@@ -105,15 +104,13 @@ void ListFramework (r2i::FrameworkMeta &meta, const std::string graph) {
 
   error = engine->SetModel(model);
   if (r2i::RuntimeError::Code::EOK != error.GetCode()) {
-    std::cerr << "Unable to set model (" << error.GetCode () << "): " <<
-              error.GetDescription () << std::endl;
+    std::cerr << "Unable to set model " << error << std::endl;
     return;
   }
 
   error = engine->Start ();
   if (r2i::RuntimeError::Code::EOK != error.GetCode()) {
-    std::cerr << "Unable to start engine (" << error.GetCode () << "): " <<
-              error.GetDescription () << std::endl;
+    std::cerr << "Unable to start engine " << error << std::endl;
     return;
   }
 

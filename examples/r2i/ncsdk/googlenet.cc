@@ -146,7 +146,7 @@ int main (int argc, char *argv[]) {
   auto loader = factory->MakeLoader (error);
   model = loader->Load (model_path, error);
   if (r2i::RuntimeError::Code::EOK != error.GetCode()) {
-    std::cerr << "Loader error: " << error.GetDescription() << std::endl;
+    std::cerr << "Loader error: " << error << std::endl;
     exit(EXIT_FAILURE);
   }
 
@@ -165,14 +165,14 @@ int main (int argc, char *argv[]) {
   std::cout << "Starting engine..." << std::endl;
   error = engine->Start ();
   if (r2i::RuntimeError::Code::EOK != error.GetCode()) {
-    std::cerr << "Engine start error: " << error.GetDescription() << std::endl;
+    std::cerr << "Engine start error: " << error << std::endl;
     exit(EXIT_FAILURE);
   }
 
   std::cout << "Predicting..." << std::endl;
   auto prediction = engine->Predict (frame, error);
   if (r2i::RuntimeError::Code::EOK != error.GetCode()) {
-    std::cerr << "Engine prediction error: " << error.GetDescription() << std::endl;
+    std::cerr << "Engine prediction error: " << error << std::endl;
     exit(EXIT_FAILURE);
   }
 
@@ -181,7 +181,7 @@ int main (int argc, char *argv[]) {
   std::cout << "Stopping engine..." << std::endl;
   error = engine->Stop ();
   if (r2i::RuntimeError::Code::EOK != error.GetCode()) {
-    std::cerr << "Engine stop error: " << error.GetDescription() << std::endl;
+    std::cerr << "Engine stop error: " << error << std::endl;
     exit(EXIT_FAILURE);
   }
 

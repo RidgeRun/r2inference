@@ -60,7 +60,6 @@ TEST (NcsdkFrameworkFactory, ValidFactory) {
   CHECK (nullptr != uparameters);
 
   /* Test for meta */
-  auto description = factory->GetDescription (error);
   LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
 }
 
