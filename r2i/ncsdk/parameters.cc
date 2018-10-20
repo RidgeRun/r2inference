@@ -98,6 +98,16 @@ Parameters::Parameters () :
         r2i::ParameterMeta::Type::INTEGER, NC_RO_DEVICE_MAX_EXECUTORS_NUM,
         &r2i::ncsdk::SetParameterEngine,
         &r2i::ncsdk::GetParameterEngine),
+  PARAM("device-debug-info", "Returns debug info",
+        r2i::ParameterMeta::Flags::READ,
+        r2i::ParameterMeta::Type::STRING, NC_RO_DEVICE_DEBUG_INFO,
+        &r2i::ncsdk::SetParameterEngine,
+        &r2i::ncsdk::GetParameterEngine),
+  PARAM("device-name", "Returns the name of the device",
+        r2i::ParameterMeta::Flags::READ,
+        r2i::ParameterMeta::Type::STRING, NC_RO_DEVICE_NAME,
+        &r2i::ncsdk::SetParameterEngine,
+        &r2i::ncsdk::GetParameterEngine),
 
   /* Input fifo parameters */
   PARAM("input-fifo-type", "Fifo type from ncFifoType_t",
@@ -232,7 +242,23 @@ Parameters::Parameters () :
         r2i::ParameterMeta::Flags::READWRITE,
         r2i::ParameterMeta::Type::INTEGER, NC_RW_GRAPH_EXECUTORS_NUM,
         &r2i::ncsdk::SetParameterGraph,
-        &r2i::ncsdk::GetParameterGraph)
+        &r2i::ncsdk::GetParameterGraph),
+  PARAM("graph-debug-info", "Returns debug info",
+        r2i::ParameterMeta::Flags::READ,
+        r2i::ParameterMeta::Type::STRING, NC_RO_GRAPH_DEBUG_INFO,
+        &r2i::ncsdk::SetParameterGraph,
+        &r2i::ncsdk::GetParameterGraph),
+  PARAM("graph-name", "Returns the name of the graph",
+        r2i::ParameterMeta::Flags::READ,
+        r2i::ParameterMeta::Type::STRING, NC_RO_GRAPH_NAME,
+        &r2i::ncsdk::SetParameterGraph,
+        &r2i::ncsdk::GetParameterGraph),
+  PARAM("graph-version", "Returns the version of the graph",
+        r2i::ParameterMeta::Flags::READ,
+        r2i::ParameterMeta::Type::STRING, NC_RO_GRAPH_VERSION,
+        &r2i::ncsdk::SetParameterGraph,
+        &r2i::ncsdk::GetParameterGraph),
+
 }) {
 }
 
@@ -284,12 +310,14 @@ RuntimeError Parameters::Get (const std::string &in_parameter, int &value) {
 
 RuntimeError Parameters::Get (const std::string &in_parameter,
                               std::string &value) {
+  RuntimeError error;
   unsigned int value_size = value.size();
 
-  return this->ApplyParameter (this->parameter_map, in_parameter,
-                               r2i::ParameterMeta::Type::STRING, "string",
-                               &(value[0]),
-                               &value_size, AccessorIndex::GET);
+  error = this->ApplyParameter (this->parameter_map, in_parameter,
+                                r2i::ParameterMeta::Type::STRING, "string",
+                                &(value[0]), &value_size, AccessorIndex::GET);
+
+  return error;
 }
 
 RuntimeError Parameters::Set (const std::string &in_parameter,
