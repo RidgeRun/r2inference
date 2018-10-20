@@ -7,7 +7,7 @@
  * RidgeRun, LLC.  The user is free to modify the source code after obtaining
  * a software license from RidgeRun.  All source code changes must be provided
  * back to RidgeRun without any encumbrance.
-*/
+ */
 
 #include <cstring>
 #include <memory>
@@ -374,6 +374,11 @@ RuntimeError Parameters::ApplyParameter (const ParamMap &map,
 }
 
 RuntimeError Parameters::ListParameters (std::vector<ParameterMeta> &metas) {
+  for (auto &param : this->parameter_map) {
+    r2i::ParameterMeta meta = param.second.meta;
+    metas.push_back(meta);
+  }
+
   return RuntimeError();
 }
 
