@@ -12,17 +12,17 @@
 #ifndef R2I_R2I_H
 #define R2I_R2I_H
 
+#include <r2i/frameworks.h>
 #include <r2i/iengine.h>
+#include <r2i/iframe.h>
 #include <r2i/iframeworkfactory.h>
 #include <r2i/iloader.h>
+#include <r2i/imageformat.h>
+#include <r2i/imodel.h>
 #include <r2i/iparameters.h>
 #include <r2i/iprediction.h>
+#include <r2i/parametermeta.h>
+#include <r2i/r2i.h>
 #include <r2i/runtimeerror.h>
-
-namespace r2i {
-
-void init ();
-
-};
 
 #endif //R2I_R2I_H
