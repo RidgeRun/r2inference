@@ -95,7 +95,7 @@ class IParameters {
    * the parameters.
    * \return RuntimeError with a description of an error.
    */
-  virtual RuntimeError ListParameters (std::vector<ParameterMeta> &metas) = 0;
+  virtual RuntimeError List (std::vector<ParameterMeta> &metas) = 0;
 
   /**
    * \brief Default destructor

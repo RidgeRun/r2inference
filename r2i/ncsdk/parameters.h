@@ -43,7 +43,7 @@ class Parameters : public IParameters {
 
   RuntimeError Set (const std::string &in_parameter, int in_value) override;
 
-  RuntimeError ListParameters (std::vector<ParameterMeta> &metas) override;
+  RuntimeError List (std::vector<ParameterMeta> &metas) override;
 
  private:
   std::shared_ptr<Engine> engine;

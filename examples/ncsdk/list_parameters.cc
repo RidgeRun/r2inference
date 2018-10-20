@@ -96,7 +96,7 @@ int main (int argc, char *argv[]) {
   }
 
   auto factory = r2i::IFrameworkFactory::MakeFactory(
-                   r2i::IFrameworkFactory::FrameworkCode::NCSDK, error);
+                   r2i::IFrameworkFactory::Code::NCSDK, error);
 
   auto loader = factory->MakeLoader(error);
 
@@ -127,7 +127,7 @@ int main (int argc, char *argv[]) {
   error = params->Configure (engine, model);
 
   std::vector<r2i::ParameterMeta> desc;
-  error = params->ListParameters(desc);
+  error = params->List (desc);
 
   std::cout << "Listing NCSDK parameters" << std::endl;
   std::cout << "========================" << std::endl;

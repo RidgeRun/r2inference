@@ -31,13 +31,13 @@ MakeFactory;
 const std::unordered_map<int, MakeFactory> frameworks ({
 
 #ifdef HAVE_NCSDK
-  {IFrameworkFactory::FrameworkCode::NCSDK, MakeNcsdkFactory},
+  {IFrameworkFactory::Code::NCSDK, MakeNcsdkFactory},
 #endif //HAVE_NCSDK
 
 });
 
 std::unique_ptr<IFrameworkFactory>
-IFrameworkFactory::MakeFactory (FrameworkCode code, RuntimeError &error) {
+IFrameworkFactory::MakeFactory (Code code, RuntimeError &error) {
   auto match = frameworks.find (code);
 
   /* No match found */

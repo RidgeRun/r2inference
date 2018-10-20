@@ -39,7 +39,7 @@ class IFrameworkFactory {
    * no development where found or if the system doesn't seem to have
    * to appropriate hardware.
    */
-  enum FrameworkCode {
+  enum Code {
     /**
      * Intel Movidius Neural Compute software developer kit
      */
@@ -51,7 +51,7 @@ class IFrameworkFactory {
     MAX_FRAMEWORK
   };
 
-  static std::unique_ptr<IFrameworkFactory> MakeFactory (FrameworkCode code,
+  static std::unique_ptr<IFrameworkFactory> MakeFactory (Code code,
       RuntimeError &error);
 
   /**

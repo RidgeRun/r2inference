@@ -373,7 +373,7 @@ RuntimeError Parameters::ApplyParameter (const ParamMap &map,
   return apply (this, nccode, target, target_size);
 }
 
-RuntimeError Parameters::ListParameters (std::vector<ParameterMeta> &metas) {
+RuntimeError Parameters::List (std::vector<ParameterMeta> &metas) {
   for (auto &param : this->parameter_map) {
     r2i::ParameterMeta meta = param.second.meta;
     metas.push_back(meta);
