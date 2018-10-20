@@ -20,6 +20,14 @@
 namespace r2i {
 namespace ncsdk {
 
+Engine::Engine () :
+  model(nullptr),
+  movidius_device(nullptr),
+  input_buffers(nullptr),
+  output_buffers(nullptr),
+  status(Engine::Status::IDLE)  {
+}
+
 ncDeviceHandle_t *Engine::GetDeviceHandler () {
   return this->movidius_device;
 }
@@ -226,7 +234,7 @@ RuntimeError Engine::Stop () {
 
   if ( Status:: IDLE == engine_status) {
     error.Set (RuntimeError::Code:: WRONG_ENGINE_STATE,
-               "Engine in wrong State");
+               "Engine in wrong state");
     return error;
   }
 
@@ -241,6 +249,7 @@ RuntimeError Engine::Stop () {
 
 
   ret = ncFifoDestroy(&output_buffers_ptr);
+  this->output_buffers = nullptr;
 
   if (NC_OK != ret) {
     error.Set (RuntimeError::Code::FRAMEWORK_ERROR,
@@ -249,6 +258,7 @@ RuntimeError Engine::Stop () {
   }
 
   ret = ncFifoDestroy(&input_buffers_ptr);
+  this->input_buffers = nullptr;
 
   if (NC_OK != ret) {
     error.Set (RuntimeError::Code::FRAMEWORK_ERROR,
@@ -272,6 +282,7 @@ RuntimeError Engine::Stop () {
   }
 
   ret = ncDeviceDestroy (&device_handle);
+  this->movidius_device = nullptr;
 
   if (NC_OK != ret) {
     error.Set (RuntimeError::Code::FRAMEWORK_ERROR,
