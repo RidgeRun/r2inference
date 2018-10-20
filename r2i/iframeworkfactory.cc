@@ -28,16 +28,16 @@ MakeNcsdkFactory (RuntimeError &error) {
 
 typedef std::function<std::unique_ptr<IFrameworkFactory>(RuntimeError &)>
 MakeFactory;
-const std::unordered_map<int, MakeFactory> frameworks ({
+const std::unordered_map<FrameworkCode, MakeFactory> frameworks ({
 
 #ifdef HAVE_NCSDK
-  {IFrameworkFactory::Code::NCSDK, MakeNcsdkFactory},
+  {FrameworkCode::NCSDK, MakeNcsdkFactory},
 #endif //HAVE_NCSDK
 
 });
 
 std::unique_ptr<IFrameworkFactory>
-IFrameworkFactory::MakeFactory (Code code, RuntimeError &error) {
+IFrameworkFactory::MakeFactory (FrameworkCode code, RuntimeError &error) {
   auto match = frameworks.find (code);
 
   /* No match found */
@@ -48,6 +48,18 @@ IFrameworkFactory::MakeFactory (Code code, RuntimeError &error) {
   }
 
   return match->second (error);
+}
+
+std::vector<FrameworkMeta>
+IFrameworkFactory::List(RuntimeError &error) {
+  std::vector<FrameworkMeta> metas;
+
+  for (auto &fw : frameworks) {
+    auto factory = IFrameworkFactory::MakeFactory (fw.first, error);
+    metas.push_back (factory->GetDescription (error));
+  }
+
+  return metas;
 }
 
 } // namespace r2i

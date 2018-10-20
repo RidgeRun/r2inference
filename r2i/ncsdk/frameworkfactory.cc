@@ -41,6 +41,7 @@ std::unique_ptr<r2i::IParameters> FrameworkFactory::MakeParameters (
 
 r2i::FrameworkMeta FrameworkFactory::GetDescription (RuntimeError &error) {
   const FrameworkMeta meta {
+    .code = r2i::FrameworkCode::NCSDK,
     .name = "NCSDK",
     .description = "Intel Movidius Neural Compute software developer kit",
     .version = "2"

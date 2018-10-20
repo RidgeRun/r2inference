@@ -23,7 +23,7 @@ TEST (IFrameworkFactory, InvalidFramework) {
   std::unique_ptr<r2i::IFrameworkFactory> fw;
 
   fw = r2i::IFrameworkFactory::MakeFactory (
-         r2i::IFrameworkFactory::Code::MAX_FRAMEWORK, error);
+         r2i::FrameworkCode::MAX_FRAMEWORK, error);
   LONGS_EQUAL (r2i::RuntimeError::Code::UNSUPPORTED_FRAMEWORK, error.GetCode ());
   POINTERS_EQUAL (nullptr, fw.get());
 }

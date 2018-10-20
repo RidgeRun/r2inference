@@ -7,11 +7,10 @@
  * RidgeRun, LLC.  The user is free to modify the source code after obtaining
  * a software license from RidgeRun.  All source code changes must be provided
  * back to RidgeRun without any encumbrance.
-*/
+ */
 
 #include <iostream>
 #include <r2i/r2i.h>
-#include <unordered_map>
 
 const std::string TypeToString (r2i::ParameterMeta::Type type) {
   switch (type) {
@@ -84,6 +83,51 @@ void PrintParameter (std::shared_ptr<r2i::IParameters> params,
   std::cout << std::endl;
 }
 
+void ListFramework (r2i::FrameworkMeta &meta, const std::string graph) {
+  r2i::RuntimeError error;
+
+  std::cout << "Listing " << meta.name << " parameters" << std::endl;
+  std::cout << "========================" << std::endl;
+  std::cout << std::endl;
+
+  auto factory = r2i::IFrameworkFactory::MakeFactory(meta.code, error);
+
+  auto loader = factory->MakeLoader(error);
+
+  auto model = loader->Load(graph, error);
+  if (r2i::RuntimeError::Code::EOK != error.GetCode()) {
+    std::cerr << "Unable to load model (" << error.GetCode () << "): " <<
+              error.GetDescription () << std::endl;
+    return;
+  }
+
+  std::shared_ptr<r2i::IEngine> engine = factory->MakeEngine(error);
+
+  error = engine->SetModel(model);
+  if (r2i::RuntimeError::Code::EOK != error.GetCode()) {
+    std::cerr << "Unable to set model (" << error.GetCode () << "): " <<
+              error.GetDescription () << std::endl;
+    return;
+  }
+
+  error = engine->Start ();
+  if (r2i::RuntimeError::Code::EOK != error.GetCode()) {
+    std::cerr << "Unable to start engine (" << error.GetCode () << "): " <<
+              error.GetDescription () << std::endl;
+    return;
+  }
+
+  std::shared_ptr<r2i::IParameters> params = factory->MakeParameters(error);
+  error = params->Configure (engine, model);
+
+  std::vector<r2i::ParameterMeta> desc;
+  error = params->List (desc);
+
+  for (auto &param : desc) {
+    PrintParameter (params, param);
+  }
+}
+
 int main (int argc, char *argv[]) {
   r2i::RuntimeError error;
   std::string graph;
@@ -95,47 +139,10 @@ int main (int argc, char *argv[]) {
     graph = argv[1];
   }
 
-  auto factory = r2i::IFrameworkFactory::MakeFactory(
-                   r2i::IFrameworkFactory::Code::NCSDK, error);
-
-  auto loader = factory->MakeLoader(error);
-
-  auto model = loader->Load(graph, error);
-  if (r2i::RuntimeError::Code::EOK != error.GetCode()) {
-    std::cerr << "Unable to load model (" << error.GetCode () << "): " <<
-              error.GetDescription () << std::endl;
-    return 1;
-  }
-
-  std::shared_ptr<r2i::IEngine> engine = factory->MakeEngine(error);
-
-  error = engine->SetModel(model);
-  if (r2i::RuntimeError::Code::EOK != error.GetCode()) {
-    std::cerr << "Unable to set model (" << error.GetCode () << "): " <<
-              error.GetDescription () << std::endl;
-    return 1;
-  }
-
-  error = engine->Start ();
-  if (r2i::RuntimeError::Code::EOK != error.GetCode()) {
-    std::cerr << "Unable to start engine (" << error.GetCode () << "): " <<
-              error.GetDescription () << std::endl;
-    return 1;
-  }
-
-  std::shared_ptr<r2i::IParameters> params = factory->MakeParameters(error);
-  error = params->Configure (engine, model);
-
-  std::vector<r2i::ParameterMeta> desc;
-  error = params->List (desc);
-
-  std::cout << "Listing NCSDK parameters" << std::endl;
-  std::cout << "========================" << std::endl;
-  std::cout << std::endl;
-
-  for (auto &param : desc) {
-    PrintParameter (params, param);
+  for (auto &meta : r2i::IFrameworkFactory::List (error)) {
+    ListFramework (meta, graph);
   }
 
   return 0;
 }
+
