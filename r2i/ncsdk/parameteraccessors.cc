@@ -70,7 +70,7 @@ RuntimeError SetParameterGlobal (Parameters *self, int param,
   RuntimeError error;
 
   error = ValidateAccessorParameters (self, target, target_size);
-  if (r2i::RuntimeError::Code::EOK != error.GetCode()) {
+  if (error.IsError ()) {
     return error;
   }
 
@@ -90,7 +90,7 @@ RuntimeError GetParameterGlobal (Parameters *self, int param,
   RuntimeError error;
 
   error = ValidateAccessorParameters (self, target, target_size);
-  if (r2i::RuntimeError::Code::EOK != error.GetCode()) {
+  if (error.IsError ()) {
     return error;
   }
 
@@ -109,7 +109,7 @@ static RuntimeError ValidateEngineAccessorParameters (Parameters *self,
   RuntimeError error;
 
   error = ValidateAccessorParameters (self, target, target_size);
-  if (r2i::RuntimeError::Code::EOK != error.GetCode()) {
+  if (error.IsError ()) {
     return error;
   }
 
@@ -128,7 +128,7 @@ static RuntimeError ValidateEngineDeviceAccessorParameters (Parameters *self,
   RuntimeError error;
 
   error = ValidateEngineAccessorParameters (self, target, target_size);
-  if (r2i::RuntimeError::Code::EOK != error.GetCode()) {
+  if (error.IsError ()) {
     return error;
   }
 
@@ -149,7 +149,7 @@ RuntimeError SetParameterEngine (Parameters *self, int param,
   RuntimeError error;
 
   error = ValidateEngineDeviceAccessorParameters (self, target, target_size);
-  if (r2i::RuntimeError::Code::EOK != error.GetCode()) {
+  if (error.IsError ()) {
     return error;
   }
 
@@ -172,7 +172,7 @@ RuntimeError GetParameterEngine (Parameters *self, int param,
   RuntimeError error;
 
   error = ValidateEngineDeviceAccessorParameters (self, target, target_size);
-  if (r2i::RuntimeError::Code::EOK != error.GetCode()) {
+  if (error.IsError ()) {
     return error;
   }
 
@@ -194,7 +194,7 @@ static RuntimeError ValidateInputFifoAccessorParameters (Parameters *self,
   RuntimeError error;
 
   error = ValidateEngineAccessorParameters (self, target, target_size);
-  if (r2i::RuntimeError::Code::EOK != error.GetCode()) {
+  if (error.IsError ()) {
     return error;
   }
 
@@ -216,7 +216,7 @@ RuntimeError SetParameterInputFifo (Parameters *self, int param,
   RuntimeError error;
 
   error = ValidateInputFifoAccessorParameters (self, target, target_size);
-  if (r2i::RuntimeError::Code::EOK != error.GetCode()) {
+  if (error.IsError ()) {
     return error;
   }
 
@@ -239,7 +239,7 @@ RuntimeError GetParameterInputFifo (Parameters *self, int param,
   RuntimeError error;
 
   error = ValidateInputFifoAccessorParameters (self, target, target_size);
-  if (r2i::RuntimeError::Code::EOK != error.GetCode()) {
+  if (error.IsError ()) {
     return error;
   }
 
@@ -261,7 +261,7 @@ static RuntimeError ValidateOutputFifoAccessorParameters (Parameters *self,
   RuntimeError error;
 
   error = ValidateEngineAccessorParameters (self, target, target_size);
-  if (r2i::RuntimeError::Code::EOK != error.GetCode()) {
+  if (error.IsError ()) {
     return error;
   }
 
@@ -283,7 +283,7 @@ RuntimeError SetParameterOutputFifo (Parameters *self, int param,
   RuntimeError error;
 
   error = ValidateOutputFifoAccessorParameters (self, target, target_size);
-  if (r2i::RuntimeError::Code::EOK != error.GetCode()) {
+  if (error.IsError ()) {
     return error;
   }
 
@@ -306,7 +306,7 @@ RuntimeError GetParameterOutputFifo (Parameters *self, int param,
   RuntimeError error;
 
   error = ValidateOutputFifoAccessorParameters (self, target, target_size);
-  if (r2i::RuntimeError::Code::EOK != error.GetCode()) {
+  if (error.IsError ()) {
     return error;
   }
 
@@ -328,7 +328,7 @@ static RuntimeError ValidateGraphAccessorParameters (Parameters *self,
   RuntimeError error;
 
   error = ValidateAccessorParameters (self, target, target_size);
-  if (r2i::RuntimeError::Code::EOK != error.GetCode()) {
+  if (error.IsError ()) {
     return error;
   }
 
@@ -356,7 +356,7 @@ RuntimeError SetParameterGraph (Parameters *self, int param,
   RuntimeError error;
 
   error = ValidateGraphAccessorParameters (self, target, target_size);
-  if (r2i::RuntimeError::Code::EOK != error.GetCode()) {
+  if (error.IsError ()) {
     return error;
   }
 
@@ -379,7 +379,7 @@ RuntimeError GetParameterGraph (Parameters *self, int param,
   RuntimeError error;
 
   error = ValidateGraphAccessorParameters (self, target, target_size);
-  if (r2i::RuntimeError::Code::EOK != error.GetCode()) {
+  if (error.IsError ()) {
     return error;
   }
 

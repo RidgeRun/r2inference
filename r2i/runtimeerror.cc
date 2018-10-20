@@ -41,6 +41,10 @@ RuntimeError::Code RuntimeError::GetCode () const {
   return this->code;
 }
 
+bool RuntimeError::IsError () const {
+  return Code::EOK != this->code;
+}
+
 std::ostream &operator<<(std::ostream &os, RuntimeError const &self) {
   return os << "(" << self.GetCode () << "): " << self.GetDescription ();
 }

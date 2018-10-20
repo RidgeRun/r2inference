@@ -127,6 +127,12 @@ class RuntimeError {
    */
   Code GetCode () const;
 
+  /**
+   * \brief Checks if the RuntimeError is in an error state
+   * \return true if an error ocurred, false otherwise
+   */
+  bool IsError () const;
+
  private:
   std::string description;
   Code code;

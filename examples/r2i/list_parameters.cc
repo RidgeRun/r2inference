@@ -51,7 +51,7 @@ const std::string GetCurrentValue (std::shared_ptr<r2i::IParameters> params,
     case (r2i::ParameterMeta::Type::INTEGER): {
       int value;
       error = params->Get (param.name, value);
-      if (r2i::RuntimeError::Code::EOK != error.GetCode ()) {
+      if (error.IsError ()) {
         return "error: " + error.GetDescription();
       } else {
         return std::to_string (value);
@@ -61,7 +61,7 @@ const std::string GetCurrentValue (std::shared_ptr<r2i::IParameters> params,
     case (r2i::ParameterMeta::Type::STRING): {
       std::string value (256, 0);
       error = params->Get (param.name, value);
-      if (r2i::RuntimeError::Code::EOK != error.GetCode ()) {
+      if (error.IsError ()) {
         return "error: " + error.GetDescription();
       } else {
         return value;
@@ -95,7 +95,7 @@ void ListFramework (r2i::FrameworkMeta &meta, const std::string graph) {
   auto loader = factory->MakeLoader(error);
 
   auto model = loader->Load(graph, error);
-  if (r2i::RuntimeError::Code::EOK != error.GetCode()) {
+  if (error.IsError ()) {
     std::cerr << "Unable to load model " << error << std::endl;
     return;
   }
@@ -103,13 +103,13 @@ void ListFramework (r2i::FrameworkMeta &meta, const std::string graph) {
   std::shared_ptr<r2i::IEngine> engine = factory->MakeEngine(error);
 
   error = engine->SetModel(model);
-  if (r2i::RuntimeError::Code::EOK != error.GetCode()) {
+  if (error.IsError ()) {
     std::cerr << "Unable to set model " << error << std::endl;
     return;
   }
 
   error = engine->Start ();
-  if (r2i::RuntimeError::Code::EOK != error.GetCode()) {
+  if (error.IsError ()) {
     std::cerr << "Unable to start engine " << error << std::endl;
     return;
   }
