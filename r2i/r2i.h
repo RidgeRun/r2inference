@@ -17,6 +17,7 @@
 #include <r2i/iloader.h>
 #include <r2i/iparameters.h>
 #include <r2i/iprediction.h>
+#include <r2i/runtimeerror.h>
 
 namespace r2i {
 

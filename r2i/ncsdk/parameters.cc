@@ -311,7 +311,7 @@ RuntimeError Parameters::Get (const std::string &in_parameter, int &value) {
 RuntimeError Parameters::Get (const std::string &in_parameter,
                               std::string &value) {
   RuntimeError error;
-  unsigned int value_size = value.size();
+  unsigned int value_size = value.size() + 1;
 
   error = this->ApplyParameter (this->parameter_map, in_parameter,
                                 r2i::ParameterMeta::Type::STRING, "string",
