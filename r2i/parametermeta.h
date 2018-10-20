@@ -52,6 +52,11 @@ struct ParameterMeta {
      * System dependent integer
      */
     INTEGER,
+
+    /**
+     * A standard string
+     */
+    STRING
   };
 
   /**
