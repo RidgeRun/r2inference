@@ -22,6 +22,8 @@ class FrameworkFactory : public IFrameworkFactory {
   std::unique_ptr<r2i::ILoader> MakeLoader (RuntimeError &error) override;
   std::unique_ptr<r2i::IEngine> MakeEngine (RuntimeError &error) override;
   std::unique_ptr<r2i::IParameters> MakeParameters (RuntimeError &error) override;
+  std::unique_ptr<r2i::IFrame> MakeFrame (RuntimeError &error) override;
+
   r2i::FrameworkMeta GetDescription (RuntimeError &error) override;
 };
 

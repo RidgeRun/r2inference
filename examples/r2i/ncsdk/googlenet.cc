@@ -15,7 +15,6 @@
 #include <string>
 
 #include <r2i/r2i.h>
-#include <r2i/ncsdk/frame.h>
 #include <r2i/ncsdk/prediction.h>
 
 #define STB_IMAGE_IMPLEMENTATION
@@ -122,9 +121,7 @@ bool ParseArgs (int &argc, char *argv[], std::string &image_path,
 
 
 int main (int argc, char *argv[]) {
-  std::shared_ptr<r2i::IModel> model;
   r2i::RuntimeError error;
-  std::shared_ptr<r2i::ncsdk::Frame> frame (new r2i::ncsdk::Frame());
   std::string model_path;
   std::string image_path;
   int Index = 0;
@@ -144,7 +141,7 @@ int main (int argc, char *argv[]) {
 
   std::cout << "Loading Model: " << model_path << "..." << std::endl;
   auto loader = factory->MakeLoader (error);
-  model = loader->Load (model_path, error);
+  auto model = loader->Load (model_path, error);
   if (error.IsError ()) {
     std::cerr << "Loader error: " << error << std::endl;
     exit(EXIT_FAILURE);
@@ -159,6 +156,7 @@ int main (int argc, char *argv[]) {
 						   GOOGLENET_DIM, GoogleNetMean);
 
   std::cout << "Configuring frame..." << std::endl;
+  std::shared_ptr<r2i::IFrame> frame = factory->MakeFrame (error);
   error = frame->Configure (image_data.get(), GOOGLENET_DIM, GOOGLENET_DIM,
                             r2i::ImageFormat::Id::RGB);
 

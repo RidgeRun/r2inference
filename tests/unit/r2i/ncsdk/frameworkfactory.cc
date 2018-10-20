@@ -12,6 +12,7 @@
 #include <memory>
 
 #include <r2i/iframeworkfactory.h>
+#include <r2i/ncsdk/frame.h>
 #include <r2i/ncsdk/frameworkfactory.h>
 #include <r2i/ncsdk/loader.h>
 #include <r2i/ncsdk/engine.h>
@@ -58,6 +59,13 @@ TEST (NcsdkFrameworkFactory, ValidFactory) {
   auto uparameters =
     std::dynamic_pointer_cast<r2i::ncsdk::Parameters, r2i::IParameters>(parameters);
   CHECK (nullptr != uparameters);
+
+  /* Test for parameters */
+  std::shared_ptr<r2i::IFrame> frame = factory->MakeFrame(error);
+  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
+  auto uframe =
+    std::dynamic_pointer_cast<r2i::ncsdk::Frame, r2i::IFrame>(frame);
+  CHECK (nullptr != uframe);
 
   /* Test for meta */
   LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());

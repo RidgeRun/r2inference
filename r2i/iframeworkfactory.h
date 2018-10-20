@@ -66,6 +66,13 @@ class IFrameworkFactory {
     RuntimeError &error) = 0;
 
   /**
+   * \brief Creates a valid IFrame on a particular Framework
+   * \param error [out] RuntimeError with a description of an error.
+   * \return a valid IFrame of a framework or nullptr in case of error.
+   */
+  virtual std::unique_ptr<r2i::IFrame> MakeFrame (RuntimeError &error) = 0;
+
+  /**
    * \brief Creates the FrameworkMetadata of particular Framework
    * \param error [out] RuntimeError with a description of an error.
    * \return A FrameworkMetadata of a framework which is valid only if
