@@ -29,7 +29,7 @@ TEST (NcsdkFrameworkFactory, ValidFactory) {
   std::shared_ptr<r2i::IFrameworkFactory> factory;
 
   factory = r2i::IFrameworkFactory::MakeFactory(
-              r2i::IFrameworkFactory::FrameworkCode::NCSDK, error);
+              r2i::FrameworkCode::NCSDK, error);
   LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
 
   /* Is this a valid NCSDK factory? */

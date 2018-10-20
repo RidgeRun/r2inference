@@ -79,5 +79,10 @@ unsigned int Model::GetDataSize () {
 void Model::SetDataSize (unsigned int graph_size) {
   this->graph_size = graph_size;
 }
+
+Model::~Model () {
+  this->Stop ();
 }
-}
+
+} // namespace ncsdk
+} // namespace r2i

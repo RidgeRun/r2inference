@@ -15,7 +15,6 @@
 #include <functional>
 #include <string>
 #include <unordered_map>
-#include <vector>
 
 #include <r2i/iparameters.h>
 #include <r2i/ncsdk/engine.h>
@@ -44,6 +43,8 @@ class Parameters : public IParameters {
 
   RuntimeError Set (const std::string &in_parameter, int in_value) override;
 
+  RuntimeError List (std::vector<ParameterMeta> &metas) override;
+
  private:
   std::shared_ptr<Engine> engine;
   std::shared_ptr<IModel> model;
@@ -63,37 +64,28 @@ class Parameters : public IParameters {
   typedef std::function<RuntimeError(Parameters *, int param, void *target,
                                      unsigned int *target_size)> Accessor;
 
-
-
-  typedef std::unordered_map<std::string, int> CodeMap;
-
   enum AccessorIndex {
     SET = 0,
     GET = 1,
   };
 
-  struct AccessorNode {
-    const CodeMap map;
-    const Accessor accessor[2];
+  struct ParamDesc {
+    ParameterMeta meta;
+    int nccode;
+    Accessor accessor[2];
   };
 
-  typedef std::vector<struct AccessorNode> AccessorVector;
+  typedef std::unordered_map<std::string, ParamDesc> ParamMap;
 
-  RuntimeError ApplyParameter (const AccessorVector &vec,
+  RuntimeError ApplyParameter (const ParamMap &map,
                                const std::string &in_parameter,
-                               const std::string &type,
+                               const r2i::ParameterMeta::Type type,
+                               const std::string &stype,
                                void *target,
                                unsigned int *target_size,
                                int accesor_index);
 
-  const CodeMap parameter_map_global_string;
-  const CodeMap parameter_map_global_int;
-  const CodeMap parameter_map_device_int;
-  const CodeMap parameter_map_input_fifo_int;
-  const CodeMap parameter_map_output_fifo_int;
-  const CodeMap parameter_map_graph_int;
-  const AccessorVector parameter_maps_int;
-  const AccessorVector parameter_maps_string;
+  const ParamMap parameter_map;
 };
 
 } // namespace ncsdk

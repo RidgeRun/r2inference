@@ -14,14 +14,22 @@
 
 #include <string>
 
+#include <r2i/frameworks.h>
+
 /**
  * R2Inference Namespace
  */
 namespace r2i {
+
 /**
  * Implements the placeholder for framework information.
  */
 struct FrameworkMeta {
+  /**
+   * The numerical code to create a framework factory
+   */
+  const FrameworkCode code;
+
   /**
    * A string to identify the name of the framework
    */

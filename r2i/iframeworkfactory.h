@@ -17,6 +17,7 @@
 #include <r2i/imodel.h>
 #include <r2i/iparameters.h>
 #include <r2i/frameworkmeta.h>
+#include <r2i/frameworks.h>
 
 #include <memory>
 #include <string>
@@ -33,23 +34,11 @@ class IFrameworkFactory {
 
  public:
   /**
-   * Numerical codes identifying supported frameworks. Not that not
-   * all frameworks will be available at runtime. For example, some of
-   * them may be disabled at configure by the user, automatically if
-   * no development where found or if the system doesn't seem to have
-   * to appropriate hardware.
+   * \brief Lists the frameworks supported by the system
+   * \param error [out] RuntimeError with a descritpion of an error.
+   * \return a vector of FrameworkMeta
    */
-  enum FrameworkCode {
-    /**
-     * Intel Movidius Neural Compute software developer kit
-     */
-    NCSDK,
-
-    /**
-     * Number of supported frameworks, mostly for testing purposes.
-     */
-    MAX_FRAMEWORK
-  };
+  static std::vector<FrameworkMeta> List(RuntimeError &error);
 
   static std::unique_ptr<IFrameworkFactory> MakeFactory (FrameworkCode code,
       RuntimeError &error);

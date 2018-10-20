@@ -74,6 +74,7 @@ extern "C" {
   }
 
   int ncDeviceOptionInt = -1;
+  char ncDeviceOptionString[16];
   bool ncDeviceOptionError = false;
 
   ncStatus_t ncDeviceGetOption (ncDeviceHandle_t *handle, int param, void *target,
@@ -83,6 +84,8 @@ extern "C" {
     if (NC_RO_DEVICE_STATE == param) {
       LONGS_EQUAL (sizeof (int), *target_size);
       *((int *)target) = ncDeviceOptionInt;
+    } else if (NC_RO_DEVICE_NAME == param) {
+      memcpy (target, ncDeviceOptionString, *target_size);
     } else {
       FAIL ("Unknown parameter");
     }
@@ -97,6 +100,8 @@ extern "C" {
     if (NC_RO_DEVICE_STATE == param) {
       LONGS_EQUAL (sizeof (int), target_size);
       ncDeviceOptionInt = *((int *)target);
+    } else if (NC_RO_DEVICE_NAME == param) {
+      memcpy (ncDeviceOptionString, target, target_size);
     } else {
       FAIL ("Unknown parameter");
     }
@@ -136,6 +141,7 @@ extern "C" {
   }
 
   int ncGraphOptionInt = -1;
+  char ncGraphOptionString[16];
   bool ncGraphOptionError = false;
 
   ncStatus_t ncGraphGetOption (ncGraphHandle_t *handle, int param, void *target,
@@ -145,6 +151,8 @@ extern "C" {
     if (NC_RW_GRAPH_EXECUTORS_NUM == param) {
       LONGS_EQUAL (sizeof (int), *target_size);
       *((int *)target) = ncGraphOptionInt;
+    } else if (NC_RO_GRAPH_NAME == param) {
+      memcpy (target, ncGraphOptionString, *target_size);
     } else {
       FAIL ("Unknown parameter");
     }
@@ -159,6 +167,8 @@ extern "C" {
     if (NC_RW_GRAPH_EXECUTORS_NUM == param) {
       LONGS_EQUAL (sizeof (int), target_size);
       ncGraphOptionInt = *((int *)target);
+    } else if (NC_RO_GRAPH_NAME == param) {
+      memcpy (ncGraphOptionString, target, target_size);
     } else {
       FAIL ("Unknown parameter");
     }
@@ -177,12 +187,13 @@ TEST_GROUP (NcsdkParameters) {
     ncGlobalOptionInt = -1;
     ncGlobalOptionError = false;
     ncDeviceOptionInt = -1;
+    memset (ncDeviceOptionString, 0, sizeof (ncDeviceOptionString));
     ncDeviceOptionError = false;
     ncFifoOptionInt = -1;
     ncFifoOptionError = false;
     ncGraphOptionInt = -1;
+    memset (ncDeviceOptionString, 0, sizeof (ncDeviceOptionString));
     ncGraphOptionError = false;
-
     engine = std::make_shared<r2i::ncsdk::Engine> ();
     model = std::make_shared<r2i::ncsdk::Model> ();
   }
@@ -317,6 +328,34 @@ TEST (NcsdkParameters, SetGetDeviceInt) {
   LONGS_EQUAL (expected, target);
 }
 
+TEST (NcsdkParameters, SetGetDeviceString) {
+  r2i::RuntimeError error;
+  std::string expected(sizeof (ncDeviceOptionString), 0);
+  std::string target(sizeof (ncDeviceOptionString), 0);
+  ncDeviceHandle_t ncdevice;
+
+  auto ncengine = std::dynamic_pointer_cast<r2i::ncsdk::Engine, r2i::IEngine>
+                  (engine);
+  ncengine->SetDeviceHandler (&ncdevice);
+
+  error = params.Configure (engine, model);
+  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
+
+  memcpy (ncDeviceOptionString, "before", sizeof (ncDeviceOptionString));
+
+  expected = "after";
+
+  error = params.Set ("device-name", expected);
+  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
+
+  STRCMP_EQUAL(expected.c_str(), ncDeviceOptionString);
+
+  error = params.Get ("device-name", target);
+  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
+
+  STRCMP_EQUAL(expected.c_str(), target.c_str());
+}
+
 TEST (NcsdkParameters, GetDeviceNoEngine) {
   r2i::RuntimeError error;
   int target = -1;
@@ -419,7 +458,6 @@ TEST (NcsdkParameters, GetOutputFifoNoHandler) {
   LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
 
   error = params.Get ("output-fifo-capacity", target);
-  fprintf (stderr, "Error is %s\n", error.GetDescription().c_str());
   LONGS_EQUAL (r2i::RuntimeError::Code::NULL_PARAMETER, error.GetCode ());
 
   LONGS_EQUAL (-1, target);
@@ -452,6 +490,34 @@ TEST (NcsdkParameters, SetGetGraphInt) {
   LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
 
   LONGS_EQUAL (expected, target);
+}
+
+TEST (NcsdkParameters, SetGetGraphString) {
+  r2i::RuntimeError error;
+  std::string expected(sizeof (ncGraphOptionString), 0);
+  std::string target(sizeof (ncGraphOptionString), 0);
+  ncGraphHandle_t ncgraph;
+
+  auto ncmodel = std::dynamic_pointer_cast<r2i::ncsdk::Model, r2i::IModel>
+                 (model);
+  ncmodel->SetHandler (&ncgraph);
+
+  error = params.Configure (engine, model);
+  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
+
+  memcpy (ncGraphOptionString, "before", sizeof (ncGraphOptionString));
+
+  expected = "after";
+
+  error = params.Set ("graph-name", expected);
+  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
+
+  STRCMP_EQUAL(expected.c_str(), ncGraphOptionString);
+
+  error = params.Get ("graph-name", target);
+  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
+
+  STRCMP_EQUAL(expected.c_str(), target.c_str());
 }
 
 TEST (NcsdkParameters, GetGraphNoModel) {

@@ -20,6 +20,14 @@
 namespace r2i {
 namespace ncsdk {
 
+Engine::Engine () :
+  model(nullptr),
+  movidius_device(nullptr),
+  input_buffers(nullptr),
+  output_buffers(nullptr),
+  status(Engine::Status::IDLE)  {
+}
+
 ncDeviceHandle_t *Engine::GetDeviceHandler () {
   return this->movidius_device;
 }
@@ -66,7 +74,6 @@ RuntimeError Engine::SetModel (std::shared_ptr<r2i::IModel> in_model) {
     this->model = nullptr;
   }
 
-
   this->model = model;
 
   return error;
@@ -111,7 +118,7 @@ RuntimeError Engine::Start ()  {
     return error;
   }
 
-  model->Start ("NSDK");
+  model->Start ("NCSDK");
 
   ret = ncDeviceCreate(0, &device_handle);
 
@@ -216,7 +223,6 @@ create_fail:
 RuntimeError Engine::Stop () {
 
   ncDeviceHandle_t *device_handle;
-  ncGraphHandle_t *model_handle;
   ncFifoHandle_t *input_buffers_ptr;
   ncFifoHandle_t  *output_buffers_ptr;
   Status engine_status;
@@ -228,7 +234,7 @@ RuntimeError Engine::Stop () {
 
   if ( Status:: IDLE == engine_status) {
     error.Set (RuntimeError::Code:: WRONG_ENGINE_STATE,
-               "Engine in wrong State");
+               "Engine in wrong state");
     return error;
   }
 
@@ -243,6 +249,7 @@ RuntimeError Engine::Stop () {
 
 
   ret = ncFifoDestroy(&output_buffers_ptr);
+  this->output_buffers = nullptr;
 
   if (NC_OK != ret) {
     error.Set (RuntimeError::Code::FRAMEWORK_ERROR,
@@ -251,6 +258,7 @@ RuntimeError Engine::Stop () {
   }
 
   ret = ncFifoDestroy(&input_buffers_ptr);
+  this->input_buffers = nullptr;
 
   if (NC_OK != ret) {
     error.Set (RuntimeError::Code::FRAMEWORK_ERROR,
@@ -258,19 +266,23 @@ RuntimeError Engine::Stop () {
     return error;
   }
 
-  model_handle = this->model->GetHandler();
-
-  ret = ncGraphDestroy(&model_handle);
-
-  if (NC_OK != ret) {
-    error.Set (RuntimeError::Code::FRAMEWORK_ERROR,
-               GetStringFromStatus (ret, error));
+  error = this->model->Stop ();
+  if (RuntimeError::Code::EOK != error.GetCode ()) {
     return error;
   }
 
   device_handle = this->GetDeviceHandler();
 
   ret = ncDeviceClose(device_handle);
+
+  if (NC_OK != ret) {
+    error.Set (RuntimeError::Code::FRAMEWORK_ERROR,
+               GetStringFromStatus (ret, error));
+    return error;
+  }
+
+  ret = ncDeviceDestroy (&device_handle);
+  this->movidius_device = nullptr;
 
   if (NC_OK != ret) {
     error.Set (RuntimeError::Code::FRAMEWORK_ERROR,
@@ -398,6 +410,10 @@ engine_error:
 
 }
 
+Engine::~Engine () {
+  this->Stop();
 }
-}
+
+} //namespace ncsdk
+} //namepsace r2i
 

@@ -22,7 +22,6 @@ lib_LTLIBRARIES = libr2inference-@RR_PACKAGE_VERSION@.la
 r2iincludedir = $(includedir)/r2inference-$(RR_PACKAGE_VERSION)/r2i
 
 libr2inference_@RR_PACKAGE_VERSION@_la_SOURCES =	\
-	r2i.cc						\
 	iframeworkfactory.cc				\
 	runtimeerror.cc					\
 	imageformat.cc
@@ -43,12 +42,21 @@ libr2inference_@RR_PACKAGE_VERSION@_la_LIBADD = 	\
 	$(RR_LIBS)					\
 	$(CODE_COVERAGE_LIBS)
 
-r2iinclude_HEADERS =					\
-	r2i.h						\
-	iframeworkfactory.h				\
-	runtimeerror.h					\
-	imageformat.h					\
-	frameworkmeta.h
+r2iinclude_HEADERS =		\
+	frameworkmeta.h		\
+	frameworks.h		\
+	iengine.h		\
+	iframe.h		\
+	iframeworkfactory.h	\
+	iloader.h		\
+	imageformat.h		\
+	imodel.h		\
+	iparameters.h		\
+	iprediction.h		\
+	parametermeta.h		\
+	r2i.h			\
+	runtimeerror.h
+
 
 if HAVE_NCSDK
 libr2inference_@RR_PACKAGE_VERSION@_la_LIBADD += 	\

@@ -20,6 +20,7 @@ namespace ncsdk {
 
 class Engine : public IEngine {
  public:
+  Engine ();
 
   r2i::RuntimeError SetModel (std::shared_ptr<r2i::IModel> in_model) override;
 
@@ -38,6 +39,8 @@ class Engine : public IEngine {
 
   ncFifoHandle_t *GetOutputFifoHandler ();
   void SetOutputFifoHandler (ncFifoHandle_t *handler);
+
+  ~Engine ();
 
   enum Status {
     IDLE,

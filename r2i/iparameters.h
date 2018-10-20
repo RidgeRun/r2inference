@@ -14,10 +14,12 @@
 
 #include <r2i/iengine.h>
 #include <r2i/imodel.h>
+#include <r2i/parametermeta.h>
 #include <r2i/runtimeerror.h>
 
 #include <memory>
 #include <string>
+#include <vector>
 
 /**
  * R2Inference Namespace
@@ -86,6 +88,14 @@ class IParameters {
    * \return RuntimeError with a description of an error.
    */
   virtual RuntimeError Set (const std::string &in_parameter, int in_value) = 0;
+
+  /**
+   * \brief Lists the available parameters for this framework
+   * \param metas [out] A vector of ParameterMeta with the description of
+   * the parameters.
+   * \return RuntimeError with a description of an error.
+   */
+  virtual RuntimeError List (std::vector<ParameterMeta> &metas) = 0;
 
   /**
    * \brief Default destructor

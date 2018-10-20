@@ -321,6 +321,23 @@ TEST (NcsdkEngine, StartStopEngine) {
 
 }
 
+TEST (NcsdkEngine, StartStopEngineTwice) {
+  r2i::RuntimeError error;
+
+  error = engine.SetModel (model);
+  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
+
+  error = engine.Start ();
+  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
+  error = engine.Stop ();
+  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
+
+  error = engine.Start ();
+  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
+  error = engine.Stop ();
+  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
+}
+
 
 TEST (NcsdkEngine, StopEngine) {
   r2i::RuntimeError error;
