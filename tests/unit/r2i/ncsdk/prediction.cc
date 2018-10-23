@@ -20,11 +20,11 @@
 
 TEST_GROUP (NcsdkPrediction) {
   r2i::ncsdk::Prediction prediction;
-  void *data;
+  float *data;
   float matrix[3] = {0.2, 0.4, 0.6};
 
   void setup () {
-    data = (void *) matrix;
+    data = matrix;
   }
 
   void teardown () {

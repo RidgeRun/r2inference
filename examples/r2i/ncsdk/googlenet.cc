@@ -15,7 +15,6 @@
 #include <string>
 
 #include <r2i/r2i.h>
-#include <r2i/ncsdk/prediction.h>
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
@@ -35,13 +34,10 @@ void PrintTopPrediction (std::shared_ptr<r2i::IPrediction> prediction) {
   int index = 0;
   double max = -1;
 
-  auto ncpred =
-    std::dynamic_pointer_cast<r2i::ncsdk::Prediction, r2i::IPrediction>
-    (prediction);
-  int num_labels = ncpred->GetResultSize();
+  int num_labels = prediction->GetResultSize();
 
   for (int i = 0; i < num_labels; ++i) {
-    double current = ncpred->At(i, error);
+    double current = prediction->At(i, error);
     if (current > max) {
       max = current;
       index = i;
@@ -152,8 +148,8 @@ int main (int argc, char *argv[]) {
   error = engine->SetModel (model);
 
   std::cout << "Loading image: " << image_path << "..." << std::endl;
-  std::unique_ptr<float[]> image_data =LoadImage (image_path, GOOGLENET_DIM,
-						   GOOGLENET_DIM, GoogleNetMean);
+  std::unique_ptr<float[]> image_data = LoadImage (image_path, GOOGLENET_DIM,
+                                        GOOGLENET_DIM, GoogleNetMean);
 
   std::cout << "Configuring frame..." << std::endl;
   std::shared_ptr<r2i::IFrame> frame = factory->MakeFrame (error);

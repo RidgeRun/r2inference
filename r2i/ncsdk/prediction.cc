@@ -27,11 +27,11 @@ unsigned int Prediction::GetResultSize () {
   return this->result_size;
 }
 
-void *Prediction::GetResultData () {
+float *Prediction::GetResultData () {
   return this->result_data;
 }
 
-double Prediction::At (unsigned int index,  RuntimeError &error) {
+float Prediction::At (unsigned int index,  RuntimeError &error) {
 
   unsigned int n_results;
   float *float_result;
@@ -45,7 +45,7 @@ double Prediction::At (unsigned int index,  RuntimeError &error) {
     return 0;
   }
 
-  float_result = (float *) this->GetResultData ();
+  float_result = static_cast<float *> (this->GetResultData ());
 
   if (nullptr == float_result) {
     error.Set (RuntimeError::Code::NULL_PARAMETER,
@@ -57,7 +57,7 @@ double Prediction::At (unsigned int index,  RuntimeError &error) {
 
 }
 
-RuntimeError Prediction::SetResult (void *data, unsigned int size) {
+RuntimeError Prediction::SetResult (float *data, unsigned int size) {
   RuntimeError error;
 
   if (nullptr == data) {
