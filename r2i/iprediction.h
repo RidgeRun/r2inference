@@ -31,14 +31,15 @@ class IPrediction {
    * \param error [out] RuntimeError with a description of an error.
    * \return a double that indicates the prediction at the provided index .
    */
-  virtual float At (unsigned int index,  r2i::RuntimeError &error) = 0;
+  virtual double At (unsigned int index,  r2i::RuntimeError &error) = 0;
 
   /**
    * \brief Gets the underlying vector to the result data. The pointer
-   * will be valid as long as the prediction is valid.
+   * will be valid as long as the prediction is valid. The actual type
+   * of the underlying data will depend on the backend being used.
    * \return The underlying result pointer.
    */
-  virtual float *GetResultData () = 0;
+  virtual void *GetResultData () = 0;
 
   /**
    * \brief Gets the size (in bytes) of the underlying data. Note that

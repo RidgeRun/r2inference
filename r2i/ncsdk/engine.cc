@@ -332,7 +332,7 @@ std::shared_ptr<r2i::IPrediction> Engine::Predict (std::shared_ptr<r2i::IFrame>
     goto engine_error;
   }
 
-  data = frame->GetData();
+  data = static_cast<float *>(frame->GetData());
 
   in_format = in_frame->GetFormat();
   input_data_size = sizeof(float) * in_frame->GetWidth() *

@@ -89,7 +89,7 @@ TEST (NcsdkFrame, SetGetData) {
   float *setdata = (float *) malloc(SIZE_TEST);
   error = frame.Configure (setdata, WIDTH_TEST, HEIGHT_TEST,
                            r2i::ImageFormat::Id::RGB);
-  float *data = frame.GetData ();
+  float *data = static_cast<float *>(frame.GetData ());
   POINTERS_EQUAL (setdata, data);
 }
 

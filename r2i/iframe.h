@@ -30,20 +30,22 @@ class IFrame {
  public:
   /**
    * \brief Configures the frame to pass to the framework
-   * \param in_data Pointer to the data to use.
+   * \param in_data Pointer to the data to use. The actual data pointer type
+   * will depend on the backend being used.
    * \param width Image Width.
    * \param height Image Height.
    * \param format Image format Id (Defined by each framework)
    * \return A RuntimeError with a description of the error.
    */
-  virtual RuntimeError Configure (float *in_data, int width,
+  virtual RuntimeError Configure (void *in_data, int width,
                                   int height, r2i::ImageFormat::Id format) = 0;
 
   /**
-   * \brief Gets the data set to the Frame.
+   * \brief Gets the data set to the Frame. The actual data pointer type
+   * will depend on the backend being used.
    * \return A Shared Pointer with the data set to the Frame.
    */
-  virtual float *GetData () = 0;
+  virtual void *GetData () = 0;
 
   /**
    * \brief Gets the Image width set to the Frame.

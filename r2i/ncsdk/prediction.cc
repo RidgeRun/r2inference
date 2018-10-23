@@ -27,11 +27,11 @@ unsigned int Prediction::GetResultSize () {
   return this->result_size;
 }
 
-float *Prediction::GetResultData () {
+void *Prediction::GetResultData () {
   return this->result_data;
 }
 
-float Prediction::At (unsigned int index,  RuntimeError &error) {
+double Prediction::At (unsigned int index,  RuntimeError &error) {
 
   unsigned int n_results;
   float *float_result;

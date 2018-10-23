@@ -20,8 +20,8 @@ namespace ncsdk {
 class Prediction: public IPrediction {
  public:
   Prediction();
-  float At (unsigned int index,  r2i::RuntimeError &error) override;
-  float *GetResultData () override;
+  double At (unsigned int index,  r2i::RuntimeError &error) override;
+  void *GetResultData () override;
   unsigned int GetResultSize () override;
 
   r2i::RuntimeError SetResult (float *data, unsigned int size);
