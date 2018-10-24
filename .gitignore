@@ -25,6 +25,7 @@ m4/
 .deps/
 .libs/
 stamp-h*
+r2inference-*.pc
 
 # Build outputs
 .deps/

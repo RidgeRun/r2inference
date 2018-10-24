@@ -57,6 +57,7 @@ examples/r2i/Makefile
 examples/r2i/ncsdk/Makefile
 r2i/Makefile
 r2i/ncsdk/Makefile
+r2inference-${RR_PACKAGE_VERSION}.pc:r2inference.pc.in
 tests/Makefile
 tests/acceptance/Makefile
 tests/unit/Makefile
