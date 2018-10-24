@@ -140,6 +140,12 @@ extern "C" {
     return NC_OK;
   }
 
+  ncStatus_t ncGraphDestroy(struct ncGraphHandle_t **graphHandle) {
+    CHECK (graphHandle != nullptr);
+    *graphHandle = nullptr;
+
+    return NC_OK;
+  }
   int ncGraphOptionInt = -1;
   char ncGraphOptionString[16];
   bool ncGraphOptionError = false;
