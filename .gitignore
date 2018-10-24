@@ -77,3 +77,4 @@ cscope.out
 # Examples
 examples/r2i/list_parameters
 examples/r2i/ncsdk/googlenet
+examples/external/list-backends

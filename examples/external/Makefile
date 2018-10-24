@@ -8,6 +8,24 @@
 # a software license from RidgeRun.  All source code changes must be provided
 # back to RidgeRun without any encumbrance.
 
-SUBDIRS = r2i
+R2IVERSION=0.0
 
-DIST_SUBDIRS = external
+CXXFLAGS:=$(shell pkg-config --cflags r2inference-$(R2IVERSION))
+LIBS:=$(shell pkg-config --libs r2inference-$(R2IVERSION))
+
+OUT=list-backends
+SOURCES=list_backends.cc
+OBJECTS=$(SOURCES:.cc=.o)
+
+CXX=g++
+
+.PHONY: clean
+
+$(OUT): $(OBJECTS)
+	@$(CXX) -o $@ $< $(LIBS)
+
+%.o: %.cc
+	@$(CXX) -c -o $@ $(CXXFLAGS) $< 
+
+clean:
+	@rm -f $(OBJECTS) $(OUT) *~
