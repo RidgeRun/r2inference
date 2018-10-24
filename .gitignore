@@ -25,6 +25,7 @@ m4/
 .deps/
 .libs/
 stamp-h*
+r2inference-*.pc
 
 # Build outputs
 .deps/
@@ -76,3 +77,4 @@ cscope.out
 # Examples
 examples/r2i/list_parameters
 examples/r2i/ncsdk/googlenet
+examples/external/list-backends

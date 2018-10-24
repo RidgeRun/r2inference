@@ -8,33 +8,24 @@
 # a software license from RidgeRun.  All source code changes must be provided
 # back to RidgeRun without any encumbrance.
 
-# Keep in sync with configure.ac
-ACLOCAL_AMFLAGS = -I m4 -I common/m4
+R2IVERSION=0.0
 
-SUBDIRS =	\
-	r2i
+CXXFLAGS:=$(shell pkg-config --cflags r2inference-$(R2IVERSION))
+LIBS:=$(shell pkg-config --libs r2inference-$(R2IVERSION))
 
-if ENABLE_TESTS
-SUBDIRS += tests
-endif
+OUT=list-backends
+SOURCES=list_backends.cc
+OBJECTS=$(SOURCES:.cc=.o)
 
-if ENABLE_EXAMPLES
-SUBDIRS += examples
-endif
+CXX=g++
 
-if ENABLE_DOCS
-SUBDIRS += docs
-endif
+.PHONY: clean
 
-DIST_SUBDIRS =		\
-	$(SUBDIRS)	\
-	tests		\
-	examples	\
-	docs
+$(OUT): $(OBJECTS)
+	@$(CXX) -o $@ $< $(LIBS)
 
-@CODE_COVERAGE_RULES@
+%.o: %.cc
+	@$(CXX) -c -o $@ $(CXXFLAGS) $< 
 
-pkgconfigdir = $(libdir)/pkgconfig
-pkgconfig_DATA = r2inference-@RR_PACKAGE_VERSION@.pc
-
-EXTRA_DIST = r2inference.pc.in
+clean:
+	@rm -f $(OBJECTS) $(OUT) *~

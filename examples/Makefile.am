@@ -9,3 +9,5 @@
 # back to RidgeRun without any encumbrance.
 
 SUBDIRS = r2i
+
+DIST_SUBDIRS = external
