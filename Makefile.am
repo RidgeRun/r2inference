@@ -33,3 +33,8 @@ DIST_SUBDIRS =		\
 	docs
 
 @CODE_COVERAGE_RULES@
+
+pkgconfigdir = $(libdir)/pkgconfig
+pkgconfig_DATA = r2inference-@RR_PACKAGE_VERSION@.pc
+
+EXTRA_DIST = r2inference.pc.in
