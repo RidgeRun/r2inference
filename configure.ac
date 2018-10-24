@@ -44,7 +44,7 @@ AC_CONFIG_HEADER([config.h])
 
 # Check for NCSDK
 RR_CHECK_FEATURE_LIB(NCSDK, NCSDK Installation,
-                      mvnc, ncGlobalSetOption, mvnc.h,  yes)
+                     mvnc, ncGlobalSetOption, mvnc.h, no)
 
 # Our Include path, to be shared in multiple makefiles
 AC_SUBST([R2IINCLUDEDIR],[$includedir/r2inference-$RR_PACKAGE_VERSION/])
