@@ -13,7 +13,7 @@ if HAVE_NCSDK
 noinst_LTLIBRARIES = libncsdk.la
 
 # Define a custom area for our headers
-ncsdkincludedir = $(includedir)/r2inference-$(RR_PACKAGE_VERSION)/r2i/ncsdk
+ncsdkincludedir = @R2IINCLUDEDIR@/r2i/ncsdk
 
 libncsdk_la_SOURCES =			\
 	parameters.cc			\

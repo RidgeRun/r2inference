@@ -19,7 +19,7 @@ DIST_SUBDIRS = ncsdk
 lib_LTLIBRARIES = libr2inference-@RR_PACKAGE_VERSION@.la
 
 # Define a custom area for our headers
-r2iincludedir = $(includedir)/r2inference-$(RR_PACKAGE_VERSION)/r2i
+r2iincludedir = @R2IINCLUDEDIR@/r2i
 
 libr2inference_@RR_PACKAGE_VERSION@_la_SOURCES =	\
 	iframeworkfactory.cc				\
