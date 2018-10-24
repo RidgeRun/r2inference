@@ -11,6 +11,8 @@
 
 #include "r2i/runtimeerror.h"
 
+#include <iostream>
+
 namespace r2i {
 const std::string ok_string = "Everything went OK";
 
@@ -31,12 +33,20 @@ void RuntimeError::Set (Code code, const std::string &description) {
   this->description = description;
 }
 
-const std::string RuntimeError::GetDescription () {
+const std::string RuntimeError::GetDescription () const {
   return this->description;
 }
 
-RuntimeError::Code RuntimeError::GetCode () {
+RuntimeError::Code RuntimeError::GetCode () const {
   return this->code;
+}
+
+bool RuntimeError::IsError () const {
+  return Code::EOK != this->code;
+}
+
+std::ostream &operator<<(std::ostream &os, RuntimeError const &self) {
+  return os << "(" << self.GetCode () << "): " << self.GetDescription ();
 }
 
 }

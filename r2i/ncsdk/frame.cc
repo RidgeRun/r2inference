@@ -15,7 +15,7 @@
 namespace r2i {
 namespace ncsdk {
 
-RuntimeError Frame::Configure (std::shared_ptr<void> in_data, int width,
+RuntimeError Frame::Configure (void *in_data, int width,
                                int height, r2i::ImageFormat::Id format) {
   RuntimeError error;
   ImageFormat imageformat (format);
@@ -35,7 +35,7 @@ RuntimeError Frame::Configure (std::shared_ptr<void> in_data, int width,
     return error;
   }
 
-  this->frame_data = in_data;
+  this->frame_data = static_cast<float *>(in_data);
   this->frame_width = width;
   this->frame_height = height;
   this->frame_format = imageformat;
@@ -43,7 +43,7 @@ RuntimeError Frame::Configure (std::shared_ptr<void> in_data, int width,
   return error;
 }
 
-std::shared_ptr<void> Frame::GetData () {
+void *Frame::GetData () {
   return this->frame_data;
 }
 
@@ -58,5 +58,6 @@ int Frame::GetHeight () {
 ImageFormat Frame::GetFormat () {
   return this->frame_format;
 }
+
 }
 }

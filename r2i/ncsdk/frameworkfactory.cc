@@ -12,6 +12,7 @@
 #include "frameworkfactory.h"
 
 #include "engine.h"
+#include "frame.h"
 #include "loader.h"
 #include "parameters.h"
 
@@ -37,6 +38,13 @@ std::unique_ptr<r2i::IParameters> FrameworkFactory::MakeParameters (
   error.Clean ();
 
   return std::unique_ptr <IParameters> (new Parameters);
+}
+
+std::unique_ptr<r2i::IFrame> FrameworkFactory::MakeFrame (
+  RuntimeError &error) {
+  error.Clean ();
+
+  return std::unique_ptr <IFrame> (new Frame);
 }
 
 r2i::FrameworkMeta FrameworkFactory::GetDescription (RuntimeError &error) {

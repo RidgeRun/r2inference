@@ -21,13 +21,13 @@ class Prediction: public IPrediction {
  public:
   Prediction();
   double At (unsigned int index,  r2i::RuntimeError &error) override;
+  void *GetResultData () override;
+  unsigned int GetResultSize () override;
 
-  r2i::RuntimeError SetResult (void *data, unsigned int size);
-  void *GetResultData ();
-  unsigned int GetResultSize ();
+  r2i::RuntimeError SetResult (float *data, unsigned int size);
 
  private:
-  void *result_data;
+  float *result_data;
   unsigned int result_size;
 };
 

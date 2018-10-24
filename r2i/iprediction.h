@@ -34,6 +34,26 @@ class IPrediction {
   virtual double At (unsigned int index,  r2i::RuntimeError &error) = 0;
 
   /**
+   * \brief Gets the underlying vector to the result data. The pointer
+   * will be valid as long as the prediction is valid. The actual type
+   * of the underlying data will depend on the backend being used.
+   * \return The underlying result pointer.
+   */
+  virtual void *GetResultData () = 0;
+
+  /**
+   * \brief Gets the size (in bytes) of the underlying data. Note that
+   * this size wont necessarily match with the number of elements. To
+   * get the number of elements, an explicit division must be made
+   * such as:
+   *   int num_of_elements = pred->GetResultSize () / sizeof (element);
+   * where sizeof (element) expands to the size of a single element.
+   *
+   * \return The underlying result size in bytes
+   */
+  virtual unsigned int GetResultSize () = 0;
+
+  /**
    * \brief Default destructor
    */
   virtual ~IPrediction () {};

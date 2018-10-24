@@ -307,11 +307,10 @@ std::shared_ptr<r2i::IPrediction> Engine::Predict (std::shared_ptr<r2i::IFrame>
   ncFifoHandle_t *output_buffers_ptr;
   ncGraphHandle_t *model_handle;
   void *userParam;
-  void *result;
-  void *data;
+  float *result;
+  float *data;
   Status engine_status;
   r2i::ImageFormat in_format;
-
   error.Clean ();
 
   std::shared_ptr<Prediction> prediction (new r2i::ncsdk::Prediction());
@@ -333,7 +332,7 @@ std::shared_ptr<r2i::IPrediction> Engine::Predict (std::shared_ptr<r2i::IFrame>
     goto engine_error;
   }
 
-  data = frame->GetData().get();
+  data = static_cast<float *>(frame->GetData());
 
   in_format = in_frame->GetFormat();
   input_data_size = sizeof(float) * in_frame->GetWidth() *
@@ -343,7 +342,7 @@ std::shared_ptr<r2i::IPrediction> Engine::Predict (std::shared_ptr<r2i::IFrame>
   output_buffers_ptr = this->GetOutputFifoHandler();;
 
 
-  ret = ncFifoWriteElem(input_buffers_ptr, data, &input_data_size, 0);
+  ret = ncFifoWriteElem(input_buffers_ptr, (float *)data, &input_data_size, 0);
 
   if (NC_OK != ret) {
     error.Set (RuntimeError::Code:: FRAMEWORK_ERROR,
@@ -375,7 +374,7 @@ std::shared_ptr<r2i::IPrediction> Engine::Predict (std::shared_ptr<r2i::IFrame>
     goto exit;
   }
 
-  result = malloc(output_data_size);
+  result = static_cast<float *>(malloc(output_data_size));
 
   if (nullptr == result) {
     error.Set (RuntimeError::Code::UNKNOWN_ERROR,

@@ -120,17 +120,31 @@ class RuntimeError {
   /**
    * Returns a human readable description of the error
    */
-  const std::string GetDescription ();
+  const std::string GetDescription () const;
 
   /**
    * Returns the code configured in the error
    */
-  Code GetCode ();
+  Code GetCode () const;
+
+  /**
+   * \brief Checks if the RuntimeError is in an error state
+   * \return true if an error ocurred, false otherwise
+   */
+  bool IsError () const;
 
  private:
   std::string description;
   Code code;
 };
+
+/**
+ * \brief overload output stream operator to be used on printf
+ * \param os output stream to be extended with error description
+ * \param current error to be serialized
+ * \return extended output stream
+ */
+std::ostream &operator<<(std::ostream &os, RuntimeError const &self);
 
 }
 

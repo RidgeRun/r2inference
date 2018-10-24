@@ -74,4 +74,5 @@ cscope.files
 cscope.out
 
 # Examples
-examples/list_parameters
+examples/r2i/list_parameters
+examples/r2i/ncsdk/googlenet
