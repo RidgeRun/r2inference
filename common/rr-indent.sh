@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 # Copyright (C) 2018 RidgeRun, LLC (http://www.ridgerun.com)
 # All Rights Reserved.
 #
@@ -13,6 +13,7 @@
 LOGGER_PROJECT_TAG="INDENT"; . common/logger.sh
 
 # Used for configurable pattern matching
+# FIXME: Find the portable way to use shopt instead of using bash directly
 shopt -s extglob
 
 indent_tool="astyle"

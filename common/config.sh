@@ -59,7 +59,7 @@ config_main()
     config_find_config_file
 
     if [ -r "$RRCONFIG" ]; then
-	source $RRCONFIG
+	. $RRCONFIG
     else
 	log_info "No custom config found. Using defaults"
     fi

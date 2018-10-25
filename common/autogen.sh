@@ -42,7 +42,14 @@ run_sanity_checks()
     {
         log_error "not found! Please install the automake package."
         exit 1
-    }	
+    }
+
+    log_info "Checking for pkg-config"
+    which "pkg-config" >/dev/null ||
+    {
+        log_error "not found! Please install the pkg-config package."
+        exit 1
+    }
 }
 
 install_git_hook()
