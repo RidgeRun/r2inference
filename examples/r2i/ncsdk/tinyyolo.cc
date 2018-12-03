@@ -114,7 +114,7 @@ void PrintTopPrediction (std::shared_ptr<r2i::IPrediction> prediction,
   box[3] *= input_image_height;
 
   std::cout << "Box highest probaility:" ;
-  std::cout << "[class:'" << tiny_yolo_labels[max_prob_class] << "', ";
+  std::cout << "[class:'" << labels[max_prob_class] << "', ";
   std::cout << "x:" << box[0] << ", ";
   std::cout << "y:" << box[1] << ", ";
   std::cout << "width:" << box[2] << ", ";
