@@ -13,6 +13,7 @@
 #include <iostream>
 #include <memory>
 #include <string>
+#include <bits/stdc++.h>
 
 #include <r2i/r2i.h>
 
@@ -57,6 +58,13 @@ void PrintTopPrediction (std::shared_ptr<r2i::IPrediction> prediction,
   int max_prob_class = 0;
   int max_prob_box = 0;
   double box[4];
+
+  std::string labels [CLASSES] = {"aeroplane", "bicycle", "bird", "boat",
+                                  "bottle", "bus", "car", "cat", "chair",
+                                  "cow", "diningtable", "dog", "horse",
+                                  "motorbike", "person", "pottedplant",
+                                  "sheep", "sofa", "train", "tvmonitor"
+                                 };
 
   /* Find the box index with the highest probability */
   for (i = 0; i < GRID_H; i++) {        /* Iterate rows    */
@@ -105,8 +113,13 @@ void PrintTopPrediction (std::shared_ptr<r2i::IPrediction> prediction,
   box[2] *= input_image_width;
   box[3] *= input_image_height;
 
-  printf ("Box highest probaility: [x:%lf, y:%lf, width:%lf, height:%lf, class:%d, prob:%lf] \n",
-          box[0], box[1], box[2], box[3], max_prob_class, max_prob);
+  std::cout << "Box highest probaility:" ;
+  std::cout << "[class:'" << tiny_yolo_labels[max_prob_class] << "', ";
+  std::cout << "x:" << box[0] << ", ";
+  std::cout << "y:" << box[1] << ", ";
+  std::cout << "width:" << box[2] << ", ";
+  std::cout << "height:" << box[3] << ", ";
+  std::cout << "prob:" << max_prob << "]" << std::endl;
 
 }
 
