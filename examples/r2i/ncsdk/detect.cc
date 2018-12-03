@@ -8,15 +8,13 @@
  * a software license from RidgeRun.  All source code changes must be provided
  * back to RidgeRun without any encumbrance.
 */
-#include <iostream>
+
 #include <getopt.h>
+#include <iostream>
+#include <memory>
 #include <string>
+
 #include <r2i/r2i.h>
-#include <r2i/ncsdk/engine.h>
-#include <r2i/ncsdk/loader.h>
-#include <r2i/ncsdk/model.h>
-#include <r2i/ncsdk/frame.h>
-#include <r2i/ncsdk/prediction.h>
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
@@ -30,62 +28,9 @@
 #define GRID_W 7
 #define CLASSES 20
 #define BOXES 2
-#define THRESHOLD 0.07
 
-
-void
-print_usage () {
-  printf ("Usage: example -i [JPG input_image] -m [Model] \n");
-}
-
-
-float *
-LoadImage (const char *path, int reqsize, int &width, int &height) {
-  int cp, i;
-  unsigned char *img, *imgresized;
-  float *imgfp32;
-  unsigned int imageSize;
-
-  img = stbi_load (path, &width, &height, &cp, 3);
-  if (!img) {
-    printf ("The picture %s could not be loaded\n", path);
-    return 0;
-  }
-  imgresized = (unsigned char *) malloc (3 * reqsize * reqsize);
-  if (!imgresized) {
-    free (img);
-    perror ("malloc");
-    return 0;
-  }
-  stbir_resize_uint8 (img, width, height, 0, imgresized, reqsize, reqsize, 0,
-                      3);
-  free (img);
-
-  imageSize = sizeof (*imgfp32) * reqsize * reqsize * 3;
-  imgfp32 = (float *) malloc (imageSize);
-
-  printf ("size: %i\n", imageSize);
-  if (!imgfp32) {
-    free (imgresized);
-    perror ("malloc");
-    return 0;
-  }
-  for (i = 0; i < reqsize * reqsize * 3; i++)
-    imgfp32[i] = imgresized[i];
-  free (imgresized);
-  for (i = 0; i < reqsize * reqsize; i++) {
-    imgfp32[3 * i + 0] = imgfp32[3 * i + 0] / 255;
-    imgfp32[3 * i + 1] = imgfp32[3 * i + 1] / 255;
-    imgfp32[3 * i + 2] = imgfp32[3 * i + 2] / 255;
-
-  }
-  return imgfp32;
-}
-
-
-bool
-interpret_prediction (std::shared_ptr < r2i::ncsdk::Prediction > prediction,
-                      int input_image_width, int input_image_height, double *box) {
+void PrintTopPrediction (std::shared_ptr<r2i::IPrediction> prediction,
+                         int input_image_width, int input_image_height) {
   /*
    * Tiny yolo parameters:
    *    Grid: 7*7
@@ -111,16 +56,16 @@ interpret_prediction (std::shared_ptr < r2i::ncsdk::Prediction > prediction,
   int max_prob_col = 0;
   int max_prob_class = 0;
   int max_prob_box = 0;
+  double box[4];
 
   /* Find the box index with the highest probability */
   for (i = 0; i < GRID_H; i++) {        /* Iterate rows    */
     for (j = 0; j < GRID_W; j++) {      /* Iterate columns */
       for (c = 0; c < CLASSES; c++) {   /* Iterate classes */
+        class_prob = prediction->At ((i * GRID_W + j) * CLASSES + c, error);
         for (b = 0; b < BOXES; b++) {   /* Iterate boxes   */
-          class_prob = prediction->At ((i * GRID_W + j) * CLASSES + c, error);
-          box_prob =
-            prediction->At (GRID_H * GRID_W * CLASSES + (i * GRID_W + j) * BOXES + b,
-                            error);
+          box_prob = prediction->At (GRID_H * GRID_W * CLASSES + (i * GRID_W + j) * BOXES
+                                     + b, error);
           prob = class_prob * box_prob;
           if (prob > max_prob) {
             max_prob = prob;
@@ -134,10 +79,6 @@ interpret_prediction (std::shared_ptr < r2i::ncsdk::Prediction > prediction,
     }
   }
 
-  if (max_prob < THRESHOLD) {
-    return false;
-  }
-
   /* Convert box coordinates to pixels */
   /*
    * box position (x,y) is normalized inside each cell from 0 to 1
@@ -146,14 +87,17 @@ interpret_prediction (std::shared_ptr < r2i::ncsdk::Prediction > prediction,
    * box dimmensions are squared on the ncappzoo python example
    */
   for (i = 0; i < 4; i++) {
-    box[i] =
-      prediction->At (GRID_H * GRID_W * CLASSES + GRID_H * GRID_W * BOXES +
-                      max_prob_row * max_prob_col * max_prob_box + i, error);
+    box[i] = prediction->At (GRID_H * GRID_W * CLASSES + GRID_H * GRID_W * BOXES
+                             + ((max_prob_row * GRID_W + max_prob_col) * BOXES + max_prob_box ) * 4 + i,
+                             error);
   }
+
+  /* adjust the box anchor according to its cell and grid dim */
   box[0] += max_prob_col;
   box[1] += max_prob_row;
-  box[0] /= (DIM / GRID_H);
-  box[1] /= (DIM / GRID_W);
+  box[0] /= GRID_H;
+  box[1] /= GRID_W;
+
   box[2] *= box[2];
   box[3] *= box[3];
   box[0] *= input_image_width;
@@ -161,110 +105,140 @@ interpret_prediction (std::shared_ptr < r2i::ncsdk::Prediction > prediction,
   box[2] *= input_image_width;
   box[3] *= input_image_height;
 
-  /* Set the class and probability */
-  box[4] = (double) max_prob_class;
-  box[5] = max_prob;
+  printf ("Box highest probaility: [x:%lf, y:%lf, width:%lf, height:%lf, class:%d, prob:%lf] \n",
+          box[0], box[1], box[2], box[3], max_prob_class, max_prob);
+
+}
+
+void PrintUsage() {
+  std::cerr << "Usage: example -i [JPG input_image] -m [TinyYOLO Model]" <<
+            std::endl;
+}
+
+std::unique_ptr<float[]> PreProcessImage (const unsigned char *input, int width,
+    int height, int reqwidth, int reqheight) {
+  const int channels = 3;
+  const int scaled_size = channels * reqwidth * reqheight;
+
+  std::unique_ptr<unsigned char[]> scaled (new unsigned char[scaled_size]);
+  std::unique_ptr<float[]> adjusted (new float[scaled_size]);
+
+  stbir_resize_uint8(input, width, height, 0, scaled.get(), reqwidth,
+                     reqheight, 0, channels);
+
+  for (int i = 0; i < scaled_size; i += channels) {
+    adjusted[i + 0] = static_cast<float>(scaled[i + 2]) / 255;
+    adjusted[i + 1] = static_cast<float>(scaled[i + 1]) / 255;
+    adjusted[i + 2] = static_cast<float>(scaled[i + 0]) / 255;
+  }
+
+  return adjusted;
+}
+
+std::unique_ptr<float[]> LoadImage(const std::string &path, int reqwidth,
+                                   int reqheight, int *width, int *height) {
+  int channels = 3;
+  int cp;
+
+  unsigned char *img = stbi_load(path.c_str(), width, height, &cp, channels);
+  if (!img) {
+    std::cerr << "The picture " << path << " could not be loaded";
+    return nullptr;
+  }
+
+  auto ret = PreProcessImage(img, *width, *height, reqwidth, reqheight);
+  free (img);
+
+  return ret;
+}
+
+bool ParseArgs (int &argc, char *argv[], std::string &image_path,
+                std::string &model_path, int &index) {
+  int option = 0;
+
+  while ((option = getopt(argc, argv, "i:m:p:")) != -1) {
+    switch (option) {
+      case 'i' :
+        image_path = optarg;
+        break;
+      case 'm' :
+        model_path  = optarg;
+        break;
+      case 'p' :
+        index  = std::stoi (optarg);
+        break;
+      default:
+        return false;
+    }
+  }
 
   return true;
 }
 
-int
-main (int argc, char *argv[]) {
-  std::shared_ptr < r2i::IModel > model;
-  std::shared_ptr < r2i::ncsdk::Prediction > prediction;
-  r2i::ncsdk::Engine engine;
-  r2i::ncsdk::Loader loader;
-  std::shared_ptr < r2i::ncsdk::Frame > frame (new r2i::ncsdk::Frame ());
+
+int main (int argc, char *argv[]) {
   r2i::RuntimeError error;
   std::string model_path;
   std::string image_path;
-  int option = 0;
-  float *image_data;
+  int Index = 0;
   int width, height;
 
-  if (argc < 2) {
-    print_usage ();
-    exit (EXIT_FAILURE);
-  }
-  while ((option = getopt (argc, argv, "i:m:")) != -1) {
-    switch (option) {
-      case 'i':
-        image_path = optarg;
-        break;
-      case 'm':
-        model_path = optarg;
-        break;
-
-      default:
-        print_usage ();
-        exit (EXIT_FAILURE);
-    }
-  }
-
-  printf ("Loading Model: %s ...\n", model_path.c_str ());
-  model = loader.Load (model_path, error);
-  if (r2i::RuntimeError::Code::EOK != error.GetCode ()) {
-    printf ("Loader Error: %s\n", error.GetDescription ().c_str ());
+  if (false == ParseArgs (argc, argv, image_path, model_path, Index)) {
+    PrintUsage ();
     exit (EXIT_FAILURE);
   }
 
-  printf ("Setting Model to Engine...\n");
-  error = engine.SetModel (model);
-  if (r2i::RuntimeError::Code::EOK != error.GetCode ()) {
-    printf ("Engine SetModel Error: %s\n", error.GetDescription ().c_str ());
+  if (image_path.empty() || model_path.empty ()) {
+    PrintUsage ();
     exit (EXIT_FAILURE);
   }
 
-  printf ("Process Image: %s...\n", image_path.c_str ());
-  image_data = LoadImage (image_path.c_str (), DIM, width, height);
+  auto factory = r2i::IFrameworkFactory::MakeFactory(r2i::FrameworkCode::NCSDK,
+                 error);
 
-  std::shared_ptr < void >in_data = std::make_shared < float *>(image_data);
-
-  printf ("Configure Frame...\n");
-  error = frame->Configure (image_data, DIM, DIM, r2i::ImageFormat::Id::RGB);
-  if (r2i::RuntimeError::Code::EOK != error.GetCode ()) {
-    printf ("Frame Configuration Error: %s\n",
-            error.GetDescription ().c_str ());
-    exit (EXIT_FAILURE);
+  std::cout << "Loading Model: " << model_path << "..." << std::endl;
+  auto loader = factory->MakeLoader (error);
+  auto model = loader->Load (model_path, error);
+  if (error.IsError ()) {
+    std::cerr << "Loader error: " << error << std::endl;
+    exit(EXIT_FAILURE);
   }
 
-  printf ("Start Engine...\n");
-  error = engine.Start ();
-  if (r2i::RuntimeError::Code::EOK != error.GetCode ()) {
-    printf ("Engine Start Error: %s\n", error.GetDescription ().c_str ());
-    exit (EXIT_FAILURE);
+  std::cout << "Setting model to engine..." << std::endl;
+  auto engine = factory->MakeEngine (error);
+  error = engine->SetModel (model);
+
+  std::cout << "Loading image: " << image_path << "..." << std::endl;
+  std::unique_ptr<float[]> image_data = LoadImage (image_path, DIM, DIM, &width,
+                                        &height);
+
+  std::cout << "Configuring frame..." << std::endl;
+  std::shared_ptr<r2i::IFrame> frame = factory->MakeFrame (error);
+  error = frame->Configure (image_data.get(), DIM, DIM,
+                            r2i::ImageFormat::Id::RGB);
+
+  std::cout << "Starting engine..." << std::endl;
+  error = engine->Start ();
+  if (error.IsError ()) {
+    std::cerr << "Engine start error: " << error << std::endl;
+    exit(EXIT_FAILURE);
   }
 
-  printf ("Predict...\n");
-  prediction =
-    std::dynamic_pointer_cast < r2i::ncsdk::Prediction, r2i::IPrediction >
-    (engine.Predict (frame, error));
-  if (r2i::RuntimeError::Code::EOK != error.GetCode ()) {
-    printf ("Engine Prediction Error: %s\n", error.GetDescription ().c_str ());
-    exit (EXIT_FAILURE);
+  std::cout << "Predicting..." << std::endl;
+  auto prediction = engine->Predict (frame, error);
+  if (error.IsError ()) {
+    std::cerr << "Engine prediction error: " << error << std::endl;
+    exit(EXIT_FAILURE);
   }
 
-  unsigned int out_size = prediction->GetResultSize ();
+  PrintTopPrediction (prediction, width, height);
 
-  int numResults = out_size / (int) sizeof (float);
-
-  printf ("Result size was: %d, which represents %d elements \n", out_size,
-          numResults);
-
-
-  double Result[6];
-  /* interpret prediction outputs the hightest probability box that surpasses a threshold */
-  if (interpret_prediction (prediction, width, height, Result)) {
-    printf
-    ("Box highest probaility: [x:%lf, y:%lf, width:%lf, height:%lf, class:%lf, prob:%lf] \n",
-     Result[0], Result[1], Result[2], Result[3], Result[4], Result[5]);
+  std::cout << "Stopping engine..." << std::endl;
+  error = engine->Stop ();
+  if (error.IsError ()) {
+    std::cerr << "Engine stop error: " << error << std::endl;
+    exit(EXIT_FAILURE);
   }
 
-  printf ("Stop Engine...\n");
-  error = engine.Stop ();
-  if (r2i::RuntimeError::Code::EOK != error.GetCode ()) {
-    printf ("Engine Stop Error: %s\n", error.GetDescription ().c_str ());
-    exit (EXIT_FAILURE);
-  }
-  return 0;
+  return EXIT_SUCCESS;
 }
