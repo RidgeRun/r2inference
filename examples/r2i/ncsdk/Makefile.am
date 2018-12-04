@@ -12,17 +12,19 @@ AM_DEFAULT_SOURCE_EXT = .cc
 
 if ENABLE_EXAMPLES
 
-noinst_PROGRAMS = googlenet
+noinst_PROGRAMS = 			\
+	googlenet			\
+	tinyyolo
 
-AM_CXXFLAGS = 				\
+AM_CXXFLAGS =				\
 	$(RR_CXXFLAGS)			\
 	$(CODE_COVERAGE_CXXFLAGS)
 
-AM_CFLAGS = 				\
+AM_CFLAGS =				\
 	$(RR_CFLAGS)			\
 	$(CODE_COVERAGE_CFLAGS)
 
-AM_CPPFLAGS = 				\
+AM_CPPFLAGS =				\
 	$(RR_CPPFLAGS)			\
 	$(CODE_COVERAGE_CPPFLAGS)
 
