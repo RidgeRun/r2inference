@@ -36,6 +36,15 @@
 /* Probability threshold */
 #define PROB_THRESH 0.07
 
+struct box {
+  std::string label;
+  double x_center;
+  double y_center;
+  double width;
+  double height;
+  double prob;
+};
+
 void PrintTopPrediction (std::shared_ptr<r2i::IPrediction> prediction,
                          int input_image_width, int input_image_height) {
   /*
@@ -63,7 +72,7 @@ void PrintTopPrediction (std::shared_ptr<r2i::IPrediction> prediction,
   int max_prob_col = 0;
   int max_prob_class = 0;
   int max_prob_box = 0;
-  double box[4];
+  box result;
 
   int box_probs_start = GRID_H * GRID_W * CLASSES;
   int all_boxes_start = GRID_H * GRID_W * CLASSES + GRID_H * GRID_W * BOXES;
@@ -106,31 +115,34 @@ void PrintTopPrediction (std::shared_ptr<r2i::IPrediction> prediction,
    * box dimmensions are squared on the ncappzoo python example
    */
   index = ((max_prob_row * GRID_W + max_prob_col) * BOXES + max_prob_box ) * 4;
-  box[0] = prediction->At (all_boxes_start + index, error);
-  box[1] = prediction->At (all_boxes_start + index + 1, error);
-  box[2] = prediction->At (all_boxes_start + index + 2, error);
-  box[3] = prediction->At (all_boxes_start + index + 3, error);
+
+  result.label = labels[max_prob_class];
+  result.x_center = prediction->At (all_boxes_start + index, error);
+  result.y_center = prediction->At (all_boxes_start + index + 1, error);
+  result.width = prediction->At (all_boxes_start + index + 2, error);
+  result.height = prediction->At (all_boxes_start + index + 3, error);
+  result.prob = max_prob;
 
   /* adjust the box anchor according to its cell and grid dim */
-  box[0] += max_prob_col;
-  box[1] += max_prob_row;
-  box[0] /= GRID_H;
-  box[1] /= GRID_W;
+  result.x_center += max_prob_col;
+  result.y_center += max_prob_row;
+  result.x_center /= GRID_H;
+  result.y_center /= GRID_W;
 
-  box[2] *= box[2];
-  box[3] *= box[3];
-  box[0] *= input_image_width;
-  box[1] *= input_image_height;
-  box[2] *= input_image_width;
-  box[3] *= input_image_height;
+  result.width *= result.width;
+  result.height *= result.height;
+  result.x_center *= input_image_width;
+  result.y_center *= input_image_height;
+  result.width *= input_image_width;
+  result.height *= input_image_height;
 
   std::cout << "Box highest probaility:" ;
-  std::cout << "[class:'" << labels[max_prob_class] << "', ";
-  std::cout << "x_center:" << box[0] << ", ";
-  std::cout << "y_center:" << box[1] << ", ";
-  std::cout << "width:" << box[2] << ", ";
-  std::cout << "height:" << box[3] << ", ";
-  std::cout << "prob:" << max_prob << "]" << std::endl;
+  std::cout << "[class:'" << result.label << "', ";
+  std::cout << "x_center:" << result.x_center << ", ";
+  std::cout << "y_center:" << result.y_center << ", ";
+  std::cout << "width:" << result.width << ", ";
+  std::cout << "height:" << result.height << ", ";
+  std::cout << "prob:" << result.prob << "]" << std::endl;
 
 }
 
