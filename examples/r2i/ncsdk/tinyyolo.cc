@@ -115,8 +115,8 @@ void PrintTopPrediction (std::shared_ptr<r2i::IPrediction> prediction,
 
   std::cout << "Box highest probaility:" ;
   std::cout << "[class:'" << labels[max_prob_class] << "', ";
-  std::cout << "x:" << box[0] << ", ";
-  std::cout << "y:" << box[1] << ", ";
+  std::cout << "x_center:" << box[0] << ", ";
+  std::cout << "y_center:" << box[1] << ", ";
   std::cout << "width:" << box[2] << ", ";
   std::cout << "height:" << box[3] << ", ";
   std::cout << "prob:" << max_prob << "]" << std::endl;
@@ -140,9 +140,9 @@ std::unique_ptr<float[]> PreProcessImage (const unsigned char *input, int width,
                      reqheight, 0, channels);
 
   for (int i = 0; i < scaled_size; i += channels) {
-    adjusted[i + 0] = static_cast<float>(scaled[i + 2]) / 255;
-    adjusted[i + 1] = static_cast<float>(scaled[i + 1]) / 255;
-    adjusted[i + 2] = static_cast<float>(scaled[i + 0]) / 255;
+    adjusted[i + 2] = static_cast<float>(scaled[i + 2]) / 255.0;
+    adjusted[i + 1] = static_cast<float>(scaled[i + 1]) / 255.0;
+    adjusted[i + 0] = static_cast<float>(scaled[i + 0]) / 255.0;
   }
 
   return adjusted;
