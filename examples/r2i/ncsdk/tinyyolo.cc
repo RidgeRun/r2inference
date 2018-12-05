@@ -24,11 +24,17 @@
 #include "stb_image_resize.h"
 
 /* Tiny YOLO oputput parameters */
+/* Input image dim */
 #define DIM 448
+/* Grid dim */
 #define GRID_H 7
 #define GRID_W 7
+/* Number of classes */
 #define CLASSES 20
+/* Number of boxes per cell */
 #define BOXES 2
+/* Probability threshold */
+#define PROB_THRESH 0.07
 
 void PrintTopPrediction (std::shared_ptr<r2i::IPrediction> prediction,
                          int input_image_width, int input_image_height) {
@@ -59,6 +65,10 @@ void PrintTopPrediction (std::shared_ptr<r2i::IPrediction> prediction,
   int max_prob_box = 0;
   double box[4];
 
+  int box_probs_start = GRID_H * GRID_W * CLASSES;
+  int all_boxes_start = GRID_H * GRID_W * CLASSES + GRID_H * GRID_W * BOXES;
+  int index;
+
   std::string labels [CLASSES] = {"aeroplane", "bicycle", "bird", "boat",
                                   "bottle", "bus", "car", "cat", "chair",
                                   "cow", "diningtable", "dog", "horse",
@@ -70,12 +80,13 @@ void PrintTopPrediction (std::shared_ptr<r2i::IPrediction> prediction,
   for (i = 0; i < GRID_H; i++) {        /* Iterate rows    */
     for (j = 0; j < GRID_W; j++) {      /* Iterate columns */
       for (c = 0; c < CLASSES; c++) {   /* Iterate classes */
-        class_prob = prediction->At ((i * GRID_W + j) * CLASSES + c, error);
+        index = (i * GRID_W + j) * CLASSES + c;
+        class_prob = prediction->At (index, error);
         for (b = 0; b < BOXES; b++) {   /* Iterate boxes   */
-          box_prob = prediction->At (GRID_H * GRID_W * CLASSES + (i * GRID_W + j) * BOXES
-                                     + b, error);
+          index = (i * GRID_W + j) * BOXES + b;
+          box_prob = prediction->At (box_probs_start + index, error);
           prob = class_prob * box_prob;
-          if (prob > max_prob) {
+          if (prob > PROB_THRESH) {
             max_prob = prob;
             max_prob_row = i;
             max_prob_col = j;
@@ -89,16 +100,16 @@ void PrintTopPrediction (std::shared_ptr<r2i::IPrediction> prediction,
 
   /* Convert box coordinates to pixels */
   /*
-   * box position (x,y) is normalized inside each cell from 0 to 1
+   * box position (x_center,y_center) is normalized inside each cell from 0 to 1
    * width and heigh are also normalized, but with image size as reference
-   * box is ordered [x,y,width,height]
+   * box is ordered [x_center,y_center,width,height]
    * box dimmensions are squared on the ncappzoo python example
    */
-  for (i = 0; i < 4; i++) {
-    box[i] = prediction->At (GRID_H * GRID_W * CLASSES + GRID_H * GRID_W * BOXES
-                             + ((max_prob_row * GRID_W + max_prob_col) * BOXES + max_prob_box ) * 4 + i,
-                             error);
-  }
+  index = ((max_prob_row * GRID_W + max_prob_col) * BOXES + max_prob_box ) * 4;
+  box[0] = prediction->At (all_boxes_start + index, error);
+  box[1] = prediction->At (all_boxes_start + index + 1, error);
+  box[2] = prediction->At (all_boxes_start + index + 2, error);
+  box[3] = prediction->At (all_boxes_start + index + 3, error);
 
   /* adjust the box anchor according to its cell and grid dim */
   box[0] += max_prob_col;
