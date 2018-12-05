@@ -69,6 +69,16 @@ void Box2Pixels (box *normalized_box, int row, int col, int image_width,
   normalized_box->height *= image_height;
 }
 
+void PrintBox (box in_box) {
+  std::cout << "Box:" ;
+  std::cout << "[class:'" << in_box.label << "', ";
+  std::cout << "x_center:" << in_box.x_center << ", ";
+  std::cout << "y_center:" << in_box.y_center << ", ";
+  std::cout << "width:" << in_box.width << ", ";
+  std::cout << "height:" << in_box.height << ", ";
+  std::cout << "prob:" << in_box.prob << "]" << std::endl;
+}
+
 void PrintTopPrediction (std::shared_ptr<r2i::IPrediction> prediction,
                          int input_image_width, int input_image_height) {
   /*
@@ -91,11 +101,6 @@ void PrintTopPrediction (std::shared_ptr<r2i::IPrediction> prediction,
   double class_prob;
   double box_prob;
   double prob;
-  double max_prob = 0;
-  int max_prob_row = 0;
-  int max_prob_col = 0;
-  int max_prob_class = 0;
-  int max_prob_box = 0;
   box result;
 
   int box_probs_start = GRID_H * GRID_W * CLASSES;
@@ -103,6 +108,7 @@ void PrintTopPrediction (std::shared_ptr<r2i::IPrediction> prediction,
   int index;
 
   std::list<box> boxes;
+  std::list<box>::iterator it;
 
   std::string labels [CLASSES] = {"aeroplane", "bicycle", "bird", "boat",
                                   "bottle", "bus", "car", "cat", "chair",
@@ -121,40 +127,26 @@ void PrintTopPrediction (std::shared_ptr<r2i::IPrediction> prediction,
           index = (i * GRID_W + j) * BOXES + b;
           box_prob = prediction->At (box_probs_start + index, error);
           prob = class_prob * box_prob;
+          /* If the probability is over the threshold add it to the boxes list */
           if (prob > PROB_THRESH) {
-            max_prob = prob;
-            max_prob_row = i;
-            max_prob_col = j;
-            max_prob_class = c;
-            max_prob_box = b;
+            index = ((i * GRID_W + j) * BOXES + b ) * 4;
+            result.label = labels[c];
+            result.x_center = prediction->At (all_boxes_start + index, error);
+            result.y_center = prediction->At (all_boxes_start + index + 1, error);
+            result.width = prediction->At (all_boxes_start + index + 2, error);
+            result.height = prediction->At (all_boxes_start + index + 3, error);
+            result.prob = prob;
+            Box2Pixels(&result, i, j, input_image_width, input_image_height);
+            boxes.push_front(result);
           }
         }
       }
     }
   }
 
+  for (it = boxes.begin(); it != boxes.end(); ++it)
+    PrintBox(*it);
 
-  index = ((max_prob_row * GRID_W + max_prob_col) * BOXES + max_prob_box ) * 4;
-
-  result.label = labels[max_prob_class];
-  result.x_center = prediction->At (all_boxes_start + index, error);
-  result.y_center = prediction->At (all_boxes_start + index + 1, error);
-  result.width = prediction->At (all_boxes_start + index + 2, error);
-  result.height = prediction->At (all_boxes_start + index + 3, error);
-  result.prob = max_prob;
-
-  Box2Pixels(&result, max_prob_row, max_prob_col, input_image_width,
-             input_image_height);
-
-  std::cout << "Box highest probaility:" ;
-  std::cout << "[class:'" << result.label << "', ";
-  std::cout << "x_center:" << result.x_center << ", ";
-  std::cout << "y_center:" << result.y_center << ", ";
-  std::cout << "width:" << result.width << ", ";
-  std::cout << "height:" << result.height << ", ";
-  std::cout << "prob:" << result.prob << "]" << std::endl;
-
-  boxes.push_front(result);
 }
 
 void PrintUsage() {
