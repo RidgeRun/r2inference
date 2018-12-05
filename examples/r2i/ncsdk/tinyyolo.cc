@@ -45,6 +45,30 @@ struct box {
   double prob;
 };
 
+void Box2Pixels (box *normalized_box, int row, int col, int image_width,
+                 int image_height) {
+  /* Convert box coordinates to pixels
+   * box position (x_center,y_center) is normalized inside each cell from 0 to 1
+   * width and heigh are also normalized, but with image size as reference
+   * box is ordered [x_center,y_center,width,height]
+   */
+  /* adjust the box center according to its cell and grid dim */
+  normalized_box->x_center += col;
+  normalized_box->y_center += row;
+  normalized_box->x_center /= GRID_H;
+  normalized_box->y_center /= GRID_W;
+
+  /* adjust the lengths and widths */
+  normalized_box->width *= normalized_box->width;
+  normalized_box->height *= normalized_box->height;
+
+  /* scale the boxes to the image size in pixels */
+  normalized_box->x_center *= image_width;
+  normalized_box->y_center *= image_height;
+  normalized_box->width *= image_width;
+  normalized_box->height *= image_height;
+}
+
 void PrintTopPrediction (std::shared_ptr<r2i::IPrediction> prediction,
                          int input_image_width, int input_image_height) {
   /*
@@ -78,6 +102,8 @@ void PrintTopPrediction (std::shared_ptr<r2i::IPrediction> prediction,
   int all_boxes_start = GRID_H * GRID_W * CLASSES + GRID_H * GRID_W * BOXES;
   int index;
 
+  std::list<box> boxes;
+
   std::string labels [CLASSES] = {"aeroplane", "bicycle", "bird", "boat",
                                   "bottle", "bus", "car", "cat", "chair",
                                   "cow", "diningtable", "dog", "horse",
@@ -107,13 +133,7 @@ void PrintTopPrediction (std::shared_ptr<r2i::IPrediction> prediction,
     }
   }
 
-  /* Convert box coordinates to pixels */
-  /*
-   * box position (x_center,y_center) is normalized inside each cell from 0 to 1
-   * width and heigh are also normalized, but with image size as reference
-   * box is ordered [x_center,y_center,width,height]
-   * box dimmensions are squared on the ncappzoo python example
-   */
+
   index = ((max_prob_row * GRID_W + max_prob_col) * BOXES + max_prob_box ) * 4;
 
   result.label = labels[max_prob_class];
@@ -123,18 +143,8 @@ void PrintTopPrediction (std::shared_ptr<r2i::IPrediction> prediction,
   result.height = prediction->At (all_boxes_start + index + 3, error);
   result.prob = max_prob;
 
-  /* adjust the box anchor according to its cell and grid dim */
-  result.x_center += max_prob_col;
-  result.y_center += max_prob_row;
-  result.x_center /= GRID_H;
-  result.y_center /= GRID_W;
-
-  result.width *= result.width;
-  result.height *= result.height;
-  result.x_center *= input_image_width;
-  result.y_center *= input_image_height;
-  result.width *= input_image_width;
-  result.height *= input_image_height;
+  Box2Pixels(&result, max_prob_row, max_prob_col, input_image_width,
+             input_image_height);
 
   std::cout << "Box highest probaility:" ;
   std::cout << "[class:'" << result.label << "', ";
@@ -144,6 +154,7 @@ void PrintTopPrediction (std::shared_ptr<r2i::IPrediction> prediction,
   std::cout << "height:" << result.height << ", ";
   std::cout << "prob:" << result.prob << "]" << std::endl;
 
+  boxes.push_front(result);
 }
 
 void PrintUsage() {
