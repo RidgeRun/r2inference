@@ -14,7 +14,13 @@ if HAVE_NCSDK
 SUBDIRS += ncsdk
 endif
 
-DIST_SUBDIRS = ncsdk
+if HAVE_TENSORFLOW
+SUBDIRS += tensorflow
+endif
+
+DIST_SUBDIRS = 		\
+	ncsdk		\
+	tensorflow
 
 lib_LTLIBRARIES = libr2inference-@RR_PACKAGE_VERSION@.la
 
@@ -61,4 +67,9 @@ r2iinclude_HEADERS =		\
 if HAVE_NCSDK
 libr2inference_@RR_PACKAGE_VERSION@_la_LIBADD += 	\
 	$(top_builddir)/r2i/ncsdk/libncsdk.la
+endif
+
+if HAVE_TENSORFLOW
+libr2inference_@RR_PACKAGE_VERSION@_la_LIBADD += 	\
+	$(top_builddir)/r2i/tensorflow/libtensorflow.la
 endif

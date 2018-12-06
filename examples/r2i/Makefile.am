@@ -10,13 +10,19 @@
 
 AM_DEFAULT_SOURCE_EXT = .cc
 
-DIST_SUBDIRS = ncsdk
+DIST_SUBDIRS = 		\
+	ncsdk		\
+	tensorflow
 SUBDIRS =
 
 if ENABLE_EXAMPLES
 
 if HAVE_NCSDK
 SUBDIRS += ncsdk
+endif
+
+if HAVE_TENSORFLOW
+SUBDIRS += tensorflow
 endif
 
 noinst_PROGRAMS = list_parameters

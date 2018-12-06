@@ -11,12 +11,14 @@
 AM_DEFAULT_SOURCE_EXT = .cc
 
 if ENABLE_TESTS
+if HAVE_TENSORFLOW
 
-TESTS = 			\
-	iframeworkfactory
+TESTS =
+
 
 check_PROGRAMS=$(TESTS)
 
+endif # HAVE_TENSORFLOW
 endif # ENABLE_TESTS
 
 if ENABLE_CODE_COVERAGE
@@ -30,11 +32,13 @@ LOG_DRIVER=$(top_builddir)/common/rr-test-driver.py $(SINGLE_PROCESS)
 AM_CXXFLAGS = 				\
 	$(RR_CXXFLAGS)			\
 	$(TESTS_CFLAGS)			\
+	$(TENSORFLOW_CFLAGS)		\
 	$(CODE_COVERAGE_CXXFLAGS)
 
 AM_CFLAGS = 				\
 	$(RR_CFLAGS)			\
 	$(TESTS_CFLAGS)			\
+	$(TENSORFLOW_CFLAGS)		\
 	$(CODE_COVERAGE_CFLAGS)
 
 AM_CPPFLAGS = 				\
@@ -43,21 +47,9 @@ AM_CPPFLAGS = 				\
 
 AM_LDFLAGS =				\
 	$(RR_LIBS)			\
+	$(TENSORFLOW_LIBS)		\
 	$(TESTS_LIBS) 			\
 	$(CODE_COVERAGE_LIBS)		\
 	$(top_builddir)/r2i/libr2inference-@RR_PACKAGE_VERSION@.la
 
 CLEANFILES = cpputest_*.xml
-
-DIST_SUBDIRS = 		\
-	ncsdk		\
-	tensorflow
-SUBDIRS =
-
-if HAVE_NCSDK
-SUBDIRS += ncsdk
-endif
-
-if HAVE_TENSORFLOW
-SUBDIRS += tensorflow
-endif

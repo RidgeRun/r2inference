@@ -61,14 +61,17 @@ docs/uml/Makefile
 examples/Makefile
 examples/r2i/Makefile
 examples/r2i/ncsdk/Makefile
+examples/r2i/tensorflow/Makefile
 r2i/Makefile
 r2i/ncsdk/Makefile
+r2i/tensorflow/Makefile
 r2inference-${RR_PACKAGE_VERSION}.pc:r2inference.pc.in
 tests/Makefile
 tests/acceptance/Makefile
 tests/unit/Makefile
 tests/unit/r2i/Makefile
 tests/unit/r2i/ncsdk/Makefile
+tests/unit/r2i/tensorflow/Makefile
 ])
 
 AC_OUTPUT
