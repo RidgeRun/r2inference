@@ -14,6 +14,7 @@
 #include <memory>
 #include <string>
 #include <bits/stdc++.h>
+#include <algorithm>
 
 #include <r2i/r2i.h>
 
@@ -35,6 +36,8 @@
 #define BOXES 2
 /* Probability threshold */
 #define PROB_THRESH 0.07
+/* Intersection over union threshold */
+#define IOU_THRESH 0.35
 
 struct box {
   std::string label;
@@ -67,6 +70,39 @@ void Box2Pixels (box *normalized_box, int row, int col, int image_width,
   normalized_box->y_center *= image_height;
   normalized_box->width *= image_width;
   normalized_box->height *= image_height;
+}
+
+double IntersectionOverUnion(box box_1, box box_2) {
+  /*
+   * Evaluate the intersection-over-union for two boxes
+   * The intersection-over-union metric determines how close
+   * two boxes are to being the same box.
+   */
+  double intersection_dim_1;
+  double intersection_dim_2;
+  double intersection_area;
+  double union_area;
+
+  /* First diminsion of the intersecting box */
+  intersection_dim_1 = std::min(box_1.x_center + 0.5 * box_1.width,
+                                box_2.x_center + 0.5 * box_2.width) -
+                       std::max(box_1.x_center - 0.5 * box_1.width,
+                                box_2.x_center - 0.5 * box_2.width);
+
+  /* Second dimension of the intersecting box */
+  intersection_dim_2 = std::min(box_1.y_center + 0.5 * box_1.height,
+                                box_2.y_center + 0.5 * box_2.height) -
+                       std::max(box_1.y_center - 0.5 * box_1.height,
+                                box_2.y_center - 0.5 * box_2.height);
+
+  if ((intersection_dim_1 < 0) || (intersection_dim_2 < 0)) {
+    intersection_area = 0;
+  } else {
+    intersection_area =  intersection_dim_1 * intersection_dim_2;
+  }
+  union_area = box_1.width * box_1.height + box_2.width * box_2.height -
+               intersection_area;
+  return intersection_area / union_area;
 }
 
 void PrintBox (box in_box) {
@@ -117,7 +153,6 @@ void PrintTopPrediction (std::shared_ptr<r2i::IPrediction> prediction,
                                   "sheep", "sofa", "train", "tvmonitor"
                                  };
 
-  /* Find the box index with the highest probability */
   for (i = 0; i < GRID_H; i++) {        /* Iterate rows    */
     for (j = 0; j < GRID_W; j++) {      /* Iterate columns */
       for (c = 0; c < CLASSES; c++) {   /* Iterate classes */
@@ -144,6 +179,13 @@ void PrintTopPrediction (std::shared_ptr<r2i::IPrediction> prediction,
     }
   }
 
+  /* Remove duplicated boxes. A box is considered a duplicate if its
+   * intersection over union metric is above a threshold
+   */
+  IntersectionOverUnion (boxes.front(), boxes.back());
+
+
+  /* Print all resulting boxes */
   for (it = boxes.begin(); it != boxes.end(); ++it)
     PrintBox(*it);
 
