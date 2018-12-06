@@ -35,9 +35,9 @@
 /* Number of boxes per cell */
 #define BOXES 2
 /* Probability threshold */
-#define PROB_THRESH 0.07
+#define PROB_THRESH 0.08
 /* Intersection over union threshold */
-#define IOU_THRESH 0.35
+#define IOU_THRESH 0.30
 
 struct box {
   std::string label;
@@ -182,6 +182,12 @@ void PrintTopPrediction (std::shared_ptr<r2i::IPrediction> prediction,
     }
   }
 
+  /* Print all resulting boxes */
+  std::cout << "Boxes before clustering: " << std::endl;
+  for (it1 = boxes.begin(); it1 != boxes.end(); ++it1) {
+    PrintBox(*it1);
+  }
+
   /* Remove duplicated boxes. A box is considered a duplicate if its
    * intersection over union metric is above a threshold
    */
@@ -202,6 +208,7 @@ void PrintTopPrediction (std::shared_ptr<r2i::IPrediction> prediction,
     }
   }
 
+  std::cout << "Boxes after clustering: " << std::endl;
   /* Print all resulting boxes */
   for (it1 = boxes.begin(); it1 != boxes.end(); ++it1) {
     PrintBox(*it1);
