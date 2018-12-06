@@ -132,19 +132,22 @@ void PrintTopPrediction (std::shared_ptr<r2i::IPrediction> prediction,
    *    [980:1078]: 7*7*2 probability multiplicator for each box in the grid
    *    [1078:1470]: 7*7*2*4 [x,y,w,h] for each box in the grid
    */
-  int i, j, c, b;
   r2i::RuntimeError error;
-  double class_prob;
-  double box_prob;
-  double prob;
-  box result;
 
+  int i, j, c, b;
   int box_probs_start = GRID_H * GRID_W * CLASSES;
   int all_boxes_start = GRID_H * GRID_W * CLASSES + GRID_H * GRID_W * BOXES;
   int index;
 
+  double class_prob;
+  double box_prob;
+  double prob;
+  double iou;
+
+  box result;
   std::list<box> boxes;
-  std::list<box>::iterator it;
+  std::list<box>::iterator it1;
+  std::list<box>::iterator it2;
 
   std::string labels [CLASSES] = {"aeroplane", "bicycle", "bird", "boat",
                                   "bottle", "bus", "car", "cat", "chair",
@@ -183,11 +186,26 @@ void PrintTopPrediction (std::shared_ptr<r2i::IPrediction> prediction,
    * intersection over union metric is above a threshold
    */
   IntersectionOverUnion (boxes.front(), boxes.back());
-
+  for (it1 = boxes.begin(); it1 != boxes.end(); it1++) {
+    for (it2 = std::next(it1); it2 != boxes.end(); it2++) {
+      if (it1->label == it2->label) {
+        iou = IntersectionOverUnion(*it1, *it2);
+        if (iou > IOU_THRESH) {
+          if (it1->prob > it2->prob) {
+            boxes.erase(it2--);
+          } else {
+            boxes.erase(it1--);
+            break;
+          }
+        }
+      }
+    }
+  }
 
   /* Print all resulting boxes */
-  for (it = boxes.begin(); it != boxes.end(); ++it)
-    PrintBox(*it);
+  for (it1 = boxes.begin(); it1 != boxes.end(); ++it1) {
+    PrintBox(*it1);
+  }
 
 }
 
