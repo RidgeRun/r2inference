@@ -26,6 +26,13 @@ MakeNcsdkFactory (RuntimeError &error) {
 }
 #endif // HAVE_NCSDK
 
+#ifdef HAVE_TENSORFLOW
+static std::unique_ptr<IFrameworkFactory>
+MakeTensorflowFactory (RuntimeError &error) {
+  return nullptr;
+}
+#endif // HAVE_TENSORFLOW
+
 typedef std::function<std::unique_ptr<IFrameworkFactory>(RuntimeError &)>
 MakeFactory;
 const std::unordered_map<int, MakeFactory> frameworks ({
@@ -33,6 +40,10 @@ const std::unordered_map<int, MakeFactory> frameworks ({
 #ifdef HAVE_NCSDK
   {FrameworkCode::NCSDK, MakeNcsdkFactory},
 #endif //HAVE_NCSDK
+
+#ifdef HAVE_TENSORFLOW
+  {FrameworkCode::TENSORFLOW, MakeTensorflowFactory},
+#endif //HAVE_TENSORFLOW
 
 });
 

@@ -16,7 +16,8 @@ noinst_LTLIBRARIES = libtensorflow.la
 tensorflowincludedir = @R2IINCLUDEDIR@/r2i/tensorflow
 
 libtensorflow_la_SOURCES =		\
-	engine.cc
+	engine.cc			\
+	frameworkfactory.cc
 
 libtensorflow_la_CPPFLAGS = 		\
 	$(RR_CPPFLAGS)			\
@@ -37,7 +38,8 @@ libtensorflow_la_LIBADD = 		\
 	$(TENSORFLOW_LIBS)		\
 	$(CODE_COVERAGE_LIBS)
 
-tensorflowinclude_HEADERS =
+tensorflowinclude_HEADERS =		\
+	frameworkfactory.h
 
 
 endif # HAVE_TENSORFLOW

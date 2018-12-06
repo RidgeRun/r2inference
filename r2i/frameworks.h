@@ -27,6 +27,11 @@ enum FrameworkCode {
   NCSDK,
 
   /**
+   * Google's TensorFlow
+   */
+  TENSORFLOW,
+
+  /**
    * Number of supported frameworks, mostly for testing purposes.
    */
   MAX_FRAMEWORK
