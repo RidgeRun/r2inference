@@ -71,5 +71,5 @@ endif
 
 if HAVE_TENSORFLOW
 libr2inference_@RR_PACKAGE_VERSION@_la_LIBADD += 	\
-	$(top_builddir)/r2i/tensorflow/libtensorflow.la
+	$(top_builddir)/r2i/tensorflow/libtf.la
 endif

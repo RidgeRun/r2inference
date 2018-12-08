@@ -10,30 +10,30 @@
 
 if HAVE_TENSORFLOW
 
-noinst_LTLIBRARIES = libtensorflow.la
+noinst_LTLIBRARIES = libtf.la
 
 # Define a custom area for our headers
 tensorflowincludedir = @R2IINCLUDEDIR@/r2i/tensorflow
 
-libtensorflow_la_SOURCES =		\
+libtf_la_SOURCES =			\
 	engine.cc			\
 	frameworkfactory.cc
 
-libtensorflow_la_CPPFLAGS = 		\
+libtf_la_CPPFLAGS = 			\
 	$(RR_CPPFLAGS)			\
 	$(CODE_COVERAGE_CPPFLAGS)
 
-libtensorflow_la_CFLAGS = 		\
+libtf_la_CFLAGS = 			\
 	$(RR_CFLAGS)			\
 	$(TENSORFLOW_CFLAGS)		\
 	$(CODE_COVERAGE_CFLAGS)
 
-libtensorflow_la_CXXFLAGS = 		\
+libtf_la_CXXFLAGS = 			\
 	$(RR_CXXFLAGS)			\
 	$(TENSORFLOW_CFLAGS)		\
 	$(CODE_COVERAGE_CXXFLAGS)
 
-libtensorflow_la_LIBADD = 		\
+libtf_la_LIBADD = 			\
 	$(RR_LIBS)			\
 	$(TENSORFLOW_LIBS)		\
 	$(CODE_COVERAGE_LIBS)
