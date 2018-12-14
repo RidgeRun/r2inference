@@ -22,9 +22,15 @@
 
 AC_DEFUN([RR_INIT_FLAGS],[
 
-  AC_REQUIRE([AC_PROG_CC])
-  AC_REQUIRE([AC_PROG_CXX])
-  AC_REQUIRE([AC_PROG_CPP])
+  # Dont let AC_PROG_C{C,XX} add the default -O2 -g if no C{XX}_CLAGS
+  # are specified. Define them to an empty string if there is no user
+  # defined value
+  : ${CFLAGS=""}
+  : ${CXXFLAGS=""}
+
+  AC_PROG_CPP
+  AC_PROG_CC
+  AC_PROG_CXX
 
   AC_ARG_WITH([profile], AS_HELP_STRING([--with-profile=release|debug|lazy],
     [Specify the build profile to use:

@@ -12,6 +12,9 @@
 AC_PREREQ([2.69])
 AC_INIT([RidgeRun inference library],[0.1.0],[https://github.com/RidgeRun/r2inference/issues],[r2inference])
 
+# Initialize our build utils
+RR_INIT
+
 # Initialize automake.
 AM_INIT_AUTOMAKE([1.14 no-dist-gzip dist-xz tar-ustar foreign])
 
@@ -20,9 +23,6 @@ LT_INIT
 
 # Checks for programs.
 AC_PROG_LN_S
-
-# Initialize our build utils
-RR_INIT
 
 # Allow the user to fine-tune project build
 RR_ENABLE_TESTS
