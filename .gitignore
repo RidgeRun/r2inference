@@ -65,6 +65,7 @@ tests/unit/r2i/ncsdk/model
 tests/unit/r2i/ncsdk/prediction
 tests/unit/r2i/ncsdk/parameters
 tests/unit/r2i/ncsdk/frameworkfactory
+tests/unit/r2i/tensorflow/loader
 
 # rr-build-utils configuration files
 .rrconfig

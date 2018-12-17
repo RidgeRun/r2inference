@@ -13,6 +13,8 @@
 
 #include <tensorflow/c/c_api.h>
 
+#include "loader.h"
+
 namespace r2i {
 namespace tensorflow {
 
@@ -20,7 +22,7 @@ std::unique_ptr<r2i::ILoader> FrameworkFactory::MakeLoader (
   RuntimeError &error) {
   error.Clean ();
 
-  return nullptr;
+  return std::unique_ptr<ILoader> (new Loader);
 }
 
 std::unique_ptr<r2i::IEngine> FrameworkFactory::MakeEngine (
