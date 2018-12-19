@@ -17,11 +17,12 @@ tensorflowincludedir = @R2IINCLUDEDIR@/r2i/tensorflow
 
 libtf_la_SOURCES =   			\
 	engine.cc			\
+	frame.cc			\
 	frameworkfactory.cc		\
 	loader.cc			\
 	model.cc			\
-	statuscodes.cc			\
-	frame.cc
+	prediction.cc
+
 
 libtf_la_CPPFLAGS =  			\
 	$(RR_CPPFLAGS)			\
@@ -43,10 +44,10 @@ libtf_la_LIBADD =  			\
 	$(CODE_COVERAGE_LIBS)
 
 tensorflowinclude_HEADERS =   		\
+	frame.h				\
 	frameworkfactory.h		\
 	loader.h			\
-	model.h   			\
-	statuscodes.h			\
-	frame.h
+	model.h				\
+	prediction.h
 
 endif # HAVE_TENSORFLOW

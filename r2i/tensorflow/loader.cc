@@ -17,7 +17,6 @@
 
 #include "r2i/imodel.h"
 #include "r2i/tensorflow/model.h"
-#include "r2i/tensorflow/statuscodes.h"
 
 namespace r2i {
 namespace tensorflow {

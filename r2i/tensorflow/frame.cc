@@ -10,7 +10,6 @@
 */
 
 #include "r2i/tensorflow/frame.h"
-#include "r2i/tensorflow/statuscodes.h"
 
 namespace r2i {
 namespace tensorflow {
@@ -178,16 +177,14 @@ RuntimeError Frame::GetTensorShape (std::shared_ptr<TF_Graph> pgraph,
 
   num_dims = TF_GraphGetTensorNumDims (graph, output, status);
   if (TF_GetCode (status) != TF_OK) {
-    error.Set (RuntimeError::Code::FRAMEWORK_ERROR,
-               GetStringFromStatus(TF_GetCode (status), error));
+    error.Set (RuntimeError::Code::FRAMEWORK_ERROR, TF_Message (status));
     return error;
   }
 
   *dims = new int64_t[num_dims];
   TF_GraphGetTensorShape(graph, output, *dims, num_dims, status);
   if (TF_GetCode (status) != TF_OK) {
-    error.Set (RuntimeError::Code::FRAMEWORK_ERROR,
-               GetStringFromStatus(TF_GetCode (status), error));
+    error.Set (RuntimeError::Code::FRAMEWORK_ERROR, TF_Message (status));
     return error;
   }
 

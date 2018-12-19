@@ -66,8 +66,7 @@ RuntimeError Model::Load (std::shared_ptr<TF_Buffer> pbuffer) {
 
   TF_Code code = TF_GetCode(status);
   if (code != TF_OK) {
-    error.Set (RuntimeError::Code::INCOMPATIBLE_MODEL,
-               GetStringFromStatus (code, error));
+    error.Set (RuntimeError::Code::INCOMPATIBLE_MODEL, TF_Message (status));
     return error;
   }
 
