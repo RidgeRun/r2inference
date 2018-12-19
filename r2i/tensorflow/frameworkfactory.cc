@@ -14,6 +14,7 @@
 #include <tensorflow/c/c_api.h>
 
 #include "loader.h"
+#include "frame.h"
 
 namespace r2i {
 namespace tensorflow {
@@ -43,7 +44,7 @@ std::unique_ptr<r2i::IFrame> FrameworkFactory::MakeFrame (
   RuntimeError &error) {
   error.Clean ();
 
-  return nullptr;
+  return std::unique_ptr<IFrame> (new Frame);
 }
 
 r2i::FrameworkMeta FrameworkFactory::GetDescription (RuntimeError &error) {

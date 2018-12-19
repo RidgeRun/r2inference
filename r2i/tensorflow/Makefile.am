@@ -15,36 +15,38 @@ noinst_LTLIBRARIES = libtf.la
 # Define a custom area for our headers
 tensorflowincludedir = @R2IINCLUDEDIR@/r2i/tensorflow
 
-libtf_la_SOURCES =  			\
+libtf_la_SOURCES =   			\
 	engine.cc			\
 	frameworkfactory.cc		\
 	loader.cc			\
 	model.cc			\
-	statuscodes.cc
+	statuscodes.cc			\
+	frame.cc
 
 libtf_la_CPPFLAGS =  			\
 	$(RR_CPPFLAGS)			\
 	$(CODE_COVERAGE_CPPFLAGS)
 
-libtf_la_CFLAGS =  			\
+libtf_la_CFLAGS =   			\
 	$(RR_CFLAGS)			\
 	$(TENSORFLOW_CFLAGS)		\
 	$(CODE_COVERAGE_CFLAGS)
 
-libtf_la_CXXFLAGS =  			\
+libtf_la_CXXFLAGS =   			\
 	$(RR_CXXFLAGS)			\
 	$(TENSORFLOW_CFLAGS)		\
 	$(CODE_COVERAGE_CXXFLAGS)
 
-libtf_la_LIBADD =    			\
+libtf_la_LIBADD =  			\
 	$(RR_LIBS)			\
 	$(TENSORFLOW_LIBS)		\
 	$(CODE_COVERAGE_LIBS)
 
-tensorflowinclude_HEADERS =		\
+tensorflowinclude_HEADERS =   		\
 	frameworkfactory.h		\
 	loader.h			\
 	model.h   			\
-	statuscodes.h
+	statuscodes.h			\
+	frame.h
 
 endif # HAVE_TENSORFLOW
