@@ -12,7 +12,8 @@ AM_DEFAULT_SOURCE_EXT = .cc
 
 if ENABLE_EXAMPLES
 
-noinst_PROGRAMS =
+noinst_PROGRAMS =			\
+	googlenet
 
 AM_CXXFLAGS =				\
 	$(RR_CXXFLAGS)			\

@@ -76,7 +76,9 @@ cscope.files
 cscope.out
 
 # Examples
+examples/external/list-backends
 examples/r2i/list_parameters
 examples/r2i/ncsdk/googlenet
 examples/r2i/ncsdk/tinyyolo
-examples/external/list-backends
+examples/r2i/tensorflow/googlenet
+
