@@ -48,7 +48,7 @@ check_file_indentation()
 
 check_project_indentation()
 {
-    for file in `git diff-index --cached --name-only HEAD --diff-filter=ACMR| grep $indent_extensions` ; do
+    for file in `git diff-index --cached --name-only HEAD --diff-filter=ACMR| grep -E $indent_extensions` ; do
 	log_info "Checking style in $file"
 
         # to_commit is the temporary checkout. This makes sure we check against the
