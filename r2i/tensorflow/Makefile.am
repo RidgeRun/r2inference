@@ -44,6 +44,7 @@ libtf_la_LIBADD =  			\
 	$(CODE_COVERAGE_LIBS)
 
 tensorflowinclude_HEADERS =   		\
+	engine.h			\
 	frame.h				\
 	frameworkfactory.h		\
 	loader.h			\

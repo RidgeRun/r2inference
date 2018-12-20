@@ -14,6 +14,7 @@
 #include <tensorflow/c/c_api.h>
 
 #include "loader.h"
+#include "engine.h"
 #include "frame.h"
 
 namespace r2i {
@@ -30,7 +31,7 @@ std::unique_ptr<r2i::IEngine> FrameworkFactory::MakeEngine (
   RuntimeError &error) {
   error.Clean ();
 
-  return nullptr;
+  return std::unique_ptr<IEngine> (new Engine);
 }
 
 std::unique_ptr<r2i::IParameters> FrameworkFactory::MakeParameters (

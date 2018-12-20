@@ -16,6 +16,7 @@
 
 #include "config.h"
 #include "ncsdk/frameworkfactory.h"
+#include "tensorflow/frameworkfactory.h"
 
 namespace r2i {
 
@@ -29,7 +30,8 @@ MakeNcsdkFactory (RuntimeError &error) {
 #ifdef HAVE_TENSORFLOW
 static std::unique_ptr<IFrameworkFactory>
 MakeTensorflowFactory (RuntimeError &error) {
-  return nullptr;
+  return std::unique_ptr<tensorflow::FrameworkFactory> (new
+         tensorflow::FrameworkFactory);
 }
 #endif // HAVE_TENSORFLOW
 
