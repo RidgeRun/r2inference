@@ -148,27 +148,21 @@ std::shared_ptr<r2i::IPrediction> Engine::Predict (std::shared_ptr<r2i::IFrame>
     return nullptr;
   }
 
-  auto pin_tensor = frame->GetTensor (pgraph, out_operation, error);
+  auto pin_tensor = frame->GetTensor (pgraph, in_operation, error);
   if (error.IsError ()) {
     return nullptr;
   }
 
   auto prediction = std::make_shared<Prediction>();
-  error = prediction->Init (pgraph, out_operation);
-  if (error.IsError ()) {
-    return nullptr;
-  }
-
-  auto pout_tensor = prediction->GetTensor ();
   std::shared_ptr<TF_Status> pstatus(TF_NewStatus(), TF_DeleteStatus);
 
   auto *session = this->session.get ();
   auto *in_tensor = pin_tensor.get ();
-  auto *out_tensor = pout_tensor.get ();
   auto *status = pstatus.get ();
 
   TF_Output run_outputs = {.oper = out_operation, .index = 0};
   TF_Output run_inputs = {.oper = in_operation, .index = 0};
+  TF_Tensor *out_tensor = nullptr;
 
   TF_SessionRun(session,
                 NULL,                         /* RunOptions */
@@ -181,6 +175,9 @@ std::shared_ptr<r2i::IPrediction> Engine::Predict (std::shared_ptr<r2i::IFrame>
     error.Set (RuntimeError::Code::FRAMEWORK_ERROR, TF_Message (status));
     return nullptr;
   }
+
+  std::shared_ptr<TF_Tensor> pout_tensor (out_tensor, TF_DeleteTensor);
+  prediction->SetTensor (pgraph, out_operation, pout_tensor);
 
   return prediction;
 }

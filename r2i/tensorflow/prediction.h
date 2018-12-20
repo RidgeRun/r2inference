@@ -24,19 +24,15 @@ namespace tensorflow {
 class Prediction: public IPrediction {
  public:
   Prediction ();
-  RuntimeError Init (std::shared_ptr<TF_Graph> graph, TF_Operation *operation);
   double At (unsigned int index,  r2i::RuntimeError &error) override;
   void *GetResultData () override;
   unsigned int GetResultSize () override;
-  std::shared_ptr<TF_Tensor> GetTensor ();
+  RuntimeError SetTensor (std::shared_ptr<TF_Graph> graph,
+                          TF_Operation *operation, std::shared_ptr<TF_Tensor> tensor);
 
  private:
-  std::shared_ptr<TF_Graph> graph;
   std::shared_ptr<TF_Tensor> tensor;
-  TF_Operation *operation;
   size_t result_size;
-
-  RuntimeError CreateTensor ();
   int64_t GetRequiredBufferSize (TF_Output output, int64_t *dims,
                                  int64_t num_dims);
 };
