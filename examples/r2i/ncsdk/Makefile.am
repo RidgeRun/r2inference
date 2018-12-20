@@ -12,25 +12,25 @@ AM_DEFAULT_SOURCE_EXT = .cc
 
 if ENABLE_EXAMPLES
 
-noinst_PROGRAMS = 			\
-	googlenet			\
-	tinyyolo
+noinst_PROGRAMS =                 \
+        googlenet                 \
+        tinyyolo
 
-AM_CXXFLAGS =				\
-	$(RR_CXXFLAGS)			\
-	$(CODE_COVERAGE_CXXFLAGS)
+AM_CXXFLAGS =                     \
+        $(RR_CXXFLAGS)            \
+        $(CODE_COVERAGE_CXXFLAGS)
 
-AM_CFLAGS =				\
-	$(RR_CFLAGS)			\
-	$(CODE_COVERAGE_CFLAGS)
+AM_CFLAGS =                       \
+        $(RR_CFLAGS)              \
+        $(CODE_COVERAGE_CFLAGS)
 
-AM_CPPFLAGS =				\
-	$(RR_CPPFLAGS)			\
-	$(CODE_COVERAGE_CPPFLAGS)
+AM_CPPFLAGS =                     \
+        $(RR_CPPFLAGS)            \
+        $(CODE_COVERAGE_CPPFLAGS)
 
-AM_LDFLAGS =				\
-	$(RR_LIBS)			\
-	$(CODE_COVERAGE_LIBS)		\
-	$(top_builddir)/r2i/libr2inference-@RR_PACKAGE_VERSION@.la
+AM_LDFLAGS =                      \
+        $(RR_LIBS)                \
+        $(CODE_COVERAGE_LIBS)     \
+        $(top_builddir)/r2i/libr2inference-@RR_PACKAGE_VERSION@.la
 
 endif # ENABLE_EXAMPLES

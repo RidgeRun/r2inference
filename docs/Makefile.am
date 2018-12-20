@@ -8,6 +8,6 @@
 # a software license from RidgeRun.  All source code changes must be provided
 # back to RidgeRun without any encumbrance.
 
-SUBDIRS = 	\
-	api	\
-	uml
+SUBDIRS =     \
+        api   \
+        uml

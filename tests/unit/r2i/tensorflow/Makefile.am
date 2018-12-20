@@ -13,8 +13,8 @@ AM_DEFAULT_SOURCE_EXT = .cc
 if ENABLE_TESTS
 if HAVE_TENSORFLOW
 
-TESTS = 	\
-	loader
+TESTS =         \
+        loader
 
 
 check_PROGRAMS=$(TESTS)
@@ -30,27 +30,27 @@ endif
 
 LOG_DRIVER=$(top_builddir)/common/rr-test-driver.py $(SINGLE_PROCESS)
 
-AM_CXXFLAGS = 				\
-	$(RR_CXXFLAGS)			\
-	$(TESTS_CFLAGS)			\
-	$(TENSORFLOW_CFLAGS)		\
-	$(CODE_COVERAGE_CXXFLAGS)
+AM_CXXFLAGS =                       \
+        $(RR_CXXFLAGS)              \
+        $(TESTS_CFLAGS)             \
+        $(TENSORFLOW_CFLAGS)        \
+        $(CODE_COVERAGE_CXXFLAGS)
 
-AM_CFLAGS = 				\
-	$(RR_CFLAGS)			\
-	$(TESTS_CFLAGS)			\
-	$(TENSORFLOW_CFLAGS)		\
-	$(CODE_COVERAGE_CFLAGS)
+AM_CFLAGS =                         \
+        $(RR_CFLAGS)                \
+        $(TESTS_CFLAGS)             \
+        $(TENSORFLOW_CFLAGS)        \
+        $(CODE_COVERAGE_CFLAGS)
 
-AM_CPPFLAGS = 				\
-	$(RR_CPPFLAGS)			\
-	$(CODE_COVERAGE_CPPFLAGS)
+AM_CPPFLAGS =                       \
+        $(RR_CPPFLAGS)              \
+        $(CODE_COVERAGE_CPPFLAGS)
 
-AM_LDFLAGS =				\
-	$(RR_LIBS)			\
-	$(TENSORFLOW_LIBS)		\
-	$(TESTS_LIBS) 			\
-	$(CODE_COVERAGE_LIBS)		\
-	$(top_builddir)/r2i/libr2inference-@RR_PACKAGE_VERSION@.la
+AM_LDFLAGS =                        \
+        $(RR_LIBS)                  \
+        $(TENSORFLOW_LIBS)          \
+        $(TESTS_LIBS)               \
+        $(CODE_COVERAGE_LIBS)       \
+        $(top_builddir)/r2i/libr2inference-@RR_PACKAGE_VERSION@.la
 
 CLEANFILES = cpputest_*.xml

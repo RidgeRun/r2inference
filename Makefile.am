@@ -11,8 +11,8 @@
 # Keep in sync with configure.ac
 ACLOCAL_AMFLAGS = -I m4 -I common/m4
 
-SUBDIRS =	\
-	r2i
+SUBDIRS =              \
+        r2i
 
 if ENABLE_TESTS
 SUBDIRS += tests
@@ -26,11 +26,11 @@ if ENABLE_DOCS
 SUBDIRS += docs
 endif
 
-DIST_SUBDIRS =		\
-	$(SUBDIRS)	\
-	tests		\
-	examples	\
-	docs
+DIST_SUBDIRS =         \
+        $(SUBDIRS)     \
+        tests          \
+        examples       \
+        docs
 
 @CODE_COVERAGE_RULES@
 

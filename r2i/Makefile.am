@@ -18,58 +18,58 @@ if HAVE_TENSORFLOW
 SUBDIRS += tensorflow
 endif
 
-DIST_SUBDIRS = 		\
-	ncsdk		\
-	tensorflow
+DIST_SUBDIRS =       \
+        ncsdk        \
+        tensorflow
 
 lib_LTLIBRARIES = libr2inference-@RR_PACKAGE_VERSION@.la
 
 # Define a custom area for our headers
 r2iincludedir = @R2IINCLUDEDIR@/r2i
 
-libr2inference_@RR_PACKAGE_VERSION@_la_SOURCES =	\
-	iframeworkfactory.cc				\
-	runtimeerror.cc					\
-	imageformat.cc
+libr2inference_@RR_PACKAGE_VERSION@_la_SOURCES =    \
+        iframeworkfactory.cc                        \
+        runtimeerror.cc                             \
+        imageformat.cc
 
-libr2inference_@RR_PACKAGE_VERSION@_la_CPPFLAGS = 	\
-	$(RR_CPPFLAGS)					\
-	$(CODE_COVERAGE_CPPFLAGS)
+libr2inference_@RR_PACKAGE_VERSION@_la_CPPFLAGS =   \
+        $(RR_CPPFLAGS)                              \
+        $(CODE_COVERAGE_CPPFLAGS)
 
-libr2inference_@RR_PACKAGE_VERSION@_la_CFLAGS = 	\
-	$(RR_CFLAGS)					\
-	$(CODE_COVERAGE_CFLAGS)
+libr2inference_@RR_PACKAGE_VERSION@_la_CFLAGS =     \
+        $(RR_CFLAGS)                                \
+        $(CODE_COVERAGE_CFLAGS)
 
-libr2inference_@RR_PACKAGE_VERSION@_la_CXXFLAGS = 	\
-	$(RR_CXXFLAGS)					\
-	$(CODE_COVERAGE_CXXFLAGS)
+libr2inference_@RR_PACKAGE_VERSION@_la_CXXFLAGS =   \
+        $(RR_CXXFLAGS)                              \
+        $(CODE_COVERAGE_CXXFLAGS)
 
-libr2inference_@RR_PACKAGE_VERSION@_la_LIBADD = 	\
-	$(RR_LIBS)					\
-	$(CODE_COVERAGE_LIBS)
+libr2inference_@RR_PACKAGE_VERSION@_la_LIBADD =     \
+        $(RR_LIBS)                                  \
+        $(CODE_COVERAGE_LIBS)
 
-r2iinclude_HEADERS =		\
-	frameworkmeta.h		\
-	frameworks.h		\
-	iengine.h		\
-	iframe.h		\
-	iframeworkfactory.h	\
-	iloader.h		\
-	imageformat.h		\
-	imodel.h		\
-	iparameters.h		\
-	iprediction.h		\
-	parametermeta.h		\
-	r2i.h			\
-	runtimeerror.h
+r2iinclude_HEADERS =         \
+        frameworkmeta.h      \
+        frameworks.h         \
+        iengine.h            \
+        iframe.h             \
+        iframeworkfactory.h  \
+        iloader.h            \
+        imageformat.h        \
+        imodel.h             \
+        iparameters.h        \
+        iprediction.h        \
+        parametermeta.h      \
+        r2i.h                \
+        runtimeerror.h
 
 
 if HAVE_NCSDK
-libr2inference_@RR_PACKAGE_VERSION@_la_LIBADD += 	\
-	$(top_builddir)/r2i/ncsdk/libncsdk.la
+libr2inference_@RR_PACKAGE_VERSION@_la_LIBADD +=    \
+        $(top_builddir)/r2i/ncsdk/libncsdk.la
 endif
 
 if HAVE_TENSORFLOW
-libr2inference_@RR_PACKAGE_VERSION@_la_LIBADD += 	\
-	$(top_builddir)/r2i/tensorflow/libtf.la
+libr2inference_@RR_PACKAGE_VERSION@_la_LIBADD +=    \
+        $(top_builddir)/r2i/tensorflow/libtf.la
 endif
