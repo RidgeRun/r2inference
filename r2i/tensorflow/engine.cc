@@ -105,6 +105,11 @@ RuntimeError Engine::Start ()  {
     return error;
   }
 
+  error = this->model->Start("Tensorflow");
+  if (error.IsError ()) {
+    return error;
+  }
+
   this->session = session;
   this->state = State::STARTED;
 

@@ -49,7 +49,9 @@ class Parameters : public IParameters {
 
  private:
   std::shared_ptr<Engine> engine;
-  std::shared_ptr<IModel> model;
+  std::shared_ptr<Model> model;
+
+  friend class Accessor;
 
   class Accessor {
    public:
@@ -83,6 +85,32 @@ class Parameters : public IParameters {
 
     RuntimeError Get () {
       this->value = TF_Version ();
+      return RuntimeError ();
+    }
+  };
+
+  class InputLayerAccessor : public StringAccessor {
+   public:
+    InputLayerAccessor (Parameters *target) : StringAccessor(target) {}
+    RuntimeError Set () {
+      return target->model->SetInputLayerName(this->value);
+    }
+
+    RuntimeError Get () {
+      this->value = target->model->GetInputLayerName();
+      return RuntimeError ();
+    }
+  };
+
+  class OutputLayerAccessor : public StringAccessor {
+   public:
+    OutputLayerAccessor (Parameters *target) : StringAccessor(target) {}
+    RuntimeError Set () {
+      return target->model->SetOutputLayerName(this->value);
+    }
+
+    RuntimeError Get () {
+      this->value = target->model->GetOutputLayerName();
       return RuntimeError ();
     }
   };

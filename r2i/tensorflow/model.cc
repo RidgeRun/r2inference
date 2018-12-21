@@ -26,6 +26,40 @@ Model::Model () {
 RuntimeError Model::Start (const std::string &name) {
   RuntimeError error;
 
+  if (this->input_layer_name.empty()) {
+    error.Set (RuntimeError::Code::NULL_PARAMETER,
+               "Input layer name has not been set");
+    return error;
+  }
+
+  if (this->output_layer_name.empty()) {
+    error.Set (RuntimeError::Code::NULL_PARAMETER,
+               "Output layer name has not been set");
+    return error;
+  }
+
+  TF_Graph *graph = this->graph.get();
+
+  TF_Operation *in_operation = nullptr;
+  in_operation = TF_GraphOperationByName(graph, this->input_layer_name.c_str ());
+  if (nullptr == in_operation) {
+    error.Set (RuntimeError::Code::INVALID_FRAMEWORK_PARAMETER,
+               "No valid input node provided");
+    return error;
+  }
+
+  TF_Operation *out_operation = nullptr;
+  out_operation = TF_GraphOperationByName(graph,
+                                          this->output_layer_name.c_str ());
+  if (nullptr == out_operation) {
+    error.Set (RuntimeError::Code::INVALID_FRAMEWORK_PARAMETER,
+               "No valid output node provided");
+    return error;
+  }
+
+  this->in_operation = in_operation;
+  this->out_operation = out_operation;
+
   return error;
 }
 
@@ -74,18 +108,6 @@ RuntimeError Model::Load (std::shared_ptr<TF_Buffer> pbuffer) {
     return error;
   }
 
-  if (this->input_layer_name.empty()) {
-    error.Set (RuntimeError::Code::NULL_PARAMETER,
-               "Input layer name has not been set");
-    return error;
-  }
-
-  if (this->output_layer_name.empty()) {
-    error.Set (RuntimeError::Code::NULL_PARAMETER,
-               "Output layer name has not been set");
-    return error;
-  }
-
   std::shared_ptr<TF_Status> pstatus (TF_NewStatus (), TF_DeleteStatus);
   std::shared_ptr<TF_Graph> pgraph (TF_NewGraph (), TF_DeleteGraph);
   std::shared_ptr<TF_ImportGraphDefOptions> pgopts (TF_NewImportGraphDefOptions(),
@@ -104,27 +126,9 @@ RuntimeError Model::Load (std::shared_ptr<TF_Buffer> pbuffer) {
     return error;
   }
 
-  TF_Operation *in_operation = nullptr;
-  in_operation = TF_GraphOperationByName(graph, this->input_layer_name.c_str ());
-  if (nullptr == in_operation) {
-    error.Set (RuntimeError::Code::INVALID_FRAMEWORK_PARAMETER,
-               "No valid input node provided");
-    return error;
-  }
-
-  TF_Operation *out_operation = nullptr;
-  out_operation = TF_GraphOperationByName(graph,
-                                          this->output_layer_name.c_str ());
-  if (nullptr == out_operation) {
-    error.Set (RuntimeError::Code::INVALID_FRAMEWORK_PARAMETER,
-               "No valid output node provided");
-    return error;
-  }
-
   this->buffer = pbuffer;
   this->graph = pgraph;
-  this->in_operation = in_operation;
-  this->out_operation = out_operation;
+
 
   return error;
 }

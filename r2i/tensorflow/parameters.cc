@@ -38,6 +38,16 @@ Parameters::Parameters () :
         r2i::ParameterMeta::Flags::READ,
         r2i::ParameterMeta::Type::STRING,
         std::make_shared<VersionAccessor>(this)),
+
+  /* Model parameters */
+  PARAM("input-layer", "Name of the input layer in the graph",
+        r2i::ParameterMeta::Flags::READWRITE,
+        r2i::ParameterMeta::Type::STRING,
+        std::make_shared<InputLayerAccessor>(this)),
+  PARAM("output-layer", "Name of the output layer in the graph",
+        r2i::ParameterMeta::Flags::READWRITE,
+        r2i::ParameterMeta::Type::STRING,
+        std::make_shared<OutputLayerAccessor>(this)),
 }) {
 }
 
@@ -169,7 +179,7 @@ RuntimeError Parameters::Set (const std::string &in_parameter,
   RuntimeError error;
 
   ParamDesc param = this->Validate (in_parameter,
-                                    r2i::ParameterMeta::Type::STRING, "string", error);
+                                    r2i::ParameterMeta::Type::STRING, std::string ("string"), error);
   if (error.IsError ()) {
     return error;
   }
