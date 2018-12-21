@@ -18,30 +18,33 @@
 #include <r2i/imodel.h>
 #include <r2i/runtimeerror.h>
 
-namespace r2i
-{
-namespace tensorflow
-{
+namespace r2i {
+namespace tensorflow {
 
-class Model : public IModel
-{
-public:
+class Model : public IModel {
+ public:
   Model ();
 
   RuntimeError Start (const std::string &name) override;
 
   std::shared_ptr<TF_Graph> GetGraph ();
   std::shared_ptr<TF_Buffer> GetBuffer ();
-  TF_Operation * GetInputOperation ();
-  TF_Operation * GetOutputOperation ();
+  TF_Operation *GetInputOperation ();
+  TF_Operation *GetOutputOperation ();
+  RuntimeError SetInputLayerName (const std::string &name);
+  RuntimeError SetOutputLayerName (const std::string &name);
+  const std::string GetInputLayerName ();
+  const std::string GetOutputLayerName ();
 
   RuntimeError Load (std::shared_ptr<TF_Buffer> buffer);
 
-private:
+ private:
   std::shared_ptr<TF_Graph> graph;
   std::shared_ptr<TF_Buffer> buffer;
-  TF_Operation * in_operation;
-  TF_Operation * out_operation;
+  TF_Operation *in_operation;
+  TF_Operation *out_operation;
+  std::string input_layer_name;
+  std::string output_layer_name;
 };
 
 }

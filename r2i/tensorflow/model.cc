@@ -19,6 +19,8 @@ Model::Model () {
   this->buffer = nullptr;
   this->out_operation = nullptr;
   this->in_operation = nullptr;
+  this->input_layer_name.clear ();
+  this->output_layer_name.clear ();
 }
 
 RuntimeError Model::Start (const std::string &name) {
@@ -43,12 +45,44 @@ TF_Operation *Model::GetOutputOperation () {
   return this->out_operation;
 }
 
+RuntimeError Model::SetInputLayerName (const std::string &name) {
+  this->input_layer_name = name;
+
+  return RuntimeError ();
+}
+
+RuntimeError Model::SetOutputLayerName (const std::string &name) {
+  this->output_layer_name = name;
+
+  return RuntimeError ();
+}
+
+const std::string Model::GetInputLayerName () {
+  return this->input_layer_name;
+}
+
+const std::string Model::GetOutputLayerName () {
+  return this->output_layer_name;
+}
+
 RuntimeError Model::Load (std::shared_ptr<TF_Buffer> pbuffer) {
   RuntimeError error;
 
   if (nullptr != buffer) {
     error.Set (RuntimeError::Code::NULL_PARAMETER,
                "Trying to load model with null buffer");
+    return error;
+  }
+
+  if (this->input_layer_name.empty()) {
+    error.Set (RuntimeError::Code::NULL_PARAMETER,
+               "Input layer name has not been set");
+    return error;
+  }
+
+  if (this->output_layer_name.empty()) {
+    error.Set (RuntimeError::Code::NULL_PARAMETER,
+               "Output layer name has not been set");
     return error;
   }
 
@@ -71,7 +105,7 @@ RuntimeError Model::Load (std::shared_ptr<TF_Buffer> pbuffer) {
   }
 
   TF_Operation *in_operation = nullptr;
-  in_operation = TF_GraphOperationByName(graph, "input");
+  in_operation = TF_GraphOperationByName(graph, this->input_layer_name.c_str ());
   if (nullptr == in_operation) {
     error.Set (RuntimeError::Code::INVALID_FRAMEWORK_PARAMETER,
                "No valid input node provided");
@@ -80,7 +114,7 @@ RuntimeError Model::Load (std::shared_ptr<TF_Buffer> pbuffer) {
 
   TF_Operation *out_operation = nullptr;
   out_operation = TF_GraphOperationByName(graph,
-                                          "InceptionV4/Logits/Predictions");
+                                          this->output_layer_name.c_str ());
   if (nullptr == out_operation) {
     error.Set (RuntimeError::Code::INVALID_FRAMEWORK_PARAMETER,
                "No valid output node provided");
