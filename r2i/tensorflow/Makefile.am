@@ -21,8 +21,8 @@ libtf_la_SOURCES =               \
     frameworkfactory.cc          \
     loader.cc                    \
     model.cc                     \
+    parameters.cc                \
     prediction.cc
-
 
 libtf_la_CPPFLAGS =              \
     $(RR_CPPFLAGS)               \
@@ -49,6 +49,7 @@ tensorflowinclude_HEADERS =      \
     frameworkfactory.h           \
     loader.h                     \
     model.h                      \
+    parameters.h                 \
     prediction.h
 
 endif # HAVE_TENSORFLOW

@@ -16,6 +16,7 @@
 #include "loader.h"
 #include "engine.h"
 #include "frame.h"
+#include "parameters.h"
 
 namespace r2i {
 namespace tensorflow {
@@ -38,7 +39,7 @@ std::unique_ptr<r2i::IParameters> FrameworkFactory::MakeParameters (
   RuntimeError &error) {
   error.Clean ();
 
-  return nullptr;
+  return std::unique_ptr<IParameters> (new Parameters);
 }
 
 std::unique_ptr<r2i::IFrame> FrameworkFactory::MakeFrame (
