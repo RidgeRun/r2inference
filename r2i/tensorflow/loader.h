@@ -16,16 +16,13 @@
 #include <r2i/imodel.h>
 #include <r2i/tensorflow/model.h>
 
-namespace r2i
-{
-namespace tensorflow
-{
+namespace r2i {
+namespace tensorflow {
 
-class Loader : public ILoader
-{
-public:
+class Loader : public ILoader {
+ public:
   virtual std::shared_ptr<r2i::IModel> Load (const std::string &in_path,
-    r2i::RuntimeError &error) override;
+      r2i::RuntimeError &error) override;
 };
 
 }

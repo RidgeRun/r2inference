@@ -16,20 +16,17 @@
 
 #include <r2i/iframe.h>
 
-namespace r2i
-{
-namespace tensorflow
-{
+namespace r2i {
+namespace tensorflow {
 
-class Frame : public IFrame
-{
-public:
+class Frame : public IFrame {
+ public:
   Frame ();
 
-  RuntimeError Configure (void * in_data, int width,
-    int height, r2i::ImageFormat::Id format) override;
+  RuntimeError Configure (void *in_data, int width,
+                          int height, r2i::ImageFormat::Id format) override;
 
-  void * GetData () override;
+  void *GetData () override;
 
   int GetWidth () override;
 
@@ -38,20 +35,21 @@ public:
   ImageFormat GetFormat () override;
 
   std::shared_ptr<TF_Tensor> GetTensor (std::shared_ptr<TF_Graph> graph,
-					TF_Operation *operation, RuntimeError &error);
+                                        TF_Operation *operation, RuntimeError &error);
 
-private:
-  float * frame_data;
+ private:
+  float *frame_data;
   int frame_width;
   int frame_height;
   ImageFormat frame_format;
   std::shared_ptr<TF_Tensor> tensor;
 
-  RuntimeError GetTensorShape (std::shared_ptr<TF_Graph> graph, TF_Operation *operation,
-			       TF_DataType &type, int64_t **dims,
-			       int64_t &num_dims, int64_t &size);
+  RuntimeError GetTensorShape (std::shared_ptr<TF_Graph> graph,
+                               TF_Operation *operation,
+                               TF_DataType &type, int64_t **dims,
+                               int64_t &num_dims, int64_t &size);
   RuntimeError CreateTensor (TF_DataType type, int64_t dims[], int64_t num_dims,
-			     int64_t size);
+                             int64_t size);
   RuntimeError Validate (int64_t dims[], int64_t num_dims);
 };
 

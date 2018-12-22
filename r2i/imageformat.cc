@@ -41,7 +41,7 @@ std::pair<const std::string, int> search (ImageFormat::Id id) {
   if (format_descriptors.end () == search) {
     search = format_descriptors.find (ImageFormat::Id::UNKNOWN_FORMAT);
   }
-  return search->second;  
+  return search->second;
 }
 
 const std::string ImageFormat::GetDescription () {
