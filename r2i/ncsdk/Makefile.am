@@ -15,44 +15,44 @@ noinst_LTLIBRARIES = libncsdk.la
 # Define a custom area for our headers
 ncsdkincludedir = @R2IINCLUDEDIR@/r2i/ncsdk
 
-libncsdk_la_SOURCES =			\
-	parameters.cc			\
-	parameteraccessors.cc		\
-	model.cc			\
-	loader.cc			\
-	engine.cc			\
-	frame.cc			\
-	prediction.cc			\
-	statuscodes.cc			\
-	frameworkfactory.cc
+libncsdk_la_SOURCES =               \
+        parameters.cc               \
+        parameteraccessors.cc       \
+        model.cc                    \
+        loader.cc                   \
+        engine.cc                   \
+        frame.cc                    \
+        prediction.cc               \
+        statuscodes.cc              \
+        frameworkfactory.cc
 
-libncsdk_la_CPPFLAGS = 			\
-	$(RR_CPPFLAGS)			\
-	$(CODE_COVERAGE_CPPFLAGS)
+libncsdk_la_CPPFLAGS =              \
+        $(RR_CPPFLAGS)              \
+        $(CODE_COVERAGE_CPPFLAGS)
 
-libncsdk_la_CFLAGS = 			\
-	$(RR_CFLAGS)			\
-	$(NCSDK_CFLAGS)			\
-	$(CODE_COVERAGE_CFLAGS)
+libncsdk_la_CFLAGS =                \
+        $(RR_CFLAGS)                \
+        $(NCSDK_CFLAGS)             \
+        $(CODE_COVERAGE_CFLAGS)
 
-libncsdk_la_CXXFLAGS = 			\
-	$(RR_CXXFLAGS)			\
-	$(NCSDK_CFLAGS)			\
-	$(CODE_COVERAGE_CXXFLAGS)
+libncsdk_la_CXXFLAGS =              \
+        $(RR_CXXFLAGS)              \
+        $(NCSDK_CFLAGS)             \
+        $(CODE_COVERAGE_CXXFLAGS)
 
-libncsdk_la_LIBADD = 			\
-	$(RR_LIBS)			\
-	$(NCSDK_LIBS)			\
-	$(CODE_COVERAGE_LIBS)
+libncsdk_la_LIBADD =                \
+        $(RR_LIBS)                  \
+        $(NCSDK_LIBS)               \
+        $(CODE_COVERAGE_LIBS)
 
-ncsdkinclude_HEADERS =			\
-	parameters.h			\
-	parameteraccessors.h		\
-	model.h				\
-	loader.h			\
-	engine.h 			\
-	prediction.h			\
-	frame.h				\
-	frameworkfactory.h
+ncsdkinclude_HEADERS =              \
+        parameters.h                \
+        parameteraccessors.h        \
+        model.h                     \
+        loader.h                    \
+        engine.h                    \
+        prediction.h                \
+        frame.h                     \
+        frameworkfactory.h
 
 endif # HAVE_NCSDK

@@ -65,6 +65,7 @@ tests/unit/r2i/ncsdk/model
 tests/unit/r2i/ncsdk/prediction
 tests/unit/r2i/ncsdk/parameters
 tests/unit/r2i/ncsdk/frameworkfactory
+tests/unit/r2i/tensorflow/loader
 
 # rr-build-utils configuration files
 .rrconfig
@@ -75,7 +76,9 @@ cscope.files
 cscope.out
 
 # Examples
+examples/external/list-backends
 examples/r2i/list_parameters
 examples/r2i/ncsdk/googlenet
 examples/r2i/ncsdk/tinyyolo
-examples/external/list-backends
+examples/r2i/tensorflow/googlenet
+

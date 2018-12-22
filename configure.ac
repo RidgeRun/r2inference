@@ -12,6 +12,9 @@
 AC_PREREQ([2.69])
 AC_INIT([RidgeRun inference library],[0.1.0],[https://github.com/RidgeRun/r2inference/issues],[r2inference])
 
+# Initialize our build utils
+RR_INIT
+
 # Initialize automake.
 AM_INIT_AUTOMAKE([1.14 no-dist-gzip dist-xz tar-ustar foreign])
 
@@ -20,9 +23,6 @@ LT_INIT
 
 # Checks for programs.
 AC_PROG_LN_S
-
-# Initialize our build utils
-RR_INIT
 
 # Allow the user to fine-tune project build
 RR_ENABLE_TESTS
@@ -46,6 +46,9 @@ AC_CONFIG_HEADER([config.h])
 RR_CHECK_FEATURE_LIB(NCSDK, NCSDK Installation,
                      mvnc, ncGlobalSetOption, mvnc.h, no)
 
+RR_CHECK_FEATURE_LIB(TENSORFLOW, TensorFlow Installation,
+                     tensorflow, TF_Version, tensorflow/c/c_api.h, no)
+
 # Our Include path, to be shared in multiple makefiles
 AC_SUBST([R2IINCLUDEDIR],[$includedir/r2inference-$RR_PACKAGE_VERSION/])
 
@@ -58,14 +61,17 @@ docs/uml/Makefile
 examples/Makefile
 examples/r2i/Makefile
 examples/r2i/ncsdk/Makefile
+examples/r2i/tensorflow/Makefile
 r2i/Makefile
 r2i/ncsdk/Makefile
+r2i/tensorflow/Makefile
 r2inference-${RR_PACKAGE_VERSION}.pc:r2inference.pc.in
 tests/Makefile
 tests/acceptance/Makefile
 tests/unit/Makefile
 tests/unit/r2i/Makefile
 tests/unit/r2i/ncsdk/Makefile
+tests/unit/r2i/tensorflow/Makefile
 ])
 
 AC_OUTPUT
