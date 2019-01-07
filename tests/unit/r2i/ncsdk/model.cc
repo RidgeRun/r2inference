@@ -94,16 +94,20 @@ TEST (NcsdkModel, SetGetDataSize) {
   LONGS_EQUAL (SIZE_TEST, model.GetDataSize());
 }
 
+static void _free (void *data) {
+  free (data);
+}
+
 TEST (NcsdkModel, SetGetData) {
-  std::shared_ptr<void> setdata(malloc(SIZE_TEST), free);
+  std::shared_ptr<void> setdata(malloc(SIZE_TEST), _free);
   model.SetData (setdata);
   std::shared_ptr<void> getdata = model.GetData();
   CHECK (setdata == getdata);
 }
 
 TEST (NcsdkModel, SetGetDataOverride) {
-  std::shared_ptr<void> setdata1(malloc(SIZE_TEST), free);
-  std::shared_ptr<void> setdata2(malloc(SIZE_TEST), free);
+  std::shared_ptr<void> setdata1(malloc(SIZE_TEST), _free);
+  std::shared_ptr<void> setdata2(malloc(SIZE_TEST), _free);
   model.SetData (setdata1);
   model.SetData (setdata2);
   std::shared_ptr<void> getdata = model.GetData();
