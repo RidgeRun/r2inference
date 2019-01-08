@@ -13,6 +13,7 @@
 #include <r2i/r2i.h>
 #include <r2i/ncsdk/prediction.h>
 #include <fstream>
+#include <cstring>
 
 #include <CppUTest/CommandLineTestRunner.h>
 #include <CppUTest/MemoryLeakDetectorNewMacros.h>
@@ -21,11 +22,13 @@
 
 TEST_GROUP (NcsdkPrediction) {
   r2i::ncsdk::Prediction prediction;
-  float *data;
+  std::shared_ptr<float> data;
   float matrix[3] = {0.2, 0.4, 0.6};
 
   void setup () {
-    data = matrix;
+    data = std::shared_ptr<float> (static_cast<float *> (malloc (sizeof (matrix))),
+                                   free);
+    memcpy (data.get (), matrix, sizeof (matrix));
   }
 
   void teardown () {

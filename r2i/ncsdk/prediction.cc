@@ -28,7 +28,7 @@ unsigned int Prediction::GetResultSize () {
 }
 
 void *Prediction::GetResultData () {
-  return this->result_data;
+  return this->result_data.get ();
 }
 
 double Prediction::At (unsigned int index,  RuntimeError &error) {
@@ -57,16 +57,14 @@ double Prediction::At (unsigned int index,  RuntimeError &error) {
 
 }
 
-RuntimeError Prediction::SetResult (float *data, unsigned int size) {
+RuntimeError Prediction::SetResult (std::shared_ptr<float> data,
+                                    unsigned int size) {
   RuntimeError error;
 
   if (nullptr == data) {
     error.Set (RuntimeError::Code::NULL_PARAMETER,
                "Trying to assign a null value as presdiction result");
     return error;
-  }
-  if (nullptr != this->result_data) {
-    free(this->result_data);
   }
   this->result_data = data;
   this->result_size = size;

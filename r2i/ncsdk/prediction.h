@@ -12,6 +12,9 @@
 #define R2I_NCSDK_PREDICTION_H
 
 #include <r2i/iprediction.h>
+
+#include <memory>
+
 #include <r2i/runtimeerror.h>
 
 namespace r2i {
@@ -24,10 +27,10 @@ class Prediction: public IPrediction {
   void *GetResultData () override;
   unsigned int GetResultSize () override;
 
-  r2i::RuntimeError SetResult (float *data, unsigned int size);
+  r2i::RuntimeError SetResult (std::shared_ptr<float> data, unsigned int size);
 
  private:
-  float *result_data;
+  std::shared_ptr<float> result_data;
   unsigned int result_size;
 };
 
