@@ -307,6 +307,7 @@ std::shared_ptr<r2i::IPrediction> Engine::Predict (std::shared_ptr<r2i::IFrame>
   ncFifoHandle_t *output_buffers_ptr;
   ncGraphHandle_t *model_handle;
   void *userParam;
+  std::shared_ptr<float> presult;
   float *result;
   float *data;
   Status engine_status;
@@ -374,14 +375,16 @@ std::shared_ptr<r2i::IPrediction> Engine::Predict (std::shared_ptr<r2i::IFrame>
     goto exit;
   }
 
-  result = static_cast<float *>(malloc(output_data_size));
+  presult = std::shared_ptr<float> (static_cast<float *> (malloc (
+                                      output_data_size)), free);
 
-  if (nullptr == result) {
+  if (nullptr == presult) {
     error.Set (RuntimeError::Code::UNKNOWN_ERROR,
                "Can't alloc data for inference results");
     goto engine_error;
   }
 
+  result = presult.get ();
 
   ret = ncFifoReadElem(output_buffers_ptr,
                        result, &output_data_size,
@@ -394,7 +397,7 @@ std::shared_ptr<r2i::IPrediction> Engine::Predict (std::shared_ptr<r2i::IFrame>
 
   }
 
-  error = prediction->SetResult(result, output_data_size);
+  error = prediction->SetResult(presult, output_data_size);
   if (RuntimeError::Code::EOK != error.GetCode()) {
     goto exit;
   }
