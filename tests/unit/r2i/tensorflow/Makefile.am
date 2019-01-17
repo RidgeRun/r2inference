@@ -53,4 +53,13 @@ AM_LDFLAGS =                        \
         $(CODE_COVERAGE_LIBS)       \
         $(top_builddir)/r2i/libr2inference-@RR_PACKAGE_VERSION@.la
 
+COMMON_SOURCES = \
+	@top_srcdir@/r2i/runtimeerror.cc
+
+loader_SOURCES =                              \
+        loader.cc                             \
+        @top_srcdir@/r2i/tensorflow/loader.cc \
+        $(COMMON_SOURCES)
+
+
 CLEANFILES = cpputest_*.xml
