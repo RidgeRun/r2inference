@@ -19,9 +19,10 @@
 namespace mock {
 class Model : public r2i::IModel {
  public:
+  Model () {}
   r2i::RuntimeError Start (const std::string &name) {
     return r2i::RuntimeError();
-  };
+  }
 };
 
 class Engine : public r2i::IEngine {
@@ -36,12 +37,47 @@ class Engine : public r2i::IEngine {
     return r2i::RuntimeError();
   };
   virtual std::shared_ptr<r2i::IPrediction> Predict (std::shared_ptr<r2i::IFrame>
-      in_frame, r2i::RuntimeError &error) {
-    std::shared_ptr<r2i::IPrediction> prediction(new r2i::tensorflow::Prediction);
-    return prediction;
-  }
+      in_frame, r2i::RuntimeError &error) { return nullptr; }
 };
 }
+
+namespace r2i {
+namespace tensorflow {
+Model::Model () { }
+
+RuntimeError Model::Start (const std::string &name) { return RuntimeError(); }
+
+RuntimeError Model::Load (std::shared_ptr<TF_Buffer> pbuffer) {
+  this->buffer = pbuffer;
+  return RuntimeError();
+}
+
+std::shared_ptr<TF_Graph> Model::GetGraph () {return this->graph;}
+std::shared_ptr<TF_Buffer> Model::GetBuffer () {return this->buffer;}
+TF_Operation *Model::GetInputOperation () { return nullptr; }
+TF_Operation *Model::GetOutputOperation () { return nullptr; }
+RuntimeError Model::SetInputLayerName (const std::string &name) {
+  this->input_layer_name = name;
+  return RuntimeError();
+}
+RuntimeError Model::SetOutputLayerName (const std::string &name) {
+  this->output_layer_name = name;
+  return RuntimeError();
+}
+const std::string Model::GetInputLayerName () { return this->input_layer_name; }
+const std::string Model::GetOutputLayerName () { return this->output_layer_name; }
+
+Engine::Engine ()  { }
+RuntimeError Engine::SetModel (std::shared_ptr<IModel> in_model) { return RuntimeError(); }
+RuntimeError Engine::Start () { return RuntimeError(); }
+RuntimeError Engine::Stop () { return RuntimeError(); }
+std::shared_ptr<IPrediction> Engine::Predict (std::shared_ptr<IFrame> in_frame,
+    RuntimeError &error) { return nullptr; }
+Engine::~Engine () { }
+
+}
+}
+
 
 TEST_GROUP (TensorflowParameters) {
 };
