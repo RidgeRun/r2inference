@@ -42,7 +42,7 @@ Parameters::Parameters () :
   parameter_map ({
   /* Global parameters */
   PARAM("log-level", "NCSDK debug log level",
-        r2i::ParameterMeta::Flags::READWRITE,
+        r2i::ParameterMeta::Flags::READWRITE | r2i::ParameterMeta::Flags::WRITE_BEFORE_START,
         r2i::ParameterMeta::Type::INTEGER, NC_RW_LOG_LEVEL,
         &r2i::ncsdk::SetParameterGlobal,
         &r2i::ncsdk::GetParameterGlobal),

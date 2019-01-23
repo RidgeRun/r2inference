@@ -38,6 +38,12 @@ struct ParameterMeta {
     WRITE = 1 << 1,
 
     /**
+     * The parameter can be written before the engine interface
+     * start method is called
+     */
+    WRITE_BEFORE_START = 1 << 2,
+
+    /**
      * The parameter may be read and written. Equivalent to the
      * bitwise OR of READ and WRITE.
      */
