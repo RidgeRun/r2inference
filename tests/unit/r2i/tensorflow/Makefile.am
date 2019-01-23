@@ -14,7 +14,8 @@ if ENABLE_TESTS
 if HAVE_TENSORFLOW
 
 TESTS =         \
-        loader
+        loader  \
+        parameters
 
 
 check_PROGRAMS=$(TESTS)
@@ -54,10 +55,15 @@ AM_LDFLAGS =                        \
         $(top_builddir)/r2i/libr2inference-@RR_PACKAGE_VERSION@.la
 
 COMMON_SOURCES = \
-	@top_srcdir@/r2i/runtimeerror.cc
+        @top_srcdir@/r2i/runtimeerror.cc
 
 loader_SOURCES =                              \
         loader.cc                             \
+        @top_srcdir@/r2i/tensorflow/loader.cc \
+        $(COMMON_SOURCES)
+
+parameters_SOURCES =                          \
+        parameters.cc                         \
         @top_srcdir@/r2i/tensorflow/loader.cc \
         $(COMMON_SOURCES)
 
