@@ -50,7 +50,7 @@ aminclude_static.am
 *.gcda
 *.gcno
 
-# Tests 
+# Tests
 test-driver
 *.xml
 *.log
@@ -69,6 +69,7 @@ tests/unit/r2i/tensorflow/loader
 tests/unit/r2i/tensorflow/engine
 tests/unit/r2i/tensorflow/parameters
 tests/unit/r2i/tensorflow/model
+tests/unit/r2i/tensorflow/prediction
 
 # rr-build-utils configuration files
 .rrconfig
@@ -84,4 +85,3 @@ examples/r2i/list_parameters
 examples/r2i/ncsdk/googlenet
 examples/r2i/ncsdk/tinyyolo
 examples/r2i/tensorflow/googlenet
-

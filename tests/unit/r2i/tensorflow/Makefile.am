@@ -17,7 +17,8 @@ TESTS =            \
         loader     \
         parameters \
         engine     \
-        model
+        model      \
+        prediction
 
 check_PROGRAMS=$(TESTS)
 
@@ -54,28 +55,33 @@ AM_LDFLAGS =                        \
         $(TESTS_LIBS)               \
         $(CODE_COVERAGE_LIBS)
 
-COMMON_SOURCES = \
-        @top_srcdir@/r2i/runtimeerror.cc          \
+COMMON_SOURCES =                                   \
+        @top_srcdir@/r2i/runtimeerror.cc           \
         @top_srcdir@/r2i/imageformat.cc
 
-loader_SOURCES =                                  \
-        loader.cc                                 \
-        @top_srcdir@/r2i/tensorflow/loader.cc     \
+loader_SOURCES =                                   \
+        loader.cc                                  \
+        @top_srcdir@/r2i/tensorflow/loader.cc      \
         $(COMMON_SOURCES)
 
-parameters_SOURCES =                              \
-        parameters.cc                             \
-        @top_srcdir@/r2i/tensorflow/parameters.cc \
+parameters_SOURCES =                               \
+        parameters.cc                              \
+        @top_srcdir@/r2i/tensorflow/parameters.cc  \
         $(COMMON_SOURCES)
 
-engine_SOURCES =                                  \
-        engine.cc                                 \
-        @top_srcdir@/r2i/tensorflow/engine.cc     \
+engine_SOURCES =                                   \
+        engine.cc                                  \
+        @top_srcdir@/r2i/tensorflow/engine.cc      \
         $(COMMON_SOURCES)
 
-model_SOURCES =                                  \
-        model.cc                                 \
-        @top_srcdir@/r2i/tensorflow/model.cc     \
+model_SOURCES =                                   \
+        model.cc                                  \
+        @top_srcdir@/r2i/tensorflow/model.cc      \
+        $(COMMON_SOURCES)
+
+prediction_SOURCES =                              \
+        prediction.cc                             \
+        @top_srcdir@/r2i/tensorflow/prediction.cc \
         $(COMMON_SOURCES)
 
 CLEANFILES = cpputest_*.xml
