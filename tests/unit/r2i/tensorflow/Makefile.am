@@ -16,7 +16,8 @@ if HAVE_TENSORFLOW
 TESTS =            \
         loader     \
         parameters \
-        engine
+        engine     \
+        model
 
 check_PROGRAMS=$(TESTS)
 
@@ -70,6 +71,11 @@ parameters_SOURCES =                              \
 engine_SOURCES =                                  \
         engine.cc                                 \
         @top_srcdir@/r2i/tensorflow/engine.cc     \
+        $(COMMON_SOURCES)
+
+model_SOURCES =                                  \
+        model.cc                                 \
+        @top_srcdir@/r2i/tensorflow/model.cc     \
         $(COMMON_SOURCES)
 
 CLEANFILES = cpputest_*.xml
