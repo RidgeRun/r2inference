@@ -18,7 +18,8 @@ TESTS =            \
         parameters \
         engine     \
         model      \
-        prediction
+        prediction \
+        frame
 
 check_PROGRAMS=$(TESTS)
 
@@ -82,6 +83,11 @@ model_SOURCES =                                   \
 prediction_SOURCES =                              \
         prediction.cc                             \
         @top_srcdir@/r2i/tensorflow/prediction.cc \
+        $(COMMON_SOURCES)
+
+frame_SOURCES =                              \
+        frame.cc                             \
+        @top_srcdir@/r2i/tensorflow/frame.cc \
         $(COMMON_SOURCES)
 
 CLEANFILES = cpputest_*.xml

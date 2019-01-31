@@ -70,6 +70,7 @@ tests/unit/r2i/tensorflow/engine
 tests/unit/r2i/tensorflow/parameters
 tests/unit/r2i/tensorflow/model
 tests/unit/r2i/tensorflow/prediction
+tests/unit/r2i/tensorflow/frame
 
 # rr-build-utils configuration files
 .rrconfig
