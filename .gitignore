@@ -26,6 +26,7 @@ m4/
 .libs/
 stamp-h*
 r2inference-*.pc
+*.dirstamp
 
 # Build outputs
 .deps/
@@ -71,6 +72,7 @@ tests/unit/r2i/tensorflow/parameters
 tests/unit/r2i/tensorflow/model
 tests/unit/r2i/tensorflow/prediction
 tests/unit/r2i/tensorflow/frame
+tests/unit/r2i/tensorflow/frameworkfactory
 
 # rr-build-utils configuration files
 .rrconfig

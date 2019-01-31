@@ -13,13 +13,14 @@ AM_DEFAULT_SOURCE_EXT = .cc
 if ENABLE_TESTS
 if HAVE_TENSORFLOW
 
-TESTS =            \
-        loader     \
-        parameters \
-        engine     \
-        model      \
-        prediction \
-        frame
+TESTS =                 \
+        model           \
+        loader          \
+        engine          \
+        prediction      \
+        frame           \
+        parameters      \
+        frameworkfactory
 
 check_PROGRAMS=$(TESTS)
 
@@ -54,7 +55,9 @@ AM_LDFLAGS =                        \
         $(RR_LIBS)                  \
         $(TENSORFLOW_LIBS)          \
         $(TESTS_LIBS)               \
-        $(CODE_COVERAGE_LIBS)
+        $(CODE_COVERAGE_LIBS)       \
+        $(top_builddir)/r2i/libr2inference-@RR_PACKAGE_VERSION@.la
+
 
 COMMON_SOURCES =                                   \
         @top_srcdir@/r2i/runtimeerror.cc           \
