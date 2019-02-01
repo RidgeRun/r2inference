@@ -78,7 +78,6 @@ Engine::~Engine () { }
 }
 }
 
-
 TEST_GROUP (TensorflowParameters) {
 };
 
@@ -321,7 +320,6 @@ TEST (TensorflowParameters, GetList) {
 
   LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
 }
-
 
 int main (int ac, char **av) {
   return CommandLineTestRunner::RunAllTests (ac, av);

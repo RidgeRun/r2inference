@@ -57,7 +57,6 @@ TEST_GROUP (TensorflowPrediction) {
   TF_Operation *poperation;
   std::shared_ptr<TF_Tensor> pout_tensor;
 
-
   int64_t raw_input_dims[1] = {INPUTS};
 
   void setup () {

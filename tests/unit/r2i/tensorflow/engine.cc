@@ -127,7 +127,6 @@ TEST (TensorflowEngine, StartEngineEmpty) {
   LONGS_EQUAL (r2i::RuntimeError::Code::NULL_PARAMETER, error.GetCode ());
 }
 
-
 TEST (TensorflowEngine, StartEngineTwice) {
   r2i::RuntimeError error;
 
@@ -170,7 +169,6 @@ TEST (TensorflowEngine, StartStopEngineTwice) {
   LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
 }
 
-
 TEST (TensorflowEngine, StopEngine) {
   r2i::RuntimeError error;
 
@@ -181,7 +179,6 @@ TEST (TensorflowEngine, StopEngine) {
   LONGS_EQUAL (r2i::RuntimeError::Code::WRONG_ENGINE_STATE, error.GetCode ());
 
 }
-
 
 TEST (TensorflowEngine, StopStopEngine) {
   r2i::RuntimeError error;
