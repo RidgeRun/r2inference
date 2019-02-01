@@ -82,11 +82,13 @@ std::shared_ptr<TF_Tensor> Frame::GetTensor (std::shared_ptr<TF_Graph> graph,
 
   error = this->Validate (dims, num_dims);
   if (error.IsError ()) {
+    delete []dims;
     return nullptr;
   }
 
   error = this->CreateTensor (type, dims, num_dims, size);
   if (error.IsError ()) {
+    delete []dims;
     return nullptr;
   }
 
@@ -184,6 +186,7 @@ RuntimeError Frame::GetTensorShape (std::shared_ptr<TF_Graph> pgraph,
   *dims = new int64_t[num_dims];
   TF_GraphGetTensorShape(graph, output, *dims, num_dims, status);
   if (TF_GetCode (status) != TF_OK) {
+    delete []dims;
     error.Set (RuntimeError::Code::FRAMEWORK_ERROR, TF_Message (status));
     return error;
   }

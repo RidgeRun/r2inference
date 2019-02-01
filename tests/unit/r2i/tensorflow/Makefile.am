@@ -1,4 +1,4 @@
-# Copyright (C) 2018 RidgeRun, LLC (http://www.ridgerun.com)
+# Copyright (C) 2019 RidgeRun, LLC (http://www.ridgerun.com)
 # All Rights Reserved.
 #
 # The contents of this software are proprietary and confidential to RidgeRun,
@@ -13,9 +13,14 @@ AM_DEFAULT_SOURCE_EXT = .cc
 if ENABLE_TESTS
 if HAVE_TENSORFLOW
 
-TESTS =         \
-        loader
-
+TESTS =                 \
+        model           \
+        loader          \
+        engine          \
+        prediction      \
+        frame           \
+        parameters      \
+        frameworkfactory
 
 check_PROGRAMS=$(TESTS)
 

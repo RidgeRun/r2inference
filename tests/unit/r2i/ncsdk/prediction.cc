@@ -20,6 +20,10 @@
 #include <CppUTest/MemoryLeakDetectorMallocMacros.h>
 #include <CppUTest/TestHarness.h>
 
+void _free (void *data) {
+  free (data);
+}
+
 TEST_GROUP (NcsdkPrediction) {
   r2i::ncsdk::Prediction prediction;
   std::shared_ptr<float> data;
@@ -27,7 +31,7 @@ TEST_GROUP (NcsdkPrediction) {
 
   void setup () {
     data = std::shared_ptr<float> (static_cast<float *> (malloc (sizeof (matrix))),
-                                   free);
+                                   _free);
     memcpy (data.get (), matrix, sizeof (matrix));
   }
 
