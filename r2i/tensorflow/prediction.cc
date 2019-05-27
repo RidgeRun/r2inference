@@ -72,6 +72,12 @@ RuntimeError Prediction::SetTensor (std::shared_ptr<TF_Graph> pgraph,
     return error;
   }
 
+  /* Some tensors may refer to generic batch sizes as -1. If this is the case
+     fallback to 1 */
+  if (-1 == dims[0]) {
+    dims[0] = 1;
+  }
+
   TF_DataType type = TF_OperationOutputType(output);
   size_t type_size = TF_DataTypeSize(type);
   size_t data_size = this->GetRequiredBufferSize (output, dims, num_dims);
