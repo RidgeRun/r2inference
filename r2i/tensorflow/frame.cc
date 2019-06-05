@@ -191,11 +191,10 @@ RuntimeError Frame::GetTensorShape (std::shared_ptr<TF_Graph> pgraph,
     return error;
   }
 
-  /* Some tensors may refer to generic batch sizes as -1. If this is the case
-     fallback to 1 */
-  if (-1 == (*dims)[0]) {
-    (*dims)[0] = 1;
-  }
+  /* R2Inference uses a batch size of 1 but some tensors have this value set to
+   * generic (-1) or greater than 1.
+   * Batch size set to 1 for general compatibility support. */
+  (*dims)[0] = 1;
 
   type = TF_OperationOutputType(output);
   size = TF_DataTypeSize(type);
