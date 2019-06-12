@@ -1,4 +1,4 @@
-/* Copyright (C) 2018 RidgeRun, LLC (http://www.ridgerun.com)
+/* Copyright (C) 2019 RidgeRun, LLC (http://www.ridgerun.com)
  * All Rights Reserved.
  *
  * The contents of this software are proprietary and confidential to RidgeRun,
@@ -15,7 +15,7 @@
 #include <string>
 #include <bits/stdc++.h>
 #include <algorithm>
-
+#include <math.h>
 #include <r2i/r2i.h>
 
 #define STB_IMAGE_IMPLEMENTATION
@@ -24,63 +24,72 @@
 #define STB_IMAGE_RESIZE_IMPLEMENTATION
 #include "stb_image_resize.h"
 
-/* Tiny YOLO oputput parameters */
+/* Tiny YOLOV2 oputput parameters */
 /* Input image dim */
-#define DIM 448
+#define DIM 416
 /* Grid dim */
-#define GRID_H 7
-#define GRID_W 7
+#define GRID_H 13
+#define GRID_W 13
 /* Number of classes */
 #define CLASSES 20
 /* Number of boxes per cell */
-#define BOXES 2
+#define BOXES 5
 /* Box dim */
-#define BOX_DIM 4
+#define BOX_DIM 5
 /* Probability threshold */
 #define PROB_THRESH 0.08
 /* Intersection over union threshold */
 #define IOU_THRESH 0.30
+/* Objectness threshold */
+#define OBJ_THRESH 0.08
+/* Grid cell size in pixels */
+#define GRID_SIZE 32
+
+const float box_anchors[] =
+    { 1.08, 1.19, 3.42, 4.41, 6.63, 11.38, 9.42, 5.11, 16.62, 10.52 };
 
 struct box {
   std::string label;
-  double x_center;
-  double y_center;
+  double x;
+  double y;
   double width;
   double height;
   double prob;
 };
 
-void Box2Pixels (box &normalized_box, int row, int col, int image_width,
-                 int image_height) {
+/* sigmoid approximation as a lineal function */
+static double
+sigmoid (double x)
+{
+  return 1.0 / (1.0 + pow (M_E, -1.0 * x));
+}
+
+void Box2Pixels (box * normalized_box, int row, int col, int box) {
   /* Convert box coordinates to pixels
-   * box position (x_center,y_center) is normalized inside each cell from 0 to 1
+   * box position (x,y) is normalized inside each cell from 0 to 1
    * width and heigh are also normalized, but with image size as reference
    * box is ordered [x_center,y_center,width,height]
    */
-  /* adjust the box center according to its cell and grid dim */
-  normalized_box.x_center += col;
-  normalized_box.y_center += row;
-  normalized_box.x_center /= GRID_H;
-  normalized_box.y_center /= GRID_W;
+  /* Adjust the box center according to its cell and grid dim */
 
-  /* adjust the lengths and widths */
-  normalized_box.width *= normalized_box.width;
-  normalized_box.height *= normalized_box.height;
+  normalized_box->x = (col + sigmoid (normalized_box->x)) * GRID_SIZE;
+  normalized_box->y = (row + sigmoid (normalized_box->y)) * GRID_SIZE;
 
-  /* scale the boxes to the image size in pixels */
-  normalized_box.x_center *= image_width;
-  normalized_box.y_center *= image_height;
-  normalized_box.width *= image_width;
-  normalized_box.height *= image_height;
+  normalized_box->width =
+      pow (M_E, normalized_box->width) * box_anchors[2 * box] * GRID_SIZE;
+  normalized_box->height =
+      pow (M_E, normalized_box->height) * box_anchors[2 * box + 1] * GRID_SIZE;
+
 }
 
 void GetBoxesFromPrediction(std::shared_ptr<r2i::IPrediction> prediction,
-                            int input_image_width, int input_image_height, std::list<box> &boxes) {
+                            int input_image_width, int input_image_height,
+                            std::list<box> &boxes) {
   /*
    * Get all the boxes from the prediction and store them in a list
    * Tiny yolo parameters:
-   *    Grid: 7*7
-   *    Boxes per grid cell: 2
+   *    Grid: 13*13
+   *    Boxes per grid cell: 5
    *    Number of classes: 20
    *    Classes: ["aeroplane", "bicycle", "bird", "boat", "bottle",
    *              "bus", "car", "cat", "chair", "cow", "diningtable",
@@ -88,23 +97,19 @@ void GetBoxesFromPrediction(std::shared_ptr<r2i::IPrediction> prediction,
    *              "sheep", "sofa", "train", "tvmonitor"]
    *
    * Prediction structure:
-   *    [0:980]: 7*7*20 probability per class per grid cell
-   *    [980:1078]: 7*7*2 probability multiplicator for each box in the grid
-   *    [1078:1470]: 7*7*2*4 [x,y,w,h] for each box in the grid
+   *    13*13*(5+20) [x,y,w,h,objectness] for each box in the grid
    */
   r2i::RuntimeError error;
   int i, j, c, b;
-  int box_probs_start = GRID_H * GRID_W * CLASSES;
-  int all_boxes_start = GRID_H * GRID_W * CLASSES + GRID_H * GRID_W * BOXES;
   int index;
-  double class_prob;
-  double box_prob;
-  double prob;
-  box result;
+  double max_class_prob;
+  double cur_class_prob;
+  double obj_prob;
+  int max_class_prob_index;
 
   /*
    * This label list is highly dependent on the way the model was trained.
-   * We are assumig the same labels that are used on the ncappzoo tinyyolo
+   * We are assumig the same labels that are used on the ncappzoo tinyyolov2
    * example.
    */
   std::string labels [CLASSES] = {"aeroplane", "bicycle", "bird", "boat",
@@ -116,23 +121,32 @@ void GetBoxesFromPrediction(std::shared_ptr<r2i::IPrediction> prediction,
 
   for (i = 0; i < GRID_H; i++) {        /* Iterate rows    */
     for (j = 0; j < GRID_W; j++) {      /* Iterate columns */
-      for (c = 0; c < CLASSES; c++) {   /* Iterate classes */
-        index = (i * GRID_W + j) * CLASSES + c;
-        class_prob = prediction->At (index, error);
-        for (b = 0; b < BOXES; b++) {   /* Iterate boxes   */
-          index = (i * GRID_W + j) * BOXES + b;
-          box_prob = prediction->At (box_probs_start + index, error);
-          prob = class_prob * box_prob;
-          /* If the probability is over the threshold add it to the boxes list */
-          if (prob > PROB_THRESH) {
-            index = ((i * GRID_W + j) * BOXES + b ) * BOX_DIM;
-            result.label = labels[c];
-            result.x_center = prediction->At (all_boxes_start + index, error);
-            result.y_center = prediction->At (all_boxes_start + index + 1, error);
-            result.width = prediction->At (all_boxes_start + index + 2, error);
-            result.height = prediction->At (all_boxes_start + index + 3, error);
-            result.prob = prob;
-            Box2Pixels(result, i, j, input_image_width, input_image_height);
+      for (b = 0; b < BOXES; b++) {   /* Iterate boxes   */
+        index = ((i * GRID_W + j) * BOXES + b) * (BOX_DIM + CLASSES);
+        obj_prob = prediction->At (index + 4, error);
+        /* If the probability is over the threshold add it to the boxes list */
+        if (obj_prob > OBJ_THRESH) {
+          max_class_prob = 0;
+          max_class_prob_index = 0;
+          for (c = 0; c < CLASSES; c++) {
+            cur_class_prob = prediction->At (index + BOX_DIM + c, error);
+            if (cur_class_prob > max_class_prob) {
+              max_class_prob = cur_class_prob;
+              max_class_prob_index = c;
+            }
+          }
+
+          if (max_class_prob > PROB_THRESH) {
+            box result;
+            result.label = labels[max_class_prob_index];
+            result.x = prediction->At (index, error);
+            result.y = prediction->At (index + 1, error);
+            result.width = prediction->At (index + 2, error);
+            result.height = prediction->At (index + 3, error);
+            result.prob = max_class_prob;
+            Box2Pixels(&result, i, j, b);
+            result.x = result.x - result.width * 0.5;
+            result.y = result.y - result.height * 0.5;
             boxes.push_front(result);
           }
         }
@@ -153,22 +167,22 @@ double IntersectionOverUnion(box box_1, box box_2) {
   double union_area;
 
   /* First diminsion of the intersecting box */
-  intersection_dim_1 = std::min(box_1.x_center + 0.5 * box_1.width,
-                                box_2.x_center + 0.5 * box_2.width) -
-                       std::max(box_1.x_center - 0.5 * box_1.width,
-                                box_2.x_center - 0.5 * box_2.width);
+  intersection_dim_1 = std::min(box_1.x + box_1.width,
+                                box_2.x + box_2.width) -
+                       std::max(box_1.x, box_2.x);
 
   /* Second dimension of the intersecting box */
-  intersection_dim_2 = std::min(box_1.y_center + 0.5 * box_1.height,
-                                box_2.y_center + 0.5 * box_2.height) -
-                       std::max(box_1.y_center - 0.5 * box_1.height,
-                                box_2.y_center - 0.5 * box_2.height);
+  intersection_dim_2 = std::min(box_1.y + box_1.height,
+                                box_2.y + box_2.height) -
+                       std::max(box_1.y, box_2.y);
 
   if ((intersection_dim_1 < 0) || (intersection_dim_2 < 0)) {
     intersection_area = 0;
-  } else {
+  }
+  else {
     intersection_area =  intersection_dim_1 * intersection_dim_2;
   }
+
   union_area = box_1.width * box_1.height + box_2.width * box_2.height -
                intersection_area;
   return intersection_area / union_area;
@@ -202,8 +216,8 @@ void RemoveDuplicatedBoxes(std::list<box> &boxes) {
 void PrintBox (box in_box) {
   std::cout << "Box:" ;
   std::cout << "[class:'" << in_box.label << "', ";
-  std::cout << "x_center:" << in_box.x_center << ", ";
-  std::cout << "y_center:" << in_box.y_center << ", ";
+  std::cout << "x:" << in_box.x << ", ";
+  std::cout << "y:" << in_box.y << ", ";
   std::cout << "width:" << in_box.width << ", ";
   std::cout << "height:" << in_box.height << ", ";
   std::cout << "prob:" << in_box.prob << "]" << std::endl;
@@ -230,8 +244,9 @@ void PrintTopPredictions (std::shared_ptr<r2i::IPrediction> prediction,
 }
 
 void PrintUsage() {
-  std::cerr << "Usage: example -i [JPG input_image] -m [TinyYOLO Model]" <<
-            std::endl;
+  std::cerr << "Usage: example -i [JPG input_image] -m [TinyYOLOV2 NCSDK Model] \n" 
+            << "Example: ./tinyyolov2 -i dog.jpg -m graph_tinyyolov2_ncsdk"
+            << std::endl;
 }
 
 std::unique_ptr<float[]> PreProcessImage (const unsigned char *input, int width,
@@ -246,9 +261,9 @@ std::unique_ptr<float[]> PreProcessImage (const unsigned char *input, int width,
                      reqheight, 0, channels);
 
   for (int i = 0; i < scaled_size; i += channels) {
-    adjusted[i + 2] = static_cast<float>(scaled[i + 2]) / 255.0;
-    adjusted[i + 1] = static_cast<float>(scaled[i + 1]) / 255.0;
-    adjusted[i + 0] = static_cast<float>(scaled[i + 0]) / 255.0;
+    adjusted[i + 0] = static_cast<float>(scaled[i + 0]) / 255;
+    adjusted[i + 1] = static_cast<float>(scaled[i + 1]) / 255;
+    adjusted[i + 2] = static_cast<float>(scaled[i + 2]) / 255;
   }
 
   return adjusted;
@@ -315,7 +330,7 @@ int main (int argc, char *argv[]) {
   auto factory = r2i::IFrameworkFactory::MakeFactory(r2i::FrameworkCode::NCSDK,
                  error);
 
-  std::cout << "Loading Model: " << model_path << "..." << std::endl;
+  std::cout << "Loading Model: " << model_path << std::endl;
   auto loader = factory->MakeLoader (error);
   auto model = loader->Load (model_path, error);
   if (error.IsError ()) {
@@ -323,27 +338,27 @@ int main (int argc, char *argv[]) {
     exit(EXIT_FAILURE);
   }
 
-  std::cout << "Setting model to engine..." << std::endl;
+  std::cout << "Setting model to engine" << std::endl;
   auto engine = factory->MakeEngine (error);
   error = engine->SetModel (model);
 
-  std::cout << "Loading image: " << image_path << "..." << std::endl;
-  std::unique_ptr<float[]> image_data = LoadImage (image_path, DIM, DIM, &width,
-                                        &height);
+  std::cout << "Loading image: " << image_path << std::endl;
+  std::unique_ptr<float[]> image_data = LoadImage (image_path, DIM, DIM,
+                                                   &width, &height);
 
-  std::cout << "Configuring frame..." << std::endl;
+  std::cout << "Configuring frame" << std::endl;
   std::shared_ptr<r2i::IFrame> frame = factory->MakeFrame (error);
   error = frame->Configure (image_data.get(), DIM, DIM,
                             r2i::ImageFormat::Id::RGB);
 
-  std::cout << "Starting engine..." << std::endl;
+  std::cout << "Starting engine" << std::endl;
   error = engine->Start ();
   if (error.IsError ()) {
     std::cerr << "Engine start error: " << error << std::endl;
     exit(EXIT_FAILURE);
   }
 
-  std::cout << "Predicting..." << std::endl;
+  std::cout << "Predicting" << std::endl;
   auto prediction = engine->Predict (frame, error);
   if (error.IsError ()) {
     std::cerr << "Engine prediction error: " << error << std::endl;
@@ -352,7 +367,7 @@ int main (int argc, char *argv[]) {
 
   PrintTopPredictions (prediction, width, height);
 
-  std::cout << "Stopping engine..." << std::endl;
+  std::cout << "Stopping engine" << std::endl;
   error = engine->Stop ();
   if (error.IsError ()) {
     std::cerr << "Engine stop error: " << error << std::endl;

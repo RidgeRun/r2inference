@@ -1,4 +1,4 @@
-# Copyright (C) 2018 RidgeRun, LLC (http://www.ridgerun.com)
+# Copyright (C) 2019 RidgeRun, LLC (http://www.ridgerun.com)
 # All Rights Reserved.
 #
 # The contents of this software are proprietary and confidential to RidgeRun,
@@ -13,8 +13,8 @@ AM_DEFAULT_SOURCE_EXT = .cc
 if ENABLE_EXAMPLES
 
 noinst_PROGRAMS =                 \
-        googlenet                 \
-        tinyyolo
+        inception                 \
+        tinyyolov2
 
 AM_CXXFLAGS =                     \
         $(RR_CXXFLAGS)            \
