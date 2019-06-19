@@ -228,9 +228,9 @@ TEST (TensorflowFrame, FrameGetTensorMultipleBatches) {
   error = frame.Configure(data, width, height, format.GetId());
   LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode());
 
+  /* R2I will set the tensor size to 1 to allow frame by frame processing */
   tensor = frame.GetTensor(pgraph, operation, error);
-  LONGS_EQUAL (r2i::RuntimeError::Code::INVALID_FRAMEWORK_PARAMETER,
-               error.GetCode());
+  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode());
 
   multiple_batches = false;
 }
