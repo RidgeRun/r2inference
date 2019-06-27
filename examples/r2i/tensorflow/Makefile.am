@@ -13,7 +13,7 @@ AM_DEFAULT_SOURCE_EXT = .cc
 if ENABLE_EXAMPLES
 
 noinst_PROGRAMS =                  \
-        googlenet
+        inception
 
 AM_CXXFLAGS =                      \
         $(RR_CXXFLAGS)             \

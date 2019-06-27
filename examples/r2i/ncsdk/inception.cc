@@ -1,4 +1,4 @@
-/* Copyright (C) 2018 RidgeRun, LLC (http://www.ridgerun.com)
+/* Copyright (C) 2019 RidgeRun, LLC (http://www.ridgerun.com)
  * All Rights Reserved.
  *
  * The contents of this software are proprietary and confidential to RidgeRun,
@@ -13,7 +13,6 @@
 #include <iostream>
 #include <memory>
 #include <string>
-
 #include <r2i/r2i.h>
 
 #define STB_IMAGE_IMPLEMENTATION
@@ -22,19 +21,12 @@
 #define STB_IMAGE_RESIZE_IMPLEMENTATION
 #include "stb_image_resize.h"
 
-#define GOOGLENET_DIM 224
-
-const float GoogleNetMean[] = {0.40787054 * 255.0,
-                               0.45752458 * 255.0,
-                               0.48109378 * 255.0
-                              };
-
 void PrintTopPrediction (std::shared_ptr<r2i::IPrediction> prediction) {
   r2i::RuntimeError error;
   int index = 0;
   double max = -1;
 
-  int num_labels = prediction->GetResultSize();
+  int num_labels = prediction->GetResultSize() / sizeof(float);
 
   for (int i = 0; i < num_labels; ++i) {
     double current = prediction->At(i, error);
@@ -44,18 +36,23 @@ void PrintTopPrediction (std::shared_ptr<r2i::IPrediction> prediction) {
     }
   }
 
-  std::cout << "Highest probability is label " << index <<
-            " (" << max << ")" << std::endl;
+  std::cout << "Highest probability is label " 
+            << index << " (" << max << ")" << std::endl;
 }
 
 void PrintUsage() {
-  std::cerr << "Usage: example -i [JPG input_image] -m [GoogLeNet Model]" <<
-            std::endl;
+  std::cerr << "Required arguments:"
+            << "-i [JPG input_image] "
+            << "-m [Inception NCS Model] "
+            << "-s [Model Input Size] \n"
+            << " Example:"
+            << " ./inception -i cat.jpg -m graph_inceptionv2_ncsdk -s 224"
+            << std::endl;
 }
 
 std::unique_ptr<float[]> PreProcessImage (const unsigned char *input,
-    int width, int height, int reqwidth,
-    int reqheight, const float *mean) {
+    int width, int height, int reqwidth, int reqheight) {
+
   const int channels = 3;
   const int scaled_size = channels * reqwidth * reqheight;
 
@@ -66,17 +63,17 @@ std::unique_ptr<float[]> PreProcessImage (const unsigned char *input,
                      reqheight, 0, channels);
 
   for (int i = 0; i < scaled_size; i += channels) {
-    // BGR = RGB - Mean
-    adjusted[i + 0] = static_cast<float>(scaled[i + 2]) - mean[0];
-    adjusted[i + 1] = static_cast<float>(scaled[i + 1]) - mean[1];
-    adjusted[i + 2] = static_cast<float>(scaled[i + 0]) - mean[2];
+    /* RGB = (RGB)*StdDev */
+    adjusted[i + 0] = (static_cast<float>(scaled[i + 0]) - 128) / 128.0;
+    adjusted[i + 1] = (static_cast<float>(scaled[i + 1]) - 128) / 128.0;
+    adjusted[i + 2] = (static_cast<float>(scaled[i + 2]) - 128) / 128.0;
   }
 
   return adjusted;
 }
 
 std::unique_ptr<float[]> LoadImage(const std::string &path, int reqwidth,
-                                   int reqheight, const float *mean) {
+                                   int reqheight) {
   int channels = 3;
   int width, height, cp;
 
@@ -86,17 +83,17 @@ std::unique_ptr<float[]> LoadImage(const std::string &path, int reqwidth,
     return nullptr;
   }
 
-  auto ret = PreProcessImage(img, width, height, reqwidth, reqheight, mean);
+  auto ret = PreProcessImage(img, width, height, reqwidth, reqheight);
   free (img);
 
   return ret;
 }
 
 bool ParseArgs (int &argc, char *argv[], std::string &image_path,
-                std::string &model_path, int &index) {
-  int option = 0;
+                std::string &model_path, int &index, int &size) {
 
-  while ((option = getopt(argc, argv, "i:m:p:")) != -1) {
+  int option = 0;
+  while ((option = getopt(argc, argv, "i:m:p:s:")) != -1) {
     switch (option) {
       case 'i' :
         image_path = optarg;
@@ -107,22 +104,24 @@ bool ParseArgs (int &argc, char *argv[], std::string &image_path,
       case 'p' :
         index  = std::stoi (optarg);
         break;
+      case 's' :
+        size = std::stoi (optarg);
+        break;
       default:
         return false;
     }
   }
-
   return true;
 }
-
 
 int main (int argc, char *argv[]) {
   r2i::RuntimeError error;
   std::string model_path;
   std::string image_path;
   int Index = 0;
+  int size = 0;
 
-  if (false == ParseArgs (argc, argv, image_path, model_path, Index)) {
+  if (false == ParseArgs (argc, argv, image_path, model_path, Index, size)) {
     PrintUsage ();
     exit (EXIT_FAILURE);
   }
@@ -135,7 +134,7 @@ int main (int argc, char *argv[]) {
   auto factory = r2i::IFrameworkFactory::MakeFactory(r2i::FrameworkCode::NCSDK,
                  error);
 
-  std::cout << "Loading Model: " << model_path << "..." << std::endl;
+  std::cout << "Loading Model: " << model_path << std::endl;
   auto loader = factory->MakeLoader (error);
   auto model = loader->Load (model_path, error);
   if (error.IsError ()) {
@@ -143,20 +142,20 @@ int main (int argc, char *argv[]) {
     exit(EXIT_FAILURE);
   }
 
-  std::cout << "Setting model to engine..." << std::endl;
+  std::cout << "Setting model to engine" << std::endl;
   auto engine = factory->MakeEngine (error);
   error = engine->SetModel (model);
 
-  std::cout << "Loading image: " << image_path << "..." << std::endl;
-  std::unique_ptr<float[]> image_data = LoadImage (image_path, GOOGLENET_DIM,
-                                        GOOGLENET_DIM, GoogleNetMean);
+  std::cout << "Loading image: " << image_path << std::endl;
+  std::unique_ptr<float[]> image_data = LoadImage (image_path, size,
+                                                   size);
 
-  std::cout << "Configuring frame..." << std::endl;
+  std::cout << "Configuring frame" << std::endl;
   std::shared_ptr<r2i::IFrame> frame = factory->MakeFrame (error);
-  error = frame->Configure (image_data.get(), GOOGLENET_DIM, GOOGLENET_DIM,
+  error = frame->Configure (image_data.get(), size, size,
                             r2i::ImageFormat::Id::RGB);
 
-  std::cout << "Starting engine..." << std::endl;
+  std::cout << "Starting engine" << std::endl;
   error = engine->Start ();
   if (error.IsError ()) {
     std::cerr << "Engine start error: " << error << std::endl;
@@ -172,7 +171,7 @@ int main (int argc, char *argv[]) {
 
   PrintTopPrediction (prediction);
 
-  std::cout << "Stopping engine..." << std::endl;
+  std::cout << "Stopping engine" << std::endl;
   error = engine->Stop ();
   if (error.IsError ()) {
     std::cerr << "Engine stop error: " << error << std::endl;
