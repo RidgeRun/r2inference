@@ -10,7 +10,7 @@
 
 R2IVERSION=0.0
 
-CXXFLAGS:=$(shell pkg-config --cflags r2inference-$(R2IVERSION))
+CXXFLAGS:= -std=c++11 $(shell pkg-config --cflags r2inference-$(R2IVERSION))
 LIBS:=$(shell pkg-config --libs r2inference-$(R2IVERSION))
 
 OUT=list-backends
