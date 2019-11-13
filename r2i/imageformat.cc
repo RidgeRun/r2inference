@@ -20,7 +20,7 @@ static std::unordered_map<int, std::pair<const std::string, int>>
 format_descriptors ({
   {ImageFormat::Id::RGB, {"RGB", 3}},
   {ImageFormat::Id::BGR, {"BGR", 3}},
-  {ImageFormat::Id::GRAY, {"Grayscale", 1}},
+  {ImageFormat::Id::GRAY8, {"Grayscale", 1}},
   {ImageFormat::Id::UNKNOWN_FORMAT, {"Unknown format", 0}}
 });
 

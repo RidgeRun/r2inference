@@ -43,7 +43,7 @@ class ImageFormat {
     /**
      * Grayscale: 1 plane with 8 bits per pixel
      */
-    GRAY,
+    GRAY8,
 
     /**
      * Unknown format
