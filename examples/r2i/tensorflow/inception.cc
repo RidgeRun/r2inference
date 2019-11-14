@@ -35,7 +35,7 @@ void PrintTopPrediction (std::shared_ptr<r2i::IPrediction> prediction) {
     }
   }
 
-  std::cout << "Highest probability is label " 
+  std::cout << "Highest probability is label "
             << index << " (" << max << ")" << std::endl;
 }
 
@@ -45,7 +45,7 @@ void PrintUsage() {
             << "-m [Inception TensorFlow Model] "
             << "-s [Model Input Size] "
             << "-I [Input Node] "
-            << "-O [Output Node] \n" 
+            << "-O [Output Node] \n"
             << " Example: "
             << " ./inception -i cat.jpg -m graph_inceptionv2_tensorflow.pb "
             << "-s 224 -I input -O Softmax"
@@ -147,6 +147,11 @@ int main (int argc, char *argv[]) {
                    r2i::FrameworkCode::TENSORFLOW,
                    error);
 
+  if (nullptr == factory) {
+    std::cerr << "TensorFlow backend is not built: " << error << std::endl;
+    exit(EXIT_FAILURE);
+  }
+
   std::cout << "Loading Model: " << model_path << std::endl;
   auto loader = factory->MakeLoader (error);
   std::shared_ptr<r2i::IModel> model = loader->Load (model_path, error);
@@ -167,7 +172,7 @@ int main (int argc, char *argv[]) {
 
   std::cout << "Loading image: " << image_path << std::endl;
   std::unique_ptr<float[]> image_data = LoadImage (image_path, size,
-                                                   size);
+                                        size);
 
   std::cout << "Configuring frame" << std::endl;
   std::shared_ptr<r2i::IFrame> frame = factory->MakeFrame (error);
