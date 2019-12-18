@@ -49,6 +49,9 @@ RR_CHECK_FEATURE_LIB(NCSDK, NCSDK Installation,
 RR_CHECK_FEATURE_LIB(TENSORFLOW, TensorFlow Installation,
                      tensorflow, TF_Version, tensorflow/c/c_api.h, no)
 
+RR_CHECK_FEATURE_LIB(TENSORFLOWLITE, TensorFlow lite Installation,
+                     tensorflowlite_c, TfLiteVersion, tensorflow/lite/c/c_api.h, no)
+
 # Our Include path, to be shared in multiple makefiles
 AC_SUBST([R2IINCLUDEDIR],[$includedir/r2inference-$RR_PACKAGE_VERSION/])
 
