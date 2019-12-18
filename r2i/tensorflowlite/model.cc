@@ -17,7 +17,6 @@ namespace tensorflowlite {
 Model::Model () {
 }
 
-
 RuntimeError Model::Start (const std::string &name) {
   RuntimeError error;
 
