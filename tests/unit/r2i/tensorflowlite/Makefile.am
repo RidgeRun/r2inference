@@ -1,4 +1,4 @@
-# Copyright (C) 2018 RidgeRun, LLC (http://www.ridgerun.com)
+# Copyright (C) 2019 RidgeRun, LLC (http://www.ridgerun.com)
 # All Rights Reserved.
 #
 # The contents of this software are proprietary and confidential to RidgeRun,
@@ -11,12 +11,14 @@
 AM_DEFAULT_SOURCE_EXT = .cc
 
 if ENABLE_TESTS
+if HAVE_TENSORFLOWLITE
 
-TESTS =                         \
-        iframeworkfactory
+TESTS =                 \
+        loader
 
 check_PROGRAMS=$(TESTS)
 
+endif # HAVE_TENSORFLOWLITE
 endif # ENABLE_TESTS
 
 if ENABLE_CODE_COVERAGE
@@ -27,42 +29,27 @@ endif
 
 LOG_DRIVER=$(top_builddir)/common/rr-test-driver.py $(SINGLE_PROCESS)
 
-AM_CXXFLAGS =                      \
-        $(RR_CXXFLAGS)             \
-        $(TESTS_CFLAGS)            \
+AM_CXXFLAGS =                       \
+        $(RR_CXXFLAGS)              \
+        $(TESTS_CFLAGS)             \
+        $(TENSORFLOWLITE_CFLAGS)    \
         $(CODE_COVERAGE_CXXFLAGS)
 
-AM_CFLAGS =                        \
-        $(RR_CFLAGS)               \
-        $(TESTS_CFLAGS)            \
+AM_CFLAGS =                         \
+        $(RR_CFLAGS)                \
+        $(TESTS_CFLAGS)             \
+        $(TENSORFLOWLITE_CFLAGS)    \
         $(CODE_COVERAGE_CFLAGS)
 
-AM_CPPFLAGS =                      \
-        $(RR_CPPFLAGS)             \
+AM_CPPFLAGS =                       \
+        $(RR_CPPFLAGS)              \
         $(CODE_COVERAGE_CPPFLAGS)
 
-AM_LDFLAGS =                       \
-        $(RR_LIBS)                 \
-        $(TESTS_LIBS)              \
-        $(CODE_COVERAGE_LIBS)      \
+AM_LDFLAGS =                        \
+        $(RR_LIBS)                  \
+        $(TENSORFLOWLITE_LIBS)      \
+        $(TESTS_LIBS)               \
+        $(CODE_COVERAGE_LIBS)       \
         $(top_builddir)/r2i/libr2inference-@RR_PACKAGE_VERSION@.la
 
 CLEANFILES = cpputest_*.xml
-
-DIST_SUBDIRS =                     \
-        ncsdk                      \
-        tensorflow                 \
-        tensorflowlite
-SUBDIRS =
-
-if HAVE_NCSDK
-SUBDIRS += ncsdk
-endif
-
-if HAVE_TENSORFLOW
-SUBDIRS += tensorflow
-endif
-
-if HAVE_TENSORFLOWLITE
-SUBDIRS += tensorflowlite
-endif

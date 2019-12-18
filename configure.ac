@@ -76,6 +76,7 @@ tests/unit/Makefile
 tests/unit/r2i/Makefile
 tests/unit/r2i/ncsdk/Makefile
 tests/unit/r2i/tensorflow/Makefile
+tests/unit/r2i/tensorflowlite/Makefile
 ])
 
 AC_OUTPUT
