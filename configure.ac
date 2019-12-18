@@ -68,6 +68,7 @@ examples/r2i/tensorflow/Makefile
 r2i/Makefile
 r2i/ncsdk/Makefile
 r2i/tensorflow/Makefile
+r2i/tensorflowlite/Makefile
 r2inference-${RR_PACKAGE_VERSION}.pc:r2inference.pc.in
 tests/Makefile
 tests/acceptance/Makefile
