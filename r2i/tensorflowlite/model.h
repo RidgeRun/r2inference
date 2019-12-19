@@ -16,6 +16,7 @@
 
 #include <r2i/imodel.h>
 #include <r2i/runtimeerror.h>
+#include <tensorflow/lite/c/c_api.h>
 
 namespace r2i {
 namespace tensorflowlite {
@@ -25,6 +26,11 @@ class Model : public IModel {
   Model ();
 
   RuntimeError Start (const std::string &name) override;
+
+  RuntimeError Set (std::shared_ptr<TfLiteModel> tfltmodel);
+
+ private:
+  std::shared_ptr<TfLiteModel> tflemodel;
 };
 
 }

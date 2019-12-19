@@ -15,10 +15,25 @@ namespace r2i {
 namespace tensorflowlite {
 
 Model::Model () {
+  this->tflemodel = nullptr;
 }
 
 RuntimeError Model::Start (const std::string &name) {
   RuntimeError error;
+
+  return error;
+}
+
+RuntimeError Model::Set (std::shared_ptr<TfLiteModel> tfltmodel) {
+  RuntimeError error;
+
+  if (nullptr != tfltmodel) {
+    error.Set (RuntimeError::Code::NULL_PARAMETER,
+               "Trying to set model with null model pointer");
+    return error;
+  }
+
+  this->tflemodel = tfltmodel;
 
   return error;
 }
