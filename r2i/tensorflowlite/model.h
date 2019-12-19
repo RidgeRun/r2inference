@@ -30,7 +30,7 @@ class Model : public IModel {
   RuntimeError Set (std::shared_ptr<TfLiteModel> tfltmodel);
 
  private:
-  std::shared_ptr<TfLiteModel> tflemodel;
+  std::shared_ptr<TfLiteModel> tflite_model;
 };
 
 }

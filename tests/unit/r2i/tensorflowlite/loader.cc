@@ -11,7 +11,6 @@
 
 #include <r2i/r2i.h>
 #include <r2i/tensorflowlite/loader.h>
-#include <r2i/tensorflowlite/model.h>
 #include <fstream>
 
 #include <CppUTest/CommandLineTestRunner.h>
@@ -19,43 +18,112 @@
 #include <CppUTest/MemoryLeakDetectorMallocMacros.h>
 #include <CppUTest/TestHarness.h>
 
+static bool incompatible_model = false;
+static bool pass_fake_model = false;
+
+r2i::tensorflowlite::Model::Model () {
+}
+
+r2i::RuntimeError r2i::tensorflowlite::Model::Start (const std::string &name) {
+  return r2i::RuntimeError();
+}
+
+r2i::RuntimeError r2i::tensorflowlite::Model::Set (std::shared_ptr<TfLiteModel>
+    tfltmodel) {
+  r2i::RuntimeError error;
+
+  if (incompatible_model) {
+    error.Set (r2i::RuntimeError::Code::INCOMPATIBLE_MODEL, "Incompatible model");
+  }
+
+  return error;
+}
+
+void TfLiteModelDelete(TfLiteModel *model) {return; }
+
+TfLiteModel *TfLiteModelCreateFromFile(const char *model_path) {
+  TfLiteModel *fake_model = nullptr;
+
+  if (pass_fake_model) {
+    fake_model = (TfLiteModel *)model_path;
+  }
+
+  return fake_model;
+}
+
 TEST_GROUP (TensorflowliteLoader) {
   r2i::RuntimeError error;
-  r2i::tensorflowlite::Loader loader;
-  std::shared_ptr<r2i::IModel> model;
-  std::ofstream test_file;
 
-  void setup () {
-    test_file.open ("test_file");
-    test_file << "This is a test file";
-    test_file.close();
-  }
-
-  void teardown () {
-    remove ("test_file");
-  }
 };
 
-TEST (TensorflowliteLoader, LoadValidFile) {
-  model = loader.Load ("test_file", error);
-  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode());
+TEST (TensorflowliteLoader, WrongApiUsage) {
+  std::shared_ptr<r2i::tensorflowlite::Loader> loader (new
+      r2i::tensorflowlite::Loader);
+
+  std::string empty_string = "";
+
+  /* Attempt to load this file as a valid model */
+  auto model = loader->Load(empty_string, error);
+
+  CHECK_TEXT (error.IsError(), error.GetDescription().c_str());
+  LONGS_EQUAL (r2i::RuntimeError::Code::WRONG_API_USAGE, error.GetCode ());
 }
 
-TEST (TensorflowliteLoader, DoubleLoad) {
-  model = loader.Load ("test_file", error);
-  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode());
-  model = loader.Load ("test_file", error);
-  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode());
+TEST (TensorflowliteLoader, UnableToOpenFile) {
+  std::shared_ptr<r2i::tensorflowlite::Loader> loader (new
+      r2i::tensorflowlite::Loader);
+
+  std::string non_existent_file = "*\"?";
+
+  /* Attempt to load this file as a valid model */
+  auto model = loader->Load(non_existent_file, error);
+
+  CHECK_TEXT (error.IsError(), error.GetDescription().c_str());
+  LONGS_EQUAL (r2i::RuntimeError::Code::FILE_ERROR, error.GetCode ());
 }
 
-TEST (TensorflowliteLoader, LoadEmptyFile) {
-  model = loader.Load ("", error);
-  LONGS_EQUAL (r2i::RuntimeError::Code::WRONG_API_USAGE, error.GetCode());
+TEST (TensorflowliteLoader, UnableToReadFile) {
+  std::shared_ptr<r2i::tensorflowlite::Loader> loader (new
+      r2i::tensorflowlite::Loader);
+
+  /* This will work as long as make check is run as a regular user */
+  std::string empty_string = "/root";
+
+  /* Attempt to load an unreadable file */
+  auto model = loader->Load(empty_string, error);
+
+  CHECK_TEXT (error.IsError(), error.GetDescription().c_str());
+  LONGS_EQUAL (r2i::RuntimeError::Code::FILE_ERROR, error.GetCode ());
 }
 
-TEST (TensorflowliteLoader, LoadNonExistentFile) {
-  model = loader.Load ("invalid_graph", error);
-  LONGS_EQUAL (r2i::RuntimeError::Code::FILE_ERROR, error.GetCode());
+TEST (TensorflowliteLoader, LoadInvalidFile) {
+  /* Setup */
+  incompatible_model = true;
+
+  std::shared_ptr<r2i::tensorflowlite::Loader> loader (new
+      r2i::tensorflowlite::Loader);
+
+  /* Attempt to load this file as a valid model */
+  auto model = loader->Load(__FILE__, error);
+
+  CHECK_TEXT (error.IsError(), error.GetDescription().c_str());
+  LONGS_EQUAL (r2i::RuntimeError::Code::INCOMPATIBLE_MODEL, error.GetCode ());
+
+  /* Teardown */
+  incompatible_model = false;
+}
+
+TEST (TensorflowliteLoader, LoadSuccess) {
+  /* Setup */
+  pass_fake_model = true;
+
+  std::shared_ptr<r2i::tensorflowlite::Loader> loader (new
+      r2i::tensorflowlite::Loader);
+
+  /* FIXME this isn't actually sending a correct model */
+  auto model = loader->Load(__FILE__, error);
+
+  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
 }
 
 int main (int ac, char **av) {

@@ -57,10 +57,10 @@ std::shared_ptr<r2i::IModel> Loader::Load (const std::string &in_path,
     return nullptr;
   }
 
-  std::shared_ptr<TfLiteModel> tflitemodel(TfLiteModelCreateFromFile(
+  std::shared_ptr<TfLiteModel> tflite_model(TfLiteModelCreateFromFile(
         in_path.c_str()), TfLiteModelDelete);
 
-  if (nullptr == tflitemodel) {
+  if (nullptr == tflite_model) {
     error.Set (RuntimeError::Code::INCOMPATIBLE_MODEL,
                "Can not create TfLiteModel from file");
     graphdef_file.close ();
@@ -69,7 +69,7 @@ std::shared_ptr<r2i::IModel> Loader::Load (const std::string &in_path,
 
   auto model = std::make_shared<Model>();
 
-  error = model->Set(tflitemodel);
+  error = model->Set(tflite_model);
 
   if (error.IsError ()) {
     model = nullptr;

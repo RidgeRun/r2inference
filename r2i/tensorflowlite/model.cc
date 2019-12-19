@@ -15,7 +15,7 @@ namespace r2i {
 namespace tensorflowlite {
 
 Model::Model () {
-  this->tflemodel = nullptr;
+  this->tflite_model = nullptr;
 }
 
 RuntimeError Model::Start (const std::string &name) {
@@ -33,7 +33,7 @@ RuntimeError Model::Set (std::shared_ptr<TfLiteModel> tfltmodel) {
     return error;
   }
 
-  this->tflemodel = tfltmodel;
+  this->tflite_model = tfltmodel;
 
   return error;
 }
