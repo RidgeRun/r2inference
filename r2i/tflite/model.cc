@@ -9,10 +9,10 @@
  * back to RidgeRun without any encumbrance.
 */
 
-#include "r2i/tensorflowlite/model.h"
+#include "r2i/tflite/model.h"
 
 namespace r2i {
-namespace tensorflowlite {
+namespace tflite {
 
 Model::Model () {
   this->tflite_model = nullptr;
@@ -38,5 +38,5 @@ RuntimeError Model::Set (std::shared_ptr<TfLiteModel> tfltmodel) {
   return error;
 }
 
-} // namespace tensorflowlite
+} // namespace tflite
 } // namespace r2i

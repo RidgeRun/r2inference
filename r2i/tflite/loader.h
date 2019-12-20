@@ -9,31 +9,23 @@
  * back to RidgeRun without any encumbrance.
 */
 
-#ifndef R2I_TENSORFLOWLITE_MODEL_H
-#define R2I_TENSORFLOWLITE_MODEL_H
+#ifndef R2I_TFLITE_LOADER_H
+#define R2I_TFLITE_LOADER_H
 
-#include <memory>
-
+#include <r2i/iloader.h>
 #include <r2i/imodel.h>
-#include <r2i/runtimeerror.h>
-#include <tensorflow/lite/c/c_api.h>
+#include <r2i/tflite/model.h>
 
 namespace r2i {
-namespace tensorflowlite {
+namespace tflite {
 
-class Model : public IModel {
+class Loader : public ILoader {
  public:
-  Model ();
-
-  RuntimeError Start (const std::string &name) override;
-
-  RuntimeError Set (std::shared_ptr<TfLiteModel> tfltmodel);
-
- private:
-  std::shared_ptr<TfLiteModel> tflite_model;
+  virtual std::shared_ptr<r2i::IModel> Load (const std::string &in_path,
+      r2i::RuntimeError &error) override;
 };
 
 }
 }
 
-#endif //R2I_TENSORFLOWLITE_MODEL_H
+#endif //R2I_TFLITE_LOADER_H

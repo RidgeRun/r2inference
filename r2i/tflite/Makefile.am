@@ -19,7 +19,6 @@ libtflite_la_SOURCES =               \
     loader.cc                        \
     model.cc
 
-
 libtflite_la_CPPFLAGS =              \
     $(RR_CPPFLAGS)                   \
     $(CODE_COVERAGE_CPPFLAGS)

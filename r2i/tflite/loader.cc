@@ -9,17 +9,17 @@
  * back to RidgeRun without any encumbrance.
 */
 
-#include "r2i/tensorflowlite/loader.h"
+#include "r2i/tflite/loader.h"
 
 #include <fstream>
 #include <memory>
 #include <tensorflow/lite/c/c_api.h>
 
 #include "r2i/imodel.h"
-#include "r2i/tensorflowlite/model.h"
+#include "r2i/tflite/model.h"
 
 namespace r2i {
-namespace tensorflowlite {
+namespace tflite {
 
 std::shared_ptr<r2i::IModel> Loader::Load (const std::string &in_path,
     r2i::RuntimeError &error) {
@@ -36,33 +36,12 @@ std::shared_ptr<r2i::IModel> Loader::Load (const std::string &in_path,
     return nullptr;
   }
 
-  /* Get file size */
-  unsigned int graphdef_size = graphdef_file.tellg();
-  graphdef_file.seekg (0, std::ios::beg);
-
-  std::shared_ptr<void> graph_data(malloc (graphdef_size), free);
-
-  if (nullptr == graph_data.get()) {
-    error.Set (RuntimeError::Code::MEMORY_ERROR,
-               "Can not allocate memory for graph");
-    graphdef_file.close ();
-    return nullptr;
-  }
-
-  /* Read the contents of the graphdef */
-  graphdef_file.read (reinterpret_cast<char *>(graph_data.get()), graphdef_size);
-  if (!graphdef_file) {
-    error.Set (RuntimeError::Code::FILE_ERROR, "Can not read file");
-    graphdef_file.close ();
-    return nullptr;
-  }
-
   std::shared_ptr<TfLiteModel> tflite_model(TfLiteModelCreateFromFile(
         in_path.c_str()), TfLiteModelDelete);
 
   if (nullptr == tflite_model) {
     error.Set (RuntimeError::Code::INCOMPATIBLE_MODEL,
-               "Can not create TfLiteModel from file");
+               "Unable to load TensorFlow Lite model");
     graphdef_file.close ();
     return nullptr;
   }
@@ -74,6 +53,7 @@ std::shared_ptr<r2i::IModel> Loader::Load (const std::string &in_path,
   if (error.IsError ()) {
     model = nullptr;
   }
+  graphdef_file.close ();
 
   return model;
 }
