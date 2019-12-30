@@ -11,14 +11,14 @@
 AM_DEFAULT_SOURCE_EXT = .cc
 
 if ENABLE_TESTS
-if HAVE_TENSORFLOWLITE
+if HAVE_TFLITE
 
 TESTS =                 \
         loader
 
 check_PROGRAMS=$(TESTS)
 
-endif # HAVE_TENSORFLOWLITE
+endif # HAVE_TFLITE
 endif # ENABLE_TESTS
 
 if ENABLE_CODE_COVERAGE
@@ -32,13 +32,13 @@ LOG_DRIVER=$(top_builddir)/common/rr-test-driver.py $(SINGLE_PROCESS)
 AM_CXXFLAGS =                       \
         $(RR_CXXFLAGS)              \
         $(TESTS_CFLAGS)             \
-        $(TENSORFLOWLITE_CFLAGS)    \
+        $(TFLITE_CFLAGS)    \
         $(CODE_COVERAGE_CXXFLAGS)
 
 AM_CFLAGS =                         \
         $(RR_CFLAGS)                \
         $(TESTS_CFLAGS)             \
-        $(TENSORFLOWLITE_CFLAGS)    \
+        $(TFLITE_CFLAGS)    \
         $(CODE_COVERAGE_CFLAGS)
 
 AM_CPPFLAGS =                       \
@@ -47,7 +47,7 @@ AM_CPPFLAGS =                       \
 
 AM_LDFLAGS =                        \
         $(RR_LIBS)                  \
-        $(TENSORFLOWLITE_LIBS)      \
+        $(TFLITE_LIBS)      \
         $(TESTS_LIBS)               \
         $(CODE_COVERAGE_LIBS)       \
         $(top_builddir)/r2i/libr2inference-@RR_PACKAGE_VERSION@.la

@@ -63,6 +63,6 @@ if HAVE_TENSORFLOW
 SUBDIRS += tensorflow
 endif
 
-if HAVE_TENSORFLOWLITE
+if HAVE_TFLITE
 SUBDIRS += tflite
 endif

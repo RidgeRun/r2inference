@@ -16,7 +16,7 @@
 
 #include <r2i/imodel.h>
 #include <r2i/runtimeerror.h>
-#include <tensorflow/lite/c/c_api.h>
+#include <tensorflow/lite/model.h>
 
 namespace r2i {
 namespace tflite {
@@ -27,10 +27,10 @@ class Model : public IModel {
 
   RuntimeError Start (const std::string &name) override;
 
-  RuntimeError Set (std::shared_ptr<TfLiteModel> tfltmodel);
+  RuntimeError Set (std::shared_ptr<::tflite::FlatBufferModel> tfltmodel);
 
  private:
-  std::shared_ptr<TfLiteModel> tflite_model;
+  std::shared_ptr<::tflite::FlatBufferModel> tflite_model;
 };
 
 }

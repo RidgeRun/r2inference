@@ -8,7 +8,7 @@
 # a software license from RidgeRun.  All source code changes must be provided
 # back to RidgeRun without any encumbrance.
 
-if HAVE_TENSORFLOWLITE
+if HAVE_TFLITE
 
 noinst_LTLIBRARIES = libtflite.la
 
@@ -25,21 +25,21 @@ libtflite_la_CPPFLAGS =              \
 
 libtflite_la_CFLAGS =                \
     $(RR_CFLAGS)                     \
-    $(TENSORFLOWLITE_CFLAGS)         \
+    $(TFLITE_CFLAGS)         \
     $(CODE_COVERAGE_CFLAGS)
 
 libtflite_la_CXXFLAGS =              \
     $(RR_CXXFLAGS)                   \
-    $(TENSORFLOWLITE_CFLAGS)         \
+    $(TFLITE_CFLAGS)         \
     $(CODE_COVERAGE_CXXFLAGS)
 
 libtflite_la_LIBADD =                \
     $(RR_LIBS)                       \
-    $(TENSORFLOWLITE_LIBS)           \
+    $(TFLITE_LIBS)           \
     $(CODE_COVERAGE_LIBS)
 
 tensorflowliteinclude_HEADERS =      \
     loader.h                         \
     model.h
 
-endif # HAVE_TENSORFLOWLITE
+endif # HAVE_TFLITE

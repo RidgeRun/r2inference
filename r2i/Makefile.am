@@ -18,7 +18,7 @@ if HAVE_TENSORFLOW
 SUBDIRS += tensorflow
 endif
 
-if HAVE_TENSORFLOWLITE
+if HAVE_TFLITE
 SUBDIRS += tflite
 endif
 
@@ -79,7 +79,7 @@ libr2inference_@RR_PACKAGE_VERSION@_la_LIBADD +=    \
         $(top_builddir)/r2i/tensorflow/libtf.la
 endif
 
-if HAVE_TENSORFLOWLITE
+if HAVE_TFLITE
 libr2inference_@RR_PACKAGE_VERSION@_la_LIBADD +=    \
         $(top_builddir)/r2i/tflite/libtflite.la
 endif

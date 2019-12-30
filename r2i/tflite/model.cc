@@ -24,7 +24,7 @@ RuntimeError Model::Start (const std::string &name) {
   return error;
 }
 
-RuntimeError Model::Set (std::shared_ptr<TfLiteModel> tfltmodel) {
+RuntimeError Model::Set (std::shared_ptr<::tflite::FlatBufferModel> tfltmodel) {
   RuntimeError error;
 
   if (nullptr != tfltmodel) {

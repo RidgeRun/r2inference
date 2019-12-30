@@ -12,14 +12,17 @@
 #include <r2i/r2i.h>
 #include <r2i/tflite/loader.h>
 #include <fstream>
+#include <iostream>
+#include <memory>
 
 #include <CppUTest/CommandLineTestRunner.h>
 #include <CppUTest/MemoryLeakDetectorNewMacros.h>
 #include <CppUTest/MemoryLeakDetectorMallocMacros.h>
 #include <CppUTest/TestHarness.h>
+#include <sys/stat.h>
+#include <sys/types.h>
 
 static bool incompatible_model = false;
-static bool pass_fake_model = false;
 
 r2i::tflite::Model::Model () {
 }
@@ -28,8 +31,9 @@ r2i::RuntimeError r2i::tflite::Model::Start (const std::string &name) {
   return r2i::RuntimeError();
 }
 
-r2i::RuntimeError r2i::tflite::Model::Set (std::shared_ptr<TfLiteModel>
-    tfltmodel) {
+r2i::RuntimeError r2i::tflite::Model::Set (
+  std::shared_ptr<::tflite::FlatBufferModel>
+  tfltmodel) {
   r2i::RuntimeError error;
 
   if (incompatible_model) {
@@ -39,21 +43,13 @@ r2i::RuntimeError r2i::tflite::Model::Set (std::shared_ptr<TfLiteModel>
   return error;
 }
 
-void TfLiteModelDelete(TfLiteModel *model) {return; }
-
-TfLiteModel *TfLiteModelCreateFromFile(const char *model_path) {
-  TfLiteModel *fake_model = nullptr;
-
-  if (pass_fake_model) {
-    fake_model = (TfLiteModel *)model_path;
-  }
-
-  return fake_model;
-}
-
 TEST_GROUP (TensorflowliteLoader) {
   r2i::RuntimeError error;
   std::shared_ptr<r2i::tflite::Loader> loader{new r2i::tflite::Loader};
+
+  void setup() {
+    error.Clean();
+  }
 };
 
 TEST (TensorflowliteLoader, EmptyString) {
@@ -66,7 +62,7 @@ TEST (TensorflowliteLoader, EmptyString) {
   LONGS_EQUAL (r2i::RuntimeError::Code::WRONG_API_USAGE, error.GetCode ());
 }
 
-TEST (TensorflowliteLoader, UnableToOpenFile) {
+TEST (TensorflowliteLoader, InvalidPath) {
   std::string non_existent_file = "*\"?";
 
   /* Attempt to load this file as a valid model */
@@ -76,26 +72,17 @@ TEST (TensorflowliteLoader, UnableToOpenFile) {
   LONGS_EQUAL (r2i::RuntimeError::Code::FILE_ERROR, error.GetCode ());
 }
 
-TEST (TensorflowliteLoader, UnableToReadFile) {
-  /* This will work as long as make check is run as a regular user */
-  std::string empty_string = "/root";
-
-  /* Attempt to load an unreadable file */
-  auto model = loader->Load(empty_string, error);
-
-  CHECK_TEXT (error.IsError(), error.GetDescription().c_str());
-  LONGS_EQUAL (r2i::RuntimeError::Code::FILE_ERROR, error.GetCode ());
-}
-
 TEST (TensorflowliteLoader, LoadNonExistentFile) {
   /* Setup */
   incompatible_model = true;
 
+  std::string path = "resources/squeezene.tflite";
+
   /* Attempt to load this file as a valid model */
-  auto model = loader->Load(__FILE__, error);
+  auto model = loader->Load(path.c_str(), error);
 
   CHECK_TEXT (error.IsError(), error.GetDescription().c_str());
-  LONGS_EQUAL (r2i::RuntimeError::Code::INCOMPATIBLE_MODEL, error.GetCode ());
+  LONGS_EQUAL (r2i::RuntimeError::Code::FILE_ERROR, error.GetCode ());
 
   /* Teardown */
   incompatible_model = false;
@@ -103,10 +90,10 @@ TEST (TensorflowliteLoader, LoadNonExistentFile) {
 
 TEST (TensorflowliteLoader, LoadSuccess) {
   /* Setup */
-  pass_fake_model = true;
+  std::string path = "resources/squeezenet.tflite";
 
   /* FIXME this isn't actually sending a correct model */
-  auto model = loader->Load(__FILE__, error);
+  auto model = loader->Load(path, error);
 
   LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
 }
