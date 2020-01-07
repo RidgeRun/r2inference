@@ -18,9 +18,14 @@ if HAVE_TENSORFLOW
 SUBDIRS += tensorflow
 endif
 
-DIST_SUBDIRS =       \
-        ncsdk        \
-        tensorflow
+if HAVE_TFLITE
+SUBDIRS += tflite
+endif
+
+DIST_SUBDIRS =          \
+        ncsdk           \
+        tensorflow      \
+        tflite
 
 lib_LTLIBRARIES = libr2inference-@RR_PACKAGE_VERSION@.la
 
@@ -72,4 +77,9 @@ endif
 if HAVE_TENSORFLOW
 libr2inference_@RR_PACKAGE_VERSION@_la_LIBADD +=    \
         $(top_builddir)/r2i/tensorflow/libtf.la
+endif
+
+if HAVE_TFLITE
+libr2inference_@RR_PACKAGE_VERSION@_la_LIBADD +=    \
+        $(top_builddir)/r2i/tflite/libtflite.la
 endif

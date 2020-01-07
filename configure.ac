@@ -49,6 +49,11 @@ RR_CHECK_FEATURE_LIB(NCSDK, NCSDK Installation,
 RR_CHECK_FEATURE_LIB(TENSORFLOW, TensorFlow Installation,
                      tensorflow, TF_Version, tensorflow/c/c_api.h, no)
 
+AC_LANG_PUSH([C++])
+RR_CHECK_FEATURE_LIB(TFLITE, TensorFlow lite Installation,
+                     tensorflow-lite, TfLiteTypeGetName, tensorflow/lite/model.h, no)
+AC_LANG_POP([C++])
+
 # Our Include path, to be shared in multiple makefiles
 AC_SUBST([R2IINCLUDEDIR],[$includedir/r2inference-$RR_PACKAGE_VERSION/])
 
@@ -65,6 +70,7 @@ examples/r2i/tensorflow/Makefile
 r2i/Makefile
 r2i/ncsdk/Makefile
 r2i/tensorflow/Makefile
+r2i/tflite/Makefile
 r2inference-${RR_PACKAGE_VERSION}.pc:r2inference.pc.in
 tests/Makefile
 tests/acceptance/Makefile
@@ -72,6 +78,7 @@ tests/unit/Makefile
 tests/unit/r2i/Makefile
 tests/unit/r2i/ncsdk/Makefile
 tests/unit/r2i/tensorflow/Makefile
+tests/unit/r2i/tflite/Makefile
 ])
 
 AC_OUTPUT
