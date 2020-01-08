@@ -88,6 +88,17 @@ TEST (TensorflowliteLoader, LoadNonExistentFile) {
   incompatible_model = false;
 }
 
+TEST (TensorflowliteLoader, LoadInvalidModel) {
+  /* Setup */
+  std::string path = "Makefile.am";
+
+  /* Attempt to load this file as a valid model */
+  auto model = loader->Load(path.c_str(), error);
+
+  CHECK_TEXT (error.IsError(), error.GetDescription().c_str());
+  LONGS_EQUAL (r2i::RuntimeError::Code::INCOMPATIBLE_MODEL, error.GetCode ());
+}
+
 TEST (TensorflowliteLoader, LoadSuccess) {
   /* Setup */
   std::string path = "resources/squeezenet.tflite";
