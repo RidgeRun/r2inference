@@ -30,7 +30,7 @@ AC_DEFUN([RR_INIT_FLAGS],[
 
   AC_PROG_CPP
   AC_PROG_CC
-  AC_PROG_CXX
+  AX_CXX_COMPILE_STDCXX_11([], [mandatory])
 
   AC_ARG_WITH([profile], AS_HELP_STRING([--with-profile=release|debug|lazy],
     [Specify the build profile to use:
@@ -61,7 +61,7 @@ AC_DEFUN([RR_INIT_FLAGS],[
 
   AC_MSG_NOTICE([Using profile: $with_profile])
 
-  RR_CXXFLAGS="$RR_CFLAGS --std=c++11"
+  RR_CXXFLAGS="$RR_CFLAGS"
   RR_CPPFLAGS="-I\$(top_srcdir) "
 
   AC_SUBST(RR_CFLAGS)
