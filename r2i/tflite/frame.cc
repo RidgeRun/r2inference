@@ -9,38 +9,38 @@
  * back to RidgeRun without any encumbrance.
 */
 
-#include "r2i/tflite/model.h"
+#include "r2i/tflite/frame.h"
 
 namespace r2i {
 namespace tflite {
 
-Model::Model () {
-  this->tflite_model = nullptr;
+Frame::Frame () :
+  frame_data(nullptr), frame_width(0), frame_height(0),
+  frame_format(ImageFormat::Id::UNKNOWN_FORMAT) {
 }
 
-RuntimeError Model::Start (const std::string &name) {
+RuntimeError Frame::Configure (void *in_data, int width,
+                               int height, r2i::ImageFormat::Id format) {
   RuntimeError error;
 
   return error;
 }
 
-RuntimeError Model::Set (std::shared_ptr<::tflite::FlatBufferModel> tfltmodel) {
-  RuntimeError error;
-
-  if (nullptr != tfltmodel) {
-    error.Set (RuntimeError::Code::NULL_PARAMETER,
-               "Trying to set model with null model pointer");
-    return error;
-  }
-
-  this->tflite_model = tfltmodel;
-
-  return error;
+void *Frame::GetData () {
+  return this->frame_data;
 }
 
-std::shared_ptr<::tflite::FlatBufferModel> Model::GetTfliteModel () {
-  return this->tflite_model;
+int Frame::GetWidth () {
+  return this->frame_width;
 }
 
-} // namespace tflite
-} // namespace r2i
+int Frame::GetHeight () {
+  return this->frame_height;
+}
+
+ImageFormat Frame::GetFormat () {
+  return this->frame_format;
+}
+
+}
+}

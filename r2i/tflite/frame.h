@@ -9,33 +9,38 @@
  * back to RidgeRun without any encumbrance.
 */
 
-#ifndef R2I_TFLITE_MODEL_H
-#define R2I_TFLITE_MODEL_H
+#ifndef R2I_TFLITE_FRAME_H
+#define R2I_TFLITE_FRAME_H
 
-#include <memory>
-
-#include <r2i/imodel.h>
-#include <r2i/runtimeerror.h>
-#include <tensorflow/lite/model.h>
+#include <r2i/iframe.h>
 
 namespace r2i {
 namespace tflite {
 
-class Model : public IModel {
+class Frame : public IFrame {
  public:
-  Model ();
+  Frame ();
 
-  RuntimeError Start (const std::string &name) override;
+  RuntimeError Configure (void *in_data, int width,
+                          int height, r2i::ImageFormat::Id format) override;
 
-  std::shared_ptr<::tflite::FlatBufferModel> GetTfliteModel ();
+  void *GetData () override;
 
-  RuntimeError Set (std::shared_ptr<::tflite::FlatBufferModel> tfltmodel);
+  int GetWidth () override;
+
+  int GetHeight () override;
+
+  ImageFormat GetFormat () override;
 
  private:
-  std::shared_ptr<::tflite::FlatBufferModel> tflite_model;
+  float *frame_data;
+  int frame_width;
+  int frame_height;
+  ImageFormat frame_format;
+
 };
 
 }
 }
 
-#endif //R2I_TFLITE_MODEL_H
+#endif //R2I_TFLITE_FRAME_H
