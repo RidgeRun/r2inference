@@ -15,7 +15,8 @@ if HAVE_TFLITE
 
 TESTS =                 \
         loader          \
-        engine
+        engine          \
+        prediction
 
 check_PROGRAMS=$(TESTS)
 
