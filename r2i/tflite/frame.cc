@@ -22,6 +22,27 @@ Frame::Frame () :
 RuntimeError Frame::Configure (void *in_data, int width,
                                int height, r2i::ImageFormat::Id format) {
   RuntimeError error;
+  ImageFormat imageformat (format);
+
+  if (nullptr == in_data) {
+    error.Set (RuntimeError::Code::NULL_PARAMETER, "Received a NULL data pointer");
+    return error;
+  }
+  if (width <= 0) {
+    error.Set (RuntimeError::Code::WRONG_API_USAGE,
+               "Received an invalid image width");
+    return error;
+  }
+  if (height <= 0) {
+    error.Set (RuntimeError::Code::WRONG_API_USAGE,
+               "Received an invalid image height");
+    return error;
+  }
+
+  this->frame_data = static_cast<float *>(in_data);
+  this->frame_width = width;
+  this->frame_height = height;
+  this->frame_format = imageformat;
 
   return error;
 }
