@@ -26,6 +26,11 @@ class Prediction: public IPrediction {
   double At (unsigned int index,  r2i::RuntimeError &error) override;
   void *GetResultData () override;
   unsigned int GetResultSize () override;
+  RuntimeError SetTensorValues(float *outputdata, int tensorsize);
+
+ private:
+  float *outputdata;
+  int tensorsize;
 };
 
 }
