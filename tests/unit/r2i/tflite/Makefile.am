@@ -14,7 +14,8 @@ if ENABLE_TESTS
 if HAVE_TFLITE
 
 TESTS =                 \
-        loader
+        loader          \
+        engine
 
 check_PROGRAMS=$(TESTS)
 

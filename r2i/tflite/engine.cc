@@ -70,23 +70,26 @@ RuntimeError Engine::Start ()  {
     return error;
   }
 
-  ::tflite::ops::builtin::BuiltinOpResolver resolver;
-  ::tflite::ErrorReporter *error_reporter = ::tflite::DefaultErrorReporter();
+  if (!this->interpreter) {
+    ::tflite::ops::builtin::BuiltinOpResolver resolver;
+    ::tflite::ErrorReporter *error_reporter = ::tflite::DefaultErrorReporter();
 
-  std::unique_ptr<::tflite::Interpreter> interpreter;
+    std::unique_ptr<::tflite::Interpreter> interpreter;
 
-  ::tflite::InterpreterBuilder(this->model->GetTfliteModel()->GetModel(),
-                               resolver, error_reporter)(&interpreter);
+    ::tflite::InterpreterBuilder(this->model->GetTfliteModel()->GetModel(),
+                                 resolver, error_reporter)(&interpreter);
 
-  if (!interpreter) {
-    error.Set (RuntimeError::Code::FRAMEWORK_ERROR,
-               "Failed to construct interpreter");
-    return error;
+    if (!interpreter) {
+      error.Set (RuntimeError::Code::FRAMEWORK_ERROR,
+                 "Failed to construct interpreter");
+      return error;
+    }
+
+    std::shared_ptr<::tflite::Interpreter> tflite_interpreter_shared{std::move(interpreter)};
+
+    this->interpreter = tflite_interpreter_shared;
   }
 
-  std::shared_ptr<::tflite::Interpreter> tflite_interpreter_shared{std::move(interpreter)};
-
-  this->interpreter = tflite_interpreter_shared;
   this->state = State::STARTED;
 
   return error;
@@ -124,8 +127,6 @@ std::shared_ptr<r2i::IPrediction> Engine::Predict (std::shared_ptr<r2i::IFrame>
     return nullptr;
   }
 
-  auto input_data = (float *)frame->GetData();
-
   if (this->interpreter->AllocateTensors() != kTfLiteOk) {
     error.Set (RuntimeError::Code::INCOMPATIBLE_MODEL,
                "Failed to allocate tensors!");
@@ -147,6 +148,7 @@ std::shared_ptr<r2i::IPrediction> Engine::Predict (std::shared_ptr<r2i::IFrame>
   }
 
   auto input_tensor = this->interpreter->typed_tensor<float>(input);
+  auto input_data = (float *)frame->GetData();
 
   if (!input_data) {
     error.Set (RuntimeError::Code::FRAMEWORK_ERROR, "Failed to get image data");
