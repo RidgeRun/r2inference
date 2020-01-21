@@ -67,6 +67,7 @@ examples/Makefile
 examples/r2i/Makefile
 examples/r2i/ncsdk/Makefile
 examples/r2i/tensorflow/Makefile
+examples/r2i/tflite/Makefile
 r2i/Makefile
 r2i/ncsdk/Makefile
 r2i/tensorflow/Makefile
