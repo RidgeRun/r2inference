@@ -17,6 +17,7 @@
 #include "config.h"
 #include "ncsdk/frameworkfactory.h"
 #include "tensorflow/frameworkfactory.h"
+#include "tflite/frameworkfactory.h"
 
 namespace r2i {
 
@@ -35,6 +36,14 @@ MakeTensorflowFactory (RuntimeError &error) {
 }
 #endif // HAVE_TENSORFLOW
 
+#ifdef HAVE_TFLITE
+static std::unique_ptr<IFrameworkFactory>
+MakeTfLiteFactory (RuntimeError &error) {
+  return std::unique_ptr<tflite::FrameworkFactory> (new
+         tflite::FrameworkFactory);
+}
+#endif // HAVE_TFLITE
+
 typedef std::function<std::unique_ptr<IFrameworkFactory>(RuntimeError &)>
 MakeFactory;
 const std::unordered_map<int, MakeFactory> frameworks ({
@@ -45,6 +54,10 @@ const std::unordered_map<int, MakeFactory> frameworks ({
 
 #ifdef HAVE_TENSORFLOW
   {FrameworkCode::TENSORFLOW, MakeTensorflowFactory},
+#endif //HAVE_TENSORFLOW
+
+#ifdef HAVE_TFLITE
+  {FrameworkCode::TFLITE, MakeTfLiteFactory},
 #endif //HAVE_TENSORFLOW
 
 });

@@ -15,6 +15,9 @@
 #include "r2i/tflite/frame.h"
 #include <tensorflow/lite/model.h>
 #include "tensorflow/lite/kernels/register.h"
+#include "tensorflow/lite/profiling/profiler.h"
+#include "absl/memory/memory.h"
+#include "tensorflow/lite/string_util.h"
 
 namespace r2i {
 namespace tflite {
@@ -155,13 +158,19 @@ std::shared_ptr<r2i::IPrediction> Engine::Predict (std::shared_ptr<r2i::IFrame>
     return nullptr;
   }
 
-  memcpy(input_tensor, input_data, sizeof(input_data) + 1);
+  memcpy(input_tensor, input_data, wanted_height * wanted_width * 3 + 1);
 
   if (this->interpreter->Invoke() != kTfLiteOk) {
     error.Set (RuntimeError::Code::FRAMEWORK_ERROR,
                "Failed to invoke tflite!");
     return nullptr;
   }
+
+  int output = this->interpreter->outputs()[0];
+  TfLiteIntArray *output_dims = this->interpreter->tensor(output)->dims;
+  auto output_size = output_dims->data[output_dims->size - 1];
+  float *tensor_data = this->interpreter->typed_output_tensor<float>(0);
+  prediction->SetTensorValues(tensor_data, output_size);
 
   return prediction;
 }

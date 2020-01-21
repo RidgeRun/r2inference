@@ -20,7 +20,9 @@ libtflite_la_SOURCES =           \
     frame.cc                     \
     loader.cc                    \
     model.cc                     \
-    prediction.cc
+    prediction.cc                \
+    frameworkfactory.cc          \
+    parameters.cc
 
 libtflite_la_CPPFLAGS =              \
     $(RR_CPPFLAGS)                   \
@@ -46,6 +48,8 @@ tensorflowliteinclude_HEADERS =      \
     loader.h                         \
     engine.h                         \
     prediction.h                     \
-    frame.h
+    frame.h                          \
+    frameworkfactory.h               \
+    parameters.h
 
 endif # HAVE_TFLITE
