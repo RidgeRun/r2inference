@@ -23,9 +23,15 @@ namespace tflite {
 class Prediction: public IPrediction {
  public:
   Prediction ();
+  ~Prediction ();
   double At (unsigned int index,  r2i::RuntimeError &error) override;
   void *GetResultData () override;
   unsigned int GetResultSize () override;
+  RuntimeError SetTensorValues(float *outputdata, int tensorsize);
+
+ private:
+  float *outputdata = NULL;
+  int tensorsize;
 };
 
 }
