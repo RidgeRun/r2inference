@@ -1,4 +1,4 @@
-/* Copyright (C) 2018 RidgeRun, LLC (http://www.ridgerun.com)
+/* Copyright (C) 2018-2020 RidgeRun, LLC (http://www.ridgerun.com)
  * All Rights Reserved.
  *
  * The contents of this software are proprietary and confidential to RidgeRun,
@@ -41,7 +41,7 @@ RuntimeError Engine::SetModel (std::shared_ptr<r2i::IModel> in_model) {
                (in_model);
 
   if (nullptr == model) {
-    error.Set (RuntimeError::Code::INCOMPATIBLE_MODEL,
+    error.Set (RuntimeError::Code::FRAMEWORK_ERROR,
                "The provided model is not an TFLITE model");
     return error;
   }
@@ -122,13 +122,13 @@ std::shared_ptr<r2i::IPrediction> Engine::Predict (std::shared_ptr<r2i::IFrame>
 
   auto frame = std::dynamic_pointer_cast<Frame, IFrame> (in_frame);
   if (nullptr == frame) {
-    error.Set (RuntimeError::Code::INCOMPATIBLE_MODEL,
+    error.Set (RuntimeError::Code::FRAMEWORK_ERROR,
                "The provided frame is not an tensorflow lite frame");
     return nullptr;
   }
 
   if (this->interpreter->AllocateTensors() != kTfLiteOk) {
-    error.Set (RuntimeError::Code::INCOMPATIBLE_MODEL,
+    error.Set (RuntimeError::Code::FRAMEWORK_ERROR,
                "Failed to allocate tensors!");
     return nullptr;
   }
@@ -142,7 +142,7 @@ std::shared_ptr<r2i::IPrediction> Engine::Predict (std::shared_ptr<r2i::IFrame>
 
   if ((frame->GetWidth() != wanted_width)
       or (frame->GetHeight() != wanted_height)) {
-    error.Set (RuntimeError::Code::INCOMPATIBLE_MODEL,
+    error.Set (RuntimeError::Code::FRAMEWORK_ERROR,
                "The provided frame input sizes are different to tensor sizes");
     return nullptr;
   }
@@ -158,7 +158,7 @@ std::shared_ptr<r2i::IPrediction> Engine::Predict (std::shared_ptr<r2i::IFrame>
   memcpy(input_tensor, input_data, sizeof(input_data) + 1);
 
   if (this->interpreter->Invoke() != kTfLiteOk) {
-    error.Set (RuntimeError::Code::INCOMPATIBLE_MODEL,
+    error.Set (RuntimeError::Code::FRAMEWORK_ERROR,
                "Failed to invoke tflite!");
     return nullptr;
   }

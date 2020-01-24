@@ -98,7 +98,7 @@ TEST (TfLiteEngine, SetModelInvalid) {
   r2i::RuntimeError error;
 
   error = engine.SetModel (inc_model);
-  LONGS_EQUAL (r2i::RuntimeError::Code::INCOMPATIBLE_MODEL, error.GetCode ());
+  LONGS_EQUAL (r2i::RuntimeError::Code::FRAMEWORK_ERROR, error.GetCode ());
 }
 
 TEST (TfLiteEngine, StartEngine) {
@@ -200,5 +200,8 @@ TEST (TfLiteEngine, PredictEngine) {
 }
 
 int main (int ac, char **av) {
+  /* This module detects fake leaks since the TF_Tensor couldn't
+     be mocked since it's directly used by the predict module */
+  MemoryLeakWarningPlugin::turnOffNewDeleteOverloads();
   return CommandLineTestRunner::RunAllTests (ac, av);
 }
