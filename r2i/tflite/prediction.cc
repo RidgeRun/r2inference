@@ -20,6 +20,11 @@ namespace tflite {
 Prediction::Prediction ():
   outputdata(nullptr), tensorsize(0) {
 }
+Prediction::~Prediction () {
+  if (nullptr != this->outputdata ) {
+    free(this->outputdata);
+  }
+}
 
 RuntimeError Prediction::SetTensorValues(float *outputdata, int tensorsize) {
   RuntimeError error;

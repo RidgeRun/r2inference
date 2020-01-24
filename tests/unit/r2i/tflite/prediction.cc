@@ -11,8 +11,9 @@
 
 #include <r2i/r2i.h>
 #include <r2i/tflite/prediction.h>
-#include <fstream>
+
 #include <cstring>
+#include <fstream>
 #include <memory>
 
 #include <CppUTest/CommandLineTestRunner.h>
