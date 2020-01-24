@@ -9,33 +9,25 @@
  * back to RidgeRun without any encumbrance.
 */
 
-#ifndef R2I_TFLITE_MODEL_H
-#define R2I_TFLITE_MODEL_H
+#ifndef R2I_TFLITE_PREDICTION_H
+#define R2I_TFLITE_PREDICTION_H
 
 #include <memory>
 
-#include <r2i/imodel.h>
+#include <r2i/iprediction.h>
 #include <r2i/runtimeerror.h>
-#include <tensorflow/lite/model.h>
 
 namespace r2i {
 namespace tflite {
 
-class Model : public IModel {
+class Prediction: public IPrediction {
  public:
-  Model ();
-
-  RuntimeError Start (const std::string &name) override;
-
-  std::shared_ptr<::tflite::FlatBufferModel> GetTfliteModel ();
-
-  RuntimeError Set (std::shared_ptr<::tflite::FlatBufferModel> tfltmodel);
-
- private:
-  std::shared_ptr<::tflite::FlatBufferModel> tflite_model;
+  Prediction ();
+  double At (unsigned int index,  r2i::RuntimeError &error) override;
+  void *GetResultData () override;
+  unsigned int GetResultSize () override;
 };
 
 }
 }
-
-#endif //R2I_TFLITE_MODEL_H
+#endif // R2I_TFLITE_PREDICTION_H

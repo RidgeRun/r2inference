@@ -62,7 +62,7 @@ AC_DEFUN([RR_INIT_FLAGS],[
   AC_MSG_NOTICE([Using profile: $with_profile])
 
   RR_CXXFLAGS="$RR_CFLAGS"
-  RR_CPPFLAGS="-I\$(top_srcdir) "
+  RR_CPPFLAGS="-I\$(top_srcdir) -pthread"
 
   AC_SUBST(RR_CFLAGS)
   AC_SUBST(RR_CXXFLAGS)

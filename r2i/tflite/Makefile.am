@@ -15,9 +15,12 @@ noinst_LTLIBRARIES = libtflite.la
 # Define a custom area for our headers
 tensorflowliteincludedir = @R2IINCLUDEDIR@/r2i/tensorflowlite
 
-libtflite_la_SOURCES =               \
-    loader.cc                        \
-    model.cc
+libtflite_la_SOURCES =           \
+    engine.cc                    \
+    frame.cc                     \
+    loader.cc                    \
+    model.cc                     \
+    prediction.cc
 
 libtflite_la_CPPFLAGS =              \
     $(RR_CPPFLAGS)                   \
@@ -39,7 +42,10 @@ libtflite_la_LIBADD =                \
     $(CODE_COVERAGE_LIBS)
 
 tensorflowliteinclude_HEADERS =      \
+    model.h                          \
     loader.h                         \
-    model.h
+    engine.h                         \
+    prediction.h                     \
+    frame.h
 
 endif # HAVE_TFLITE
