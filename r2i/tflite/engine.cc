@@ -23,6 +23,8 @@ namespace r2i {
 namespace tflite {
 
 Engine::Engine () : state(State::STOPPED), model(nullptr) {
+  this->number_of_threads = -1;
+  this->allow_fp16 = 0;
 }
 
 RuntimeError Engine::SetModel (std::shared_ptr<r2i::IModel> in_model) {
@@ -111,6 +113,22 @@ RuntimeError Engine::Stop () {
   return error;
 }
 
+RuntimeError Engine::SetNumberOfThreads (int number_of_threads) {
+  this->number_of_threads = number_of_threads;
+  return RuntimeError ();
+}
+const int Engine::GetNumberOfThreads () {
+  return this->number_of_threads;
+}
+
+RuntimeError Engine::SetAllowFP16 (int allow_fp16) {
+  this->allow_fp16 = allow_fp16;
+  return RuntimeError ();
+}
+const int Engine::GetAllowFP16 () {
+  return this->allow_fp16;
+}
+
 std::shared_ptr<r2i::IPrediction> Engine::Predict (std::shared_ptr<r2i::IFrame>
     in_frame, r2i::RuntimeError &error) {
   ImageFormat in_format;
@@ -129,6 +147,12 @@ std::shared_ptr<r2i::IPrediction> Engine::Predict (std::shared_ptr<r2i::IFrame>
                "The provided frame is not an tensorflow lite frame");
     return nullptr;
   }
+
+  if (this->number_of_threads != -1) {
+    interpreter->SetNumThreads(this->number_of_threads);
+  }
+
+  interpreter->SetAllowFp16PrecisionForFp32(this->allow_fp16);
 
   if (this->interpreter->AllocateTensors() != kTfLiteOk) {
     error.Set (RuntimeError::Code::FRAMEWORK_ERROR,

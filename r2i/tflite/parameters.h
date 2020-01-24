@@ -76,6 +76,7 @@ class Parameters: public IParameters {
 
   class IntAccessor: public Accessor {
    public:
+    IntAccessor (Parameters *target): Accessor (target) {}
     int value;
   };
 
@@ -90,6 +91,30 @@ class Parameters: public IParameters {
 
     RuntimeError Get () {
       // TODO: Implement Version parameter
+      return RuntimeError ();
+    }
+  };
+
+  class NumberOfThreadsAccessor: public IntAccessor {
+   public:
+    NumberOfThreadsAccessor (Parameters *target): IntAccessor (target) {}
+    RuntimeError Set () {
+      return target->engine->SetNumberOfThreads(this->value);
+    }
+    RuntimeError Get () {
+      this->value = target->engine->GetNumberOfThreads();
+      return RuntimeError ();
+    }
+  };
+
+  class AllowFP16Accessor: public IntAccessor {
+   public:
+    AllowFP16Accessor (Parameters *target): IntAccessor (target) {}
+    RuntimeError Set () {
+      return target->engine->SetNumberOfThreads(this->value);
+    }
+    RuntimeError Get () {
+      this->value = target->engine->GetNumberOfThreads();
       return RuntimeError ();
     }
   };

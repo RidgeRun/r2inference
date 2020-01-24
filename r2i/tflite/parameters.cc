@@ -37,14 +37,10 @@ Parameters::Parameters (): parameter_map ( {
          r2i::ParameterMeta::Type::STRING,
          std::make_shared < VersionAccessor > (this)),
   /* Model parameters */
-  // PARAM("input-layer", "Name of the input layer in the graph",
-  //       r2i::ParameterMeta::Flags::READWRITE | r2i::ParameterMeta::Flags::WRITE_BEFORE_START,
-  //       r2i::ParameterMeta::Type::STRING,
-  //       std::make_shared<InputLayerAccessor>(this)),
-  // PARAM("output-layer", "Name of the output layer in the graph",
-  //       r2i::ParameterMeta::Flags::READWRITE | r2i::ParameterMeta::Flags::WRITE_BEFORE_START,
-  //       r2i::ParameterMeta::Type::STRING,
-  //       std::make_shared<OutputLayerAccessor>(this)),
+  PARAM("number_of_threads", "Number of threads to run",
+        r2i::ParameterMeta::Flags::READWRITE | r2i::ParameterMeta::Flags::WRITE_BEFORE_START,
+        r2i::ParameterMeta::Type::INTEGER,
+        std::make_shared<NumberOfThreadsAccessor>(this)),
 }
                                          ) {
 }
