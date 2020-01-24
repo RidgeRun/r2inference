@@ -16,7 +16,8 @@ if HAVE_TFLITE
 TESTS =                 \
         loader          \
         engine          \
-        prediction
+        prediction      \
+        frame
 
 check_PROGRAMS=$(TESTS)
 
