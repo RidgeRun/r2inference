@@ -17,17 +17,17 @@ namespace r2i {
 namespace tflite {
 
 #define PARAM(_name, _desc, _flags, _type, _acc) \
-  {						 \
-    (_name),					 \
-    {						 \
-      .meta = {					 \
-	.name = (_name),			 \
-	.description = (_desc),			 \
-	.flags = (_flags),			 \
-	.type = (_type),			 \
-      },					 \
-      .accessor = (_acc)			 \
-    }						 \
+  {                           \
+    (_name),                  \
+    {                         \
+      .meta = {               \
+      .name = (_name),        \
+      .description = (_desc), \
+      .flags = (_flags),      \
+      .type = (_type),        \
+    },                        \
+    .accessor = (_acc)        \
+    }                         \
   }
 
 Parameters::Parameters (): parameter_map ( {
@@ -228,5 +228,5 @@ RuntimeError Parameters::List (std::vector < ParameterMeta > &metas) {
   return RuntimeError ();
 }
 
-}                             // namespace tflite
-}                               // namespace r2i
+}// namespace tflite
+}// namespace r2i

@@ -90,54 +90,9 @@ class Parameters: public IParameters {
 
     RuntimeError Get () {
       // TODO: Implement Version parameter
-      //this->value = TF_Version ();
       return RuntimeError ();
     }
   };
-
-  /* class NumberOfThreadsAccessor:public IntAccessor */
-  /* { */
-  /* public: */
-  /*   NumberOfThreadsAccessor (Parameters * target):IntAccessor (target) */
-  /*   { */
-  /*   } */
-  /*   RuntimeError Set () */
-  /*   { */
-  /*     return RuntimeError (); */
-  /*   } */
-
-  /*   RuntimeError Get () */
-  /*   { */
-  /*     this->value = 2; */
-  /*     return RuntimeError (); */
-  /*   } */
-
-  /* }; */
-  /* class InputLayerAccessor : public StringAccessor { */
-  /*  public: */
-  /*   InputLayerAccessor (Parameters *target) : StringAccessor(target) {} */
-  /*   RuntimeError Set () { */
-  /*     return target->model->SetInputLayerName(this->value); */
-  /*   } */
-
-  /*   RuntimeError Get () { */
-  /*     this->value = target->model->GetInputLayerName(); */
-  /*     return RuntimeError (); */
-  /*   } */
-  /* }; */
-
-  /* class OutputLayerAccessor : public StringAccessor { */
-  /*  public: */
-  /*   OutputLayerAccessor (Parameters *target) : StringAccessor(target) {} */
-  /*   RuntimeError Set () { */
-  /*     return target->model->SetOutputLayerName(this->value); */
-  /*   } */
-
-  /*   RuntimeError Get () { */
-  /*     this->value = target->model->GetOutputLayerName(); */
-  /*     return RuntimeError (); */
-  /*   } */
-  /* }; */
 
   struct ParamDesc {
     ParameterMeta meta;

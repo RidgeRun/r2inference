@@ -45,7 +45,7 @@ RuntimeError Prediction::SetTensorValues(float *outputdata, int tensorsize) {
 
   this->outputdata = (float *) malloc(this->tensorsize * sizeof(float));
 
-  memcpy(this->outputdata, outputdata, this->tensorsize * sizeof(float) + 1);
+  memcpy(this->outputdata, outputdata, this->tensorsize * sizeof(float));
 
   return error;
 }

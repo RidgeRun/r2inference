@@ -142,6 +142,7 @@ std::shared_ptr<r2i::IPrediction> Engine::Predict (std::shared_ptr<r2i::IFrame>
   TfLiteIntArray *dims = this->interpreter->tensor(input)->dims;
   int wanted_height = dims->data[1];
   int wanted_width = dims->data[2];
+  int wanted_channels = dims->data[3];
 
   if ((frame->GetWidth() != wanted_width)
       or (frame->GetHeight() != wanted_height)) {
@@ -159,7 +160,7 @@ std::shared_ptr<r2i::IPrediction> Engine::Predict (std::shared_ptr<r2i::IFrame>
   }
 
   memcpy(input_tensor, input_data,
-         wanted_height * wanted_width * 3 * sizeof(float) + 1);
+         wanted_height * wanted_width * wanted_channels * sizeof(float));
 
   if (this->interpreter->Invoke() != kTfLiteOk) {
     error.Set (RuntimeError::Code::FRAMEWORK_ERROR,
