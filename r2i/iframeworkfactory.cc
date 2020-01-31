@@ -58,7 +58,7 @@ const std::unordered_map<int, MakeFactory> frameworks ({
 
 #ifdef HAVE_TFLITE
   {FrameworkCode::TFLITE, MakeTfLiteFactory},
-#endif //HAVE_TENSORFLOW
+#endif //HAVE_TFLITE
 
 });
 
