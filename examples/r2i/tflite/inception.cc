@@ -25,8 +25,7 @@ void PrintTopPrediction (std::shared_ptr<r2i::IPrediction> prediction) {
   r2i::RuntimeError error;
   int index = 0;
   double max = -1;
-
-  int num_labels = prediction->GetResultSize() / sizeof(float);
+  int num_labels = prediction->GetResultSize();
 
   for (int i = 0; i < num_labels; ++i) {
     double current = prediction->At(i, error);
@@ -41,12 +40,15 @@ void PrintTopPrediction (std::shared_ptr<r2i::IPrediction> prediction) {
 }
 
 void PrintUsage() {
-  std::cerr << "Required arguments:"
+  std::cerr << "Required arguments: "
             << "-i [JPG input_image] "
-            << "-m [Inception NCS Model] "
-            << "-s [Model Input Size] \n"
-            << " Example:"
-            << " ./inception -i cat.jpg -m graph_inceptionv2_ncsdk -s 224"
+            << "-m [Inception TfLite Model] "
+            << "-s [Model Input Size] "
+            << "-I [Input Node] "
+            << "-O [Output Node] \n"
+            << " Example: "
+            << " ./inception -i cat.jpg -m graph_inceptionv2_tensorflow.pb "
+            << "-s 224"
             << std::endl;
 }
 
@@ -55,7 +57,6 @@ std::unique_ptr<float[]> PreProcessImage (const unsigned char *input,
 
   const int channels = 3;
   const int scaled_size = channels * reqwidth * reqheight;
-
   std::unique_ptr<unsigned char[]> scaled (new unsigned char[scaled_size]);
   std::unique_ptr<float[]> adjusted (new float[scaled_size]);
 
@@ -63,10 +64,10 @@ std::unique_ptr<float[]> PreProcessImage (const unsigned char *input,
                      reqheight, 0, channels);
 
   for (int i = 0; i < scaled_size; i += channels) {
-    /* RGB = (RGB)*StdDev */
-    adjusted[i + 0] = (static_cast<float>(scaled[i + 0]) - 128) / 128.0;
-    adjusted[i + 1] = (static_cast<float>(scaled[i + 1]) - 128) / 128.0;
-    adjusted[i + 2] = (static_cast<float>(scaled[i + 2]) - 128) / 128.0;
+    /* RGB = (RGB - Mean)*StdDev */
+    adjusted[i + 0] = (static_cast<float>(scaled[i + 0]) - 127.5) / 127.5;
+    adjusted[i + 1] = (static_cast<float>(scaled[i + 1]) - 127.5) / 127.5;
+    adjusted[i + 2] = (static_cast<float>(scaled[i + 2]) - 127.5) / 127.5;
   }
 
   return adjusted;
@@ -90,10 +91,11 @@ std::unique_ptr<float[]> LoadImage(const std::string &path, int reqwidth,
 }
 
 bool ParseArgs (int &argc, char *argv[], std::string &image_path,
-                std::string &model_path, int &index, int &size) {
+                std::string &model_path, int &index, int &size,
+                std::string &in_node, std::string &out_node) {
 
   int option = 0;
-  while ((option = getopt(argc, argv, "i:m:p:s:")) != -1) {
+  while ((option = getopt(argc, argv, "i:m:p:s:I:O:")) != -1) {
     switch (option) {
       case 'i' :
         image_path = optarg;
@@ -107,6 +109,12 @@ bool ParseArgs (int &argc, char *argv[], std::string &image_path,
       case 's' :
         size = std::stoi (optarg);
         break;
+      case 'I' :
+        in_node = optarg;
+        break;
+      case 'O' :
+        out_node = optarg;
+        break;
       default:
         return false;
     }
@@ -115,13 +123,17 @@ bool ParseArgs (int &argc, char *argv[], std::string &image_path,
 }
 
 int main (int argc, char *argv[]) {
+
   r2i::RuntimeError error;
   std::string model_path;
   std::string image_path;
+  std::string in_node;
+  std::string out_node;
   int Index = 0;
   int size = 0;
 
-  if (false == ParseArgs (argc, argv, image_path, model_path, Index, size)) {
+  if (false == ParseArgs (argc, argv, image_path, model_path, Index,
+                          size, in_node, out_node)) {
     PrintUsage ();
     exit (EXIT_FAILURE);
   }
@@ -131,24 +143,25 @@ int main (int argc, char *argv[]) {
     exit (EXIT_FAILURE);
   }
 
-  auto factory = r2i::IFrameworkFactory::MakeFactory(r2i::FrameworkCode::NCSDK,
-                 error);
+  auto factory = r2i::IFrameworkFactory::MakeFactory(
+                   r2i::FrameworkCode::TFLITE,
+                   error);
 
   if (nullptr == factory) {
-    std::cerr << "NCSDK backend is not built: " << error << std::endl;
+    std::cerr << "TensorFlow backend is not built: " << error << std::endl;
     exit(EXIT_FAILURE);
   }
 
   std::cout << "Loading Model: " << model_path << std::endl;
   auto loader = factory->MakeLoader (error);
-  auto model = loader->Load (model_path, error);
+  std::shared_ptr<r2i::IModel> model = loader->Load (model_path, error);
   if (error.IsError ()) {
     std::cerr << "Loader error: " << error << std::endl;
     exit(EXIT_FAILURE);
   }
 
   std::cout << "Setting model to engine" << std::endl;
-  auto engine = factory->MakeEngine (error);
+  std::shared_ptr<r2i::IEngine> engine = factory->MakeEngine (error);
   error = engine->SetModel (model);
 
   std::cout << "Loading image: " << image_path << std::endl;
@@ -157,6 +170,7 @@ int main (int argc, char *argv[]) {
 
   std::cout << "Configuring frame" << std::endl;
   std::shared_ptr<r2i::IFrame> frame = factory->MakeFrame (error);
+
   error = frame->Configure (image_data.get(), size, size,
                             r2i::ImageFormat::Id::RGB);
 

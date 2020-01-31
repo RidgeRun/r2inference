@@ -10,43 +10,26 @@
 
 AM_DEFAULT_SOURCE_EXT = .cc
 
-DIST_SUBDIRS =                    \
-        ncsdk                     \
-        tensorflow                \
-        tflite
-SUBDIRS =
-
 if ENABLE_EXAMPLES
 
-if HAVE_NCSDK
-SUBDIRS += ncsdk
-endif
+noinst_PROGRAMS =                  \
+        inception
 
-if HAVE_TENSORFLOW
-SUBDIRS += tensorflow
-endif
-
-if HAVE_TFLITE
-SUBDIRS += tflite
-endif
-
-noinst_PROGRAMS = list_parameters
-
-AM_CXXFLAGS =                     \
-        $(RR_CXXFLAGS)            \
+AM_CXXFLAGS =                      \
+        $(RR_CXXFLAGS)             \
         $(CODE_COVERAGE_CXXFLAGS)
 
-AM_CFLAGS =                       \
-        $(RR_CFLAGS)              \
+AM_CFLAGS =                        \
+        $(RR_CFLAGS)               \
         $(CODE_COVERAGE_CFLAGS)
 
-AM_CPPFLAGS =                     \
-        $(RR_CPPFLAGS)            \
+AM_CPPFLAGS =                      \
+        $(RR_CPPFLAGS)             \
         $(CODE_COVERAGE_CPPFLAGS)
 
-AM_LDFLAGS =                      \
-        $(RR_LIBS)                \
-        $(CODE_COVERAGE_LIBS)     \
+AM_LDFLAGS =                       \
+        $(RR_LIBS)                 \
+        $(CODE_COVERAGE_LIBS)      \
         $(top_builddir)/r2i/libr2inference-@RR_PACKAGE_VERSION@.la
 
 endif # ENABLE_EXAMPLES

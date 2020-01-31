@@ -27,7 +27,7 @@ RuntimeError Model::Start (const std::string &name) {
 RuntimeError Model::Set (std::shared_ptr<::tflite::FlatBufferModel> tfltmodel) {
   RuntimeError error;
 
-  if (nullptr != tfltmodel) {
+  if (nullptr == tfltmodel) {
     error.Set (RuntimeError::Code::NULL_PARAMETER,
                "Trying to set model with null model pointer");
     return error;

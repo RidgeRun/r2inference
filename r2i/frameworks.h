@@ -32,6 +32,11 @@ enum FrameworkCode {
   TENSORFLOW,
 
   /**
+   * Google's TensorFlow Lite
+   */
+  TFLITE,
+
+  /**
    * Number of supported frameworks, mostly for testing purposes.
    */
   MAX_FRAMEWORK

@@ -45,7 +45,7 @@ RuntimeError Prediction::SetTensorValues(float *outputdata, int tensorsize) {
 
   this->outputdata = (float *) malloc(this->tensorsize * sizeof(float));
 
-  memcpy(this->outputdata, outputdata, sizeof(outputdata) + 1);
+  memcpy(this->outputdata, outputdata, this->tensorsize * sizeof(float));
 
   return error;
 }
@@ -59,7 +59,7 @@ double Prediction::At (unsigned int index,  r2i::RuntimeError &error) {
     return 0;
   }
 
-  unsigned int n_results =  this->GetResultSize() / sizeof(float);
+  unsigned int n_results =  this->GetResultSize();
   if (n_results < index ) {
     error.Set (RuntimeError::Code::MEMORY_ERROR,
                "Triying to access an non-existing index");
