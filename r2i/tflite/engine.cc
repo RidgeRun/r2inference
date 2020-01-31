@@ -15,8 +15,6 @@
 #include "r2i/tflite/frame.h"
 #include <tensorflow/lite/model.h>
 #include "tensorflow/lite/kernels/register.h"
-#include "tensorflow/lite/profiling/profiler.h"
-#include "absl/memory/memory.h"
 #include "tensorflow/lite/string_util.h"
 
 namespace r2i {

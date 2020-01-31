@@ -31,11 +31,6 @@ namespace tflite {
   }
 
 Parameters::Parameters (): parameter_map ( {
-  /* Global parameters */
-  PARAM ("version", "Tflite version",
-         r2i::ParameterMeta::Flags::READ,
-         r2i::ParameterMeta::Type::STRING,
-         std::make_shared < VersionAccessor > (this)),
   /* Model parameters */
   PARAM("number_of_threads", "Number of threads to run",
         r2i::ParameterMeta::Flags::READWRITE | r2i::ParameterMeta::Flags::WRITE_BEFORE_START,
