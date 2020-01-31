@@ -111,10 +111,10 @@ class Parameters: public IParameters {
    public:
     AllowFP16Accessor (Parameters *target): IntAccessor (target) {}
     RuntimeError Set () {
-      return target->engine->SetNumberOfThreads(this->value);
+      return target->engine->SetAllowFP16(this->value);
     }
     RuntimeError Get () {
-      this->value = target->engine->GetNumberOfThreads();
+      this->value = target->engine->GetAllowFP16();
       return RuntimeError ();
     }
   };

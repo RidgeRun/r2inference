@@ -41,6 +41,10 @@ Parameters::Parameters (): parameter_map ( {
         r2i::ParameterMeta::Flags::READWRITE | r2i::ParameterMeta::Flags::WRITE_BEFORE_START,
         r2i::ParameterMeta::Type::INTEGER,
         std::make_shared<NumberOfThreadsAccessor>(this)),
+  PARAM("allow_fp16", "Allow fp16 optimization",
+        r2i::ParameterMeta::Flags::READWRITE | r2i::ParameterMeta::Flags::WRITE_BEFORE_START,
+        r2i::ParameterMeta::Type::INTEGER,
+        std::make_shared<AllowFP16Accessor>(this)),
 }
                                          ) {
 }
