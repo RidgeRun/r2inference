@@ -18,13 +18,6 @@
 #include <CppUTest/TestHarness.h>
 
 namespace mock {
-class Model : public r2i::IModel {
- public:
-  Model () {}
-  r2i::RuntimeError Start (const std::string &name) {
-    return r2i::RuntimeError();
-  }
-};
 
 class Engine : public r2i::IEngine {
  public:
@@ -44,31 +37,6 @@ class Engine : public r2i::IEngine {
 
 namespace r2i {
 namespace tflite {
-
-Model::Model () {}
-r2i::RuntimeError Model::Start (const std::string &name) { return RuntimeError(); }
-RuntimeError Model::Set (std::shared_ptr<::tflite::FlatBufferModel> tfltmodel) {
-  this->tflite_model = tfltmodel;
-  return r2i::RuntimeError();
-};
-
-std::shared_ptr<::tflite::FlatBufferModel> Model::GetTfliteModel () {
-  std::unique_ptr<::tflite::FlatBufferModel> tflite_model;
-  ::tflite::ErrorReporter *error_reporter = ::tflite::DefaultErrorReporter();
-  std::string  path = "resources/squeezenet.tflite";
-  tflite_model = ::tflite::FlatBufferModel::BuildFromFile(path.c_str(),
-                 error_reporter);
-
-  delete error_reporter;
-  std::shared_ptr<::tflite::FlatBufferModel> tflite_model_shared{std::move(tflite_model)};
-  return tflite_model_shared;
-}
-
-
-Prediction::Prediction () {}
-double Prediction::At (unsigned int index,  r2i::RuntimeError &error) { return 0.0; }
-void *Prediction::GetResultData () { return nullptr; }
-unsigned int Prediction::GetResultSize () { return 0; }
 
 Engine::Engine ()  { }
 RuntimeError Engine::SetModel (std::shared_ptr<IModel> in_model) { return RuntimeError(); }
@@ -110,19 +78,6 @@ TEST (TliteParameters, ConfigureIncompatibleEngine) {
   LONGS_EQUAL (r2i::RuntimeError::Code::INCOMPATIBLE_ENGINE, error.GetCode ());
 }
 
-TEST (TliteParameters, ConfigureIncompatibleModel) {
-  r2i::RuntimeError error;
-  r2i::tflite::Parameters parameters;
-
-  std::shared_ptr<r2i::IEngine> engine(new r2i::tflite::Engine);
-  std::shared_ptr<r2i::IModel> model(new mock::Model);
-
-  error = parameters.Configure(engine, model);
-
-  CHECK_TEXT (error.IsError(), error.GetDescription().c_str());
-  LONGS_EQUAL (r2i::RuntimeError::Code::INCOMPATIBLE_MODEL, error.GetCode ());
-}
-
 TEST (TliteParameters, ConfigureNullEngine) {
   r2i::RuntimeError error;
   r2i::tflite::Parameters parameters;
@@ -157,22 +112,6 @@ TEST (TliteParameters, ConfigureSuccess) {
   error = parameters.Configure(engine, model);
 
   LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
-}
-
-TEST (TliteParameters, SetAndGetModel) {
-  r2i::RuntimeError error;
-  r2i::tflite::Parameters parameters;
-
-  std::shared_ptr<r2i::IEngine> engine(new r2i::tflite::Engine);
-  std::shared_ptr<r2i::IModel> model(new r2i::tflite::Model);
-
-  error = parameters.Configure(engine, model);
-
-  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
-
-  std::shared_ptr<r2i::IModel> internalModel = parameters.GetModel();
-
-  POINTERS_EQUAL(internalModel.get(), model.get());
 }
 
 TEST (TliteParameters, SetAndGetEngine) {
