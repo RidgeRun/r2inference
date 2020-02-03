@@ -14,8 +14,8 @@
 #include "r2i/tflite/prediction.h"
 #include "r2i/tflite/frame.h"
 #include <tensorflow/lite/model.h>
-#include "tensorflow/lite/kernels/register.h"
-#include "tensorflow/lite/string_util.h"
+#include <tensorflow/lite/kernels/register.h>
+#include <tensorflow/lite/string_util.h>
 
 namespace r2i {
 namespace tflite {
@@ -146,7 +146,7 @@ std::shared_ptr<r2i::IPrediction> Engine::Predict (std::shared_ptr<r2i::IFrame>
     return nullptr;
   }
 
-  if (this->number_of_threads != -1) {
+  if (this->number_of_threads > 0) {
     interpreter->SetNumThreads(this->number_of_threads);
   }
 
