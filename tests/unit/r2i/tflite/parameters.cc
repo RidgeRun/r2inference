@@ -63,11 +63,13 @@ Engine::~Engine () { }
 }
 
 TEST_GROUP (TliteParameters) {
+  r2i::RuntimeError error;
+  r2i::tflite::Parameters parameters;
+  void setup() {}
+  void teardown() {}
 };
 
 TEST (TliteParameters, ConfigureIncompatibleEngine) {
-  r2i::RuntimeError error;
-  r2i::tflite::Parameters parameters;
 
   std::shared_ptr<r2i::IEngine> engine(new mock::Engine);
   std::shared_ptr<r2i::IModel> model(new r2i::tflite::Model);
@@ -79,8 +81,6 @@ TEST (TliteParameters, ConfigureIncompatibleEngine) {
 }
 
 TEST (TliteParameters, ConfigureNullEngine) {
-  r2i::RuntimeError error;
-  r2i::tflite::Parameters parameters;
 
   std::shared_ptr<r2i::IModel> model(new r2i::tflite::Model);
 
@@ -91,8 +91,6 @@ TEST (TliteParameters, ConfigureNullEngine) {
 }
 
 TEST (TliteParameters, ConfigureNullModel) {
-  r2i::RuntimeError error;
-  r2i::tflite::Parameters parameters;
 
   std::shared_ptr<r2i::IEngine> engine(new r2i::tflite::Engine);
 
@@ -103,8 +101,6 @@ TEST (TliteParameters, ConfigureNullModel) {
 }
 
 TEST (TliteParameters, ConfigureSuccess) {
-  r2i::RuntimeError error;
-  r2i::tflite::Parameters parameters;
 
   std::shared_ptr<r2i::IEngine> engine(new r2i::tflite::Engine);
   std::shared_ptr<r2i::IModel> model(new r2i::tflite::Model);
@@ -115,8 +111,6 @@ TEST (TliteParameters, ConfigureSuccess) {
 }
 
 TEST (TliteParameters, SetAndGetEngine) {
-  r2i::RuntimeError error;
-  r2i::tflite::Parameters parameters;
 
   std::shared_ptr<r2i::IEngine> engine(new r2i::tflite::Engine);
   std::shared_ptr<r2i::IModel> model(new r2i::tflite::Model);
@@ -127,12 +121,11 @@ TEST (TliteParameters, SetAndGetEngine) {
 
   std::shared_ptr<r2i::IEngine> internalEngine = parameters.GetEngine();
 
-  POINTERS_EQUAL(internalEngine.get(), engine.get());
+  POINTERS_EQUAL(engine.get(), internalEngine.get());
 }
 
 TEST (TliteParameters, SetAndGetNumberOfThreads) {
-  r2i::RuntimeError error;
-  r2i::tflite::Parameters parameters;
+
   int in_value;
   int out_value;
 
@@ -154,8 +147,7 @@ TEST (TliteParameters, SetAndGetNumberOfThreads) {
 }
 
 TEST (TliteParameters, SetAndGetAllowFP16) {
-  r2i::RuntimeError error;
-  r2i::tflite::Parameters parameters;
+
   int in_value;
   int out_value;
 
@@ -176,21 +168,8 @@ TEST (TliteParameters, SetAndGetAllowFP16) {
   CHECK_EQUAL(in_value, out_value);
 }
 
-TEST (TliteParameters, GetMissingString) {
-  r2i::RuntimeError error;
-  r2i::tflite::Parameters parameters;
-  std::string value = "value";
-
-  error = parameters.Get("*?\\", value);
-
-  CHECK_TEXT (error.IsError(), error.GetDescription().c_str());
-  LONGS_EQUAL (r2i::RuntimeError::Code::INVALID_FRAMEWORK_PARAMETER,
-               error.GetCode ());
-}
-
 TEST (TliteParameters, GetMissingInteger) {
-  r2i::RuntimeError error;
-  r2i::tflite::Parameters parameters;
+
   int value;
 
   error = parameters.Get("*?\\", value);
@@ -201,8 +180,7 @@ TEST (TliteParameters, GetMissingInteger) {
 }
 
 TEST (TliteParameters, SetMissingInteger) {
-  r2i::RuntimeError error;
-  r2i::tflite::Parameters parameters;
+
   int value = 0;
 
   error = parameters.Set("*?\\", value);
@@ -212,21 +190,8 @@ TEST (TliteParameters, SetMissingInteger) {
                error.GetCode ());
 }
 
-TEST (TliteParameters, SetMissingString) {
-  r2i::RuntimeError error;
-  r2i::tflite::Parameters parameters;
-  std::string value;
-
-  error = parameters.Set("*?\\", value);
-
-  CHECK_TEXT (error.IsError(), error.GetDescription().c_str());
-  LONGS_EQUAL (r2i::RuntimeError::Code::INVALID_FRAMEWORK_PARAMETER,
-               error.GetCode ());
-}
-
 TEST (TliteParameters, SetWrongType) {
-  r2i::RuntimeError error;
-  r2i::tflite::Parameters parameters;
+
   int value = 0;
 
   error = parameters.Set("version", value);
@@ -237,8 +202,7 @@ TEST (TliteParameters, SetWrongType) {
 }
 
 TEST (TliteParameters, GetWrongType) {
-  r2i::RuntimeError error;
-  r2i::tflite::Parameters parameters;
+
   int value = 0;
 
   error = parameters.Set("version", value);
@@ -249,8 +213,7 @@ TEST (TliteParameters, GetWrongType) {
 }
 
 TEST (TliteParameters, GetList) {
-  r2i::RuntimeError error;
-  r2i::tflite::Parameters parameters;
+
   std::vector<r2i::ParameterMeta> desc;
 
   error = parameters.List (desc);
