@@ -112,9 +112,18 @@ RuntimeError Engine::Stop () {
 }
 
 RuntimeError Engine::SetNumberOfThreads (int number_of_threads) {
+  RuntimeError error;
+
+  /* Check if number of threads is greater than 0 */
+  if (number_of_threads <= 0 ) {
+    error.Set (RuntimeError::Code::INVALID_FRAMEWORK_PARAMETER,
+               "The number of threads needs to be greater than 0");
+    return error;
+  }
   this->number_of_threads = number_of_threads;
-  return RuntimeError ();
+  return error;
 }
+
 const int Engine::GetNumberOfThreads () {
   return this->number_of_threads;
 }
@@ -146,7 +155,7 @@ std::shared_ptr<r2i::IPrediction> Engine::Predict (std::shared_ptr<r2i::IFrame>
     return nullptr;
   }
 
-  if (this->number_of_threads > 0) {
+  if (this->number_of_threads != -1) {
     interpreter->SetNumThreads(this->number_of_threads);
   }
 
