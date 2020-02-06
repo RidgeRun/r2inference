@@ -99,6 +99,7 @@ std::shared_ptr<TF_Tensor> Frame::GetTensor (std::shared_ptr<TF_Graph> graph,
 
 RuntimeError Frame::Validate (int64_t dims[], int64_t num_dims) {
   RuntimeError error;
+  int frame_format_channels = this->frame_format.GetNumPlanes();
 
   /* We only support 1 batch */
   if (1 != dims[0]) {
@@ -121,12 +122,12 @@ RuntimeError Frame::Validate (int64_t dims[], int64_t num_dims) {
     return error;
   }
 
-  /* Check that channels match
-   * TODO: relate this to the input format
-   */
-  if (3 != dims[3]) {
-    error.Set (RuntimeError::Code::INVALID_FRAMEWORK_PARAMETER,
-               "We only support a 3 channels per image");
+  /* Check that channels match */
+  if (frame_format_channels != dims[3]) {
+    std::string error_msg;
+    error_msg = "Channels per image:" + std::to_string(frame_format_channels) +
+                ", needs to be equal to model input channels:" + std::to_string(dims[3]);
+    error.Set (RuntimeError::Code::INVALID_FRAMEWORK_PARAMETER, error_msg);
     return error;
   }
 

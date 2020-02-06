@@ -1,4 +1,4 @@
-/* Copyright (C) 2019 RidgeRun, LLC (http://www.ridgerun.com)
+/* Copyright (C) 2018-2020 RidgeRun, LLC (http://www.ridgerun.com)
  * All Rights Reserved.
  *
  * The contents of this software are proprietary and confidential to RidgeRun,
@@ -36,7 +36,7 @@ void PrintTopPrediction (std::shared_ptr<r2i::IPrediction> prediction) {
     }
   }
 
-  std::cout << "Highest probability is label " 
+  std::cout << "Highest probability is label "
             << index << " (" << max << ")" << std::endl;
 }
 
@@ -134,6 +134,11 @@ int main (int argc, char *argv[]) {
   auto factory = r2i::IFrameworkFactory::MakeFactory(r2i::FrameworkCode::NCSDK,
                  error);
 
+  if (nullptr == factory) {
+    std::cerr << "NCSDK backend is not built: " << error << std::endl;
+    exit(EXIT_FAILURE);
+  }
+
   std::cout << "Loading Model: " << model_path << std::endl;
   auto loader = factory->MakeLoader (error);
   auto model = loader->Load (model_path, error);
@@ -148,7 +153,7 @@ int main (int argc, char *argv[]) {
 
   std::cout << "Loading image: " << image_path << std::endl;
   std::unique_ptr<float[]> image_data = LoadImage (image_path, size,
-                                                   size);
+                                        size);
 
   std::cout << "Configuring frame" << std::endl;
   std::shared_ptr<r2i::IFrame> frame = factory->MakeFrame (error);

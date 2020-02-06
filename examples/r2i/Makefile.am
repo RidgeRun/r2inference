@@ -12,7 +12,8 @@ AM_DEFAULT_SOURCE_EXT = .cc
 
 DIST_SUBDIRS =                    \
         ncsdk                     \
-        tensorflow
+        tensorflow                \
+        tflite
 SUBDIRS =
 
 if ENABLE_EXAMPLES
@@ -23,6 +24,10 @@ endif
 
 if HAVE_TENSORFLOW
 SUBDIRS += tensorflow
+endif
+
+if HAVE_TFLITE
+SUBDIRS += tflite
 endif
 
 noinst_PROGRAMS = list_parameters

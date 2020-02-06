@@ -1,4 +1,4 @@
-/* Copyright (C) 2019 RidgeRun, LLC (http://www.ridgerun.com)
+/* Copyright (C) 2018-2020 RidgeRun, LLC (http://www.ridgerun.com)
  * All Rights Reserved.
  *
  * The contents of this software are proprietary and confidential to RidgeRun,
@@ -46,7 +46,7 @@
 #define GRID_SIZE 32
 
 const float box_anchors[] =
-    { 1.08, 1.19, 3.42, 4.41, 6.63, 11.38, 9.42, 5.11, 16.62, 10.52 };
+{ 1.08, 1.19, 3.42, 4.41, 6.63, 11.38, 9.42, 5.11, 16.62, 10.52 };
 
 struct box {
   std::string label;
@@ -59,12 +59,11 @@ struct box {
 
 /* sigmoid approximation as a lineal function */
 static double
-sigmoid (double x)
-{
+sigmoid (double x) {
   return 1.0 / (1.0 + pow (M_E, -1.0 * x));
 }
 
-void Box2Pixels (box * normalized_box, int row, int col, int box) {
+void Box2Pixels (box *normalized_box, int row, int col, int box) {
   /* Convert box coordinates to pixels
    * box position (x,y) is normalized inside each cell from 0 to 1
    * width and heigh are also normalized, but with image size as reference
@@ -76,9 +75,9 @@ void Box2Pixels (box * normalized_box, int row, int col, int box) {
   normalized_box->y = (row + sigmoid (normalized_box->y)) * GRID_SIZE;
 
   normalized_box->width =
-      pow (M_E, normalized_box->width) * box_anchors[2 * box] * GRID_SIZE;
+    pow (M_E, normalized_box->width) * box_anchors[2 * box] * GRID_SIZE;
   normalized_box->height =
-      pow (M_E, normalized_box->height) * box_anchors[2 * box + 1] * GRID_SIZE;
+    pow (M_E, normalized_box->height) * box_anchors[2 * box + 1] * GRID_SIZE;
 
 }
 
@@ -178,8 +177,7 @@ double IntersectionOverUnion(box box_1, box box_2) {
 
   if ((intersection_dim_1 < 0) || (intersection_dim_2 < 0)) {
     intersection_area = 0;
-  }
-  else {
+  } else {
     intersection_area =  intersection_dim_1 * intersection_dim_2;
   }
 
@@ -244,7 +242,8 @@ void PrintTopPredictions (std::shared_ptr<r2i::IPrediction> prediction,
 }
 
 void PrintUsage() {
-  std::cerr << "Usage: example -i [JPG input_image] -m [TinyYOLOV2 NCSDK Model] \n" 
+  std::cerr <<
+            "Usage: example -i [JPG input_image] -m [TinyYOLOV2 NCSDK Model] \n"
             << "Example: ./tinyyolov2 -i dog.jpg -m graph_tinyyolov2_ncsdk"
             << std::endl;
 }
@@ -330,6 +329,11 @@ int main (int argc, char *argv[]) {
   auto factory = r2i::IFrameworkFactory::MakeFactory(r2i::FrameworkCode::NCSDK,
                  error);
 
+  if (nullptr == factory) {
+    std::cerr << "NCSDK backend is not built: " << error << std::endl;
+    exit(EXIT_FAILURE);
+  }
+
   std::cout << "Loading Model: " << model_path << std::endl;
   auto loader = factory->MakeLoader (error);
   auto model = loader->Load (model_path, error);
@@ -344,7 +348,7 @@ int main (int argc, char *argv[]) {
 
   std::cout << "Loading image: " << image_path << std::endl;
   std::unique_ptr<float[]> image_data = LoadImage (image_path, DIM, DIM,
-                                                   &width, &height);
+                                        &width, &height);
 
   std::cout << "Configuring frame" << std::endl;
   std::shared_ptr<r2i::IFrame> frame = factory->MakeFrame (error);
