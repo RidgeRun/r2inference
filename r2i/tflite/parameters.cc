@@ -32,7 +32,7 @@ namespace tflite {
 
 Parameters::Parameters (): parameter_map ( {
   /* Model parameters */
-  PARAM("number_of_threads", "Number of threads to run, greater than 0",
+  PARAM("number_of_threads", "Number of threads to run, greater than 0, or 0 to ignore",
         r2i::ParameterMeta::Flags::READWRITE | r2i::ParameterMeta::Flags::WRITE_BEFORE_START,
         r2i::ParameterMeta::Type::INTEGER,
         std::make_shared<NumberOfThreadsAccessor>(this)),

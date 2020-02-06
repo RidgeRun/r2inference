@@ -21,7 +21,7 @@ namespace r2i {
 namespace tflite {
 
 Engine::Engine () : state(State::STOPPED), model(nullptr) {
-  this->number_of_threads = -1;
+  this->number_of_threads = 0;
   this->allow_fp16 = 0;
 }
 
@@ -115,7 +115,7 @@ RuntimeError Engine::SetNumberOfThreads (int number_of_threads) {
   RuntimeError error;
 
   /* Check if number of threads is greater than 0 */
-  if (number_of_threads <= 0 ) {
+  if (number_of_threads < 0 ) {
     error.Set (RuntimeError::Code::INVALID_FRAMEWORK_PARAMETER,
                "The number of threads needs to be greater than 0");
     return error;
@@ -155,7 +155,7 @@ std::shared_ptr<r2i::IPrediction> Engine::Predict (std::shared_ptr<r2i::IFrame>
     return nullptr;
   }
 
-  if (this->number_of_threads != -1) {
+  if (this->number_of_threads > 0) {
     interpreter->SetNumThreads(this->number_of_threads);
   }
 
