@@ -33,6 +33,10 @@ class Engine : public IEngine {
 
   std::shared_ptr<r2i::IPrediction> Predict (std::shared_ptr<r2i::IFrame>
       in_frame, r2i::RuntimeError &error) override;
+  RuntimeError SetNumberOfThreads (int number_of_threads);
+  const int GetNumberOfThreads ();
+  RuntimeError SetAllowFP16 (int allow_fp16);
+  const int GetAllowFP16 ();
 
   ~Engine ();
 
@@ -45,6 +49,8 @@ class Engine : public IEngine {
   State state;
   std::shared_ptr<::tflite::Interpreter> interpreter;
   std::shared_ptr<Model> model;
+  int number_of_threads;
+  int allow_fp16;
 };
 
 }
