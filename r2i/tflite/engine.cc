@@ -201,7 +201,7 @@ std::shared_ptr<r2i::IPrediction> Engine::Predict (std::shared_ptr<r2i::IFrame>
 
   int output = this->interpreter->outputs()[0];
   TfLiteIntArray *output_dims = this->interpreter->tensor(output)->dims;
-  auto output_size = output_dims->data[output_dims->size - 1];
+  auto output_size = output_dims->data[output_dims->size - 1] * sizeof(float);
   auto *tensor_data = this->interpreter->typed_output_tensor<float>(0);
   prediction->SetTensorValues(tensor_data, output_size);
 
