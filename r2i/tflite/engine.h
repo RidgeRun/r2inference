@@ -37,6 +37,7 @@ class Engine : public IEngine {
   const int GetNumberOfThreads ();
   RuntimeError SetAllowFP16 (int allow_fp16);
   const int GetAllowFP16 ();
+  int64_t GetRequiredBufferSize (TfLiteIntArray *dims);
 
   ~Engine ();
 
