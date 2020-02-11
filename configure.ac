@@ -10,7 +10,7 @@
 
 # Initialize autoconf.
 AC_PREREQ([2.69])
-AC_INIT([RidgeRun inference library],[0.4.1],[https://github.com/RidgeRun/r2inference/issues],[r2inference])
+AC_INIT([RidgeRun inference library],[0.4.2],[https://github.com/RidgeRun/r2inference/issues],[r2inference])
 
 # Initialize our build utils
 RR_INIT
