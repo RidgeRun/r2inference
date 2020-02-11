@@ -136,6 +136,17 @@ const int Engine::GetAllowFP16 () {
   return this->allow_fp16;
 }
 
+int64_t Engine::GetRequiredBufferSize (TfLiteIntArray *dims) {
+  int64_t size = 1;
+
+  /* For each dimension, multiply the amount of entries */
+  for (int dim = 0; dim < dims->size; ++dim) {
+    size *= dims->data[dim];
+  }
+
+  return size;
+}
+
 std::shared_ptr<r2i::IPrediction> Engine::Predict (std::shared_ptr<r2i::IFrame>
     in_frame, r2i::RuntimeError &error) {
   ImageFormat in_format;
@@ -201,7 +212,7 @@ std::shared_ptr<r2i::IPrediction> Engine::Predict (std::shared_ptr<r2i::IFrame>
 
   int output = this->interpreter->outputs()[0];
   TfLiteIntArray *output_dims = this->interpreter->tensor(output)->dims;
-  auto output_size = output_dims->data[output_dims->size - 1] * sizeof(float);
+  auto output_size = GetRequiredBufferSize(output_dims) * sizeof(float);
   auto *tensor_data = this->interpreter->typed_output_tensor<float>(0);
   prediction->SetTensorValues(tensor_data, output_size);
 
