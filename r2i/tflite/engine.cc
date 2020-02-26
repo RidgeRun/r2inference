@@ -193,6 +193,13 @@ std::shared_ptr<r2i::IPrediction> Engine::Predict (std::shared_ptr<r2i::IFrame>
     return nullptr;
   }
 
+  // Check the model quantization, only 32 bits allowed
+  if (kTfLiteFloat32 != interpreter->tensor(input)->type) {
+    error.Set (RuntimeError::Code::FRAMEWORK_ERROR,
+               "The provided model quantization is not allowed, only float32 is supported");
+    return nullptr;
+  }
+
   auto input_tensor = this->interpreter->typed_tensor<float>(input);
   auto input_data = (float *)frame->GetData();
 
