@@ -37,6 +37,8 @@ class Parameters : public IParameters {
 
   RuntimeError Get (const std::string &in_parameter, int &value) override;
 
+  RuntimeError Get (const std::string &in_parameter, double &value) override;
+
   RuntimeError Get (const std::string &in_parameter,
                     std::string &value) override;
 
@@ -44,6 +46,8 @@ class Parameters : public IParameters {
                     const std::string &in_value) override;
 
   RuntimeError Set (const std::string &in_parameter, int in_value) override;
+
+  RuntimeError Set (const std::string &in_parameter, double in_value) override;
 
   RuntimeError List (std::vector<ParameterMeta> &metas) override;
 
@@ -75,6 +79,12 @@ class Parameters : public IParameters {
     int value;
   };
 
+  class DoubleAccessor : public Accessor {
+   public:
+    DoubleAccessor (Parameters *target) : Accessor(target) {}
+    double value;
+  };
+
   class VersionAccessor : public StringAccessor {
    public:
     VersionAccessor (Parameters *target) : StringAccessor(target) {}
@@ -85,6 +95,18 @@ class Parameters : public IParameters {
 
     RuntimeError Get () {
       this->value = TF_Version ();
+      return RuntimeError ();
+    }
+  };
+
+  class MemoryUsageAccessor : public DoubleAccessor {
+   public:
+    MemoryUsageAccessor (Parameters *target) : DoubleAccessor(target) {}
+    RuntimeError Set () {
+      return target->engine->SetMemoryUsage(this->value);
+    }
+
+    RuntimeError Get () {
       return RuntimeError ();
     }
   };
