@@ -10,9 +10,7 @@
  */
 
 #include "r2i/tensorflow/engine.h"
-
 #include <tensorflow/c/c_api.h>
-
 #include "r2i/tensorflow/prediction.h"
 #include "r2i/tensorflow/frame.h"
 
@@ -52,6 +50,18 @@ RuntimeError Engine::SetModel (std::shared_ptr<r2i::IModel> in_model) {
 
   this->model = model;
 
+  return error;
+}
+
+RuntimeError Engine::SetMemoryUsage (double memory_usage) {
+  RuntimeError error;
+
+  if (memory_usage > 1.0 || memory_usage < 0.1) {
+    error.Set (RuntimeError::Code::WRONG_API_USAGE, "Invalid memory usage value");
+    return error;
+  }
+
+  this->session_memory_usage_index = (static_cast<int>(memory_usage * 10) - 1);
   return error;
 }
 
@@ -97,6 +107,8 @@ RuntimeError Engine::Start ()  {
   TF_Graph *graph = pgraph.get();
   TF_Status *status = pstatus.get ();
   TF_SessionOptions *opt = popt.get ();
+  TF_SetConfig(opt, this->config[this->session_memory_usage_index],
+               RAM_ARRAY_SIZE, status);
 
   std::shared_ptr<TF_Session> session (TF_NewSession(graph, opt, status),
                                        FreeSession);

@@ -99,6 +99,18 @@ class Parameters : public IParameters {
     }
   };
 
+  class MemoryUsageAccessor : public DoubleAccessor {
+   public:
+    MemoryUsageAccessor (Parameters *target) : DoubleAccessor(target) {}
+    RuntimeError Set () {
+      return target->engine->SetMemoryUsage(this->value);
+    }
+
+    RuntimeError Get () {
+      return RuntimeError ();
+    }
+  };
+
   class InputLayerAccessor : public StringAccessor {
    public:
     InputLayerAccessor (Parameters *target) : StringAccessor(target) {}

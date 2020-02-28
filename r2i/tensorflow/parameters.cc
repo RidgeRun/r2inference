@@ -38,6 +38,10 @@ Parameters::Parameters () :
         r2i::ParameterMeta::Flags::READ,
         r2i::ParameterMeta::Type::STRING,
         std::make_shared<VersionAccessor>(this)),
+  PARAM("gpu-memory-usage", "Per process GPU memory usage fraction",
+        r2i::ParameterMeta::Flags::READWRITE | r2i::ParameterMeta::Flags::WRITE_BEFORE_START,
+        r2i::ParameterMeta::Type::DOUBLE,
+        std::make_shared<MemoryUsageAccessor>(this)),
 
   /* Model parameters */
   PARAM("input-layer", "Name of the input layer in the graph",
@@ -157,11 +161,6 @@ RuntimeError Parameters::Get (const std::string &in_parameter, double &value) {
   }
 
   auto accessor = std::dynamic_pointer_cast<DoubleAccessor>(param.accessor);
-  if (nullptr == model) {
-    error.Set (RuntimeError::Code::INCOMPATIBLE_MODEL,
-               "The provided engine is not an tensorflow model");
-    return error;
-  }
 
   error = accessor->Get ();
   if (error.IsError ()) {
@@ -230,11 +229,6 @@ RuntimeError Parameters::Set (const std::string &in_parameter,
   }
 
   auto accessor = std::dynamic_pointer_cast<DoubleAccessor>(param.accessor);
-  if (nullptr == model) {
-    error.Set (RuntimeError::Code::INCOMPATIBLE_MODEL,
-               "The provided engine is not an tensorflow model");
-    return error;
-  }
 
   accessor->value = in_value;
   return accessor->Set ();
