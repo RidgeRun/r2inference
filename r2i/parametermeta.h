@@ -62,7 +62,12 @@ struct ParameterMeta {
     /**
      * A standard string
      */
-    STRING
+    STRING,
+
+    /**
+     * System dependent double
+     */
+    DOUBLE
   };
 
   /**

@@ -38,6 +38,10 @@ Parameters::Parameters () :
         r2i::ParameterMeta::Flags::READ,
         r2i::ParameterMeta::Type::STRING,
         std::make_shared<VersionAccessor>(this)),
+  PARAM("gpu-memory-usage", "Per process GPU memory usage fraction",
+        r2i::ParameterMeta::Flags::READWRITE | r2i::ParameterMeta::Flags::WRITE_BEFORE_START,
+        r2i::ParameterMeta::Type::DOUBLE,
+        std::make_shared<MemoryUsageAccessor>(this)),
 
   /* Model parameters */
   PARAM("input-layer", "Name of the input layer in the graph",
@@ -147,6 +151,25 @@ RuntimeError Parameters::Get (const std::string &in_parameter, int &value) {
   return error;
 }
 
+RuntimeError Parameters::Get (const std::string &in_parameter, double &value) {
+  RuntimeError error;
+
+  ParamDesc param = this->Validate (in_parameter,
+                                    r2i::ParameterMeta::Type::DOUBLE, "double", error);
+  if (error.IsError ()) {
+    return error;
+  }
+
+  auto accessor = std::dynamic_pointer_cast<DoubleAccessor>(param.accessor);
+
+  error = accessor->Get ();
+  if (error.IsError ()) {
+    return error;
+  }
+
+  value = accessor->value;
+  return error;
+}
 
 RuntimeError Parameters::Get (const std::string &in_parameter,
                               std::string &value) {
@@ -190,6 +213,22 @@ RuntimeError Parameters::Set (const std::string &in_parameter,
                "The provided engine is not an tensorflow model");
     return error;
   }
+
+  accessor->value = in_value;
+  return accessor->Set ();
+}
+
+RuntimeError Parameters::Set (const std::string &in_parameter,
+                              double in_value) {
+  RuntimeError error;
+
+  ParamDesc param = this->Validate (in_parameter,
+                                    r2i::ParameterMeta::Type::DOUBLE, "double", error);
+  if (error.IsError ()) {
+    return error;
+  }
+
+  auto accessor = std::dynamic_pointer_cast<DoubleAccessor>(param.accessor);
 
   accessor->value = in_value;
   return accessor->Set ();
