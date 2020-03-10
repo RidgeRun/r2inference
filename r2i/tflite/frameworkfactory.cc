@@ -52,7 +52,7 @@ r2i::FrameworkMeta FrameworkFactory::GetDescription (RuntimeError &error) {
     .code = r2i::FrameworkCode::TFLITE,
     .name = "tensorflow-lite",
     .description = "Google's TensorFlow Lite",
-    .version = "1"
+    .version = TFLITE_VERSION_STRING
   };
 
   error.Clean ();
