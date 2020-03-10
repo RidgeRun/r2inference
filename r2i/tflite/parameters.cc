@@ -142,6 +142,25 @@ RuntimeError Parameters::Get (const std::string &in_parameter, int &value) {
   return error;
 }
 
+RuntimeError Parameters::Get (const std::string &in_parameter, double &value) {
+  RuntimeError error;
+
+  ParamDesc param = this->Validate (in_parameter,
+                                    r2i::ParameterMeta::Type::DOUBLE, "double", error);
+  if (error.IsError ()) {
+    return error;
+  }
+
+  auto accessor = std::dynamic_pointer_cast<DoubleAccessor>(param.accessor);
+
+  error = accessor->Get ();
+  if (error.IsError ()) {
+    return error;
+  }
+
+  value = accessor->value;
+  return error;
+}
 
 RuntimeError Parameters::Get (const std::string &in_parameter,
                               std::string &value) {
@@ -213,6 +232,23 @@ RuntimeError Parameters::Set (const std::string &in_parameter,
   accessor->value = in_value;
   return accessor->Set ();
 }
+
+RuntimeError Parameters::Set (const std::string &in_parameter,
+                              double in_value) {
+  RuntimeError error;
+
+  ParamDesc param = this->Validate (in_parameter,
+                                    r2i::ParameterMeta::Type::DOUBLE, "double", error);
+  if (error.IsError ()) {
+    return error;
+  }
+
+  auto accessor = std::dynamic_pointer_cast<DoubleAccessor>(param.accessor);
+
+  accessor->value = in_value;
+  return accessor->Set ();
+}
+
 
 RuntimeError Parameters::List (std::vector < ParameterMeta > &metas) {
   for (auto &param : this->parameter_map) {
