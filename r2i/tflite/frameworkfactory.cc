@@ -15,6 +15,7 @@
 #include "engine.h"
 #include "frame.h"
 #include "parameters.h"
+#include <tensorflow/lite/version.h>
 
 namespace r2i {
 namespace tflite {

@@ -13,7 +13,6 @@
 #define R2I_TFLITE_FRAMEWORK_FACTORY_H
 
 #include <r2i/iframeworkfactory.h>
-#include <tensorflow/lite/version.h>
 
 namespace r2i {
 namespace tflite {
