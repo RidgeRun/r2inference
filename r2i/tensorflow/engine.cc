@@ -17,7 +17,10 @@
 namespace r2i {
 namespace tensorflow {
 
-Engine::Engine () : state(State::STOPPED), session_memory_usage_index(6),
+#define RAM_ARRAY_DEFAULT_INDEX -1
+
+Engine::Engine () : state(State::STOPPED),
+  session_memory_usage_index(RAM_ARRAY_DEFAULT_INDEX),
   session(nullptr), model(nullptr) {
 }
 
@@ -108,8 +111,13 @@ RuntimeError Engine::Start ()  {
   TF_Graph *graph = pgraph.get();
   TF_Status *status = pstatus.get ();
   TF_SessionOptions *opt = popt.get ();
-  TF_SetConfig(opt, this->config[this->session_memory_usage_index],
-               RAM_ARRAY_SIZE, status);
+
+  /* If the user didn't set a value then fallback to the
+     installation's default */
+  if (RAM_ARRAY_DEFAULT_INDEX != this->session_memory_usage_index) {
+    TF_SetConfig(opt, this->config[this->session_memory_usage_index],
+                 RAM_ARRAY_SIZE, status);
+  }
 
   std::shared_ptr<TF_Session> session (TF_NewSession(graph, opt, status),
                                        FreeSession);
