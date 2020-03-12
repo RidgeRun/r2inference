@@ -17,7 +17,8 @@
 namespace r2i {
 namespace tensorflow {
 
-Engine::Engine () : state(State::STOPPED), model(nullptr) {
+Engine::Engine () : state(State::STOPPED), session_memory_usage_index(6),
+  session(nullptr), model(nullptr) {
 }
 
 RuntimeError Engine::SetModel (std::shared_ptr<r2i::IModel> in_model) {
