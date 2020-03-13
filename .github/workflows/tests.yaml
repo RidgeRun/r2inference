@@ -1,0 +1,29 @@
+name: R2Inference CI
+
+on:
+  push:
+    branches:
+      - master
+      - dev-*
+      - feature/ci-experiments
+  pull_request:
+    branches:
+      - dev-*
+
+jobs:
+  build:
+
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-16.04, ubuntu-18.04]
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install dependecies
+      run: |
+        sudo apt install libcpputest-dev
+    - name: Configure the project
+      run: |
+        NOCONFIGURE=1 ./autogen.sh
+        ./configure
