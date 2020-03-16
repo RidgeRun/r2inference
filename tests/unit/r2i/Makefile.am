@@ -52,6 +52,7 @@ CLEANFILES = cpputest_*.xml
 DIST_SUBDIRS =                     \
         ncsdk                      \
         tensorflow                 \
+        tensorrt                   \
         tflite
 SUBDIRS =
 
@@ -65,4 +66,8 @@ endif
 
 if HAVE_TFLITE
 SUBDIRS += tflite
+endif
+
+if HAVE_TENSORRT
+SUBDIRS += tensorrt
 endif

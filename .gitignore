@@ -58,28 +58,13 @@ test-driver
 *.trs
 tests/unit/r2i/tests
 tests/unit/r2i/iframeworkfactory
-tests/unit/r2i/ncsdk/tests
-tests/unit/r2i/ncsdk/engine
-tests/unit/r2i/ncsdk/frame
-tests/unit/r2i/ncsdk/loader
-tests/unit/r2i/ncsdk/model
-tests/unit/r2i/ncsdk/prediction
-tests/unit/r2i/ncsdk/parameters
-tests/unit/r2i/ncsdk/frameworkfactory
-tests/unit/r2i/tensorflow/loader
-tests/unit/r2i/tensorflow/engine
-tests/unit/r2i/tensorflow/parameters
-tests/unit/r2i/tensorflow/model
-tests/unit/r2i/tensorflow/prediction
-tests/unit/r2i/tensorflow/frame
-tests/unit/r2i/tensorflow/frameworkfactory
-tests/unit/r2i/tflite/loader
-tests/unit/r2i/tflite/engine
-tests/unit/r2i/tflite/parameters
-tests/unit/r2i/tflite/model
-tests/unit/r2i/tflite/prediction
-tests/unit/r2i/tflite/frame
-tests/unit/r2i/tflite/frameworkfactory
+tests/unit/r2i/**/loader
+tests/unit/r2i/**/engine
+tests/unit/r2i/**/parameters
+tests/unit/r2i/**/model
+tests/unit/r2i/**/prediction
+tests/unit/r2i/**/frame
+tests/unit/r2i/**/frameworkfactory
 
 # rr-build-utils configuration files
 .rrconfig
