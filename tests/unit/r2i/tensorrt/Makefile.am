@@ -23,7 +23,8 @@ if HAVE_TENSORRT
 #         frameworkfactory
 
 TESTS =                 \
-         model
+         model          \
+         loader
 
 check_PROGRAMS=$(TESTS)
 

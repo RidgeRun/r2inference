@@ -19,18 +19,23 @@
 bool infer;
 
 #include "mockcudaengine.cc"
-#include "mockruntime.cc"
 
 #define GOOD_FILENAME __FILE__
+
+void ICudaEngineDeleter (nvinfer1::ICudaEngine *p) {
+  if (p)
+    p->destroy ();
+}
 
 TEST_GROUP (TensorRTModel) {
   r2i::RuntimeError error;
   r2i::tensorrt::Model model;
+  std::shared_ptr<nvinfer1::ICudaEngine> buffer;
 
   void setup () {
-    fail_runtime = false;
-    bad_cached_engine = false;
     model = r2i::tensorrt::Model();
+    buffer = std::shared_ptr<nvinfer1::ICudaEngine> (new nvinfer1::MockCudaEngine,
+             ICudaEngineDeleter);
   }
 
   void teardown () {
@@ -38,41 +43,29 @@ TEST_GROUP (TensorRTModel) {
 };
 
 TEST (TensorRTModel, Start) {
-  error = model.Start (GOOD_FILENAME);
+  error = model.Start ("graph");
   LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode());
 }
 
-TEST (TensorRTModel, DoubleStart) {
-  error = model.Start (GOOD_FILENAME);
-  error = model.Start (GOOD_FILENAME);
-
-  LONGS_EQUAL (r2i::RuntimeError::Code::WRONG_API_USAGE, error.GetCode());
+TEST (TensorRTModel, SetSuccess) {
+  error = model.Set (buffer);
+  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode());
 }
 
-TEST (TensorRTModel, StartEmptyName) {
-  error = model.Start ("");
-
+TEST (TensorRTModel, SetNullBuffer) {
+  error = model.Set (nullptr);
   LONGS_EQUAL (r2i::RuntimeError::Code::NULL_PARAMETER, error.GetCode());
 }
 
-TEST (TensorRTModel, IncorrectRuntime) {
-  fail_runtime = true;
-  error = model.Start (GOOD_FILENAME);
+TEST (TensorRTModel, GetSuccess) {
+  std::shared_ptr<nvinfer1::ICudaEngine> model_buffer = model.GetTREngineModel ();
 
-  LONGS_EQUAL (r2i::RuntimeError::Code::FRAMEWORK_ERROR, error.GetCode());
+  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode());
 }
 
-TEST (TensorRTModel, BadFile) {
-  error = model.Start ("bad_file");
-
-  LONGS_EQUAL (r2i::RuntimeError::Code::FILE_ERROR, error.GetCode());
-}
-
-TEST (TensorRTModel, BadChechedEngine) {
-  bad_cached_engine = true;
-  error = model.Start (GOOD_FILENAME);
-
-  LONGS_EQUAL (r2i::RuntimeError::Code::FRAMEWORK_ERROR, error.GetCode());
+TEST (TensorRTModel, GetNullBuffer) {
+  std::shared_ptr<nvinfer1::ICudaEngine> model_buffer = model.GetTREngineModel ();
+  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode());
 }
 
 int main (int ac, char **av) {

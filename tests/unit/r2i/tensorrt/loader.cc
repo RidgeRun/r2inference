@@ -10,93 +10,89 @@
 */
 
 #include <r2i/r2i.h>
+#include <r2i/tensorrt/model.h>
 #include <r2i/tensorrt/loader.h>
 
 #include <CppUTest/CommandLineTestRunner.h>
 #include <CppUTest/TestHarness.h>
 
-static bool incompatible_model = false;
 
-r2i::tensorrt::Model::Model () {
+#include "mockcudaengine.cc"
+#include "mockruntime.cc"
+
+bool model_set_error = false;
+
+namespace r2i {
+namespace tensorrt {
+Model::Model () {}
+
+RuntimeError Model::Set (std::shared_ptr<nvinfer1::ICudaEngine> tensorrtmodel) {
+  r2i::RuntimeError error;
+  if (model_set_error)
+    error.Set (RuntimeError::Code::NULL_PARAMETER, "Unable to load cached engine");
+
+  return error;
 }
 
-r2i::RuntimeError r2i::tensorrt::Model::Start (const std::string &name) {
-  return r2i::RuntimeError();
+}
 }
 
 TEST_GROUP (TensorRTLoader) {
+  r2i::RuntimeError error;
+  r2i::tensorrt::Loader loader;
+
+  void setup () {
+    error.Clean();
+    loader = r2i::tensorrt::Loader();
+    incompatible_model = false;
+    model_set_error = false;
+  }
 };
 
-TEST (TensorRTLoader, WrongApiUsage) {
-  r2i::RuntimeError error;
+TEST (TensorRTLoader, LoadEmptyFileName) {
+  auto model = loader.Load("", error);
 
-  std::shared_ptr<r2i::tensorrt::Loader> loader (new r2i::tensorrt::Loader);
-
-  std::string empty_string = "";
-
-  /* Attempt to load this file as a valid model */
-  auto model = loader->Load(empty_string, error);
-
-  CHECK_TEXT (error.IsError(), error.GetDescription().c_str());
   LONGS_EQUAL (r2i::RuntimeError::Code::WRONG_API_USAGE, error.GetCode ());
 }
 
-TEST (TensorRTLoader, UnableToOpenFile) {
-  r2i::RuntimeError error;
+TEST (TensorRTLoader, WrongFileName) {
+  auto model = loader.Load("*\"?", error);
 
-  std::shared_ptr<r2i::tensorrt::Loader> loader (new r2i::tensorrt::Loader);
-
-  std::string non_existent_file = "*\"?";
-
-  /* Attempt to load this file as a valid model */
-  auto model = loader->Load(non_existent_file, error);
-
-  CHECK_TEXT (error.IsError(), error.GetDescription().c_str());
   LONGS_EQUAL (r2i::RuntimeError::Code::FILE_ERROR, error.GetCode ());
 }
 
-TEST (TensorRTLoader, UnableToReadFile) {
-  r2i::RuntimeError error;
+TEST (TensorRTLoader, LoadFileWithNoPermissions) {
+  auto model = loader.Load("/root", error);
 
-  std::shared_ptr<r2i::tensorrt::Loader> loader (new r2i::tensorrt::Loader);
-
-  /* This will work as long as make check is run as a regular user */
-  std::string empty_string = "/root";
-
-  /* Attempt to load an unreadable file */
-  auto model = loader->Load(empty_string, error);
-
-  CHECK_TEXT (error.IsError(), error.GetDescription().c_str());
   LONGS_EQUAL (r2i::RuntimeError::Code::FILE_ERROR, error.GetCode ());
 }
 
 TEST (TensorRTLoader, LoadInvalidFile) {
-  /* Setup */
   incompatible_model = true;
 
-  /* Test */
-  r2i::RuntimeError error;
+  auto model = loader.Load(__FILE__, error);
 
-  std::shared_ptr<r2i::tensorrt::Loader> loader (new r2i::tensorrt::Loader);
-
-  /* Attempt to load this file as a valid model */
-  auto model = loader->Load(__FILE__, error);
-
-  CHECK_TEXT (error.IsError(), error.GetDescription().c_str());
   LONGS_EQUAL (r2i::RuntimeError::Code::INCOMPATIBLE_MODEL, error.GetCode ());
+}
 
-  /* Teardown */
-  incompatible_model = false;
+TEST (TensorRTLoader, BadChechedEngine) {
+  bad_cached_engine = true;
+
+  auto model = loader.Load(__FILE__, error);
+
+  LONGS_EQUAL (r2i::RuntimeError::Code::INCOMPATIBLE_MODEL, error.GetCode());
+}
+
+TEST (TensorRTLoader, LoadSetError) {
+  model_set_error = true;
+
+  auto model = loader.Load(__FILE__, error);
+
+  LONGS_EQUAL (r2i::RuntimeError::Code::NULL_PARAMETER, error.GetCode ());
 }
 
 TEST (TensorRTLoader, LoadSuccess) {
-  /* Test */
-  r2i::RuntimeError error;
-
-  std::shared_ptr<r2i::tensorrt::Loader> loader (new r2i::tensorrt::Loader);
-
-  /* FIXME this isn't actually sending a correct model */
-  auto model = loader->Load(__FILE__, error);
+  auto model = loader.Load(__FILE__, error);
 
   LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
 }

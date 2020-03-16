@@ -9,80 +9,40 @@
  * back to RidgeRun without any encumbrance.
 */
 
-#include <fstream>
-#include <iostream>
-#include <vector>
+// #include <fstream>
+// #include <iostream>
+// #include <vector>
 
 #include "r2i/tensorrt/model.h"
 
 namespace r2i {
 namespace tensorrt {
 
-void iRuntimeDeleter (nvinfer1::IRuntime *p) {
-  if (p)
-    p->destroy ();
-}
-
-void ICudaEngineDeleter (nvinfer1::ICudaEngine *p) {
-  if (p)
-    p->destroy ();
-}
-
 Model::Model () {
 }
 
 RuntimeError Model::Start (const std::string &name) {
   RuntimeError error;
-  Logger logger;
-
-  if (this->engine && this->infer) {
-    error.Set (RuntimeError::Code::WRONG_API_USAGE,
-               "Model can only be started twice if it failed");
-    return error;
-  }
-
-
-  if (name.empty()) {
-    error.Set (RuntimeError::Code::NULL_PARAMETER, "Received empty file name");
-    return error;
-  }
-
-  this->infer =
-    std::shared_ptr < nvinfer1::IRuntime > (nvinfer1::createInferRuntime (logger),
-        iRuntimeDeleter);
-  if (!this->infer) {
-    error.Set (RuntimeError::Code::FRAMEWORK_ERROR, "Unable to create runtime");
-    return error;
-  }
-
-  std::vector < char > cached;
-  size_t size { 0};
-
-  std::ifstream file
-  (name, std::ios::binary);
-
-  if (file.good ()) {
-    file.seekg (0, file.end);
-    size = file.tellg ();
-    file.seekg (0, file.beg);
-    cached.resize (size);
-    file.read (cached.data (), size);
-    file.close ();
-  } else {
-    error.Set
-    (RuntimeError::Code::FILE_ERROR, "Unable to load engine");
-    return error;
-  }
-
-  this->engine = std::shared_ptr < nvinfer1::ICudaEngine >
-                 (infer->deserializeCudaEngine (cached.data (), size, nullptr),
-                  ICudaEngineDeleter);
-  if (!this->engine) {
-    error.Set (RuntimeError::Code::FRAMEWORK_ERROR, "Unable to load cached engine");
-    return error;
-  }
 
   return error;
+}
+
+RuntimeError Model::Set (std::shared_ptr<nvinfer1::ICudaEngine> tensorrtmodel) {
+  RuntimeError error;
+
+  if (nullptr == tensorrtmodel) {
+    error.Set (RuntimeError::Code::NULL_PARAMETER,
+               "Trying to set model with null model pointer");
+    return error;
+  }
+
+  this->engine = tensorrtmodel;
+
+  return error;
+}
+
+std::shared_ptr<nvinfer1::ICudaEngine> Model::GetTREngineModel () {
+  return this->engine;
 }
 
 } // namespace tensorrt

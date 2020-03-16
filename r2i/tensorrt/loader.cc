@@ -12,7 +12,8 @@
 #include "r2i/tensorrt/loader.h"
 
 #include <fstream>
-#include <memory>
+#include <iostream>
+#include <vector>
 
 #include "r2i/imodel.h"
 #include "r2i/tensorrt/model.h"
@@ -20,57 +21,72 @@
 namespace r2i {
 namespace tensorrt {
 
+void iRuntimeDeleter (nvinfer1::IRuntime *p) {
+  if (p)
+    p->destroy ();
+}
+
+void ICudaEngineDeleter (nvinfer1::ICudaEngine *p) {
+  if (p)
+    p->destroy ();
+}
+
 std::shared_ptr<r2i::IModel> Loader::Load (const std::string &in_path,
     r2i::RuntimeError &error) {
-  std::ifstream graph_file;
-  // char *buf_data = nullptr;
+  error.Clean();
+
+  Logger logger;
 
   if (in_path.empty()) {
-    error.Set (RuntimeError::Code::WRONG_API_USAGE, "Received NULL path to file");
+    error.Set (RuntimeError::Code::WRONG_API_USAGE, "Received empty path to file");
     return nullptr;
   }
 
-  std::ifstream graphdef_file;
-  graphdef_file.open (in_path, std::ios::binary | std::ios::ate);
-  if (false == graphdef_file.is_open()) {
-    error.Set (RuntimeError::Code::FILE_ERROR, "Unable to open file");
+  std::shared_ptr < nvinfer1::IRuntime > infer =
+    std::shared_ptr < nvinfer1::IRuntime > (nvinfer1::createInferRuntime (logger),
+        iRuntimeDeleter);
+  if (!infer) {
+    error.Set (RuntimeError::Code::FRAMEWORK_ERROR, "Unable to create runtime");
     return nullptr;
   }
 
-  graph_file.open (in_path, std::ios::binary | std::ios::ate);
-  if (graph_file.is_open()) {
-    std::shared_ptr<Model> model (new r2i::tensorrt::Model());
-    unsigned int graph_size;
+  std::vector < char > cached;
+  size_t size { 0};
 
-    /* Get file size */
-    graph_size = graph_file.tellg();
-    graph_file.seekg (0, std::ios::beg);
+  std::ifstream file
+  (in_path, std::ios::binary);
 
-    std::shared_ptr<void> graph_data(malloc (graph_size), free);
-
-    if (nullptr == graph_data.get()) {
-      error.Set (RuntimeError::Code::MEMORY_ERROR,
-                 "Can not allocate memory for graph");
-      graph_file.close ();
-      return nullptr;
-    }
-
-    /* Store the content of the graph */
-    graph_file.read (reinterpret_cast<char *>(graph_data.get()), graph_size);
-    if (!graph_file) {
-      error.Set (RuntimeError::Code::FILE_ERROR, "Can not read file");
-      graph_file.close ();
-      return nullptr;
-    }
-
-    this->model = model;
-    graph_file.close ();
+  if (file.good ()) {
+    file.seekg (0, file.end);
+    size = file.tellg ();
+    file.seekg (0, file.beg);
+    cached.resize (size);
+    file.read (cached.data (), size);
+    file.close ();
   } else {
-    error.Set (RuntimeError::Code::FILE_ERROR, "Unable to open file");
+    error.Set
+    (RuntimeError::Code::FILE_ERROR, "Unable to load engine");
     return nullptr;
   }
 
-  return nullptr;
+  std::shared_ptr < nvinfer1::ICudaEngine > engine = std::shared_ptr
+      < nvinfer1::ICudaEngine >
+      (infer->deserializeCudaEngine (cached.data (), size, nullptr),
+       ICudaEngineDeleter);
+  if (!engine) {
+    error.Set (RuntimeError::Code::INCOMPATIBLE_MODEL,
+               "Unable to load cached engine");
+    return nullptr;
+  }
+
+  std::shared_ptr<r2i::tensorrt::Model> model = std::make_shared<Model>();
+
+  error = model->Set(engine);
+  if (error.IsError ()) {
+    model = nullptr;
+  }
+
+  return model;
 }
 }
 }

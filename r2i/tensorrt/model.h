@@ -61,9 +61,12 @@ class Model : public IModel {
 
   //RuntimeError Start (const std::string &name) override;
   RuntimeError Start (const std::string &name) override;
+
+  std::shared_ptr<nvinfer1::ICudaEngine> GetTREngineModel ();
+
+  RuntimeError Set (std::shared_ptr<nvinfer1::ICudaEngine> tensorrtmodel);
  private:
 
-  std::shared_ptr < nvinfer1::IRuntime > infer;
   std::shared_ptr < nvinfer1::ICudaEngine > engine;
 };
 
