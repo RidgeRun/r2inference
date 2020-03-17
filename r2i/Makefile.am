@@ -38,6 +38,7 @@ lib_LTLIBRARIES = libr2inference-@RR_PACKAGE_VERSION@.la
 r2iincludedir = @R2IINCLUDEDIR@/r2i
 
 libr2inference_@RR_PACKAGE_VERSION@_la_SOURCES =    \
+        datatype.cc                                 \
         iframeworkfactory.cc                        \
         runtimeerror.cc                             \
         imageformat.cc
@@ -59,6 +60,7 @@ libr2inference_@RR_PACKAGE_VERSION@_la_LIBADD =     \
         $(CODE_COVERAGE_LIBS)
 
 r2iinclude_HEADERS =         \
+        datatype.h           \
         frameworkmeta.h      \
         frameworks.h         \
         iengine.h            \

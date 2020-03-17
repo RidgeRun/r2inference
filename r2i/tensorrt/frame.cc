@@ -11,6 +11,9 @@
 
 #include "r2i/tensorrt/frame.h"
 
+#include <cuda.h>
+#include <cuda_runtime.h>
+
 namespace r2i {
 namespace tensorrt {
 
@@ -19,10 +22,19 @@ Frame::Frame () :
   frame_format(ImageFormat::Id::UNKNOWN_FORMAT) {
 }
 
+
+void CudaMemFree (void *p) {
+  cudaFree (p);
+}
+
 RuntimeError Frame::Configure (void *in_data, int width,
-                               int height, r2i::ImageFormat::Id format) {
+                               int height, r2i::ImageFormat::Id format,
+                               r2i::DataType::Id type) {
   RuntimeError error;
-  ImageFormat imageformat (format);
+  cudaError_t cuda_error;
+  ImageFormat image_format (format);
+
+  DataType data_type (type);
 
   if (nullptr == in_data) {
     error.Set (RuntimeError::Code::NULL_PARAMETER, "Received a NULL data pointer");
@@ -38,17 +50,44 @@ RuntimeError Frame::Configure (void *in_data, int width,
                "Received an invalid image height");
     return error;
   }
+  if (type == r2i::DataType::Id::UNKNOWN_DATATYPE) {
+    error.Set (RuntimeError::Code::WRONG_API_USAGE,
+               "Received an invalid data type");
+  }
 
-  this->frame_data = static_cast<float *>(in_data);
+  /* FIXME cudaMalloc is an expensive operation, this should be only done when necessary */
+  size_t frame_size = width * height * image_format.GetNumPlanes() *
+                      data_type.GetBytesPerPixel();
+  if (frame_size != this->frame_size) {
+    void *buff;
+    cuda_error = cudaMalloc (&buff, frame_size);
+    if (cudaSuccess != cuda_error) {
+      error.Set (RuntimeError::Code::MEMORY_ERROR,
+                 "Unable to allocate managed buffer");
+      return error;
+    }
+    this->frame_data = std::shared_ptr <void> (buff, CudaMemFree);
+    this->frame_size = frame_size;
+  }
+
+  cuda_error = cudaMemcpy(this->frame_data.get(), in_data, this->frame_size,
+                          cudaMemcpyHostToDevice);
+  if (cudaSuccess != cuda_error) {
+    error.Set (RuntimeError::Code::MEMORY_ERROR,
+               "Unable to copy data to buffer");
+    return error;
+  }
+
   this->frame_width = width;
   this->frame_height = height;
-  this->frame_format = imageformat;
+  this->frame_format = image_format;
+  this->data_type = data_type;
 
   return error;
 }
 
 void *Frame::GetData () {
-  return this->frame_data;
+  return this->frame_data.get();
 }
 
 int Frame::GetWidth () {
@@ -63,147 +102,9 @@ ImageFormat Frame::GetFormat () {
   return this->frame_format;
 }
 
-// std::shared_ptr<TF_Tensor> Frame::GetTensor (std::shared_ptr<TF_Graph> graph,
-//     TF_Operation *operation, RuntimeError &error) {
-//   error.Clean ();
-
-//   if (nullptr != this->tensor) {
-//     return this->tensor;
-//   }
-
-//   TF_DataType type;
-//   int64_t *dims;
-//   int64_t num_dims;
-//   int64_t size;
-//   error = this->GetTensorShape (graph, operation, type, &dims, num_dims, size);
-//   if (error.IsError ()) {
-//     return nullptr;
-//   }
-
-//   error = this->Validate (dims, num_dims);
-//   if (error.IsError ()) {
-//     delete []dims;
-//     return nullptr;
-//   }
-
-//   error = this->CreateTensor (type, dims, num_dims, size);
-//   if (error.IsError ()) {
-//     delete []dims;
-//     return nullptr;
-//   }
-
-//   delete []dims;
-
-//   return this->tensor;
-// }
-
-RuntimeError Frame::Validate (int64_t dims[], int64_t num_dims) {
-  RuntimeError error;
-  int frame_format_channels = this->frame_format.GetNumPlanes();
-
-  /* We only support 1 batch */
-  if (1 != dims[0]) {
-    error.Set (RuntimeError::Code::INVALID_FRAMEWORK_PARAMETER,
-               "We only support a batch of 1 image(s) in our frames");
-    return error;
-  }
-
-  /* Check that widths match */
-  if (this->frame_width != dims[1]) {
-    error.Set (RuntimeError::Code::INVALID_FRAMEWORK_PARAMETER,
-               "Unsupported image width");
-    return error;
-  }
-
-  /* Check that heights match */
-  if (this->frame_height != dims[2]) {
-    error.Set (RuntimeError::Code::INVALID_FRAMEWORK_PARAMETER,
-               "Unsupported image height");
-    return error;
-  }
-
-  /* Check that channels match */
-  if (frame_format_channels != dims[3]) {
-    std::string error_msg;
-    error_msg = "Channels per image:" + std::to_string(frame_format_channels) +
-                ", needs to be equal to model input channels:" + std::to_string(dims[3]);
-    error.Set (RuntimeError::Code::INVALID_FRAMEWORK_PARAMETER, error_msg);
-    return error;
-  }
-
-  return error;
+DataType Frame::GetDataType () {
+  return this->data_type;
 }
-
-// RuntimeError Frame::CreateTensor (TF_DataType type, int64_t dims[],
-//                                   int64_t num_dims, int64_t size) {
-//   RuntimeError error;
-
-//   TF_Tensor *raw_tensor = TF_NewTensor(type, dims, num_dims, this->frame_data,
-//                                        size, DummyDeallocator, NULL);
-//   if (nullptr == raw_tensor) {
-//     error.Set (RuntimeError::Code::FRAMEWORK_ERROR,
-//                "Unable to create input tensor");
-//     return error;
-//   }
-
-//   std::shared_ptr<TF_Tensor> tensor (raw_tensor, TF_DeleteTensor);
-//   this->tensor = tensor;
-
-//   return error;
-// }
-
-// RuntimeError Frame::GetTensorShape (std::shared_ptr<TF_Graph> pgraph,
-//                                     TF_Operation *operation, TF_DataType &type, int64_t **dims,
-//                                     int64_t &num_dims, int64_t &size) {
-//   RuntimeError error;
-//   TF_Graph *graph = pgraph.get();
-
-//   if (nullptr == graph) {
-//     error.Set (RuntimeError::Code::INVALID_FRAMEWORK_PARAMETER,
-//                "Attempting to validate frame with NULL graph");
-//     return error;
-//   }
-
-//   if (nullptr == operation) {
-//     error.Set (RuntimeError::Code::INVALID_FRAMEWORK_PARAMETER,
-//                "Attempting to validate frame with NULL operation");
-//     return error;
-//   }
-
-//   TF_Output output = {.oper = operation, .index = 0};
-//   std::shared_ptr<TF_Status> pstatus (TF_NewStatus (), TF_DeleteStatus);
-//   TF_Status *status = pstatus.get ();
-
-//   num_dims = TF_GraphGetTensorNumDims (graph, output, status);
-//   if (TF_GetCode (status) != TF_OK) {
-//     error.Set (RuntimeError::Code::FRAMEWORK_ERROR, TF_Message (status));
-//     return error;
-//   }
-
-//   *dims = new int64_t[num_dims];
-//   TF_GraphGetTensorShape(graph, output, *dims, num_dims, status);
-//   if (TF_GetCode (status) != TF_OK) {
-//     delete []dims;
-//     error.Set (RuntimeError::Code::FRAMEWORK_ERROR, TF_Message (status));
-//     return error;
-//   }
-
-//   /* R2Inference uses a batch size of 1 but some tensors have this value set to
-//    * generic (-1) or greater than 1.
-//    * Batch size set to 1 for general compatibility support. */
-//   (*dims)[0] = 1;
-
-//   type = TF_OperationOutputType(output);
-//   size = TF_DataTypeSize(type);
-
-//   /* Get the required amount of space on the buffer, considering all
-//      dimensions */
-//   for (int d = 0; d < num_dims; ++d) {
-//     size *= (*dims)[d];
-//   }
-
-//   return error;
-// }
 
 }
 }

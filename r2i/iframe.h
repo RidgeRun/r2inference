@@ -14,6 +14,7 @@
 
 #include <r2i/runtimeerror.h>
 #include <r2i/imageformat.h>
+#include <r2i/datatype.h>
 
 #include <memory>
 #include <string>
@@ -38,7 +39,8 @@ class IFrame {
    * \return A RuntimeError with a description of the error.
    */
   virtual RuntimeError Configure (void *in_data, int width,
-                                  int height, r2i::ImageFormat::Id format) = 0;
+                                  int height, r2i::ImageFormat::Id format,
+                                  r2i::DataType::Id data_type) = 0;
 
   /**
    * \brief Gets the data set to the Frame. The actual data pointer type
@@ -64,6 +66,12 @@ class IFrame {
    * \return Image format.
    */
   virtual ImageFormat GetFormat () = 0;
+
+  /**
+   * \brief Gets the Image data type set to the Frame.
+   * \return Image data type.
+   */
+  virtual DataType GetDataType () { return r2i::DataType::Id::UNKNOWN_DATATYPE; }
 
   /**
    * \brief Default destructor

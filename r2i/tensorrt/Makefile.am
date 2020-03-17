@@ -26,22 +26,26 @@ libtensorrt_la_SOURCES =         \
 
 libtensorrt_la_CPPFLAGS =        \
     $(RR_CPPFLAGS)               \
-    $(CODE_COVERAGE_CPPFLAGS)
+    $(CODE_COVERAGE_CPPFLAGS)    \
+    -I$(CUDA_INCDIR)
 
 libtensorrt_la_CFLAGS =          \
     $(RR_CFLAGS)                 \
     $(TENSORRT_CFLAGS)           \
-    $(CODE_COVERAGE_CFLAGS)
+    $(CODE_COVERAGE_CFLAGS)      \
+    -I$(CUDA_INCDIR)
 
 libtensorrt_la_CXXFLAGS =        \
     $(RR_CXXFLAGS)               \
     $(TENSORRT_CFLAGS)           \
-    $(CODE_COVERAGE_CXXFLAGS)
+    $(CODE_COVERAGE_CXXFLAGS)    \
+    $(CUDA_LIBS)
 
 libtensorrt_la_LIBADD =          \
     $(RR_LIBS)                   \
     $(TENSORRT_LIBS)             \
-    $(CODE_COVERAGE_LIBS)
+    $(CODE_COVERAGE_LIBS)        \
+    $(CUDA_LIBS)
 
 tensorrtinclude_HEADERS =        \
     engine.h                     \

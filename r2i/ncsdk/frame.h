@@ -20,7 +20,8 @@ namespace ncsdk {
 class Frame : public IFrame {
  public:
   RuntimeError Configure (void *in_data, int width,
-                          int height, r2i::ImageFormat::Id format) override;
+                          int height, r2i::ImageFormat::Id format,
+                          r2i::DataType::Id data_type = r2i::DataType::Id::UNKNOWN_DATATYPE) override;
 
   void *GetData () override;
 

@@ -14,8 +14,6 @@ if ENABLE_TESTS
 if HAVE_TENSORRT
 
 # TESTS =                 \
-#         model           \
-#         loader          \
 #         engine          \
 #         prediction      \
 #         frame           \
@@ -24,7 +22,8 @@ if HAVE_TENSORRT
 
 TESTS =                 \
          model          \
-         loader
+         loader         \
+         frame
 
 check_PROGRAMS=$(TESTS)
 
@@ -43,7 +42,8 @@ AM_CXXFLAGS =                       \
         $(RR_CXXFLAGS)              \
         $(TESTS_CFLAGS)             \
         $(TENSORRT_CFLAGS)          \
-        $(CODE_COVERAGE_CXXFLAGS)
+        $(CODE_COVERAGE_CXXFLAGS)   \
+        -I$(CUDA_INCDIR)
 
 AM_CFLAGS =                         \
         $(RR_CFLAGS)                \

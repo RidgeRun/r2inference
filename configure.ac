@@ -52,11 +52,12 @@ RR_CHECK_FEATURE_LIB(TENSORFLOW, TensorFlow Installation,
 AC_LANG_PUSH([C++])
 RR_CHECK_FEATURE_LIB(TFLITE, TensorFlow lite Installation,
                      tensorflow-lite, TfLiteTypeGetName, tensorflow/lite/model.h, no)
-		     
+
 RR_CHECK_FEATURE_LIB(TENSORRT, TensorRT Installation,
                      nvinfer, createInferBuilder_INTERNAL, NvInfer.h, no)
 AC_LANG_POP([C++])
 
+AM_COND_IF([HAVE_TENSORRT], [RR_CHECK_CUDA], [])
 
 # Our Include path, to be shared in multiple makefiles
 AC_SUBST([R2IINCLUDEDIR],[$includedir/r2inference-$RR_PACKAGE_VERSION/])

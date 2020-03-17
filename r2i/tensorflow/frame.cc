@@ -20,7 +20,8 @@ Frame::Frame () :
 }
 
 RuntimeError Frame::Configure (void *in_data, int width,
-                               int height, r2i::ImageFormat::Id format) {
+                               int height, r2i::ImageFormat::Id format,
+                               r2i::DataType::Id type) {
   RuntimeError error;
   ImageFormat imageformat (format);
 

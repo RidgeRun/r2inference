@@ -12,7 +12,6 @@
 #ifndef R2I_TENSORRT_FRAME_H
 #define R2I_TENSORRT_FRAME_H
 
-
 #include <r2i/iframe.h>
 
 namespace r2i {
@@ -23,7 +22,8 @@ class Frame : public IFrame {
   Frame ();
 
   RuntimeError Configure (void *in_data, int width,
-                          int height, r2i::ImageFormat::Id format) override;
+                          int height, r2i::ImageFormat::Id format,
+                          r2i::DataType::Id data_type) override;
 
   void *GetData () override;
 
@@ -33,22 +33,17 @@ class Frame : public IFrame {
 
   ImageFormat GetFormat () override;
 
-  /* std::shared_ptr<TF_Tensor> GetTensor (std::shared_ptr<TF_Graph> graph, */
-  /*                                       TF_Operation *operation, RuntimeError &error); */
+  DataType GetDataType () override;
 
  private:
-  float *frame_data;
+  /* This backend stores its own copy of */
+  std::shared_ptr<void> frame_data;
+  size_t frame_size;
   int frame_width;
   int frame_height;
   ImageFormat frame_format;
-  /* std::shared_ptr<TF_Tensor> tensor; */
+  DataType data_type;
 
-  /* RuntimeError GetTensorShape (std::shared_ptr<TF_Graph> graph, */
-  /*                              TF_Operation *operation, */
-  /*                              TF_DataType &type, int64_t **dims, */
-  /*                              int64_t &num_dims, int64_t &size); */
-  /* RuntimeError CreateTensor (TF_DataType type, int64_t dims[], int64_t num_dims, */
-  /*                            int64_t size); */
   RuntimeError Validate (int64_t dims[], int64_t num_dims);
 };
 

@@ -7,7 +7,7 @@
  * RidgeRun, LLC.  The user is free to modify the source code after obtaining
  * a software license from RidgeRun.  All source code changes must be provided
  * back to RidgeRun without any encumbrance.
-*/
+ */
 
 #include <r2i/r2i.h>
 #include <r2i/tensorrt/frame.h>
@@ -20,16 +20,35 @@
 #include <CppUTest/MemoryLeakDetectorMallocMacros.h>
 #include <CppUTest/TestHarness.h>
 
+#include <cuda.h>
+#include <cuda_runtime.h>
+
 #define FRAME_WIDTH  2
 #define FRAME_HEIGHT  2
 
-bool multiple_batches = false;
-bool invalid_width = false;
-bool invalid_height = false;
-bool invalid_channels = false;
-bool new_tensor_error = false;
-void *dummyprt = nullptr;
+bool cudaMallocError = false;
+bool cudaMemCpyError = false;
+int cudaMallocCount = 0;
+size_t cudaRequestedSize = 0;
 
+__host__ __cudart_builtin__ cudaError_t CUDARTAPI
+cudaMalloc(void **devPtr, size_t size) {
+  if (!cudaMallocError) {
+    cudaRequestedSize = size;
+    cudaMallocCount += 1;
+    return cudaSuccess;
+  } else {
+    return cudaErrorMemoryAllocation;
+  }
+}
+
+__host__ cudaError_t CUDARTAPI cudaMemcpy(void *dst, const void *src,
+    size_t count, enum cudaMemcpyKind kind) {
+  if (!cudaMemCpyError)
+    return cudaSuccess;
+  else
+    return cudaErrorInvalidValue;
+}
 
 TEST_GROUP (TensorRTFrame) {
   r2i::tensorrt::Frame frame;
@@ -37,66 +56,79 @@ TEST_GROUP (TensorRTFrame) {
   int height = FRAME_HEIGHT;
   float data[4] = {0.1, 0.2, 0.3, 0.4};
   r2i::ImageFormat format;
+  r2i::DataType type;
+  r2i::RuntimeError error;
 
   void setup () {
+    error.Clean();
     frame = r2i::tensorrt::Frame();
     format = r2i::ImageFormat(r2i::ImageFormat::Id::RGB);
-    dummyprt = malloc(1);
+    type = r2i::DataType(r2i::DataType::Id::FLOAT);
+
+    cudaMallocError = false;
+    cudaMemCpyError = false;
+    cudaMallocCount = 0;
+    cudaRequestedSize = 0;
   }
 
   void teardown () {
-    free(dummyprt);
   }
 };
 
 TEST (TensorRTFrame, FrameConfigure) {
-  r2i::RuntimeError error;
-
-  error = frame.Configure(data, width, height, format.GetId());
+  error = frame.Configure(data, width, height, format.GetId(), type.GetId());
 
   LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode());
 }
 
-TEST (TensorRTFrame, FrameConfigureNullData) {
-  r2i::RuntimeError error;
+TEST (TensorRTFrame, FrameCheckSize) {
+  error = frame.Configure(data, width, height, format.GetId(), type.GetId());
 
-  error = frame.Configure(nullptr, width, height, format.GetId());
+  LONGS_EQUAL (FRAME_WIDTH * FRAME_HEIGHT * format.GetNumPlanes() *
+               type.GetBytesPerPixel(), cudaRequestedSize);
+}
+
+TEST (TensorRTFrame, FrameConfigureNullData) {
+  error = frame.Configure(nullptr, width, height, format.GetId(), type.GetId());
 
   LONGS_EQUAL (r2i::RuntimeError::Code::NULL_PARAMETER, error.GetCode());
 }
 
-TEST (TensorRTFrame, FrameConfigureNegativeWidth) {
-  r2i::RuntimeError error;
+TEST (TensorRTFrame, FrameConfigureNullWidth) {
+  error = frame.Configure(data, 0, height, format.GetId(), type.GetId());
 
-  error = frame.Configure(data, -1, height, format.GetId());
+  LONGS_EQUAL (r2i::RuntimeError::Code::WRONG_API_USAGE, error.GetCode());
+}
+
+TEST (TensorRTFrame, FrameConfigureNegativeWidth) {
+  error = frame.Configure(data, -1, height, format.GetId(), type.GetId());
+
+  LONGS_EQUAL (r2i::RuntimeError::Code::WRONG_API_USAGE, error.GetCode());
+}
+
+TEST (TensorRTFrame, FrameConfigureNullHeight) {
+  error = frame.Configure(data, width, 0, format.GetId(), type.GetId());
 
   LONGS_EQUAL (r2i::RuntimeError::Code::WRONG_API_USAGE, error.GetCode());
 }
 
 TEST (TensorRTFrame, FrameConfigureNegativeHeight) {
-  r2i::RuntimeError error;
-
-  error = frame.Configure(data, width, -1, format.GetId());
+  error = frame.Configure(data, width, -1, format.GetId(), type.GetId());
 
   LONGS_EQUAL (r2i::RuntimeError::Code::WRONG_API_USAGE, error.GetCode());
 }
 
-TEST (TensorRTFrame, FrameGetData) {
-  r2i::RuntimeError error;
-  void *local_data;
+TEST (TensorRTFrame, FrameConfigureUnknownDataType) {
+  error = frame.Configure(data, width, 0, format.GetId(),
+                          r2i::DataType::Id::UNKNOWN_DATATYPE);
 
-  error = frame.Configure(data, width, height, format.GetId());
-  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode());
-
-  local_data = frame.GetData();
-  POINTERS_EQUAL (data, local_data);
+  LONGS_EQUAL (r2i::RuntimeError::Code::WRONG_API_USAGE, error.GetCode());
 }
 
 TEST (TensorRTFrame, FrameGetWidth) {
-  r2i::RuntimeError error;
   int local_width;
 
-  error = frame.Configure(data, width, height, format.GetId());
+  error = frame.Configure(data, width, height, format.GetId(), type.GetId());
   LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode());
 
   local_width = frame.GetWidth();
@@ -104,10 +136,9 @@ TEST (TensorRTFrame, FrameGetWidth) {
 }
 
 TEST (TensorRTFrame, FrameGetHeight) {
-  r2i::RuntimeError error;
   int local_height;
 
-  error = frame.Configure(data, width, height, format.GetId());
+  error = frame.Configure(data, width, height, format.GetId(), type.GetId());
   LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode());
 
   local_height = frame.GetHeight();
@@ -115,151 +146,57 @@ TEST (TensorRTFrame, FrameGetHeight) {
 }
 
 TEST (TensorRTFrame, FrameGetFormat) {
-  r2i::RuntimeError error;
   r2i::ImageFormat local_format;
 
-  error = frame.Configure(data, width, height, format.GetId());
+  error = frame.Configure(data, width, height, format.GetId(), type.GetId());
   LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode());
 
   local_format = frame.GetFormat();
   LONGS_EQUAL (format.GetId(), local_format.GetId());
 }
 
-TEST (TensorRTFrame, FrameGetTensor) {
-  r2i::RuntimeError error;
-  // std::shared_ptr<TF_Graph> pgraph(TF_NewGraph(), TF_DeleteGraph);
-  // TF_Operation *operation = (TF_Operation *)
-  //                           data; /* Used to avoid passing a nullptr */
-  // std::shared_ptr<TF_Tensor> tensor(nullptr);
+TEST (TensorRTFrame, FrameGetDataType) {
+  r2i::DataType local_data_type;
 
-  error = frame.Configure(data, width, height, format.GetId());
+  error = frame.Configure(data, width, height, format.GetId(), type.GetId());
   LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode());
 
-  // tensor = frame.GetTensor(pgraph, operation, error);
-  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode());
+  local_data_type = frame.GetDataType();
+  LONGS_EQUAL (type.GetId(), local_data_type.GetId());
 }
 
-TEST (TensorRTFrame, FrameGetTensorNullGraph) {
-  r2i::RuntimeError error;
-  // TF_Operation *operation = (TF_Operation *)
-  //                           data; /* Used to avoid passing a nullptr */
-  // std::shared_ptr<TF_Tensor> tensor(nullptr);
+TEST (TensorRTFrame, FrameCudaMallocError) {
+  cudaMallocError = true;
 
-  error = frame.Configure(data, width, height, format.GetId());
-  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode());
-
-  // tensor = frame.GetTensor(nullptr, operation, error);
-  LONGS_EQUAL (r2i::RuntimeError::Code::INVALID_FRAMEWORK_PARAMETER,
-               error.GetCode());
+  error = frame.Configure(data, width, height, format.GetId(), type.GetId());
+  LONGS_EQUAL (r2i::RuntimeError::Code::MEMORY_ERROR, error.GetCode());
 }
 
-TEST (TensorRTFrame, FrameGetTensorNullOperation) {
-  r2i::RuntimeError error;
-  // std::shared_ptr<TF_Graph> pgraph(TF_NewGraph(), TF_DeleteGraph);
-  // std::shared_ptr<TF_Tensor> tensor(nullptr);
+TEST (TensorRTFrame, FrameCudaMemCpyError) {
+  cudaMemCpyError = true;
 
-  error = frame.Configure(data, width, height, format.GetId());
-  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode());
-
-  // tensor = frame.GetTensor(pgraph, nullptr, error);
-  LONGS_EQUAL (r2i::RuntimeError::Code::INVALID_FRAMEWORK_PARAMETER,
-               error.GetCode());
+  error = frame.Configure(data, width, height, format.GetId(), type.GetId());
+  LONGS_EQUAL (r2i::RuntimeError::Code::MEMORY_ERROR, error.GetCode());
 }
 
-TEST (TensorRTFrame, FrameGetTensorMultipleBatches) {
-  r2i::RuntimeError error;
-  // std::shared_ptr<TF_Graph> pgraph(TF_NewGraph(), TF_DeleteGraph);
-  // TF_Operation *operation = (TF_Operation *)
-  //                           data; /* Used to avoid passing a nullptr */
-  // std::shared_ptr<TF_Tensor> tensor(nullptr);
-
-  multiple_batches = true;
-
-  error = frame.Configure(data, width, height, format.GetId());
+TEST (TensorRTFrame, FrameCudaSameSizeSingleMalloc) {
+  error = frame.Configure(data, width, height, format.GetId(), type.GetId());
   LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode());
 
-  /* R2I will set the tensor size to 1 to allow frame by frame processing */
-  // tensor = frame.GetTensor(pgraph, operation, error);
-  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode());
-
-  multiple_batches = false;
+  /* Second configuration with same parameters shouldn't trigger cudaMalloc*/
+  error = frame.Configure(data, width, height, format.GetId(), type.GetId());
+  LONGS_EQUAL (1, cudaMallocCount);
 }
 
-TEST (TensorRTFrame, FrameGetTensorUnsupportedWidth) {
-  r2i::RuntimeError error;
-  // std::shared_ptr<TF_Graph> pgraph(TF_NewGraph(), TF_DeleteGraph);
-  // TF_Operation *operation = (TF_Operation *)
-  //                           data; /* Used to avoid passing a nullptr */
-  // std::shared_ptr<TF_Tensor> tensor(nullptr);
-
-  invalid_width = true;
-
-  error = frame.Configure(data, width, height, format.GetId());
+TEST (TensorRTFrame, FrameCudaDifferentSizeDoubleMalloc) {
+  error = frame.Configure(data, width, height, format.GetId(), type.GetId());
   LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode());
 
-  // tensor = frame.GetTensor(pgraph, operation, error);
-  LONGS_EQUAL (r2i::RuntimeError::Code::INVALID_FRAMEWORK_PARAMETER,
-               error.GetCode());
-
-  invalid_width = false;
+  /* Second configuration with different parameters should trigger cudaMalloc*/
+  error = frame.Configure(data, 2 * width, height, format.GetId(), type.GetId());
+  LONGS_EQUAL (2, cudaMallocCount);
 }
 
-TEST (TensorRTFrame, FrameGetTensorUnsupportedHeight) {
-  r2i::RuntimeError error;
-  // std::shared_ptr<TF_Graph> pgraph(TF_NewGraph(), TF_DeleteGraph);
-  // TF_Operation *operation = (TF_Operation *)
-  //                           data; /* Used to avoid passing a nullptr */
-  // std::shared_ptr<TF_Tensor> tensor(nullptr);
-
-  invalid_height = true;
-
-  error = frame.Configure(data, width, height, format.GetId());
-  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode());
-
-  // tensor = frame.GetTensor(pgraph, operation, error);
-  LONGS_EQUAL (r2i::RuntimeError::Code::INVALID_FRAMEWORK_PARAMETER,
-               error.GetCode());
-
-  invalid_height = false;
-}
-
-TEST (TensorRTFrame, FrameGetTensorIncorrectChannels) {
-  r2i::RuntimeError error;
-  // std::shared_ptr<TF_Graph> pgraph(TF_NewGraph(), TF_DeleteGraph);
-  // TF_Operation *operation = (TF_Operation *)
-  //                           data; /* Used to avoid passing a nullptr */
-  // std::shared_ptr<TF_Tensor> tensor(nullptr);
-
-  invalid_channels = true;
-
-  error = frame.Configure(data, width, height, format.GetId());
-  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode());
-
-  // tensor = frame.GetTensor(pgraph, operation, error);
-  LONGS_EQUAL (r2i::RuntimeError::Code::INVALID_FRAMEWORK_PARAMETER,
-               error.GetCode());
-
-  invalid_channels = false;
-}
-
-TEST (TensorRTFrame, FrameGetTensorNewTensorError) {
-  r2i::RuntimeError error;
-  // std::shared_ptr<TF_Graph> pgraph(TF_NewGraph(), TF_DeleteGraph);
-  // TF_Operation *operation = (TF_Operation *)
-  //                           data; /* Used to avoid passing a nullptr */
-  // std::shared_ptr<TF_Tensor> tensor(nullptr);
-
-  new_tensor_error = true;
-
-  error = frame.Configure(data, width, height, format.GetId());
-  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode());
-
-  // tensor = frame.GetTensor(pgraph, operation, error);
-  LONGS_EQUAL (r2i::RuntimeError::Code::FRAMEWORK_ERROR,
-               error.GetCode());
-
-  new_tensor_error = false;
-}
 
 int main (int ac, char **av) {
   return CommandLineTestRunner::RunAllTests (ac, av);
