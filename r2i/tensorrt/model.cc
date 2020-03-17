@@ -9,10 +9,6 @@
  * back to RidgeRun without any encumbrance.
 */
 
-// #include <fstream>
-// #include <iostream>
-// #include <vector>
-
 #include "r2i/tensorrt/model.h"
 
 namespace r2i {
@@ -27,7 +23,8 @@ RuntimeError Model::Start (const std::string &name) {
   return error;
 }
 
-RuntimeError Model::Set (std::shared_ptr<nvinfer1::ICudaEngine> tensorrtmodel) {
+RuntimeError Model::Set (std::shared_ptr<nvinfer1::IExecutionContext>
+                         tensorrtmodel) {
   RuntimeError error;
 
   if (nullptr == tensorrtmodel) {
@@ -41,7 +38,7 @@ RuntimeError Model::Set (std::shared_ptr<nvinfer1::ICudaEngine> tensorrtmodel) {
   return error;
 }
 
-std::shared_ptr<nvinfer1::ICudaEngine> Model::GetTREngineModel () {
+std::shared_ptr<nvinfer1::IExecutionContext> Model::GetTRContext () {
   return this->engine;
 }
 

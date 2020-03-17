@@ -16,7 +16,6 @@
 #include <CppUTest/CommandLineTestRunner.h>
 #include <CppUTest/TestHarness.h>
 
-
 #include "mockcudaengine.cc"
 #include "mockruntime.cc"
 
@@ -26,7 +25,8 @@ namespace r2i {
 namespace tensorrt {
 Model::Model () {}
 
-RuntimeError Model::Set (std::shared_ptr<nvinfer1::ICudaEngine> tensorrtmodel) {
+RuntimeError Model::Set (std::shared_ptr<nvinfer1::IExecutionContext
+                         >  tensorrtmodel) {
   r2i::RuntimeError error;
   if (model_set_error)
     error.Set (RuntimeError::Code::NULL_PARAMETER, "Unable to load cached engine");
@@ -46,6 +46,7 @@ TEST_GROUP (TensorRTLoader) {
     loader = r2i::tensorrt::Loader();
     incompatible_model = false;
     model_set_error = false;
+    fail_context = false;
   }
 };
 

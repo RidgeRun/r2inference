@@ -31,6 +31,11 @@ void ICudaEngineDeleter (nvinfer1::ICudaEngine *p) {
     p->destroy ();
 }
 
+void IExecutionContextDeleter (nvinfer1::IExecutionContext *p) {
+  if (p)
+    p->destroy ();
+}
+
 std::shared_ptr<r2i::IModel> Loader::Load (const std::string &in_path,
     r2i::RuntimeError &error) {
   error.Clean();
@@ -79,9 +84,18 @@ std::shared_ptr<r2i::IModel> Loader::Load (const std::string &in_path,
     return nullptr;
   }
 
+  std::shared_ptr < nvinfer1::IExecutionContext> context = std::shared_ptr
+      < nvinfer1::IExecutionContext> (engine->createExecutionContext (),
+                                      IExecutionContextDeleter);
+  if (!context) {
+    error.Set (RuntimeError::Code::INCOMPATIBLE_MODEL,
+               "Unable to load cached engine");
+    return nullptr;
+  }
+
   std::shared_ptr<r2i::tensorrt::Model> model = std::make_shared<Model>();
 
-  error = model->Set(engine);
+  error = model->Set(context);
   if (error.IsError ()) {
     model = nullptr;
   }

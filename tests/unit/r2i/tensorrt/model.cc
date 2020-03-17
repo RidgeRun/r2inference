@@ -22,7 +22,7 @@ bool infer;
 
 #define GOOD_FILENAME __FILE__
 
-void ICudaEngineDeleter (nvinfer1::ICudaEngine *p) {
+void IExecutionContextDeleter (nvinfer1::IExecutionContext *p) {
   if (p)
     p->destroy ();
 }
@@ -30,12 +30,13 @@ void ICudaEngineDeleter (nvinfer1::ICudaEngine *p) {
 TEST_GROUP (TensorRTModel) {
   r2i::RuntimeError error;
   r2i::tensorrt::Model model;
-  std::shared_ptr<nvinfer1::ICudaEngine> buffer;
+  std::shared_ptr<nvinfer1::IExecutionContext> buffer;
 
   void setup () {
     model = r2i::tensorrt::Model();
-    buffer = std::shared_ptr<nvinfer1::ICudaEngine> (new nvinfer1::MockCudaEngine,
-             ICudaEngineDeleter);
+    buffer = std::shared_ptr<nvinfer1::IExecutionContext> (new
+             nvinfer1::MockExecutionContext,
+             IExecutionContextDeleter);
   }
 
   void teardown () {
@@ -58,13 +59,15 @@ TEST (TensorRTModel, SetNullBuffer) {
 }
 
 TEST (TensorRTModel, GetSuccess) {
-  std::shared_ptr<nvinfer1::ICudaEngine> model_buffer = model.GetTREngineModel ();
+  std::shared_ptr<nvinfer1::IExecutionContext> model_buffer =
+    model.GetTRContext ();
 
   LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode());
 }
 
 TEST (TensorRTModel, GetNullBuffer) {
-  std::shared_ptr<nvinfer1::ICudaEngine> model_buffer = model.GetTREngineModel ();
+  std::shared_ptr<nvinfer1::IExecutionContext> model_buffer =
+    model.GetTRContext ();
   LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode());
 }
 

@@ -13,21 +13,17 @@
 #include "r2i/tensorrt/prediction.h"
 #include "r2i/tensorrt/frame.h"
 
+#include <vector>
+
 namespace r2i {
 namespace tensorrt {
 
-Engine::Engine () : state(State::STOPPED), model(nullptr) {
+Engine::Engine () : model(nullptr) {
 }
 
 RuntimeError Engine::SetModel (std::shared_ptr<r2i::IModel> in_model) {
 
   RuntimeError error;
-
-  if (State::STOPPED != this->state) {
-    error.Set (RuntimeError::Code::WRONG_ENGINE_STATE,
-               "Stop model before setting a new state");
-    return error;
-  }
 
   if (nullptr == in_model) {
     error.Set (RuntimeError::Code::NULL_PARAMETER,
@@ -49,28 +45,11 @@ RuntimeError Engine::SetModel (std::shared_ptr<r2i::IModel> in_model) {
 }
 
 RuntimeError Engine::Start ()  {
-  RuntimeError error;
-
-  if (nullptr == this->model) {
-    error.Set (RuntimeError::Code:: NULL_PARAMETER,
-               "Model not set yet");
-    return error;
-  }
-
-  // error = this->model->Start("Tensorrt");
-  // if (error.IsError ()) {
-  //   return error;
-  // }
-
-  return error;
+  return RuntimeError();
 }
 
 RuntimeError Engine::Stop () {
-  RuntimeError error;
-
-  // this->state = State::STOPPED;
-
-  return error;
+  return RuntimeError();
 }
 
 std::shared_ptr<r2i::IPrediction> Engine::Predict (std::shared_ptr<r2i::IFrame>
@@ -80,30 +59,20 @@ std::shared_ptr<r2i::IPrediction> Engine::Predict (std::shared_ptr<r2i::IFrame>
   error.Clean ();
 
   auto prediction = std::make_shared<Prediction>();
-  // std::shared_ptr<TF_Status> pstatus(TF_NewStatus(), TF_DeleteStatus);
 
-  // auto *session = this->session.get ();
-  // auto *in_tensor = pin_tensor.get ();
-  // auto *status = pstatus.get ();
+  int batchSize = 1;
 
-  // TF_Output run_outputs = {.oper = out_operation, .index = 0};
-  // TF_Output run_inputs = {.oper = in_operation, .index = 0};
-  // TF_Tensor *out_tensor = nullptr;
+  std::vector < void *> buffers;
+  /* FIXME Store these in the correct order */
+  buffers.emplace_back (in_frame->GetData());
+  buffers.emplace_back (prediction->GetResultData());
 
-  // TF_SessionRun(session,
-  //               NULL,                         /* RunOptions */
-  //               &run_inputs, &in_tensor, 1,   /* Input tensors */
-  //               &run_outputs, &out_tensor, 1, /* Output tensors */
-  //               NULL, 0,                      /* Target operations */
-  //               NULL,                         /* RunMetadata */
-  //               status);
-  // if (TF_GetCode(status) != TF_OK) {
-  //   error.Set (RuntimeError::Code::FRAMEWORK_ERROR, TF_Message (status));
-  //   return nullptr;
-  // }
-
-  // std::shared_ptr<TF_Tensor> pout_tensor (out_tensor, TF_DeleteTensor);
-  // prediction->SetTensor (pgraph, out_operation, pout_tensor);
+  bool status = this->model->GetTRContext()->execute (batchSize, buffers.data ());
+  if (!status) {
+    error.Set (RuntimeError::Code::FRAMEWORK_ERROR,
+               "Unable to run prediction on model");
+    return nullptr;
+  }
 
   return prediction;
 }
