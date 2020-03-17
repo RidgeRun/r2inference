@@ -37,10 +37,6 @@ Parameters::Parameters () :
         r2i::ParameterMeta::Flags::READ,
         r2i::ParameterMeta::Type::STRING,
         std::make_shared<VersionAccessor>(this)),
-  PARAM("gpu-memory-usage", "Per process GPU memory usage fraction",
-        r2i::ParameterMeta::Flags::READWRITE | r2i::ParameterMeta::Flags::WRITE_BEFORE_START,
-        r2i::ParameterMeta::Type::DOUBLE,
-        std::make_shared<MemoryUsageAccessor>(this)),
 }) {
 }
 

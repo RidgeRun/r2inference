@@ -1,4 +1,4 @@
-/* Copyright (C) 2018-2020 RidgeRun, LLC (http://www.ridgerun.com)
+/* Copyright (C) 2020 RidgeRun, LLC (http://www.ridgerun.com)
  * All Rights Reserved.
  *
  * The contents of this software are proprietary and confidential to RidgeRun,
@@ -18,102 +18,63 @@
 #include <CppUTest/CommandLineTestRunner.h>
 #include <CppUTest/TestHarness.h>
 
+#include <cuda.h>
+#include <cuda_runtime.h>
+
 #define INPUTS 3
 
-bool model_sucess = true;
+bool cudaMemCpyError = false;
+bool mallocError = false;
 
-// int TF_GraphGetTensorNumDims(TF_Graph *graph, TF_Output output,
-//                              TF_Status *status) {
-//   return 1;
-// }
-// static void DummyDeallocator (void *data, size_t len, void *arg) {
-//   //NOP
-// }
-// void TF_GraphGetTensorShape(TF_Graph *graph, TF_Output output, int64_t *dims,
-//                             int num_dims, TF_Status *status) {
-//   dims[0] = 3;
-// }
-// TF_DataType TF_OperationOutputType(TF_Output oper_out) {
-//   if (model_sucess) {
-//     return TF_FLOAT;
-//   } else {
-//     return TF_DOUBLE;
-//   }
-// }
-// TF_Graph *TF_NewGraph() { return (TF_Graph *) new int; }
-// void TF_DeleteGraph(TF_Graph *g) {
-//   if (g == nullptr) return;
-//   delete (int *) g;
-// }
+__host__ cudaError_t CUDARTAPI cudaMemcpy(void *dst, const void *src,
+    size_t count, enum cudaMemcpyKind kind) {
+  if (!cudaMemCpyError) {
+    memcpy ( dst, src, count );
+    return cudaSuccess;
+  } else {
+    return cudaErrorInvalidValue;
+  }
+}
+
+void *malloc (size_t size) {
+  if (!mallocError) {
+    return calloc (1, size);;
+  } else {
+    return nullptr;
+  }
+}
 
 TEST_GROUP (TensorRTPrediction) {
   r2i::RuntimeError error;
 
   r2i::tensorrt::Prediction prediction;
   float matrix[INPUTS] = {0.2, 0.4, 0.6};
-  // std::shared_ptr<TF_Graph> pgraph;
-  // TF_Operation *poperation;
-  // std::shared_ptr<TF_Tensor> pout_tensor;
 
   int64_t raw_input_dims[1] = {INPUTS};
 
   void setup () {
-    // pgraph = std::shared_ptr<TF_Graph> (TF_NewGraph (), TF_DeleteGraph);
-
-    // poperation = (TF_Operation *)
-    //              &matrix; /* This is only used to avoid nullptr error, the actual use of this function is captured by TF_OperationOutputType */
-
-    // pout_tensor = std::shared_ptr<TF_Tensor> (TF_NewTensor(TF_FLOAT, raw_input_dims,
-    //               1, matrix, INPUTS * sizeof(float), DummyDeallocator, NULL), TF_DeleteTensor);
+    error.Clean();
+    cudaMemCpyError = false;
   }
 
   void teardown () {
   }
 };
 
-TEST (TensorRTPrediction, SetTensorSuccess) {
-  r2i::RuntimeError error;
-
-  // error = prediction.SetTensor(pgraph, poperation, pout_tensor);
+TEST (TensorRTPrediction, SetResultBufferSuccess) {
+  error = prediction.SetResultBuffer(matrix, INPUTS * sizeof(float));
   LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode());
 }
 
-TEST (TensorRTPrediction, SetTensorNullGraph) {
-  r2i::RuntimeError error;
-
-  // error = prediction.SetTensor(nullptr, poperation, pout_tensor);
+TEST (TensorRTPrediction, SetNullResultBuffer) {
+  error = prediction.SetResultBuffer(nullptr, INPUTS * sizeof(float));
   LONGS_EQUAL (r2i::RuntimeError::Code::NULL_PARAMETER, error.GetCode());
-}
-
-TEST (TensorRTPrediction, SetTensorNullOperation) {
-  r2i::RuntimeError error;
-
-  // error = prediction.SetTensor(pgraph, nullptr, pout_tensor);
-  LONGS_EQUAL (r2i::RuntimeError::Code::NULL_PARAMETER, error.GetCode());
-}
-
-TEST (TensorRTPrediction, SetTensorNullTensor) {
-  r2i::RuntimeError error;
-
-  // error = prediction.SetTensor(pgraph, poperation, nullptr);
-  LONGS_EQUAL (r2i::RuntimeError::Code::NULL_PARAMETER, error.GetCode());
-}
-
-TEST (TensorRTPrediction, SetTensorIncompatibleModel) {
-  r2i::RuntimeError error;
-  model_sucess = false;
-
-  // error = prediction.SetTensor(pgraph, poperation, pout_tensor);
-  LONGS_EQUAL (r2i::RuntimeError::Code::INCOMPATIBLE_MODEL, error.GetCode());
-
-  model_sucess = true;
 }
 
 TEST (TensorRTPrediction, Prediction) {
-  r2i::RuntimeError error;
-  double result = 0;
+  double result;
 
-  // error = prediction.SetTensor(pgraph, poperation, pout_tensor);
+  error = prediction.SetResultBuffer(matrix, INPUTS * sizeof(float));
   LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode());
 
   result = prediction.At (0, error);
@@ -121,41 +82,41 @@ TEST (TensorRTPrediction, Prediction) {
   DOUBLES_EQUAL (matrix[0], result, 0.05);
 }
 
-TEST (TensorRTPrediction, PredictionNoTensor) {
-  r2i::RuntimeError error;
-
-  prediction.At (0, error);
-  LONGS_EQUAL (r2i::RuntimeError::Code::INVALID_FRAMEWORK_PARAMETER,
-               error.GetCode());
-}
-
-TEST (TensorRTPrediction, PredictionNoData) {
-  r2i::RuntimeError error;
-
-  // pout_tensor = std::shared_ptr<TF_Tensor> (TF_NewTensor(TF_FLOAT, raw_input_dims,
-  //               1, nullptr, INPUTS * sizeof(float), DummyDeallocator, NULL), TF_DeleteTensor);
-
-  // error = prediction.SetTensor(pgraph, poperation, pout_tensor);
+TEST (TensorRTPrediction, PredictionGetResultSize) {
+  error = prediction.SetResultBuffer(matrix, INPUTS * sizeof(float));
   LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode());
 
+  LONGS_EQUAL (INPUTS * sizeof(float), prediction.GetResultSize());
+}
+
+TEST (TensorRTPrediction, PredictionNoTensor) {
   prediction.At (0, error);
   LONGS_EQUAL (r2i::RuntimeError::Code::INVALID_FRAMEWORK_PARAMETER,
                error.GetCode());
 }
 
 TEST (TensorRTPrediction, PredictionNonExistentIndex) {
-  r2i::RuntimeError error;
-
-  // error = prediction.SetTensor(pgraph, poperation, pout_tensor);
+  error = prediction.SetResultBuffer(matrix, INPUTS * sizeof(float));
   LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode());
 
   prediction.At (5, error);
   LONGS_EQUAL (r2i::RuntimeError::Code::MEMORY_ERROR, error.GetCode());
 }
 
+TEST (TensorRTPrediction, PredictionCudaMemCpyError) {
+  cudaMemCpyError = true;
+  error = prediction.SetResultBuffer(matrix, INPUTS * sizeof(float));
+  LONGS_EQUAL (r2i::RuntimeError::Code::MEMORY_ERROR, error.GetCode());
+}
+
+TEST (TensorRTPrediction, PredictionMallocError) {
+  cudaMemCpyError = true;
+  error = prediction.SetResultBuffer(matrix, INPUTS * sizeof(float));
+  LONGS_EQUAL (r2i::RuntimeError::Code::MEMORY_ERROR, error.GetCode());
+}
+
 int main (int ac, char **av) {
-  /* This module detects fake leaks since the TF_Tensor couldn't be mocked since it's directly used by the predict module */
-  MemoryLeakWarningPlugin::turnOffNewDeleteOverloads();
+  //MemoryLeakWarningPlugin::turnOffNewDeleteOverloads();
 
   return CommandLineTestRunner::RunAllTests (ac, av);
 }

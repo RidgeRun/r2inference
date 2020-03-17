@@ -23,47 +23,29 @@ class MockModel : public r2i::IModel {
   r2i::RuntimeError Start (const std::string &name) override {r2i::RuntimeError error; return error;}
 };
 
-// /* Mock implementation of actual classes*/
-// TF_Session *TF_NewSession(TF_Graph *graph, const TF_SessionOptions *opts,
-//                           TF_Status *status) { return nullptr; }
-// void TF_CloseSession(TF_Session *s, TF_Status *status) { return; }
-// void TF_DeleteSession(TF_Session *s, TF_Status *status) { return; }
-// void TF_SessionRun(TF_Session *session, const TF_Buffer *run_options,
-//                    const TF_Output *inputs, TF_Tensor *const *input_values, int ninputs,
-//                    const TF_Output *outputs, TF_Tensor **output_values, int noutputs,
-//                    const TF_Operation *const *target_opers, int ntargets, TF_Buffer *run_metadata,
-//                    TF_Status *status) { }
 
 namespace r2i {
 namespace tensorrt {
 
 Model::Model () {}
 r2i::RuntimeError Model::Start (const std::string &name) { return RuntimeError(); }
-// r2i::RuntimeError Model::Load (std::shared_ptr<TF_Buffer> pbuffer) {
-//   this->buffer = pbuffer;
-//   return r2i::RuntimeError();
-// }
-// std::shared_ptr<TF_Graph> Model::GetGraph () {return this->graph;}
-// std::shared_ptr<TF_Buffer> Model::GetBuffer () {return this->buffer;}
-// TF_Operation *Model::GetInputOperation () { return nullptr; }
-// TF_Operation *Model::GetOutputOperation () { return nullptr; }
+r2i::RuntimeError Model::Load (std::shared_ptr<TF_Buffer> pbuffer) {
+  this->buffer = pbuffer;
+  return r2i::RuntimeError();
+}
 
 Frame::Frame () {}
 RuntimeError Frame::Configure (void *in_data, int width, int height,
-                               r2i::ImageFormat::Id format) { return RuntimeError(); }
+                               r2i::ImageFormat::Id format, r2i::DataType::Id type) { return RuntimeError(); }
 void *Frame::GetData () { return nullptr; }
 int Frame::GetWidth () { return 0; }
 int Frame::GetHeight () { return 0; }
 ImageFormat Frame::GetFormat () { return ImageFormat::Id::UNKNOWN_FORMAT; }
-// std::shared_ptr<TF_Tensor> Frame::GetTensor (std::shared_ptr<TF_Graph> graph,
-//     TF_Operation *operation, RuntimeError &error) { return nullptr; }
 
 Prediction::Prediction () {}
 double Prediction::At (unsigned int index,  r2i::RuntimeError &error) { return 0.0; }
 void *Prediction::GetResultData () { return nullptr; }
 unsigned int Prediction::GetResultSize () { return 0; }
-// RuntimeError Prediction::SetTensor (std::shared_ptr<TF_Graph> graph,
-//                                     TF_Operation *operation, std::shared_ptr<TF_Tensor> tensor) { return RuntimeError(); }
 }
 }
 

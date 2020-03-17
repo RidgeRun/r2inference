@@ -29,7 +29,7 @@ class Engine : public IEngine {
 
   r2i::RuntimeError SetModel (std::shared_ptr<r2i::IModel> in_model) override;
 
-  r2i::RuntimeError SetMemoryUsage (double memory_usage);
+  //r2i::RuntimeError SetMemoryUsage (double memory_usage);
 
   r2i::RuntimeError Start () override;
 

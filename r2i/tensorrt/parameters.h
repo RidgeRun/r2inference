@@ -99,17 +99,17 @@ class Parameters : public IParameters {
     }
   };
 
-  class MemoryUsageAccessor : public DoubleAccessor {
-   public:
-    MemoryUsageAccessor (Parameters *target) : DoubleAccessor(target) {}
-    RuntimeError Set () {
-      return target->engine->SetMemoryUsage(this->value);
-    }
+  /* class MemoryUsageAccessor : public DoubleAccessor { */
+  /*  public: */
+  /*   MemoryUsageAccessor (Parameters *target) : DoubleAccessor(target) {} */
+  /*   RuntimeError Set () { */
+  /*     return target->engine->SetMemoryUsage(this->value); */
+  /*   } */
 
-    RuntimeError Get () {
-      return RuntimeError ();
-    }
-  };
+  /*   RuntimeError Get () { */
+  /*     return RuntimeError (); */
+  /*   } */
+  /* }; */
 
   struct ParamDesc {
     ParameterMeta meta;

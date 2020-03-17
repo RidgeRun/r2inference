@@ -15,7 +15,6 @@ if HAVE_TENSORRT
 
 # TESTS =                 \
 #         engine          \
-#         prediction      \
 #         frame           \
 #         parameters      \
 #         frameworkfactory
@@ -23,7 +22,8 @@ if HAVE_TENSORRT
 TESTS =                 \
          model          \
          loader         \
-         frame
+         frame          \
+         prediction
 
 check_PROGRAMS=$(TESTS)
 

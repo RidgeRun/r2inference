@@ -1,4 +1,4 @@
-/* Copyright (C) 2018 RidgeRun, LLC (http://www.ridgerun.com)
+/* Copyright (C) 2020 RidgeRun, LLC (http://www.ridgerun.com)
  * All Rights Reserved.
  *
  * The contents of this software are proprietary and confidential to RidgeRun,
@@ -26,11 +26,10 @@ class Prediction: public IPrediction {
   double At (unsigned int index,  r2i::RuntimeError &error) override;
   void *GetResultData () override;
   unsigned int GetResultSize () override;
-  /* RuntimeError SetTensor (std::shared_ptr<TF_Graph> graph, */
-  /*                         TF_Operation *operation, std::shared_ptr<TF_Tensor> tensor); */
+  RuntimeError SetResultBuffer (void *results, size_t size);
 
  private:
-  /* std::shared_ptr<TF_Tensor> tensor; */
+  std::shared_ptr<void> result_buffer;
   size_t result_size;
   /* int64_t GetRequiredBufferSize (TF_Output output, int64_t *dims, */
   /*                                int64_t num_dims); */
