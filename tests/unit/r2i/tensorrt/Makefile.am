@@ -13,17 +13,14 @@ AM_DEFAULT_SOURCE_EXT = .cc
 if ENABLE_TESTS
 if HAVE_TENSORRT
 
-# TESTS =                 \
-#         parameters      \
-#         frameworkfactory
-
 TESTS =                 \
          model          \
          loader         \
          frame          \
          prediction     \
          engine         \
-         parameters
+         parameters     \
+         frameworkfactory
 
 check_PROGRAMS=$(TESTS)
 
