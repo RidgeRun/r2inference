@@ -22,7 +22,8 @@ TESTS =                 \
          loader         \
          frame          \
          prediction     \
-         engine
+         engine         \
+         parameters
 
 check_PROGRAMS=$(TESTS)
 

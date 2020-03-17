@@ -41,28 +41,10 @@ class Engine : public r2i::IEngine {
 };
 }
 
-namespace r2i {
-namespace tensorrt {
-Model::Model () { }
-
-RuntimeError Model::Start (const std::string &name) { return RuntimeError(); }
-
-
-Engine::Engine ()  { }
-RuntimeError Engine::SetModel (std::shared_ptr<IModel> in_model) { return RuntimeError(); }
-RuntimeError Engine::Start () { return RuntimeError(); }
-RuntimeError Engine::Stop () { return RuntimeError(); }
-std::shared_ptr<IPrediction> Engine::Predict (std::shared_ptr<IFrame> in_frame,
-    RuntimeError &error) { return nullptr; }
-Engine::~Engine () { }
-
-}
-}
-
-TEST_GROUP (TensorrtParameters) {
+TEST_GROUP (TensorRTParameters) {
 };
 
-TEST (TensorrtParameters, ConfigureIncompatibleEngine) {
+TEST (TensorRTParameters, ConfigureIncompatibleEngine) {
   r2i::RuntimeError error;
   r2i::tensorrt::Parameters parameters;
 
@@ -75,7 +57,7 @@ TEST (TensorrtParameters, ConfigureIncompatibleEngine) {
   LONGS_EQUAL (r2i::RuntimeError::Code::INCOMPATIBLE_ENGINE, error.GetCode ());
 }
 
-TEST (TensorrtParameters, ConfigureIncompatibleModel) {
+TEST (TensorRTParameters, ConfigureIncompatibleModel) {
   r2i::RuntimeError error;
   r2i::tensorrt::Parameters parameters;
 
@@ -88,7 +70,7 @@ TEST (TensorrtParameters, ConfigureIncompatibleModel) {
   LONGS_EQUAL (r2i::RuntimeError::Code::INCOMPATIBLE_MODEL, error.GetCode ());
 }
 
-TEST (TensorrtParameters, ConfigureNullEngine) {
+TEST (TensorRTParameters, ConfigureNullEngine) {
   r2i::RuntimeError error;
   r2i::tensorrt::Parameters parameters;
 
@@ -100,7 +82,7 @@ TEST (TensorrtParameters, ConfigureNullEngine) {
   LONGS_EQUAL (r2i::RuntimeError::Code::NULL_PARAMETER, error.GetCode ());
 }
 
-TEST (TensorrtParameters, ConfigureNullModel) {
+TEST (TensorRTParameters, ConfigureNullModel) {
   r2i::RuntimeError error;
   r2i::tensorrt::Parameters parameters;
 
@@ -112,7 +94,7 @@ TEST (TensorrtParameters, ConfigureNullModel) {
   LONGS_EQUAL (r2i::RuntimeError::Code::NULL_PARAMETER, error.GetCode ());
 }
 
-TEST (TensorrtParameters, ConfigureSuccess) {
+TEST (TensorRTParameters, ConfigureSuccess) {
   r2i::RuntimeError error;
   r2i::tensorrt::Parameters parameters;
 
@@ -124,7 +106,7 @@ TEST (TensorrtParameters, ConfigureSuccess) {
   LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
 }
 
-TEST (TensorrtParameters, SetAndGetModel) {
+TEST (TensorRTParameters, SetAndGetModel) {
   r2i::RuntimeError error;
   r2i::tensorrt::Parameters parameters;
 
@@ -140,7 +122,7 @@ TEST (TensorrtParameters, SetAndGetModel) {
   POINTERS_EQUAL(internalModel.get(), model.get());
 }
 
-TEST (TensorrtParameters, SetAndGetEngine) {
+TEST (TensorRTParameters, SetAndGetEngine) {
   r2i::RuntimeError error;
   r2i::tensorrt::Parameters parameters;
 
@@ -156,53 +138,7 @@ TEST (TensorrtParameters, SetAndGetEngine) {
   POINTERS_EQUAL(internalEngine.get(), engine.get());
 }
 
-TEST (TensorrtParameters, SetAndGetInputLayerName) {
-  r2i::RuntimeError error;
-  r2i::tensorrt::Parameters parameters;
-  std::string in_value;
-  std::string out_value;
-
-  std::shared_ptr<r2i::IEngine> engine(new r2i::tensorrt::Engine);
-  std::shared_ptr<r2i::IModel> model(new r2i::tensorrt::Model);
-
-  error = parameters.Configure(engine, model);
-
-  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
-
-  in_value = "myinputlayer";
-  error = parameters.Set("input-layer", in_value);
-
-  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
-
-  error = parameters.Get("input-layer", out_value);
-
-  STRCMP_EQUAL(in_value.c_str(), out_value.c_str());
-}
-
-TEST (TensorrtParameters, SetAndGetOutputLayerName) {
-  r2i::RuntimeError error;
-  r2i::tensorrt::Parameters parameters;
-  std::string in_value;
-  std::string out_value;
-
-  std::shared_ptr<r2i::IEngine> engine(new r2i::tensorrt::Engine);
-  std::shared_ptr<r2i::IModel> model(new r2i::tensorrt::Model);
-
-  error = parameters.Configure(engine, model);
-
-  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
-
-  in_value = "myoutputlayer";
-  error = parameters.Set("output-layer", in_value);
-
-  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
-
-  error = parameters.Get("output-layer", out_value);
-
-  STRCMP_EQUAL(in_value.c_str(), out_value.c_str());
-}
-
-TEST (TensorrtParameters, GetVersion) {
+TEST (TensorRTParameters, GetVersion) {
   r2i::RuntimeError error;
   r2i::tensorrt::Parameters parameters;
   std::string value = "";
@@ -220,7 +156,7 @@ TEST (TensorrtParameters, GetVersion) {
   CHECK(! value.compare(value));
 }
 
-TEST (TensorrtParameters, GetMissingString) {
+TEST (TensorRTParameters, GetMissingString) {
   r2i::RuntimeError error;
   r2i::tensorrt::Parameters parameters;
   std::string value = "value";
@@ -232,7 +168,7 @@ TEST (TensorrtParameters, GetMissingString) {
                error.GetCode ());
 }
 
-TEST (TensorrtParameters, GetMissingInteger) {
+TEST (TensorRTParameters, GetMissingInteger) {
   r2i::RuntimeError error;
   r2i::tensorrt::Parameters parameters;
   int value;
@@ -244,7 +180,7 @@ TEST (TensorrtParameters, GetMissingInteger) {
                error.GetCode ());
 }
 
-TEST (TensorrtParameters, SetMissingInteger) {
+TEST (TensorRTParameters, SetMissingInteger) {
   r2i::RuntimeError error;
   r2i::tensorrt::Parameters parameters;
   int value = 0;
@@ -256,7 +192,7 @@ TEST (TensorrtParameters, SetMissingInteger) {
                error.GetCode ());
 }
 
-TEST (TensorrtParameters, SetMissingString) {
+TEST (TensorRTParameters, SetMissingString) {
   r2i::RuntimeError error;
   r2i::tensorrt::Parameters parameters;
   std::string value;
@@ -268,7 +204,7 @@ TEST (TensorrtParameters, SetMissingString) {
                error.GetCode ());
 }
 
-TEST (TensorrtParameters, SetWrongType) {
+TEST (TensorRTParameters, SetWrongType) {
   r2i::RuntimeError error;
   r2i::tensorrt::Parameters parameters;
   int value = 0;
@@ -280,7 +216,7 @@ TEST (TensorrtParameters, SetWrongType) {
                error.GetCode ());
 }
 
-TEST (TensorrtParameters, GetWrongType) {
+TEST (TensorRTParameters, GetWrongType) {
   r2i::RuntimeError error;
   r2i::tensorrt::Parameters parameters;
   int value = 0;
@@ -292,7 +228,7 @@ TEST (TensorrtParameters, GetWrongType) {
                error.GetCode ());
 }
 
-TEST (TensorrtParameters, GetList) {
+TEST (TensorRTParameters, GetList) {
   r2i::RuntimeError error;
   r2i::tensorrt::Parameters parameters;
   std::vector<r2i::ParameterMeta> desc;
