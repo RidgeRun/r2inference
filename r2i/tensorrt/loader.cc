@@ -18,23 +18,23 @@
 #include "r2i/imodel.h"
 #include "r2i/tensorrt/model.h"
 
+static void iRuntimeDeleter (nvinfer1::IRuntime *p) {
+  if (p)
+    p->destroy ();
+}
+
+static void ICudaEngineDeleter (nvinfer1::ICudaEngine *p) {
+  if (p)
+    p->destroy ();
+}
+
+static void IExecutionContextDeleter (nvinfer1::IExecutionContext *p) {
+  if (p)
+    p->destroy ();
+}
+
 namespace r2i {
 namespace tensorrt {
-
-void iRuntimeDeleter (nvinfer1::IRuntime *p) {
-  if (p)
-    p->destroy ();
-}
-
-void ICudaEngineDeleter (nvinfer1::ICudaEngine *p) {
-  if (p)
-    p->destroy ();
-}
-
-void IExecutionContextDeleter (nvinfer1::IExecutionContext *p) {
-  if (p)
-    p->destroy ();
-}
 
 std::shared_ptr<r2i::IModel> Loader::Load (const std::string &in_path,
     r2i::RuntimeError &error) {
@@ -95,9 +95,14 @@ std::shared_ptr<r2i::IModel> Loader::Load (const std::string &in_path,
 
   std::shared_ptr<r2i::tensorrt::Model> model = std::make_shared<Model>();
 
-  error = model->Set(context);
+  error = model->SetContext(context);
   if (error.IsError ()) {
     model = nullptr;
+  } else {
+    error = model->SetCudaEngine(engine);
+    if (error.IsError ()) {
+      model = nullptr;
+    }
   }
 
   return model;

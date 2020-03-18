@@ -26,13 +26,11 @@ class Prediction: public IPrediction {
   double At (unsigned int index,  r2i::RuntimeError &error) override;
   void *GetResultData () override;
   unsigned int GetResultSize () override;
-  RuntimeError SetResultBuffer (void *results, size_t size);
+  RuntimeError SetResultBuffer (std::shared_ptr<void> results, size_t size);
 
  private:
   std::shared_ptr<void> result_buffer;
   size_t result_size;
-  /* int64_t GetRequiredBufferSize (TF_Output output, int64_t *dims, */
-  /*                                int64_t num_dims); */
 };
 
 }

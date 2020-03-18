@@ -138,10 +138,10 @@ class MockExecutionContext : public IExecutionContext {
 
 MockCudaEngine::MockCudaEngine() {}
 
-// ICudaEngine *MockCudaEngine::deserializeCudaEngine(const void *blob, std::size_t size,
-// 					 IPluginFactory *pluginFactory) { return nullptr; }
-
-int MockCudaEngine::getNbBindings() const noexcept { return 0;}
+int MockCudaEngine::getNbBindings() const noexcept {
+  /* This values is used as a default since 1 input and 1 output  */
+  return 2;
+}
 
 int MockCudaEngine::getBindingIndex(const char *name) const noexcept { return 0; }
 

@@ -17,29 +17,54 @@ namespace tensorrt {
 Model::Model () {
 }
 
+Model::~Model () {
+  /* This order should be kept, otherwise a segfault is triggered */
+  this->context = nullptr;
+  this->cuda_engine = nullptr;
+}
+
 RuntimeError Model::Start (const std::string &name) {
   RuntimeError error;
 
   return error;
 }
 
-RuntimeError Model::Set (std::shared_ptr<nvinfer1::IExecutionContext>
-                         tensorrtmodel) {
+RuntimeError Model::SetContext (std::shared_ptr<nvinfer1::IExecutionContext>
+                                context) {
   RuntimeError error;
 
-  if (nullptr == tensorrtmodel) {
+  if (nullptr == context) {
     error.Set (RuntimeError::Code::NULL_PARAMETER,
-               "Trying to set model with null model pointer");
+               "Trying to set execution context with null model pointer");
     return error;
   }
 
-  this->engine = tensorrtmodel;
+  this->context = context;
+
+  return error;
+}
+
+RuntimeError Model::SetCudaEngine (std::shared_ptr<nvinfer1::ICudaEngine>
+                                   cuda_engine) {
+  RuntimeError error;
+
+  if (nullptr == cuda_engine) {
+    error.Set (RuntimeError::Code::NULL_PARAMETER,
+               "Trying to set cuda engine with null model pointer");
+    return error;
+  }
+
+  this->cuda_engine = cuda_engine;
 
   return error;
 }
 
 std::shared_ptr<nvinfer1::IExecutionContext> Model::GetTRContext () {
-  return this->engine;
+  return this->context;
+}
+
+std::shared_ptr<nvinfer1::ICudaEngine> Model::GetTRCudaEngine () {
+  return this->cuda_engine;
 }
 
 } // namespace tensorrt

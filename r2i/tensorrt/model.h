@@ -58,15 +58,22 @@ struct Logger: public
 class Model : public IModel {
  public:
   Model ();
+  ~Model ();
 
   RuntimeError Start (const std::string &name) override;
 
   std::shared_ptr<nvinfer1::IExecutionContext> GetTRContext ();
 
-  RuntimeError Set (std::shared_ptr<nvinfer1::IExecutionContext> tensorrtmodel);
- private:
+  std::shared_ptr<nvinfer1::ICudaEngine> GetTRCudaEngine ();
 
-  std::shared_ptr < nvinfer1::IExecutionContext > engine;
+  RuntimeError SetContext (std::shared_ptr<nvinfer1::IExecutionContext> context);
+
+  RuntimeError SetCudaEngine (std::shared_ptr<nvinfer1::ICudaEngine> cuda_engine);
+
+ private:
+  std::shared_ptr < nvinfer1::IExecutionContext > context;
+
+  std::shared_ptr < nvinfer1::ICudaEngine > cuda_engine;
 };
 
 }

@@ -21,7 +21,8 @@ Prediction::Prediction () {
 }
 
 
-RuntimeError Prediction::SetResultBuffer (void *result_buffer, size_t size) {
+RuntimeError Prediction::SetResultBuffer (std::shared_ptr<void> result_buffer,
+    size_t size) {
   cudaError_t cuda_error;
   RuntimeError error;
   std::shared_ptr<void> buff;
@@ -37,11 +38,10 @@ RuntimeError Prediction::SetResultBuffer (void *result_buffer, size_t size) {
     error.Set (RuntimeError::Code::MEMORY_ERROR,
                "Unable to allocate memory for result");
     return error;
-
   }
 
   cuda_error = cudaMemcpy(buff.get(),
-                          result_buffer,
+                          result_buffer.get(),
                           size,
                           cudaMemcpyDeviceToHost);
   if (cudaSuccess != cuda_error) {

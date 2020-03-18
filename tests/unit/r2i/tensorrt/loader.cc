@@ -19,16 +19,26 @@
 #include "mockcudaengine.cc"
 #include "mockruntime.cc"
 
-bool model_set_error = false;
+bool context_set_error = false;
+bool cuda_engine_set_error = false;
 
 namespace r2i {
 namespace tensorrt {
 Model::Model () {}
 
-RuntimeError Model::Set (std::shared_ptr<nvinfer1::IExecutionContext
-                         >  tensorrtmodel) {
+RuntimeError Model::SetContext (std::shared_ptr<nvinfer1::IExecutionContext>
+                                context) {
   r2i::RuntimeError error;
-  if (model_set_error)
+  if (context_set_error)
+    error.Set (RuntimeError::Code::NULL_PARAMETER, "Unable to load cached context");
+
+  return error;
+}
+
+RuntimeError Model::SetCudaEngine (std::shared_ptr<nvinfer1::ICudaEngine>
+                                   cuda_engine) {
+  r2i::RuntimeError error;
+  if (cuda_engine_set_error)
     error.Set (RuntimeError::Code::NULL_PARAMETER, "Unable to load cached engine");
 
   return error;
@@ -45,7 +55,8 @@ TEST_GROUP (TensorRTLoader) {
     error.Clean();
     loader = r2i::tensorrt::Loader();
     incompatible_model = false;
-    model_set_error = false;
+    context_set_error = false;
+    cuda_engine_set_error = false;
     fail_context = false;
   }
 };
@@ -84,8 +95,16 @@ TEST (TensorRTLoader, BadChechedEngine) {
   LONGS_EQUAL (r2i::RuntimeError::Code::INCOMPATIBLE_MODEL, error.GetCode());
 }
 
-TEST (TensorRTLoader, LoadSetError) {
-  model_set_error = true;
+TEST (TensorRTLoader, LoadSetContextError) {
+  context_set_error = true;
+
+  auto model = loader.Load(__FILE__, error);
+
+  LONGS_EQUAL (r2i::RuntimeError::Code::NULL_PARAMETER, error.GetCode ());
+}
+
+TEST (TensorRTLoader, LoadSetEngineError) {
+  cuda_engine_set_error = true;
 
   auto model = loader.Load(__FILE__, error);
 

@@ -48,13 +48,18 @@ TEST_GROUP (TensorRTPrediction) {
   r2i::RuntimeError error;
 
   r2i::tensorrt::Prediction prediction;
-  float matrix[INPUTS] = {0.2, 0.4, 0.6};
+  std::shared_ptr<float[]> matrix = std::shared_ptr<float[]> (new float[INPUTS]);
+
 
   int64_t raw_input_dims[1] = {INPUTS};
 
   void setup () {
     error.Clean();
     cudaMemCpyError = false;
+
+    matrix[0] = 0.2;
+    matrix[1] = 0.4;
+    matrix[2] = 0.6;
   }
 
   void teardown () {
@@ -116,7 +121,5 @@ TEST (TensorRTPrediction, PredictionMallocError) {
 }
 
 int main (int ac, char **av) {
-  //MemoryLeakWarningPlugin::turnOffNewDeleteOverloads();
-
   return CommandLineTestRunner::RunAllTests (ac, av);
 }

@@ -33,6 +33,11 @@ void IExecutionContextDeleter (nvinfer1::IExecutionContext *p) {
     p->destroy ();
 }
 
+static void ICudaEngineDeleter (nvinfer1::ICudaEngine *p) {
+  if (p)
+    p->destroy ();
+}
+
 TEST_GROUP (TensorRTEngine) {
   r2i::tensorrt::Engine engine;
   std::shared_ptr<r2i::tensorrt::Model> model;
@@ -40,16 +45,23 @@ TEST_GROUP (TensorRTEngine) {
   std::shared_ptr<r2i::IFrame> frame;
   r2i::RuntimeError error;
 
-  std::shared_ptr<nvinfer1::IExecutionContext> buffer;
+  std::shared_ptr<nvinfer1::IExecutionContext> context;
+  std::shared_ptr<nvinfer1::ICudaEngine> cuda_engine;
 
   void setup () {
     error.Clean();
 
-    buffer = std::shared_ptr<nvinfer1::IExecutionContext> (new
-             nvinfer1::MockExecutionContext, IExecutionContextDeleter);
+    context = std::shared_ptr<nvinfer1::IExecutionContext> (new
+              nvinfer1::MockExecutionContext,
+              IExecutionContextDeleter);
+
+    cuda_engine = std::shared_ptr<nvinfer1::ICudaEngine> (new
+                  nvinfer1::MockCudaEngine,
+                  ICudaEngineDeleter);
 
     model = std::make_shared<r2i::tensorrt::Model> ();
-    model->Set (buffer);
+    model->SetContext (context);
+    model->SetCudaEngine (cuda_engine);
 
     inc_model = std::make_shared<MockModel> ();
     frame = std::make_shared<r2i::tensorrt::Frame> ();

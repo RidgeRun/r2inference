@@ -22,7 +22,12 @@ bool infer;
 
 #define GOOD_FILENAME __FILE__
 
-void IExecutionContextDeleter (nvinfer1::IExecutionContext *p) {
+static void IExecutionContextDeleter (nvinfer1::IExecutionContext *p) {
+  if (p)
+    p->destroy ();
+}
+
+static void ICudaEngineDeleter (nvinfer1::ICudaEngine *p) {
   if (p)
     p->destroy ();
 }
@@ -30,13 +35,18 @@ void IExecutionContextDeleter (nvinfer1::IExecutionContext *p) {
 TEST_GROUP (TensorRTModel) {
   r2i::RuntimeError error;
   r2i::tensorrt::Model model;
-  std::shared_ptr<nvinfer1::IExecutionContext> buffer;
+  std::shared_ptr<nvinfer1::IExecutionContext> context;
+  std::shared_ptr<nvinfer1::ICudaEngine> cuda_engine;
 
   void setup () {
     model = r2i::tensorrt::Model();
-    buffer = std::shared_ptr<nvinfer1::IExecutionContext> (new
-             nvinfer1::MockExecutionContext,
-             IExecutionContextDeleter);
+    context = std::shared_ptr<nvinfer1::IExecutionContext> (new
+              nvinfer1::MockExecutionContext,
+              IExecutionContextDeleter);
+
+    cuda_engine = std::shared_ptr<nvinfer1::ICudaEngine> (new
+                  nvinfer1::MockCudaEngine,
+                  ICudaEngineDeleter);
   }
 
   void teardown () {
@@ -48,27 +58,56 @@ TEST (TensorRTModel, Start) {
   LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode());
 }
 
-TEST (TensorRTModel, SetSuccess) {
-  error = model.Set (buffer);
+TEST (TensorRTModel, SetCudaEngineSuccess) {
+  error = model.SetCudaEngine (cuda_engine);
   LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode());
 }
 
-TEST (TensorRTModel, SetNullBuffer) {
-  error = model.Set (nullptr);
+TEST (TensorRTModel, SetNullCudaEngineBuffer) {
+  error = model.SetCudaEngine (nullptr);
   LONGS_EQUAL (r2i::RuntimeError::Code::NULL_PARAMETER, error.GetCode());
 }
 
-TEST (TensorRTModel, GetSuccess) {
-  std::shared_ptr<nvinfer1::IExecutionContext> model_buffer =
-    model.GetTRContext ();
-
+TEST (TensorRTModel, SetContextSuccess) {
+  error = model.SetContext (context);
   LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode());
 }
 
-TEST (TensorRTModel, GetNullBuffer) {
-  std::shared_ptr<nvinfer1::IExecutionContext> model_buffer =
-    model.GetTRContext ();
+TEST (TensorRTModel, SetNullContextBuffer) {
+  error = model.SetContext (nullptr);
+  LONGS_EQUAL (r2i::RuntimeError::Code::NULL_PARAMETER, error.GetCode());
+}
+
+TEST (TensorRTModel, GetContextSuccess) {
+  error = model.SetContext (context);
   LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode());
+
+  std::shared_ptr<nvinfer1::IExecutionContext> model_context =
+    model.GetTRContext ();
+
+  POINTERS_EQUAL (context.get(), model_context.get());
+}
+
+TEST (TensorRTModel, GetCudaEngineSuccess) {
+  error = model.SetCudaEngine (cuda_engine);
+  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode());
+
+  std::shared_ptr<nvinfer1::ICudaEngine> model_engine =
+    model.GetTRCudaEngine ();
+
+  POINTERS_EQUAL (cuda_engine.get(), model_engine.get());
+}
+
+TEST (TensorRTModel, GetNullContextBuffer) {
+  std::shared_ptr<nvinfer1::IExecutionContext> model_context =
+    model.GetTRContext ();
+  LONGS_EQUAL (nullptr, model_context.get());
+}
+
+TEST (TensorRTModel, GetNullEngineBuffer) {
+  std::shared_ptr<nvinfer1::ICudaEngine> model_engine =
+    model.GetTRCudaEngine ();
+  LONGS_EQUAL (nullptr, model_engine.get());
 }
 
 int main (int ac, char **av) {
