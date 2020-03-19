@@ -22,11 +22,6 @@ Frame::Frame () :
   frame_format(ImageFormat::Id::UNKNOWN_FORMAT) {
 }
 
-
-void CudaMemFree (void *p) {
-  cudaFree (p);
-}
-
 RuntimeError Frame::Configure (void *in_data, int width,
                                int height, r2i::ImageFormat::Id format,
                                r2i::DataType::Id type) {

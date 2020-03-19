@@ -48,6 +48,10 @@ __host__ cudaError_t CUDARTAPI cudaMemcpy(void *dst, const void *src,
     return cudaErrorInvalidValue;
 }
 
+__device__ __cudart_builtin__ cudaError_t CUDARTAPI cudaFree(void *devPtr) {
+  return cudaSuccess;
+}
+
 TEST_GROUP (TensorRTFrame) {
   r2i::tensorrt::Frame frame;
   int width = FRAME_WIDTH;
