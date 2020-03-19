@@ -28,14 +28,12 @@
 
 bool cudaMallocError = false;
 bool cudaMemCpyError = false;
-int cudaMallocCount = 0;
 size_t cudaRequestedSize = 0;
 
 __host__ __cudart_builtin__ cudaError_t CUDARTAPI
 cudaMalloc(void **devPtr, size_t size) {
   if (!cudaMallocError) {
     cudaRequestedSize = size;
-    cudaMallocCount += 1;
     return cudaSuccess;
   } else {
     return cudaErrorMemoryAllocation;
@@ -67,7 +65,6 @@ TEST_GROUP (TensorRTFrame) {
 
     cudaMallocError = false;
     cudaMemCpyError = false;
-    cudaMallocCount = 0;
     cudaRequestedSize = 0;
   }
 
@@ -178,25 +175,6 @@ TEST (TensorRTFrame, FrameCudaMemCpyError) {
   error = frame.Configure(data, width, height, format.GetId(), type.GetId());
   LONGS_EQUAL (r2i::RuntimeError::Code::MEMORY_ERROR, error.GetCode());
 }
-
-TEST (TensorRTFrame, FrameCudaSameSizeSingleMalloc) {
-  error = frame.Configure(data, width, height, format.GetId(), type.GetId());
-  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode());
-
-  /* Second configuration with same parameters shouldn't trigger cudaMalloc*/
-  error = frame.Configure(data, width, height, format.GetId(), type.GetId());
-  LONGS_EQUAL (1, cudaMallocCount);
-}
-
-TEST (TensorRTFrame, FrameCudaDifferentSizeDoubleMalloc) {
-  error = frame.Configure(data, width, height, format.GetId(), type.GetId());
-  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode());
-
-  /* Second configuration with different parameters should trigger cudaMalloc*/
-  error = frame.Configure(data, 2 * width, height, format.GetId(), type.GetId());
-  LONGS_EQUAL (2, cudaMallocCount);
-}
-
 
 int main (int ac, char **av) {
   return CommandLineTestRunner::RunAllTests (ac, av);

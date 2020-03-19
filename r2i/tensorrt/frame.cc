@@ -58,19 +58,16 @@ RuntimeError Frame::Configure (void *in_data, int width,
   /* FIXME cudaMalloc is an expensive operation, this should be only done when necessary */
   size_t frame_size = width * height * image_format.GetNumPlanes() *
                       data_type.GetBytesPerPixel();
-  if (frame_size != this->frame_size) {
-    void *buff;
-    cuda_error = cudaMalloc (&buff, frame_size);
-    if (cudaSuccess != cuda_error) {
-      error.Set (RuntimeError::Code::MEMORY_ERROR,
-                 "Unable to allocate managed buffer");
-      return error;
-    }
-    this->frame_data = std::shared_ptr <void> (buff, CudaMemFree);
-    this->frame_size = frame_size;
+  void *buff;
+  cuda_error = cudaMalloc (&buff, frame_size);
+  if (cudaSuccess != cuda_error) {
+    error.Set (RuntimeError::Code::MEMORY_ERROR,
+               "Unable to allocate managed buffer");
+    return error;
   }
+  this->frame_data = std::shared_ptr <void> (buff, cudaFree);
 
-  cuda_error = cudaMemcpy(this->frame_data.get(), in_data, this->frame_size,
+  cuda_error = cudaMemcpy(this->frame_data.get(), in_data, frame_size,
                           cudaMemcpyHostToDevice);
   if (cudaSuccess != cuda_error) {
     error.Set (RuntimeError::Code::MEMORY_ERROR,

@@ -38,7 +38,6 @@ class Frame : public IFrame {
  private:
   /* This backend stores its own copy of */
   std::shared_ptr<void> frame_data;
-  size_t frame_size;
   int frame_width;
   int frame_height;
   ImageFormat frame_format;
