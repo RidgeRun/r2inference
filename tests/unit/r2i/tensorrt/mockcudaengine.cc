@@ -1,6 +1,8 @@
 bool fail_context = false;
 bool execute_error = false;
 
+#define MAX_BATCH_SIZE 32
+
 namespace nvinfer1 {
 namespace {
 class MockCudaEngine : public ICudaEngine {
@@ -153,7 +155,9 @@ Dims MockCudaEngine::getBindingDimensions(int bindingIndex) const noexcept { ret
 
 DataType MockCudaEngine::getBindingDataType(int bindingIndex) const noexcept { return DataType(); }
 
-int MockCudaEngine::getMaxBatchSize() const noexcept { return 0; }
+int MockCudaEngine::getMaxBatchSize() const noexcept {
+  return MAX_BATCH_SIZE;
+}
 
 int MockCudaEngine::getNbLayers() const noexcept { return 0; }
 

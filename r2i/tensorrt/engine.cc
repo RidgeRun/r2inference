@@ -38,7 +38,7 @@ getSizeFromType (nvinfer1::DataType type) {
 namespace r2i {
 namespace tensorrt {
 
-Engine::Engine () : model(nullptr) {
+Engine::Engine () : model(nullptr), batch_size(1) {
 }
 
 RuntimeError Engine::SetModel (std::shared_ptr<r2i::IModel> in_model) {
@@ -82,8 +82,6 @@ std::shared_ptr<r2i::IPrediction> Engine::Predict (std::shared_ptr<r2i::IFrame>
 
   auto prediction = std::make_shared<Prediction>();
 
-  int batchSize = 1;
-
   std::vector < void *> buffers;
 
   if (cuda_engine->getNbBindings () != 2) {
@@ -92,7 +90,7 @@ std::shared_ptr<r2i::IPrediction> Engine::Predict (std::shared_ptr<r2i::IFrame>
     return nullptr;
   }
 
-  int size = 0;
+  int output_size = 1;
   void *buff;
   std::shared_ptr<void> output_buff;
   for (int i = 0; i < cuda_engine->getNbBindings (); ++i) {
@@ -101,17 +99,17 @@ std::shared_ptr<r2i::IPrediction> Engine::Predict (std::shared_ptr<r2i::IFrame>
 
     if (cuda_engine->bindingIsInput(i)) {
       buffers.emplace_back (in_frame->GetData());
-      size = -1;
     } else {
 
-      size = 1;
+      output_size = 1;
       for (int d = 0; d < dims.nbDims; ++d) {
-        size *= dims.d[d];
+        output_size *= dims.d[d];
       }
+      output_size *= this->batch_size;
 
-      size *= getSizeFromType (type);
+      output_size *= getSizeFromType (type);
 
-      cudaError_t cuda_error = cudaMalloc (&buff, size);
+      cudaError_t cuda_error = cudaMalloc (&buff, output_size);
       output_buff = std::shared_ptr<void>(buff, cudaFree);
       if (cudaSuccess != cuda_error) {
         error.Set (RuntimeError::Code::MEMORY_ERROR,
@@ -123,17 +121,44 @@ std::shared_ptr<r2i::IPrediction> Engine::Predict (std::shared_ptr<r2i::IFrame>
     }
   }
 
-  bool status = this->model->GetTRContext()->execute (batchSize, buffers.data ());
+  bool status = this->model->GetTRContext()->execute (this->batch_size,
+                buffers.data ());
   if (!status) {
     error.Set (RuntimeError::Code::FRAMEWORK_ERROR,
                "Unable to run prediction on model");
     return nullptr;
   }
 
-  prediction->SetResultBuffer(output_buff, size);
+  prediction->SetResultBuffer(output_buff, output_size);
 
   return prediction;
 }
+
+r2i::RuntimeError Engine::SetBatchSize (const int batch_size) {
+  r2i::RuntimeError error;
+  if (this->model == nullptr) {
+    error.Set (RuntimeError::Code::WRONG_API_USAGE,
+               "Model must have been added before setting a batch size");
+    return error;
+  }
+  if (this->model->GetTRCudaEngine()->getMaxBatchSize() < batch_size) {
+    error.Set (RuntimeError::Code::WRONG_API_USAGE,
+               "Batch size can't be larger than the one used to generate the engine");
+    return error;
+  }
+  if (batch_size <= 0) {
+    error.Set (RuntimeError::Code::WRONG_API_USAGE,
+               "Batch size must be larger than 0");
+    return error;
+  }
+
+  this->batch_size = batch_size;
+  return error;
+};
+
+const int Engine::GetBatchSize () {
+  return this->batch_size;
+};
 
 Engine::~Engine () {
   this->Stop();

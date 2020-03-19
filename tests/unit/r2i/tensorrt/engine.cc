@@ -92,6 +92,43 @@ TEST (TensorRTEngine, StopEngine) {
   LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
 }
 
+TEST (TensorRTEngine, SetBatchSizeNoModel) {
+  error = engine.SetBatchSize (MAX_BATCH_SIZE);
+  LONGS_EQUAL (r2i::RuntimeError::Code::WRONG_API_USAGE, error.GetCode ());
+}
+
+TEST (TensorRTEngine, SetBatchSizeLargeBatchSize) {
+  error = engine.SetModel (model);
+  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
+
+  error = engine.SetBatchSize (MAX_BATCH_SIZE + 1);
+  LONGS_EQUAL (r2i::RuntimeError::Code::WRONG_API_USAGE, error.GetCode ());
+}
+
+TEST (TensorRTEngine, SetBatchSizeNullBatchSize) {
+  error = engine.SetModel (model);
+  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
+
+  error = engine.SetBatchSize (0);
+  LONGS_EQUAL (r2i::RuntimeError::Code::WRONG_API_USAGE, error.GetCode ());
+}
+
+TEST (TensorRTEngine, SetBatchSizeNegativeBatchSize) {
+  error = engine.SetModel (model);
+  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
+
+  error = engine.SetBatchSize (-1);
+  LONGS_EQUAL (r2i::RuntimeError::Code::WRONG_API_USAGE, error.GetCode ());
+}
+
+TEST (TensorRTEngine, SetBatchSizeSucess) {
+  error = engine.SetModel (model);
+  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
+
+  error = engine.SetBatchSize (MAX_BATCH_SIZE);
+  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
+}
+
 TEST (TensorRTEngine, PredictExecutionError) {
   std::shared_ptr<r2i::IPrediction> prediction;
   execute_error = true;

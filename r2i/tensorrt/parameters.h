@@ -76,6 +76,7 @@ class Parameters : public IParameters {
 
   class IntAccessor : public Accessor {
    public:
+    IntAccessor (Parameters *target) : Accessor(target) {}
     int value;
   };
 
@@ -94,22 +95,23 @@ class Parameters : public IParameters {
     }
 
     RuntimeError Get () {
-      /* this->value = TF_Version (); */
       return RuntimeError ();
     }
   };
 
-  /* class MemoryUsageAccessor : public DoubleAccessor { */
-  /*  public: */
-  /*   MemoryUsageAccessor (Parameters *target) : DoubleAccessor(target) {} */
-  /*   RuntimeError Set () { */
-  /*     return target->engine->SetMemoryUsage(this->value); */
-  /*   } */
+  class BatchSizeAccessor : public IntAccessor {
+   public:
+    BatchSizeAccessor (Parameters *target) : IntAccessor(target) {}
 
-  /*   RuntimeError Get () { */
-  /*     return RuntimeError (); */
-  /*   } */
-  /* }; */
+    RuntimeError Set () {
+      return target->engine->SetBatchSize(this->value);
+    }
+
+    RuntimeError Get () {
+      this->value = target->engine->GetBatchSize();
+      return RuntimeError ();
+    }
+  };
 
   struct ParamDesc {
     ParameterMeta meta;

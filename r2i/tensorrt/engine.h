@@ -36,10 +36,15 @@ class Engine : public IEngine {
   std::shared_ptr<r2i::IPrediction> Predict (std::shared_ptr<r2i::IFrame>
       in_frame, r2i::RuntimeError &error) override;
 
+  r2i::RuntimeError SetBatchSize (const int batchsize);
+
+  const int GetBatchSize ();
+
   ~Engine ();
 
  private:
   std::shared_ptr<Model> model;
+  int batch_size;
 };
 
 }

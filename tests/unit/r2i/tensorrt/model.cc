@@ -16,8 +16,6 @@
 #include <CppUTest/CommandLineTestRunner.h>
 #include <CppUTest/TestHarness.h>
 
-bool infer;
-
 #include "mockcudaengine.cc"
 
 #define GOOD_FILENAME __FILE__
@@ -39,6 +37,7 @@ TEST_GROUP (TensorRTModel) {
   std::shared_ptr<nvinfer1::ICudaEngine> cuda_engine;
 
   void setup () {
+    error.Clean();
     model = r2i::tensorrt::Model();
     context = std::shared_ptr<nvinfer1::IExecutionContext> (new
               nvinfer1::MockExecutionContext,

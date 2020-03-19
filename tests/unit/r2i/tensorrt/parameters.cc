@@ -16,6 +16,13 @@
 #include <CppUTest/CommandLineTestRunner.h>
 #include <CppUTest/TestHarness.h>
 
+#include "mockcudaengine.cc"
+
+static void ICudaEngineDeleter (nvinfer1::ICudaEngine *p) {
+  if (p)
+    p->destroy ();
+}
+
 namespace mock {
 class Model : public r2i::IModel {
  public:
@@ -42,126 +49,149 @@ class Engine : public r2i::IEngine {
 }
 
 TEST_GROUP (TensorRTParameters) {
+  r2i::RuntimeError error;
+  std::shared_ptr<r2i::tensorrt::Parameters> parameters;
+  std::shared_ptr<nvinfer1::ICudaEngine> cuda_engine;
+
+  std::shared_ptr<r2i::IModel> model;
+  std::shared_ptr<r2i::IEngine> engine;
+
+  void setup () {
+    error.Clean();
+    parameters = std::shared_ptr<r2i::tensorrt::Parameters>( new
+                 r2i::tensorrt::Parameters);
+
+    cuda_engine = std::shared_ptr<nvinfer1::ICudaEngine> (new
+                  nvinfer1::MockCudaEngine,
+                  ICudaEngineDeleter);
+
+    model = std::shared_ptr<r2i::tensorrt::Model>(new r2i::tensorrt::Model);
+    engine = std::shared_ptr<r2i::tensorrt::Engine> (new r2i::tensorrt::Engine);
+  }
+
+  void teardown () {
+  }
+
 };
 
 TEST (TensorRTParameters, ConfigureIncompatibleEngine) {
-  r2i::RuntimeError error;
-  r2i::tensorrt::Parameters parameters;
+  std::shared_ptr<r2i::IEngine> mock_engine(new mock::Engine);
 
-  std::shared_ptr<r2i::IEngine> engine(new mock::Engine);
-  std::shared_ptr<r2i::IModel> model(new r2i::tensorrt::Model);
-
-  error = parameters.Configure(engine, model);
+  error = parameters->Configure(mock_engine, model);
 
   CHECK_TEXT (error.IsError(), error.GetDescription().c_str());
   LONGS_EQUAL (r2i::RuntimeError::Code::INCOMPATIBLE_ENGINE, error.GetCode ());
 }
 
 TEST (TensorRTParameters, ConfigureIncompatibleModel) {
-  r2i::RuntimeError error;
-  r2i::tensorrt::Parameters parameters;
+  std::shared_ptr<r2i::IModel> mock_model(new mock::Model);
 
-  std::shared_ptr<r2i::IEngine> engine(new r2i::tensorrt::Engine);
-  std::shared_ptr<r2i::IModel> model(new mock::Model);
-
-  error = parameters.Configure(engine, model);
+  error = parameters->Configure(engine, mock_model);
 
   CHECK_TEXT (error.IsError(), error.GetDescription().c_str());
   LONGS_EQUAL (r2i::RuntimeError::Code::INCOMPATIBLE_MODEL, error.GetCode ());
 }
 
 TEST (TensorRTParameters, ConfigureNullEngine) {
-  r2i::RuntimeError error;
-  r2i::tensorrt::Parameters parameters;
-
-  std::shared_ptr<r2i::IModel> model(new r2i::tensorrt::Model);
-
-  error = parameters.Configure(nullptr, model);
+  error = parameters->Configure(nullptr, model);
 
   CHECK_TEXT (error.IsError(), error.GetDescription().c_str());
   LONGS_EQUAL (r2i::RuntimeError::Code::NULL_PARAMETER, error.GetCode ());
 }
 
 TEST (TensorRTParameters, ConfigureNullModel) {
-  r2i::RuntimeError error;
-  r2i::tensorrt::Parameters parameters;
-
-  std::shared_ptr<r2i::IEngine> engine(new r2i::tensorrt::Engine);
-
-  error = parameters.Configure(engine, nullptr);
+  error = parameters->Configure(engine, nullptr);
 
   CHECK_TEXT (error.IsError(), error.GetDescription().c_str());
   LONGS_EQUAL (r2i::RuntimeError::Code::NULL_PARAMETER, error.GetCode ());
 }
 
 TEST (TensorRTParameters, ConfigureSuccess) {
-  r2i::RuntimeError error;
-  r2i::tensorrt::Parameters parameters;
 
-  std::shared_ptr<r2i::IEngine> engine(new r2i::tensorrt::Engine);
-  std::shared_ptr<r2i::IModel> model(new r2i::tensorrt::Model);
-
-  error = parameters.Configure(engine, model);
+  error = parameters->Configure(engine, model);
 
   LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
 }
 
 TEST (TensorRTParameters, SetAndGetModel) {
-  r2i::RuntimeError error;
-  r2i::tensorrt::Parameters parameters;
-
-  std::shared_ptr<r2i::IEngine> engine(new r2i::tensorrt::Engine);
-  std::shared_ptr<r2i::IModel> model(new r2i::tensorrt::Model);
-
-  error = parameters.Configure(engine, model);
+  error = parameters->Configure(engine, model);
 
   LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
 
-  std::shared_ptr<r2i::IModel> internalModel = parameters.GetModel();
+  std::shared_ptr<r2i::IModel> internalModel = parameters->GetModel();
 
   POINTERS_EQUAL(internalModel.get(), model.get());
 }
 
 TEST (TensorRTParameters, SetAndGetEngine) {
-  r2i::RuntimeError error;
-  r2i::tensorrt::Parameters parameters;
-
-  std::shared_ptr<r2i::IEngine> engine(new r2i::tensorrt::Engine);
-  std::shared_ptr<r2i::IModel> model(new r2i::tensorrt::Model);
-
-  error = parameters.Configure(engine, model);
+  error = parameters->Configure(engine, model);
 
   LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
 
-  std::shared_ptr<r2i::IEngine> internalEngine = parameters.GetEngine();
+  std::shared_ptr<r2i::IEngine> internalEngine = parameters->GetEngine();
 
   POINTERS_EQUAL(internalEngine.get(), engine.get());
 }
 
 TEST (TensorRTParameters, GetVersion) {
-  r2i::RuntimeError error;
-  r2i::tensorrt::Parameters parameters;
   std::string value = "";
 
   std::shared_ptr<r2i::IEngine> engine(new r2i::tensorrt::Engine);
   std::shared_ptr<r2i::IModel> model(new r2i::tensorrt::Model);
 
-  error = parameters.Configure(engine, model);
+  error = parameters->Configure(engine, model);
 
   LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
 
-  error = parameters.Get("version", value);
+  error = parameters->Get("version", value);
 
   LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
   CHECK(! value.compare(value));
 }
 
+TEST (TensorRTParameters, GetBatchSize) {
+  int value = -1;
+  error = parameters->Configure(engine, model);
+
+  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
+
+  error = engine->SetModel(model);
+  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
+
+  error = parameters->Get("batch_size", value);
+
+  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
+}
+
+TEST (TensorRTParameters, SetBatchSize) {
+  int in_value = 32;
+  int out_value;
+
+  auto tensorrt_model =
+    std::dynamic_pointer_cast<r2i::tensorrt::Model, r2i::IModel>(model);
+
+  error = tensorrt_model->SetCudaEngine (cuda_engine);
+  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode());
+
+  error = engine->SetModel(model);
+  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ())
+
+  error = parameters->Configure(engine, model);
+  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());;
+
+  error = parameters->Set("batch_size", in_value);
+  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
+
+  error = parameters->Get("batch_size", out_value);
+  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
+
+  LONGS_EQUAL (in_value, out_value);
+}
+
 TEST (TensorRTParameters, GetMissingString) {
-  r2i::RuntimeError error;
-  r2i::tensorrt::Parameters parameters;
   std::string value = "value";
 
-  error = parameters.Get("*?\\", value);
+  error = parameters->Get("*?\\", value);
 
   CHECK_TEXT (error.IsError(), error.GetDescription().c_str());
   LONGS_EQUAL (r2i::RuntimeError::Code::INVALID_FRAMEWORK_PARAMETER,
@@ -169,11 +199,9 @@ TEST (TensorRTParameters, GetMissingString) {
 }
 
 TEST (TensorRTParameters, GetMissingInteger) {
-  r2i::RuntimeError error;
-  r2i::tensorrt::Parameters parameters;
   int value;
 
-  error = parameters.Get("*?\\", value);
+  error = parameters->Get("*?\\", value);
 
   CHECK_TEXT (error.IsError(), error.GetDescription().c_str());
   LONGS_EQUAL (r2i::RuntimeError::Code::INVALID_FRAMEWORK_PARAMETER,
@@ -181,11 +209,9 @@ TEST (TensorRTParameters, GetMissingInteger) {
 }
 
 TEST (TensorRTParameters, SetMissingInteger) {
-  r2i::RuntimeError error;
-  r2i::tensorrt::Parameters parameters;
   int value = 0;
 
-  error = parameters.Set("*?\\", value);
+  error = parameters->Set("*?\\", value);
 
   CHECK_TEXT (error.IsError(), error.GetDescription().c_str());
   LONGS_EQUAL (r2i::RuntimeError::Code::INVALID_FRAMEWORK_PARAMETER,
@@ -193,11 +219,9 @@ TEST (TensorRTParameters, SetMissingInteger) {
 }
 
 TEST (TensorRTParameters, SetMissingString) {
-  r2i::RuntimeError error;
-  r2i::tensorrt::Parameters parameters;
   std::string value;
 
-  error = parameters.Set("*?\\", value);
+  error = parameters->Set("*?\\", value);
 
   CHECK_TEXT (error.IsError(), error.GetDescription().c_str());
   LONGS_EQUAL (r2i::RuntimeError::Code::INVALID_FRAMEWORK_PARAMETER,
@@ -205,11 +229,9 @@ TEST (TensorRTParameters, SetMissingString) {
 }
 
 TEST (TensorRTParameters, SetWrongType) {
-  r2i::RuntimeError error;
-  r2i::tensorrt::Parameters parameters;
   int value = 0;
 
-  error = parameters.Set("version", value);
+  error = parameters->Set("version", value);
 
   CHECK_TEXT (error.IsError(), error.GetDescription().c_str());
   LONGS_EQUAL (r2i::RuntimeError::Code::INVALID_FRAMEWORK_PARAMETER,
@@ -217,11 +239,9 @@ TEST (TensorRTParameters, SetWrongType) {
 }
 
 TEST (TensorRTParameters, GetWrongType) {
-  r2i::RuntimeError error;
-  r2i::tensorrt::Parameters parameters;
   int value = 0;
 
-  error = parameters.Set("version", value);
+  error = parameters->Set("version", value);
 
   CHECK_TEXT (error.IsError(), error.GetDescription().c_str());
   LONGS_EQUAL (r2i::RuntimeError::Code::INVALID_FRAMEWORK_PARAMETER,
@@ -229,11 +249,9 @@ TEST (TensorRTParameters, GetWrongType) {
 }
 
 TEST (TensorRTParameters, GetList) {
-  r2i::RuntimeError error;
-  r2i::tensorrt::Parameters parameters;
   std::vector<r2i::ParameterMeta> desc;
 
-  error = parameters.List (desc);
+  error = parameters->List (desc);
 
   LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
 }
