@@ -1,8 +1,3 @@
-// namespace mock {
-//   bool fail_runtime;
-// }
-
-
 bool fail_runtime = false;
 bool bad_cached_engine = false;
 bool incompatible_model = false;

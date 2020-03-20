@@ -37,7 +37,7 @@ enum FrameworkCode {
   TFLITE,
 
   /**
-   * NVidia's TensorFlow Lite
+   * NVIDIA's TensorRT Lite
    */
   TENSORRT,
 

@@ -17,8 +17,8 @@
 #include "config.h"
 #include "ncsdk/frameworkfactory.h"
 #include "tensorflow/frameworkfactory.h"
-#include "tflite/frameworkfactory.h"
 #include "tensorrt/frameworkfactory.h"
+#include "tflite/frameworkfactory.h"
 
 namespace r2i {
 

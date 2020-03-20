@@ -31,6 +31,8 @@ class Frame : public IFrame {
 
   ImageFormat GetFormat () override;
 
+  virtual DataType GetDataType () override { return r2i::DataType::Id::UNKNOWN_DATATYPE; }
+
  private:
   float *frame_data;
   int frame_width;

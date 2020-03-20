@@ -80,12 +80,6 @@ class Parameters : public IParameters {
     int value;
   };
 
-  class DoubleAccessor : public Accessor {
-   public:
-    DoubleAccessor (Parameters *target) : Accessor(target) {}
-    double value;
-  };
-
   class VersionAccessor : public StringAccessor {
    public:
     VersionAccessor (Parameters *target) : StringAccessor(target) {}

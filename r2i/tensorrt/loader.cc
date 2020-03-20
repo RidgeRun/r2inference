@@ -98,10 +98,12 @@ std::shared_ptr<r2i::IModel> Loader::Load (const std::string &in_path,
   error = model->SetContext(context);
   if (error.IsError ()) {
     model = nullptr;
+    return model;
   } else {
     error = model->SetCudaEngine(engine);
     if (error.IsError ()) {
       model = nullptr;
+      return model;
     }
   }
 

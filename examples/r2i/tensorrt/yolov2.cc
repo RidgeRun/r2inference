@@ -13,13 +13,13 @@
 #include <iostream>
 #include <memory>
 #include <string>
-#include <r2i/r2i.h>
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
-
 #define STB_IMAGE_RESIZE_IMPLEMENTATION
 #include "stb_image_resize.h"
+
+#include <r2i/r2i.h>
 
 #define NETWORK_WIDTH 416
 #define NETWORK_HEIGHT 416
@@ -52,6 +52,9 @@ box_to_pixels (BBox *normalized_box, int row, int col, int box) {
   const float box_anchors[] =
   { 1.08, 1.19, 3.42, 4.41, 6.63, 11.38, 9.42, 5.11, 16.62, 10.52 };
 
+  if (!normalized_box)
+    return;
+
   /* adjust the box center according to its cell and grid dim */
   normalized_box->x = (col + sigmoid (normalized_box->x)) * grid_size;
   normalized_box->y = (row + sigmoid (normalized_box->y)) * grid_size;
@@ -63,11 +66,15 @@ box_to_pixels (BBox *normalized_box, int row, int col, int box) {
     pow (M_E, normalized_box->height) * box_anchors[2 * box + 1] * grid_size;
 }
 
-static r2i::RuntimeError
+static void
 parse_boxes(std::shared_ptr<r2i::IPrediction> prediction) {
-  r2i::RuntimeError error;
-  float *network_output = static_cast<float *>(prediction->GetResultData());
+  float *network_output;
   int i, j, b, c;
+
+  if (!prediction)
+    return;
+
+  network_output = static_cast<float *>(prediction->GetResultData());
 
   for (i = 0; i < GRID_H; i++) {
     for (j = 0; j < GRID_W; j++) {
@@ -113,7 +120,6 @@ parse_boxes(std::shared_ptr<r2i::IPrediction> prediction) {
       }
     }
   }
-  return error;
 }
 
 void PrintUsage() {
@@ -127,11 +133,13 @@ void PrintUsage() {
 
 std::unique_ptr<float[]> PreProcessImage (const unsigned char *input,
     int width, int height, int reqwidth, int reqheight) {
-
   const int channels = 3;
   const int scaled_size = channels * reqwidth * reqheight;
   std::unique_ptr<unsigned char[]> scaled (new unsigned char[scaled_size]);
   std::unique_ptr<float[]> adjusted (new float[scaled_size]);
+
+  if (!input)
+    return nullptr;
 
   stbir_resize_uint8(input, width, height, 0, scaled.get(), reqwidth,
                      reqheight, 0, channels);

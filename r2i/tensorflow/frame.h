@@ -38,6 +38,8 @@ class Frame : public IFrame {
   std::shared_ptr<TF_Tensor> GetTensor (std::shared_ptr<TF_Graph> graph,
                                         TF_Operation *operation, RuntimeError &error);
 
+  virtual DataType GetDataType () override { return r2i::DataType::Id::UNKNOWN_DATATYPE; }
+
  private:
   float *frame_data;
   int frame_width;

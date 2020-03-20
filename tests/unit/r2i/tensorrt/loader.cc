@@ -87,7 +87,7 @@ TEST (TensorRTLoader, LoadInvalidFile) {
   LONGS_EQUAL (r2i::RuntimeError::Code::INCOMPATIBLE_MODEL, error.GetCode ());
 }
 
-TEST (TensorRTLoader, BadChechedEngine) {
+TEST (TensorRTLoader, BadCachedEngine) {
   bad_cached_engine = true;
 
   auto model = loader.Load(__FILE__, error);

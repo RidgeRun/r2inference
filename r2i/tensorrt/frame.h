@@ -42,8 +42,6 @@ class Frame : public IFrame {
   int frame_height;
   ImageFormat frame_format;
   DataType data_type;
-
-  RuntimeError Validate (int64_t dims[], int64_t num_dims);
 };
 
 }

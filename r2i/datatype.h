@@ -1,4 +1,4 @@
-/* Copyright (C) 2020 RidgeRun, LLC (http://www.ridgerun.com)
+/* Copyright (C) 2018-2020 RidgeRun, LLC (http://www.ridgerun.com)
  * All Rights Reserved.
  *
  * The contents of this software are proprietary and confidential to RidgeRun,
@@ -19,14 +19,14 @@
  */
 namespace r2i {
 /**
- *  Implements the Image formats handling class for r2i library.
+ *  Implements the Data Type handling class for r2i library.
  */
 class DataType {
 
  public:
 
   /**
-   * Numerical id describing the different formats. See the
+   * Numerical id describing the different data types. See the
    * description field for more contextual information at runtime.
    */
   enum Id {
@@ -63,24 +63,24 @@ class DataType {
   };
 
   /**
-   * \brief Creates and initializes a format to Unknown format.
+   * \brief Creates and initializes a data type to Unknown data type.
    */
   DataType ();
 
   /**
-   * \brief Creates and initializes a format.
+   * \brief Creates and initializes a data type.
    *
-   * \param id The id to set in the format
+   * \param id The id to set in the data type
    */
   DataType (Id id);
 
   /**
-   * Returns the id of the format
+   * Returns the id of the data type
    */
   Id GetId ();
 
   /**
-   * Returns a human readable description of the format
+   * Returns a human readable description of the data type
    */
   const std::string GetDescription ();
 
@@ -95,4 +95,4 @@ class DataType {
 
 }
 
-#endif // R2I_IMAGEFORMAT_H
+#endif // R2I_DATATYPE_H

@@ -1,4 +1,4 @@
-/* Copyright (C) 2020 RidgeRun, LLC (http://www.ridgerun.com)
+/* Copyright (C) 2018-2020 RidgeRun, LLC (http://www.ridgerun.com)
  * All Rights Reserved.
  *
  * The contents of this software are proprietary and confidential to RidgeRun,
@@ -17,7 +17,7 @@
 namespace r2i {
 
 static std::unordered_map<int, std::pair<const std::string, int>>
-format_descriptors ({
+data_type_descriptors ({
   {DataType::Id::INT32, {"32 bit integer", 3}},
   {DataType::Id::FLOAT, {"32 bit float", 3}},
   {DataType::Id::HALF, {"16 bit float", 2}},
@@ -39,9 +39,9 @@ DataType::Id DataType::GetId () {
 }
 
 std::pair<const std::string, int> search (DataType::Id id) {
-  auto search = format_descriptors.find (id);
-  if (format_descriptors.end () == search) {
-    search = format_descriptors.find (DataType::Id::UNKNOWN_DATATYPE);
+  auto search = data_type_descriptors.find (id);
+  if (data_type_descriptors.end () == search) {
+    search = data_type_descriptors.find (DataType::Id::UNKNOWN_DATATYPE);
   }
   return search->second;
 }

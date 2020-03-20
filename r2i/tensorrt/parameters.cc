@@ -33,7 +33,7 @@ namespace tensorrt {
 Parameters::Parameters () :
   parameter_map ({
   /* Global parameters */
-  PARAM("version", "Tensorrt version",
+  PARAM("version", "TensorRT version",
         r2i::ParameterMeta::Flags::READ,
         r2i::ParameterMeta::Type::STRING,
         std::make_shared<VersionAccessor>(this)),
@@ -142,21 +142,6 @@ RuntimeError Parameters::Get (const std::string &in_parameter, int &value) {
 
 RuntimeError Parameters::Get (const std::string &in_parameter, double &value) {
   RuntimeError error;
-
-  ParamDesc param = this->Validate (in_parameter,
-                                    r2i::ParameterMeta::Type::DOUBLE, "double", error);
-  if (error.IsError ()) {
-    return error;
-  }
-
-  auto accessor = std::dynamic_pointer_cast<DoubleAccessor>(param.accessor);
-
-  error = accessor->Get ();
-  if (error.IsError ()) {
-    return error;
-  }
-
-  value = accessor->value;
   return error;
 }
 
@@ -210,17 +195,7 @@ RuntimeError Parameters::Set (const std::string &in_parameter,
 RuntimeError Parameters::Set (const std::string &in_parameter,
                               double in_value) {
   RuntimeError error;
-
-  ParamDesc param = this->Validate (in_parameter,
-                                    r2i::ParameterMeta::Type::DOUBLE, "double", error);
-  if (error.IsError ()) {
-    return error;
-  }
-
-  auto accessor = std::dynamic_pointer_cast<DoubleAccessor>(param.accessor);
-
-  accessor->value = in_value;
-  return accessor->Set ();
+  return error;
 }
 
 RuntimeError Parameters::Set (const std::string &in_parameter, int in_value) {

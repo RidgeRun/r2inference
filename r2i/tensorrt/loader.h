@@ -23,8 +23,6 @@ class Loader : public ILoader {
  public:
   virtual std::shared_ptr<r2i::IModel> Load (const std::string &in_path,
       r2i::RuntimeError &error) override;
- private:
-  std::shared_ptr<Model> model;
 };
 
 }

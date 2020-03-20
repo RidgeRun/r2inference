@@ -12,13 +12,10 @@
 #ifndef R2I_TENSORRT_ENGINE_H
 #define R2I_TENSORRT_ENGINE_H
 
-#include <r2i/iengine.h>
-
 #include <memory>
 
+#include <r2i/iengine.h>
 #include <r2i/tensorrt/model.h>
-
-#define RAM_ARRAY_SIZE 11
 
 namespace r2i {
 namespace tensorrt {

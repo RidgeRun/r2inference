@@ -10,13 +10,14 @@
  */
 
 #include "r2i/tensorrt/engine.h"
-#include "r2i/tensorrt/prediction.h"
 #include "r2i/tensorrt/frame.h"
+#include "r2i/tensorrt/prediction.h"
 
 #include <cuda.h>
 #include <cuda_runtime.h>
 #include <NvInfer.h>
 #include "NvInferPlugin.h"
+#include <sstream>
 #include <vector>
 
 static int
@@ -74,19 +75,31 @@ RuntimeError Engine::Stop () {
 
 std::shared_ptr<r2i::IPrediction> Engine::Predict (std::shared_ptr<r2i::IFrame>
     in_frame, r2i::RuntimeError &error) {
-  std::shared_ptr<nvinfer1::ICudaEngine> cuda_engine =
-    this->model->GetTRCudaEngine();
+  std::shared_ptr<nvinfer1::ICudaEngine> cuda_engine;
   ImageFormat in_format;
 
   error.Clean ();
 
+  if (!this->model) {
+    error.Set (RuntimeError::Code::NULL_PARAMETER,
+               "Engine must have its model set before predicting");
+    return nullptr;
+  }
+
+  if (!in_frame) {
+    error.Set (RuntimeError::Code::NULL_PARAMETER,
+               "Engine received null frame for prediction");
+    return nullptr;
+  }
+
+  cuda_engine = this->model->GetTRCudaEngine();
   auto prediction = std::make_shared<Prediction>();
 
   std::vector < void *> buffers;
 
   if (cuda_engine->getNbBindings () != 2) {
     error.Set (RuntimeError::Code::INCOMPATIBLE_MODEL,
-               "Unable to run prediction on model");
+               "Current implementation only supports single input single output scheme");
     return nullptr;
   }
 
@@ -142,8 +155,12 @@ r2i::RuntimeError Engine::SetBatchSize (const int batch_size) {
     return error;
   }
   if (this->model->GetTRCudaEngine()->getMaxBatchSize() < batch_size) {
-    error.Set (RuntimeError::Code::WRONG_API_USAGE,
-               "Batch size can't be larger than the one used to generate the engine");
+    std::ostringstream errorStringStream;
+    errorStringStream << "Engine was generated with max batch size of: " <<
+                      this->model->GetTRCudaEngine()->getMaxBatchSize() <<
+                      ". Batch size can't be larger";
+
+    error.Set (RuntimeError::Code::WRONG_API_USAGE, errorStringStream.str());
     return error;
   }
   if (batch_size <= 0) {

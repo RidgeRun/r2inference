@@ -11,9 +11,9 @@
 
 #include <r2i/r2i.h>
 #include <r2i/tensorrt/engine.h>
-#include <r2i/tensorrt/model.h>
+#include <r2i/imodel.h>
 #include <r2i/tensorrt/frame.h>
-#include <r2i/tensorrt/prediction.h>
+#include <r2i/iprediction.h>
 
 #include <CppUTest/CommandLineTestRunner.h>
 #include <CppUTest/MemoryLeakDetectorNewMacros.h>
@@ -141,7 +141,29 @@ TEST (TensorRTEngine, PredictExecutionError) {
 
   prediction = engine.Predict (frame, error);
   LONGS_EQUAL (r2i::RuntimeError::Code::FRAMEWORK_ERROR, error.GetCode ());
+}
 
+TEST (TensorRTEngine, PredictNoModel) {
+  std::shared_ptr<r2i::IPrediction> prediction;
+
+  error = engine.Start ();
+  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
+
+  prediction = engine.Predict (frame, error);
+  LONGS_EQUAL (r2i::RuntimeError::Code::NULL_PARAMETER, error.GetCode ());
+}
+
+TEST (TensorRTEngine, PredictNullFrame) {
+  std::shared_ptr<r2i::IPrediction> prediction;
+
+  error = engine.SetModel (model);
+  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
+
+  error = engine.Start ();
+  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
+
+  prediction = engine.Predict (nullptr, error);
+  LONGS_EQUAL (r2i::RuntimeError::Code::NULL_PARAMETER, error.GetCode ());
 }
 
 TEST (TensorRTEngine, PredictEngine) {
