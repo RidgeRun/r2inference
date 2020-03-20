@@ -2,7 +2,6 @@ bool fail_runtime = false;
 bool bad_cached_engine = false;
 bool incompatible_model = false;
 
-
 namespace nvinfer1 {
 namespace {
 class MockRuntime : public IRuntime {

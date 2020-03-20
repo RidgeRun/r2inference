@@ -31,7 +31,6 @@ libtensorrt_la_CPPFLAGS =        \
 
 libtensorrt_la_CFLAGS =          \
     $(RR_CFLAGS)                 \
-    $(TENSORRT_CFLAGS)           \
     $(CODE_COVERAGE_CFLAGS)
 
 libtensorrt_la_CXXFLAGS =        \

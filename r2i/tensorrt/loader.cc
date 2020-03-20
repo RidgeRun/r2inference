@@ -18,19 +18,11 @@
 #include "r2i/imodel.h"
 #include "r2i/tensorrt/model.h"
 
-static void iRuntimeDeleter (nvinfer1::IRuntime *p) {
-  if (p)
+template <class T>
+static void tensorRTIFaceDeleter (T *p) {
+  if (p) {
     p->destroy ();
-}
-
-static void ICudaEngineDeleter (nvinfer1::ICudaEngine *p) {
-  if (p)
-    p->destroy ();
-}
-
-static void IExecutionContextDeleter (nvinfer1::IExecutionContext *p) {
-  if (p)
-    p->destroy ();
+  }
 }
 
 namespace r2i {
@@ -49,7 +41,7 @@ std::shared_ptr<r2i::IModel> Loader::Load (const std::string &in_path,
 
   std::shared_ptr < nvinfer1::IRuntime > infer =
     std::shared_ptr < nvinfer1::IRuntime > (nvinfer1::createInferRuntime (logger),
-        iRuntimeDeleter);
+        tensorRTIFaceDeleter<nvinfer1::IRuntime>);
   if (!infer) {
     error.Set (RuntimeError::Code::FRAMEWORK_ERROR, "Unable to create runtime");
     return nullptr;
@@ -77,7 +69,7 @@ std::shared_ptr<r2i::IModel> Loader::Load (const std::string &in_path,
   std::shared_ptr < nvinfer1::ICudaEngine > engine = std::shared_ptr
       < nvinfer1::ICudaEngine >
       (infer->deserializeCudaEngine (cached.data (), size, nullptr),
-       ICudaEngineDeleter);
+       tensorRTIFaceDeleter<nvinfer1::ICudaEngine>);
   if (!engine) {
     error.Set (RuntimeError::Code::INCOMPATIBLE_MODEL,
                "Unable to load cached engine");
@@ -86,7 +78,7 @@ std::shared_ptr<r2i::IModel> Loader::Load (const std::string &in_path,
 
   std::shared_ptr < nvinfer1::IExecutionContext> context = std::shared_ptr
       < nvinfer1::IExecutionContext> (engine->createExecutionContext (),
-                                      IExecutionContextDeleter);
+                                      tensorRTIFaceDeleter<nvinfer1::IExecutionContext>);
   if (!context) {
     error.Set (RuntimeError::Code::INCOMPATIBLE_MODEL,
                "Unable to load cached engine");
