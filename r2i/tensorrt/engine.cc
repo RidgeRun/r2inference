@@ -20,22 +20,6 @@
 #include <sstream>
 #include <vector>
 
-static int
-getSizeFromType (nvinfer1::DataType type) {
-  switch (type) {
-    case nvinfer1::DataType::kINT32:
-    case nvinfer1::DataType::kFLOAT:
-      return 4;
-    case nvinfer1::DataType::kHALF:
-      return 2;
-    case nvinfer1::DataType::kBOOL:
-    case nvinfer1::DataType::kINT8:
-      return 1;
-    default:
-      return 0;
-  }
-}
-
 namespace r2i {
 namespace tensorrt {
 
@@ -57,6 +41,29 @@ RuntimeError Engine::SetModel (std::shared_ptr<r2i::IModel> in_model) {
   if (nullptr == model) {
     error.Set (RuntimeError::Code::INCOMPATIBLE_MODEL,
                "The provided model is not an TENSORRT model");
+    return error;
+  }
+
+  if (nullptr == model->GetTRCudaEngine()) {
+    error.Set (RuntimeError::Code::WRONG_API_USAGE,
+               "Model must have a cuda engine before being used");
+    return error;
+  }
+
+  std::shared_ptr<nvinfer1::ICudaEngine> cuda_engine =
+    model->GetTRCudaEngine();
+  if (cuda_engine->getNbBindings () != 2) {
+    error.Set (RuntimeError::Code::INCOMPATIBLE_MODEL,
+               "Current implementation only supports single input single output scheme");
+    return error;
+  }
+
+  nvinfer1::DataType in_type = cuda_engine->getBindingDataType (0);
+  nvinfer1::DataType out_type = cuda_engine->getBindingDataType (1);
+  if (in_type != nvinfer1::DataType::kFLOAT
+      || out_type != nvinfer1::DataType::kFLOAT) {
+    error.Set (RuntimeError::Code::INCOMPATIBLE_MODEL,
+               "Current implementation only supports float32");
     return error;
   }
 
@@ -97,18 +104,11 @@ std::shared_ptr<r2i::IPrediction> Engine::Predict (std::shared_ptr<r2i::IFrame>
 
   std::vector < void *> buffers;
 
-  if (cuda_engine->getNbBindings () != 2) {
-    error.Set (RuntimeError::Code::INCOMPATIBLE_MODEL,
-               "Current implementation only supports single input single output scheme");
-    return nullptr;
-  }
-
   int output_size = 1;
   void *buff;
   std::shared_ptr<void> output_buff;
   for (int i = 0; i < cuda_engine->getNbBindings (); ++i) {
     nvinfer1::Dims dims = cuda_engine->getBindingDimensions (i);
-    nvinfer1::DataType type = cuda_engine->getBindingDataType (i);
 
     if (cuda_engine->bindingIsInput(i)) {
       buffers.emplace_back (in_frame->GetData());
@@ -120,7 +120,7 @@ std::shared_ptr<r2i::IPrediction> Engine::Predict (std::shared_ptr<r2i::IFrame>
       }
       output_size *= this->batch_size;
 
-      output_size *= getSizeFromType (type);
+      output_size *= sizeof(float);
 
       cudaError_t cuda_error = cudaMalloc (&buff, output_size);
       output_buff = std::shared_ptr<void>(buff, cudaFree);

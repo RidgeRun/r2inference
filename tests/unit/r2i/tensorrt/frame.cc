@@ -77,51 +77,50 @@ TEST_GROUP (TensorRTFrame) {
 };
 
 TEST (TensorRTFrame, FrameConfigure) {
-  error = frame.Configure(data, width, height, format.GetId(), type.GetId());
+  error = frame.Configure(data, width, height, format.GetId());
 
   LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode());
 }
 
 TEST (TensorRTFrame, FrameCheckSize) {
-  error = frame.Configure(data, width, height, format.GetId(), type.GetId());
+  error = frame.Configure(data, width, height, format.GetId());
 
   LONGS_EQUAL (FRAME_WIDTH * FRAME_HEIGHT * format.GetNumPlanes() *
                type.GetBytesPerPixel(), cudaRequestedSize);
 }
 
 TEST (TensorRTFrame, FrameConfigureNullData) {
-  error = frame.Configure(nullptr, width, height, format.GetId(), type.GetId());
+  error = frame.Configure(nullptr, width, height, format.GetId());
 
   LONGS_EQUAL (r2i::RuntimeError::Code::NULL_PARAMETER, error.GetCode());
 }
 
 TEST (TensorRTFrame, FrameConfigureNullWidth) {
-  error = frame.Configure(data, 0, height, format.GetId(), type.GetId());
+  error = frame.Configure(data, 0, height, format.GetId());
 
   LONGS_EQUAL (r2i::RuntimeError::Code::WRONG_API_USAGE, error.GetCode());
 }
 
 TEST (TensorRTFrame, FrameConfigureNegativeWidth) {
-  error = frame.Configure(data, -1, height, format.GetId(), type.GetId());
+  error = frame.Configure(data, -1, height, format.GetId());
 
   LONGS_EQUAL (r2i::RuntimeError::Code::WRONG_API_USAGE, error.GetCode());
 }
 
 TEST (TensorRTFrame, FrameConfigureNullHeight) {
-  error = frame.Configure(data, width, 0, format.GetId(), type.GetId());
+  error = frame.Configure(data, width, 0, format.GetId());
 
   LONGS_EQUAL (r2i::RuntimeError::Code::WRONG_API_USAGE, error.GetCode());
 }
 
 TEST (TensorRTFrame, FrameConfigureNegativeHeight) {
-  error = frame.Configure(data, width, -1, format.GetId(), type.GetId());
+  error = frame.Configure(data, width, -1, format.GetId());
 
   LONGS_EQUAL (r2i::RuntimeError::Code::WRONG_API_USAGE, error.GetCode());
 }
 
 TEST (TensorRTFrame, FrameConfigureUnknownDataType) {
-  error = frame.Configure(data, width, 0, format.GetId(),
-                          r2i::DataType::Id::UNKNOWN_DATATYPE);
+  error = frame.Configure(data, width, 0, format.GetId());
 
   LONGS_EQUAL (r2i::RuntimeError::Code::WRONG_API_USAGE, error.GetCode());
 }
@@ -129,7 +128,7 @@ TEST (TensorRTFrame, FrameConfigureUnknownDataType) {
 TEST (TensorRTFrame, FrameGetWidth) {
   int local_width;
 
-  error = frame.Configure(data, width, height, format.GetId(), type.GetId());
+  error = frame.Configure(data, width, height, format.GetId());
   LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode());
 
   local_width = frame.GetWidth();
@@ -139,7 +138,7 @@ TEST (TensorRTFrame, FrameGetWidth) {
 TEST (TensorRTFrame, FrameGetHeight) {
   int local_height;
 
-  error = frame.Configure(data, width, height, format.GetId(), type.GetId());
+  error = frame.Configure(data, width, height, format.GetId());
   LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode());
 
   local_height = frame.GetHeight();
@@ -149,7 +148,7 @@ TEST (TensorRTFrame, FrameGetHeight) {
 TEST (TensorRTFrame, FrameGetFormat) {
   r2i::ImageFormat local_format;
 
-  error = frame.Configure(data, width, height, format.GetId(), type.GetId());
+  error = frame.Configure(data, width, height, format.GetId());
   LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode());
 
   local_format = frame.GetFormat();
@@ -159,7 +158,7 @@ TEST (TensorRTFrame, FrameGetFormat) {
 TEST (TensorRTFrame, FrameGetDataType) {
   r2i::DataType local_data_type;
 
-  error = frame.Configure(data, width, height, format.GetId(), type.GetId());
+  error = frame.Configure(data, width, height, format.GetId());
   LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode());
 
   local_data_type = frame.GetDataType();
@@ -169,14 +168,14 @@ TEST (TensorRTFrame, FrameGetDataType) {
 TEST (TensorRTFrame, FrameCudaMallocError) {
   cudaMallocError = true;
 
-  error = frame.Configure(data, width, height, format.GetId(), type.GetId());
+  error = frame.Configure(data, width, height, format.GetId());
   LONGS_EQUAL (r2i::RuntimeError::Code::MEMORY_ERROR, error.GetCode());
 }
 
 TEST (TensorRTFrame, FrameCudaMemCpyError) {
   cudaMemCpyError = true;
 
-  error = frame.Configure(data, width, height, format.GetId(), type.GetId());
+  error = frame.Configure(data, width, height, format.GetId());
   LONGS_EQUAL (r2i::RuntimeError::Code::MEMORY_ERROR, error.GetCode());
 }
 

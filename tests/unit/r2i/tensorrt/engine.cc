@@ -28,14 +28,11 @@ class MockModel : public r2i::IModel {
   }
 };
 
-void IExecutionContextDeleter (nvinfer1::IExecutionContext *p) {
-  if (p)
+template <class T>
+static void tensorRTIFaceDeleter (T *p) {
+  if (p) {
     p->destroy ();
-}
-
-static void ICudaEngineDeleter (nvinfer1::ICudaEngine *p) {
-  if (p)
-    p->destroy ();
+  }
 }
 
 TEST_GROUP (TensorRTEngine) {
@@ -53,11 +50,11 @@ TEST_GROUP (TensorRTEngine) {
 
     context = std::shared_ptr<nvinfer1::IExecutionContext> (new
               nvinfer1::MockExecutionContext,
-              IExecutionContextDeleter);
+              tensorRTIFaceDeleter<nvinfer1::IExecutionContext>);
 
     cuda_engine = std::shared_ptr<nvinfer1::ICudaEngine> (new
                   nvinfer1::MockCudaEngine,
-                  ICudaEngineDeleter);
+                  tensorRTIFaceDeleter<nvinfer1::ICudaEngine>);
 
     model = std::make_shared<r2i::tensorrt::Model> ();
     model->SetContext (context);
@@ -80,6 +77,28 @@ TEST (TensorRTEngine, SetModelNull) {
 TEST (TensorRTEngine, SetModelInvalid) {
   error = engine.SetModel (inc_model);
   LONGS_EQUAL (r2i::RuntimeError::Code::INCOMPATIBLE_MODEL, error.GetCode ());
+}
+
+TEST (TensorRTEngine, SetModelWrongModelDataType) {
+  wrong_network_data_type = true;
+
+  error = engine.SetModel (model);
+  LONGS_EQUAL (r2i::RuntimeError::Code::INCOMPATIBLE_MODEL, error.GetCode ());
+}
+
+TEST (TensorRTEngine, SetModelWrongNumBindings) {
+  wrong_num_bindings = true;
+
+  error = engine.SetModel (model);
+  LONGS_EQUAL (r2i::RuntimeError::Code::INCOMPATIBLE_MODEL, error.GetCode ());
+}
+
+TEST (TensorRTEngine, SetModelNoCudaEngine) {
+  std::shared_ptr<r2i::tensorrt::Model> unconfigured_model =
+    std::make_shared<r2i::tensorrt::Model> ();
+
+  error = engine.SetModel (unconfigured_model);
+  LONGS_EQUAL (r2i::RuntimeError::Code::WRONG_API_USAGE, error.GetCode ());
 }
 
 TEST (TensorRTEngine, StartEngine) {
@@ -177,7 +196,6 @@ TEST (TensorRTEngine, PredictEngine) {
 
   prediction = engine.Predict (frame, error);
   LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
-
 }
 
 int main (int ac, char **av) {

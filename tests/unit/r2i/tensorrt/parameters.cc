@@ -18,9 +18,11 @@
 
 #include "mockcudaengine.cc"
 
-static void ICudaEngineDeleter (nvinfer1::ICudaEngine *p) {
-  if (p)
+template <class T>
+static void tensorRTIFaceDeleter (T *p) {
+  if (p) {
     p->destroy ();
+  }
 }
 
 namespace mock {
@@ -52,21 +54,32 @@ TEST_GROUP (TensorRTParameters) {
   r2i::RuntimeError error;
   std::shared_ptr<r2i::tensorrt::Parameters> parameters;
   std::shared_ptr<nvinfer1::ICudaEngine> cuda_engine;
+  std::shared_ptr<nvinfer1::IExecutionContext> context;
 
   std::shared_ptr<r2i::IModel> model;
   std::shared_ptr<r2i::IEngine> engine;
 
   void setup () {
     error.Clean();
+
     parameters = std::shared_ptr<r2i::tensorrt::Parameters>( new
                  r2i::tensorrt::Parameters);
 
     cuda_engine = std::shared_ptr<nvinfer1::ICudaEngine> (new
                   nvinfer1::MockCudaEngine,
-                  ICudaEngineDeleter);
+                  tensorRTIFaceDeleter<nvinfer1::ICudaEngine>);
+    context = std::shared_ptr<nvinfer1::IExecutionContext> (new
+              nvinfer1::MockExecutionContext,
+              tensorRTIFaceDeleter<nvinfer1::IExecutionContext>);
 
     model = std::shared_ptr<r2i::tensorrt::Model>(new r2i::tensorrt::Model);
     engine = std::shared_ptr<r2i::tensorrt::Engine> (new r2i::tensorrt::Engine);
+
+    auto tensorrt_model =
+      std::dynamic_pointer_cast<r2i::tensorrt::Model, r2i::IModel>
+      (model);
+    tensorrt_model->SetContext (context);
+    tensorrt_model->SetCudaEngine (cuda_engine);
   }
 
   void teardown () {

@@ -1,5 +1,7 @@
 bool fail_context = false;
 bool execute_error = false;
+bool wrong_network_data_type = false;
+bool wrong_num_bindings = false;
 
 #define MAX_BATCH_SIZE 32
 
@@ -142,7 +144,10 @@ MockCudaEngine::MockCudaEngine() {}
 
 int MockCudaEngine::getNbBindings() const noexcept {
   /* This values is used as a default since 1 input and 1 output  */
-  return 2;
+  if (!wrong_num_bindings)
+    return 2;
+  else
+    return 1;
 }
 
 int MockCudaEngine::getBindingIndex(const char *name) const noexcept { return 0; }
@@ -153,7 +158,13 @@ bool MockCudaEngine::bindingIsInput(int bindingIndex) const noexcept { return tr
 
 Dims MockCudaEngine::getBindingDimensions(int bindingIndex) const noexcept { return Dims(); }
 
-DataType MockCudaEngine::getBindingDataType(int bindingIndex) const noexcept { return DataType(); }
+DataType MockCudaEngine::getBindingDataType(int bindingIndex) const noexcept {
+  /* Only float 32 is currently supported*/
+  if (!wrong_network_data_type)
+    return nvinfer1::DataType::kFLOAT;
+  else
+    return nvinfer1::DataType::kINT8;
+}
 
 int MockCudaEngine::getMaxBatchSize() const noexcept {
   return MAX_BATCH_SIZE;

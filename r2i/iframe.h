@@ -39,8 +39,7 @@ class IFrame {
    * \return A RuntimeError with a description of the error.
    */
   virtual RuntimeError Configure (void *in_data, int width,
-                                  int height, r2i::ImageFormat::Id format,
-                                  r2i::DataType::Id data_type) = 0;
+                                  int height, r2i::ImageFormat::Id format) = 0;
 
   /**
    * \brief Gets the data set to the Frame. The actual data pointer type

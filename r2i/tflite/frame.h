@@ -22,8 +22,7 @@ class Frame : public IFrame {
   Frame ();
 
   RuntimeError Configure (void *in_data, int width,
-                          int height, r2i::ImageFormat::Id format,
-                          r2i::DataType::Id data_type = r2i::DataType::Id::UNKNOWN_DATATYPE) override;
+                          int height, r2i::ImageFormat::Id format) override;
 
   void *GetData () override;
 

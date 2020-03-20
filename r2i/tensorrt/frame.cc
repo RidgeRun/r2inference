@@ -23,13 +23,12 @@ Frame::Frame () :
 }
 
 RuntimeError Frame::Configure (void *in_data, int width,
-                               int height, r2i::ImageFormat::Id format,
-                               r2i::DataType::Id type) {
+                               int height, r2i::ImageFormat::Id format) {
   RuntimeError error;
   cudaError_t cuda_error;
   ImageFormat image_format (format);
 
-  DataType data_type (type);
+  DataType data_type (r2i::DataType::FLOAT);
 
   if (nullptr == in_data) {
     error.Set (RuntimeError::Code::NULL_PARAMETER, "Received a NULL data pointer");
@@ -44,10 +43,6 @@ RuntimeError Frame::Configure (void *in_data, int width,
     error.Set (RuntimeError::Code::WRONG_API_USAGE,
                "Received an invalid image height");
     return error;
-  }
-  if (type == r2i::DataType::Id::UNKNOWN_DATATYPE) {
-    error.Set (RuntimeError::Code::WRONG_API_USAGE,
-               "Received an invalid data type");
   }
 
   /* FIXME cudaMalloc is an expensive operation, this should be only done when necessary */
