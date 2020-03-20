@@ -23,38 +23,6 @@
 namespace r2i {
 namespace tensorrt {
 
-struct Logger: public
-  nvinfer1::ILogger {
-  void log (Severity severity, const char *msg) override {
-    std::string tag;
-
-    switch (severity) {
-      case Severity::kINTERNAL_ERROR:
-        tag = "INTERNAL_ERROR";
-        break;
-      case
-          Severity::kERROR:
-        tag = "ERROR";
-        break;
-      case
-          Severity::kWARNING:
-        tag = "WARNING";
-        break;
-      case
-          Severity::kINFO:
-        tag = "INFO";
-        break;
-      case
-          Severity::kVERBOSE:
-        tag = "VERBOSE";
-        break;
-    }
-
-    std::cerr << "[RR]" << "[" << tag << "] " << std::string (msg) << std::endl;
-  }
-};
-
-
 class Model : public IModel {
  public:
   Model ();

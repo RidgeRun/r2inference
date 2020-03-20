@@ -18,6 +18,36 @@
 #include "r2i/imodel.h"
 #include "r2i/tensorrt/model.h"
 
+
+struct Logger: public
+  nvinfer1::ILogger {
+  void log (Severity severity, const char *msg) override {
+    std::string tag;
+
+    switch (severity) {
+      case Severity::kINTERNAL_ERROR:
+        tag = "INTERNAL_ERROR";
+        break;
+      case
+          Severity::kERROR:
+        tag = "ERROR";
+        break;
+      case
+          Severity::kWARNING:
+        tag = "WARNING";
+        break;
+      case
+          Severity::kINFO:
+        tag = "INFO";
+        break;
+      case
+          Severity::kVERBOSE:
+        tag = "VERBOSE";
+        break;
+    }
+  }
+};
+
 template <class T>
 static void tensorRTIFaceDeleter (T *p) {
   if (p) {

@@ -36,8 +36,7 @@ libtensorrt_la_CFLAGS =          \
 libtensorrt_la_CXXFLAGS =        \
     $(RR_CXXFLAGS)               \
     $(TENSORRT_CFLAGS)           \
-    $(CODE_COVERAGE_CXXFLAGS)    \
-    $(CUDA_LIBS)
+    $(CODE_COVERAGE_CXXFLAGS)
 
 libtensorrt_la_LIBADD =          \
     $(RR_LIBS)                   \
