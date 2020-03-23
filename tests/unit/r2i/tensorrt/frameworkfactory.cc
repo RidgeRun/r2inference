@@ -73,6 +73,20 @@ TEST (TensorRTFrameworkFactory, ValidFactory) {
   LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
 }
 
+TEST (TensorRTFrameworkFactory, GetDescription) {
+  r2i::RuntimeError error;
+  std::shared_ptr<r2i::IFrameworkFactory> factory;
+
+  factory = r2i::IFrameworkFactory::MakeFactory(r2i::FrameworkCode::TENSORRT,
+            error);
+  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
+
+  r2i::FrameworkMeta meta = factory->GetDescription(error);
+  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
+
+  LONGS_EQUAL (r2i::FrameworkCode::TENSORRT, meta.code);
+}
+
 int main (int ac, char **av) {
   return CommandLineTestRunner::RunAllTests (ac, av);
 }
