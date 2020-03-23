@@ -27,16 +27,16 @@ RuntimeError Prediction::SetResultBuffer (std::shared_ptr<void> result_buffer,
   RuntimeError error;
   std::shared_ptr<void> buff;
 
-  if (nullptr == result_buffer) {
-    error.Set (RuntimeError::Code::NULL_PARAMETER,
-               "Invalid result buffer passed to prediction");
-    return error;
-  }
-
   buff = std::shared_ptr<void>(malloc(size), free);
   if (!buff) {
     error.Set (RuntimeError::Code::MEMORY_ERROR,
                "Unable to allocate memory for result");
+    return error;
+  }
+
+  if (nullptr == result_buffer) {
+    error.Set (RuntimeError::Code::NULL_PARAMETER,
+               "Invalid result buffer passed to prediction");
     return error;
   }
 

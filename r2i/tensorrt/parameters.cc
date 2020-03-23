@@ -125,7 +125,7 @@ RuntimeError Parameters::Get (const std::string &in_parameter, int &value) {
   }
 
   auto accessor = std::dynamic_pointer_cast<IntAccessor>(param.accessor);
-  if (nullptr == model) {
+  if (nullptr == accessor) {
     error.Set (RuntimeError::Code::INCOMPATIBLE_MODEL,
                "The provided engine is not an tensorrt model");
     return error;
@@ -156,7 +156,7 @@ RuntimeError Parameters::Get (const std::string &in_parameter,
   }
 
   auto accessor = std::dynamic_pointer_cast<StringAccessor>(param.accessor);
-  if (nullptr == model) {
+  if (nullptr == accessor) {
     error.Set (RuntimeError::Code::INCOMPATIBLE_MODEL,
                "The provided engine is not an tensorrt model");
     return error;
@@ -182,7 +182,7 @@ RuntimeError Parameters::Set (const std::string &in_parameter,
   }
 
   auto accessor = std::dynamic_pointer_cast<StringAccessor>(param.accessor);
-  if (nullptr == model) {
+  if (nullptr == accessor) {
     error.Set (RuntimeError::Code::INCOMPATIBLE_MODEL,
                "The provided engine is not an tensorrt model");
     return error;
@@ -208,7 +208,7 @@ RuntimeError Parameters::Set (const std::string &in_parameter, int in_value) {
   }
 
   auto accessor = std::dynamic_pointer_cast<IntAccessor>(param.accessor);
-  if (nullptr == model) {
+  if (nullptr == accessor) {
     error.Set (RuntimeError::Code::INCOMPATIBLE_MODEL,
                "The provided engine is not an tensorrt model");
     return error;

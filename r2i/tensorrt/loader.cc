@@ -110,7 +110,7 @@ std::shared_ptr<r2i::IModel> Loader::Load (const std::string &in_path,
       < nvinfer1::IExecutionContext> (engine->createExecutionContext (),
                                       tensorRTIFaceDeleter<nvinfer1::IExecutionContext>);
   if (!context) {
-    error.Set (RuntimeError::Code::INCOMPATIBLE_MODEL,
+    error.Set (RuntimeError::Code::FRAMEWORK_ERROR,
                "Unable to load cached engine");
     return nullptr;
   }

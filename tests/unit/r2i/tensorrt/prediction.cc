@@ -24,7 +24,6 @@
 #define INPUTS 3
 
 bool cudaMemCpyError = false;
-bool mallocError = false;
 
 __host__ cudaError_t CUDARTAPI cudaMemcpy(void *dst, const void *src,
     size_t count, enum cudaMemcpyKind kind) {
@@ -33,14 +32,6 @@ __host__ cudaError_t CUDARTAPI cudaMemcpy(void *dst, const void *src,
     return cudaSuccess;
   } else {
     return cudaErrorInvalidValue;
-  }
-}
-
-void *malloc (size_t size) {
-  if (!mallocError) {
-    return calloc (1, size);;
-  } else {
-    return nullptr;
   }
 }
 
@@ -109,12 +100,6 @@ TEST (TensorRTPrediction, PredictionNonExistentIndex) {
 }
 
 TEST (TensorRTPrediction, PredictionCudaMemCpyError) {
-  cudaMemCpyError = true;
-  error = prediction.SetResultBuffer(matrix, INPUTS * sizeof(float));
-  LONGS_EQUAL (r2i::RuntimeError::Code::MEMORY_ERROR, error.GetCode());
-}
-
-TEST (TensorRTPrediction, PredictionMallocError) {
   cudaMemCpyError = true;
   error = prediction.SetResultBuffer(matrix, INPUTS * sizeof(float));
   LONGS_EQUAL (r2i::RuntimeError::Code::MEMORY_ERROR, error.GetCode());

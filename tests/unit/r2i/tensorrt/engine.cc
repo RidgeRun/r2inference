@@ -20,6 +20,9 @@
 #include <CppUTest/MemoryLeakDetectorMallocMacros.h>
 #include <CppUTest/TestHarness.h>
 
+#include <cuda.h>
+#include <cuda_runtime.h>
+
 #include "mockcudaengine.cc"
 
 class MockModel : public r2i::IModel {
@@ -27,6 +30,17 @@ class MockModel : public r2i::IModel {
     r2i::RuntimeError error; return error;
   }
 };
+
+bool cudaMallocError = false;
+
+__host__ __cudart_builtin__ cudaError_t CUDARTAPI
+cudaMalloc(void **devPtr, size_t size) {
+  if (!cudaMallocError) {
+    return cudaSuccess;
+  } else {
+    return cudaErrorMemoryAllocation;
+  }
+}
 
 template <class T>
 static void tensorRTIFaceDeleter (T *p) {
@@ -66,6 +80,8 @@ TEST_GROUP (TensorRTEngine) {
     wrong_network_data_type = false;
     wrong_num_bindings = false;
     execute_error = false;
+    cudaMallocError = false;
+    output_binding = false;
   }
 };
 
@@ -200,6 +216,35 @@ TEST (TensorRTEngine, PredictEngine) {
 
   prediction = engine.Predict (frame, error);
   LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
+}
+
+TEST (TensorRTEngine, PredictEngineOutput) {
+  std::shared_ptr<r2i::IPrediction> prediction;
+  output_binding = true;
+
+  error = engine.SetModel (model);
+  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
+
+  error = engine.Start ();
+  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
+
+  prediction = engine.Predict (frame, error);
+  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
+}
+
+TEST (TensorRTEngine, PredictEngineOutputCudaMallocError) {
+  std::shared_ptr<r2i::IPrediction> prediction;
+  output_binding = true;
+
+  error = engine.SetModel (model);
+  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
+
+  error = engine.Start ();
+  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
+
+  cudaMallocError = true;
+  prediction = engine.Predict (frame, error);
+  LONGS_EQUAL (r2i::RuntimeError::Code::MEMORY_ERROR, error.GetCode ());
 }
 
 int main (int ac, char **av) {

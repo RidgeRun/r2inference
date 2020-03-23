@@ -55,9 +55,11 @@ TEST_GROUP (TensorRTLoader) {
     error.Clean();
     loader = r2i::tensorrt::Loader();
     incompatible_model = false;
+    bad_cached_engine = false;
     context_set_error = false;
     cuda_engine_set_error = false;
     fail_context = false;
+    fail_runtime = false;
   }
 };
 
@@ -85,6 +87,22 @@ TEST (TensorRTLoader, LoadInvalidFile) {
   auto model = loader.Load(__FILE__, error);
 
   LONGS_EQUAL (r2i::RuntimeError::Code::INCOMPATIBLE_MODEL, error.GetCode ());
+}
+
+TEST (TensorRTLoader, LoadFailRuntime) {
+  fail_runtime = true;
+
+  auto model = loader.Load(__FILE__, error);
+
+  LONGS_EQUAL (r2i::RuntimeError::Code::FRAMEWORK_ERROR, error.GetCode ());
+}
+
+TEST (TensorRTLoader, LoadFailContext) {
+  fail_context = true;
+
+  auto model = loader.Load(__FILE__, error);
+
+  LONGS_EQUAL (r2i::RuntimeError::Code::FRAMEWORK_ERROR, error.GetCode ());
 }
 
 TEST (TensorRTLoader, BadCachedEngine) {
