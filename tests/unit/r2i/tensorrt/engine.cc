@@ -62,6 +62,10 @@ TEST_GROUP (TensorRTEngine) {
 
     inc_model = std::make_shared<MockModel> ();
     frame = std::make_shared<r2i::tensorrt::Frame> ();
+
+    wrong_network_data_type = false;
+    wrong_num_bindings = false;
+    execute_error = false;
   }
 };
 
