@@ -15,6 +15,7 @@
 #include <memory>
 
 #include <r2i/iprediction.h>
+#include <r2i/datatype.h>
 #include <r2i/runtimeerror.h>
 
 namespace r2i {
@@ -30,11 +31,13 @@ class Prediction: public IPrediction {
 
   unsigned int GetResultSize () override;
 
-  RuntimeError SetResultBuffer (std::shared_ptr<void> results, size_t size);
+  RuntimeError SetResultBuffer (std::shared_ptr<void> results, size_t num,
+                                DataType data_type);
 
  private:
   std::shared_ptr<void> result_buffer;
-  size_t result_size;
+  size_t num;
+  DataType data_type;
 };
 
 }

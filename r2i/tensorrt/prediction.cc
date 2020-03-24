@@ -22,12 +22,12 @@ Prediction::Prediction () {
 
 
 RuntimeError Prediction::SetResultBuffer (std::shared_ptr<void> result_buffer,
-    size_t size) {
+    size_t num, DataType data_type) {
   cudaError_t cuda_error;
   RuntimeError error;
   std::shared_ptr<void> buff;
 
-  buff = std::shared_ptr<void>(malloc(size), free);
+  buff = std::shared_ptr<void>(malloc(num * data_type.GetBytesPerPixel()), free);
   if (!buff) {
     error.Set (RuntimeError::Code::MEMORY_ERROR,
                "Unable to allocate memory for result");
@@ -42,7 +42,7 @@ RuntimeError Prediction::SetResultBuffer (std::shared_ptr<void> result_buffer,
 
   cuda_error = cudaMemcpy(buff.get(),
                           result_buffer.get(),
-                          size,
+                          num * data_type.GetBytesPerPixel(),
                           cudaMemcpyDeviceToHost);
   if (cudaSuccess != cuda_error) {
     error.Set (RuntimeError::Code::MEMORY_ERROR,
@@ -51,13 +51,14 @@ RuntimeError Prediction::SetResultBuffer (std::shared_ptr<void> result_buffer,
   }
 
   this->result_buffer = std::shared_ptr<void>(buff);
-  this->result_size = size;
+  this->num = num;
+  this->data_type = data_type;
 
   return error;
 }
 
 unsigned int Prediction::GetResultSize () {
-  return this->result_size;
+  return this->num * this->data_type.GetBytesPerPixel();
 }
 
 void *Prediction::GetResultData () {
@@ -68,8 +69,23 @@ void *Prediction::GetResultData () {
   return result_buffer.get();
 }
 
-double Prediction::At (unsigned int index,  RuntimeError &error) {
+template <class T>
+static double PointerToResult (void *buff, unsigned int index,
+                               RuntimeError &error) {
+  T *data = static_cast<T *>(buff);
+
+  if (nullptr == data) {
+    error.Set (RuntimeError::Code::INVALID_FRAMEWORK_PARAMETER,
+               "Prediction result not set yet");
+    return 0;
+  }
+
+  return data[index];
+}
+
+double Prediction::At (unsigned int index, RuntimeError &error) {
   error.Clean ();
+  double result;
 
   if (nullptr == this->result_buffer) {
     error.Set (RuntimeError::Code::INVALID_FRAMEWORK_PARAMETER,
@@ -77,22 +93,24 @@ double Prediction::At (unsigned int index,  RuntimeError &error) {
     return 0;
   }
 
-  /* FIXME get correct datatype */
-  unsigned int n_results =  this->GetResultSize() / sizeof(float);
+  unsigned int n_results =  this->num;
   if ( n_results < index ) {
     error.Set (RuntimeError::Code::MEMORY_ERROR,
-               "Triying to access an non-existing index");
+               "Trying to access an non-existing index");
     return 0;
   }
 
-  float *fdata = static_cast<float *> (this->GetResultData ());
-  if (nullptr == fdata) {
-    error.Set (RuntimeError::Code::INVALID_FRAMEWORK_PARAMETER,
-               "Prediction result not set yet");
-    return 0;
+  switch ( this->data_type.GetId() ) {
+    case DataType::FLOAT :
+      result = PointerToResult<float>( this->GetResultData(), index, error);
+      break;
+    default :
+      result = 0;
+      error.Set (RuntimeError::Code::WRONG_API_USAGE,
+                 "Unsupported data type");
   }
 
-  return fdata[index];
+  return result;
 }
 
 }

@@ -16,7 +16,6 @@
 #include <cuda.h>
 #include <cuda_runtime.h>
 #include <NvInfer.h>
-#include "NvInferPlugin.h"
 #include <sstream>
 #include <vector>
 
@@ -84,6 +83,7 @@ std::shared_ptr<r2i::IPrediction> Engine::Predict (std::shared_ptr<r2i::IFrame>
     in_frame, r2i::RuntimeError &error) {
   std::shared_ptr<nvinfer1::ICudaEngine> cuda_engine;
   ImageFormat in_format;
+  int data_size;
 
   error.Clean ();
 
@@ -98,6 +98,7 @@ std::shared_ptr<r2i::IPrediction> Engine::Predict (std::shared_ptr<r2i::IFrame>
                "Engine received null frame for prediction");
     return nullptr;
   }
+  data_size = in_frame->GetDataType().GetBytesPerPixel();
 
   cuda_engine = this->model->GetTRCudaEngine();
   auto prediction = std::make_shared<Prediction>();
@@ -113,14 +114,12 @@ std::shared_ptr<r2i::IPrediction> Engine::Predict (std::shared_ptr<r2i::IFrame>
     if (cuda_engine->bindingIsInput(i)) {
       buffers.emplace_back (in_frame->GetData());
     } else {
-
       output_size = 1;
       for (int d = 0; d < dims.nbDims; ++d) {
         output_size *= dims.d[d];
       }
       output_size *= this->batch_size;
-
-      output_size *= sizeof(float);
+      output_size *= data_size;
 
       cudaError_t cuda_error = cudaMalloc (&buff, output_size);
       output_buff = std::shared_ptr<void>(buff, cudaFree);
@@ -142,7 +141,9 @@ std::shared_ptr<r2i::IPrediction> Engine::Predict (std::shared_ptr<r2i::IFrame>
     return nullptr;
   }
 
-  prediction->SetResultBuffer(output_buff, output_size);
+  prediction->SetResultBuffer(output_buff,
+                              output_size / in_frame->GetDataType().GetBytesPerPixel(),
+                              in_frame->GetDataType());
 
   return prediction;
 }

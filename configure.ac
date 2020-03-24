@@ -71,8 +71,8 @@ docs/uml/Makefile
 examples/Makefile
 examples/r2i/Makefile
 examples/r2i/ncsdk/Makefile
-examples/r2i/tensorrt/Makefile
 examples/r2i/tensorflow/Makefile
+examples/r2i/tensorrt/Makefile
 examples/r2i/tflite/Makefile
 r2i/Makefile
 r2i/ncsdk/Makefile
@@ -85,8 +85,8 @@ tests/acceptance/Makefile
 tests/unit/Makefile
 tests/unit/r2i/Makefile
 tests/unit/r2i/ncsdk/Makefile
-tests/unit/r2i/tensorrt/Makefile
 tests/unit/r2i/tensorflow/Makefile
+tests/unit/r2i/tensorrt/Makefile
 tests/unit/r2i/tflite/Makefile
 ])
 

@@ -15,7 +15,6 @@
 #include <iostream>
 #include <memory>
 #include <NvInfer.h>
-#include "NvInferPlugin.h"
 
 #include <r2i/imodel.h>
 #include <r2i/runtimeerror.h>

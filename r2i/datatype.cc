@@ -18,8 +18,8 @@ namespace r2i {
 
 static std::unordered_map<int, std::pair<const std::string, int>>
 data_type_descriptors ({
-  {DataType::Id::INT32, {"32 bit integer", 3}},
-  {DataType::Id::FLOAT, {"32 bit float", 3}},
+  {DataType::Id::INT32, {"32 bit integer", 4}},
+  {DataType::Id::FLOAT, {"32 bit float", 4}},
   {DataType::Id::HALF, {"16 bit float", 2}},
   {DataType::Id::BOOL, {"8 bit boolean", 1}},
   {DataType::Id::INT8, {"8 bit integer", 1}},

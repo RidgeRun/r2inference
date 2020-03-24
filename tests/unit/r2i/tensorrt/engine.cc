@@ -25,6 +25,8 @@
 
 #include "mockcudaengine.cc"
 
+#define INPUTS 3
+
 class MockModel : public r2i::IModel {
   r2i::RuntimeError Start (const std::string &name) override {
     r2i::RuntimeError error; return error;
@@ -40,6 +42,17 @@ cudaMalloc(void **devPtr, size_t size) {
   } else {
     return cudaErrorMemoryAllocation;
   }
+}
+
+__host__ cudaError_t CUDARTAPI
+cudaMemcpy(void *dst, const void *src,
+           size_t count, enum cudaMemcpyKind kind) {
+  return cudaSuccess;
+}
+
+__host__ __cudart_builtin__ cudaError_t CUDARTAPI
+cudaFree(void *devPtr) {
+  return cudaSuccess;
 }
 
 template <class T>
@@ -59,8 +72,16 @@ TEST_GROUP (TensorRTEngine) {
   std::shared_ptr<nvinfer1::IExecutionContext> context;
   std::shared_ptr<nvinfer1::ICudaEngine> cuda_engine;
 
+  float matrix[INPUTS];
+
   void setup () {
     error.Clean();
+
+    wrong_network_data_type = false;
+    wrong_num_bindings = false;
+    execute_error = false;
+    cudaMallocError = false;
+    output_binding = false;
 
     context = std::shared_ptr<nvinfer1::IExecutionContext> (new
               nvinfer1::MockExecutionContext,
@@ -76,12 +97,8 @@ TEST_GROUP (TensorRTEngine) {
 
     inc_model = std::make_shared<MockModel> ();
     frame = std::make_shared<r2i::tensorrt::Frame> ();
+    frame->Configure(matrix, INPUTS, 1, r2i::ImageFormat::RGB);
 
-    wrong_network_data_type = false;
-    wrong_num_bindings = false;
-    execute_error = false;
-    cudaMallocError = false;
-    output_binding = false;
   }
 };
 
@@ -94,6 +111,7 @@ TEST (TensorRTEngine, SetModelNull) {
   error = engine.SetModel (nullptr);
   LONGS_EQUAL (r2i::RuntimeError::Code::NULL_PARAMETER, error.GetCode ());
 }
+
 TEST (TensorRTEngine, SetModelInvalid) {
   error = engine.SetModel (inc_model);
   LONGS_EQUAL (r2i::RuntimeError::Code::INCOMPATIBLE_MODEL, error.GetCode ());

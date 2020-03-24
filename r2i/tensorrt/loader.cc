@@ -45,6 +45,12 @@ struct Logger: public
         tag = "VERBOSE";
         break;
     }
+    /*
+     * This function is meant as an input for the nvinfer runtime
+     * structure, this function is empty since this logging to the
+     * console isn't considered a good practice. This function could
+     * be extended to log to a file or a with a custom log level.
+     */
   }
 };
 

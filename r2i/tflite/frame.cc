@@ -63,5 +63,9 @@ ImageFormat Frame::GetFormat () {
   return this->frame_format;
 }
 
+DataType Frame::GetDataType () {
+  return r2i::DataType::Id::FLOAT;
+}
+
 }
 }

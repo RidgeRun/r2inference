@@ -40,8 +40,9 @@ cudaMalloc(void **devPtr, size_t size) {
   }
 }
 
-__host__ cudaError_t CUDARTAPI cudaMemcpy(void *dst, const void *src,
-    size_t count, enum cudaMemcpyKind kind) {
+__host__ cudaError_t CUDARTAPI
+cudaMemcpy(void *dst, const void *src,
+           size_t count, enum cudaMemcpyKind kind) {
   if (!cudaMemCpyError)
     return cudaSuccess;
   else

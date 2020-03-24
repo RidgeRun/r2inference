@@ -42,7 +42,6 @@ TEST_GROUP (TensorRTPrediction) {
   r2i::tensorrt::Prediction prediction;
   std::shared_ptr<float[]> matrix = std::shared_ptr<float[]> (new float[INPUTS]);
 
-
   int64_t raw_input_dims[1] = {INPUTS};
 
   void setup () {
@@ -59,19 +58,19 @@ TEST_GROUP (TensorRTPrediction) {
 };
 
 TEST (TensorRTPrediction, SetResultBufferSuccess) {
-  error = prediction.SetResultBuffer(matrix, INPUTS * sizeof(float));
+  error = prediction.SetResultBuffer(matrix, INPUTS, r2i::DataType::FLOAT);
   LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode());
 }
 
 TEST (TensorRTPrediction, SetNullResultBuffer) {
-  error = prediction.SetResultBuffer(nullptr, INPUTS * sizeof(float));
+  error = prediction.SetResultBuffer(nullptr, INPUTS, r2i::DataType::FLOAT);
   LONGS_EQUAL (r2i::RuntimeError::Code::NULL_PARAMETER, error.GetCode());
 }
 
 TEST (TensorRTPrediction, Prediction) {
   double result;
 
-  error = prediction.SetResultBuffer(matrix, INPUTS * sizeof(float));
+  error = prediction.SetResultBuffer(matrix, INPUTS, r2i::DataType::FLOAT);
   LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode());
 
   result = prediction.At (0, error);
@@ -80,7 +79,7 @@ TEST (TensorRTPrediction, Prediction) {
 }
 
 TEST (TensorRTPrediction, PredictionGetResultSize) {
-  error = prediction.SetResultBuffer(matrix, INPUTS * sizeof(float));
+  error = prediction.SetResultBuffer(matrix, INPUTS, r2i::DataType::FLOAT);
   LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode());
 
   LONGS_EQUAL (INPUTS * sizeof(float), prediction.GetResultSize());
@@ -93,7 +92,7 @@ TEST (TensorRTPrediction, PredictionNoTensor) {
 }
 
 TEST (TensorRTPrediction, PredictionNonExistentIndex) {
-  error = prediction.SetResultBuffer(matrix, INPUTS * sizeof(float));
+  error = prediction.SetResultBuffer(matrix, INPUTS, r2i::DataType::FLOAT);
   LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode());
 
   prediction.At (5, error);
@@ -102,7 +101,7 @@ TEST (TensorRTPrediction, PredictionNonExistentIndex) {
 
 TEST (TensorRTPrediction, PredictionCudaMemCpyError) {
   cudaMemCpyError = true;
-  error = prediction.SetResultBuffer(matrix, INPUTS * sizeof(float));
+  error = prediction.SetResultBuffer(matrix, INPUTS, r2i::DataType::FLOAT);
   LONGS_EQUAL (r2i::RuntimeError::Code::MEMORY_ERROR, error.GetCode());
 }
 
