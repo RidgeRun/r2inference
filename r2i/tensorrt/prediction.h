@@ -23,9 +23,13 @@ namespace tensorrt {
 class Prediction: public IPrediction {
  public:
   Prediction ();
+
   double At (unsigned int index,  r2i::RuntimeError &error) override;
+
   void *GetResultData () override;
+
   unsigned int GetResultSize () override;
+
   RuntimeError SetResultBuffer (std::shared_ptr<void> results, size_t size);
 
  private:

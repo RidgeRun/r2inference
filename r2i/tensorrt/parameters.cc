@@ -37,7 +37,7 @@ Parameters::Parameters () :
         r2i::ParameterMeta::Flags::READ,
         r2i::ParameterMeta::Type::STRING,
         std::make_shared<VersionAccessor>(this)),
-  PARAM("batch_size", "Batch size, can't be larger the one the engine was created with",
+  PARAM("batch_size", "Batch size, can't be larger than the one the engine was created with",
         r2i::ParameterMeta::Flags::READWRITE | r2i::ParameterMeta::Flags::WRITE_BEFORE_START,
         r2i::ParameterMeta::Type::INTEGER,
         std::make_shared<BatchSizeAccessor>(this)),
