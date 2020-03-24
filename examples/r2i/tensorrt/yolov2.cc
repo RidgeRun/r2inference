@@ -239,7 +239,7 @@ int main (int argc, char *argv[]) {
   std::shared_ptr<r2i::IFrame> frame = factory->MakeFrame (error);
 
   error = frame->Configure (image_data.get(), NETWORK_WIDTH, NETWORK_HEIGHT,
-                            r2i::ImageFormat::Id::RGB, r2i::DataType::Id::FLOAT);
+                            r2i::ImageFormat::Id::RGB);
 
   std::cout << "Starting engine" << std::endl;
   error = engine->Start ();
