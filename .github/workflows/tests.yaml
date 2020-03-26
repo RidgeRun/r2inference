@@ -23,4 +23,4 @@ jobs:
     - name: Configure the project
       run: |
         NOCONFIGURE=1 ./autogen.sh
-        ./configure 
+        ./configure --disable-docs
