@@ -31,3 +31,5 @@ jobs:
         ./configure --disable-docs --prefix $PREFIX --enable-tensorflow
     - name: Build
       run: make
+    - name: Run tests
+      run: make check
