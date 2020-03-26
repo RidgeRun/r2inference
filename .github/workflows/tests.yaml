@@ -29,3 +29,5 @@ jobs:
       run: |
         NOCONFIGURE=1 ./autogen.sh
         ./configure --disable-docs --prefix $PREFIX --enable-tensorflow
+    - name: Build
+      run: make
