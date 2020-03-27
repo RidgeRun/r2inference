@@ -14,8 +14,6 @@ jobs:
   build:
     runs-on: ubuntu-18.04
     container: ridgerun/r2inference:v0.1.1
-    env: 
-      PREFIX: /usr/lib/x86_64-linux-gnu/
     steps:
     - uses: actions/checkout@v2
     - name: Install backend version
@@ -25,7 +23,7 @@ jobs:
     - name: Configure the project
       run: |
         NOCONFIGURE=1 ./autogen.sh
-        ./configure --disable-docs --prefix $PREFIX --enable-tensorflow
+        ./configure --disable-docs --enable-tensorflow
     - name: Build
       run: make
     - name: Run tests
