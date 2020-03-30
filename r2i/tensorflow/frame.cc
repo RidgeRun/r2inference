@@ -209,5 +209,9 @@ RuntimeError Frame::GetTensorShape (std::shared_ptr<TF_Graph> pgraph,
   return error;
 }
 
+DataType Frame::GetDataType () {
+  return r2i::DataType::Id::FLOAT;
+}
+
 }
 }

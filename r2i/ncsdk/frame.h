@@ -30,6 +30,8 @@ class Frame : public IFrame {
 
   ImageFormat GetFormat () override;
 
+  virtual DataType GetDataType () override;
+
  private:
   float *frame_data;
   int frame_width;

@@ -1,4 +1,4 @@
-/* Copyright (C) 2018 RidgeRun, LLC (http://www.ridgerun.com)
+/* Copyright (C) 2018-2020 RidgeRun, LLC (http://www.ridgerun.com)
  * All Rights Reserved.
  *
  * The contents of this software are proprietary and confidential to RidgeRun,
@@ -9,16 +9,26 @@
  * back to RidgeRun without any encumbrance.
 */
 
-#include "r2i/ncsdk/frame.h"
-#include "r2i/ncsdk/statuscodes.h"
+#include "r2i/tensorrt/frame.h"
+
+#include <cuda.h>
+#include <cuda_runtime.h>
 
 namespace r2i {
-namespace ncsdk {
+namespace tensorrt {
+
+Frame::Frame () :
+  frame_data(nullptr), frame_width(0), frame_height(0),
+  frame_format(ImageFormat::Id::UNKNOWN_FORMAT) {
+}
 
 RuntimeError Frame::Configure (void *in_data, int width,
                                int height, r2i::ImageFormat::Id format) {
   RuntimeError error;
-  ImageFormat imageformat (format);
+  cudaError_t cuda_error;
+  ImageFormat image_format (format);
+
+  DataType data_type (r2i::DataType::FLOAT);
 
   if (nullptr == in_data) {
     error.Set (RuntimeError::Code::NULL_PARAMETER, "Received a NULL data pointer");
@@ -35,16 +45,36 @@ RuntimeError Frame::Configure (void *in_data, int width,
     return error;
   }
 
-  this->frame_data = static_cast<float *>(in_data);
+  /* FIXME cudaMalloc is an expensive operation, this should be only done when necessary */
+  size_t frame_size = width * height * image_format.GetNumPlanes() *
+                      data_type.GetBytesPerPixel();
+  void *buff;
+  cuda_error = cudaMalloc (&buff, frame_size);
+  if (cudaSuccess != cuda_error) {
+    error.Set (RuntimeError::Code::MEMORY_ERROR,
+               "Unable to allocate managed buffer");
+    return error;
+  }
+  this->frame_data = std::shared_ptr <void> (buff, cudaFree);
+
+  cuda_error = cudaMemcpy(this->frame_data.get(), in_data, frame_size,
+                          cudaMemcpyHostToDevice);
+  if (cudaSuccess != cuda_error) {
+    error.Set (RuntimeError::Code::MEMORY_ERROR,
+               "Unable to copy data to buffer");
+    return error;
+  }
+
   this->frame_width = width;
   this->frame_height = height;
-  this->frame_format = imageformat;
+  this->frame_format = image_format;
+  this->data_type = data_type;
 
   return error;
 }
 
 void *Frame::GetData () {
-  return this->frame_data;
+  return this->frame_data.get();
 }
 
 int Frame::GetWidth () {
@@ -60,7 +90,7 @@ ImageFormat Frame::GetFormat () {
 }
 
 DataType Frame::GetDataType () {
-  return r2i::DataType::Id::FLOAT;
+  return this->data_type;
 }
 
 }

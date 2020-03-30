@@ -1,4 +1,4 @@
-/* Copyright (C) 2018 RidgeRun, LLC (http://www.ridgerun.com)
+/* Copyright (C) 2018-2020 RidgeRun, LLC (http://www.ridgerun.com)
  * All Rights Reserved.
  *
  * The contents of this software are proprietary and confidential to RidgeRun,
@@ -9,13 +9,13 @@
  * back to RidgeRun without any encumbrance.
 */
 
-#ifndef R2I_TFLITE_FRAME_H
-#define R2I_TFLITE_FRAME_H
+#ifndef R2I_TENSORRT_FRAME_H
+#define R2I_TENSORRT_FRAME_H
 
 #include <r2i/iframe.h>
 
 namespace r2i {
-namespace tflite {
+namespace tensorrt {
 
 class Frame : public IFrame {
  public:
@@ -32,17 +32,18 @@ class Frame : public IFrame {
 
   ImageFormat GetFormat () override;
 
-  virtual DataType GetDataType () override;
+  DataType GetDataType () override;
 
  private:
-  float *frame_data;
+  /* This backend stores its own copy of */
+  std::shared_ptr<void> frame_data;
   int frame_width;
   int frame_height;
   ImageFormat frame_format;
-
+  DataType data_type;
 };
 
 }
 }
 
-#endif //R2I_TFLITE_FRAME_H
+#endif //R2I_TENSORRT_FRAME_H

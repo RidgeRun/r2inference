@@ -22,9 +22,14 @@ if HAVE_TFLITE
 SUBDIRS += tflite
 endif
 
+if HAVE_TENSORRT
+SUBDIRS += tensorrt
+endif
+
 DIST_SUBDIRS =          \
         ncsdk           \
         tensorflow      \
+        tensorrt        \
         tflite
 
 lib_LTLIBRARIES = libr2inference-@RR_PACKAGE_VERSION@.la
@@ -33,6 +38,7 @@ lib_LTLIBRARIES = libr2inference-@RR_PACKAGE_VERSION@.la
 r2iincludedir = @R2IINCLUDEDIR@/r2i
 
 libr2inference_@RR_PACKAGE_VERSION@_la_SOURCES =    \
+        datatype.cc                                 \
         iframeworkfactory.cc                        \
         runtimeerror.cc                             \
         imageformat.cc
@@ -54,6 +60,7 @@ libr2inference_@RR_PACKAGE_VERSION@_la_LIBADD =     \
         $(CODE_COVERAGE_LIBS)
 
 r2iinclude_HEADERS =         \
+        datatype.h           \
         frameworkmeta.h      \
         frameworks.h         \
         iengine.h            \
@@ -77,6 +84,11 @@ endif
 if HAVE_TENSORFLOW
 libr2inference_@RR_PACKAGE_VERSION@_la_LIBADD +=    \
         $(top_builddir)/r2i/tensorflow/libtf.la
+endif
+
+if HAVE_TENSORRT
+libr2inference_@RR_PACKAGE_VERSION@_la_LIBADD +=    \
+        $(top_builddir)/r2i/tensorrt/libtensorrt.la
 endif
 
 if HAVE_TFLITE

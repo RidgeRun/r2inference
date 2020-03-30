@@ -17,7 +17,8 @@ noinst_PROGRAMS =                  \
 
 AM_CXXFLAGS =                      \
         $(RR_CXXFLAGS)             \
-        $(CODE_COVERAGE_CXXFLAGS)
+        $(CODE_COVERAGE_CXXFLAGS)  \
+        -I../common/
 
 AM_CFLAGS =                        \
         $(RR_CFLAGS)               \

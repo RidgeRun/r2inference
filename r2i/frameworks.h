@@ -37,6 +37,11 @@ enum FrameworkCode {
   TFLITE,
 
   /**
+   * NVIDIA's TensorRT Lite
+   */
+  TENSORRT,
+
+  /**
    * Number of supported frameworks, mostly for testing purposes.
    */
   MAX_FRAMEWORK
