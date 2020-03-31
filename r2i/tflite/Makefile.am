@@ -43,8 +43,8 @@ libtflite_la_LIBADD =                \
     $(TFLITE_LIBS)           \
     $(CODE_COVERAGE_LIBS)
 
-libtflite_la_LDFLAGS =							 \
-		-pthread -ldl -lrt
+libtflite_la_LDFLAGS =		     \
+    $(TFLITE_LDFLAGS)
 
 tensorflowliteinclude_HEADERS =      \
     model.h                          \
