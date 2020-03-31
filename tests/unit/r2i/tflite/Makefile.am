@@ -54,6 +54,7 @@ AM_LDFLAGS =                        \
         $(TFLITE_LIBS)      \
         $(TESTS_LIBS)               \
         $(CODE_COVERAGE_LIBS)       \
+        $(TFLITE_LDFLAGS)           \
         $(top_builddir)/r2i/libr2inference-@RR_PACKAGE_VERSION@.la
 
 CLEANFILES = cpputest_*.xml

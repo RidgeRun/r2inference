@@ -52,6 +52,10 @@ RR_CHECK_FEATURE_LIB(TENSORFLOW, TensorFlow Installation,
 AC_LANG_PUSH([C++])
 RR_CHECK_FEATURE_LIB(TFLITE, TensorFlow lite Installation,
                      tensorflow-lite, TfLiteTypeGetName, tensorflow/lite/model.h, no)
+
+# add specific LDFLAGS for TFLITE
+AC_SUBST([TFLITE_LDFLAGS], ["-pthread -ldl -lrt"])
+
 AC_LANG_POP([C++])
 
 # Our Include path, to be shared in multiple makefiles
