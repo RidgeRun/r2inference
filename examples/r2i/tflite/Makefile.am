@@ -28,7 +28,7 @@ AM_CPPFLAGS =                      \
         $(RR_CPPFLAGS)             \
         $(CODE_COVERAGE_CPPFLAGS)
 
-AM_LDFLAGS =                       \
+LDADD =                            \
         $(RR_LIBS)                 \
         $(TFLITE_LIBS)             \
         $(CODE_COVERAGE_LIBS)      \

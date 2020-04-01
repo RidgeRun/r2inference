@@ -36,22 +36,22 @@ LOG_DRIVER=$(top_builddir)/common/rr-test-driver.py $(SINGLE_PROCESS)
 AM_CXXFLAGS =                       \
         $(RR_CXXFLAGS)              \
         $(TESTS_CFLAGS)             \
-        $(TFLITE_CFLAGS)    \
+        $(TFLITE_CFLAGS)            \
         $(CODE_COVERAGE_CXXFLAGS)
 
 AM_CFLAGS =                         \
         $(RR_CFLAGS)                \
         $(TESTS_CFLAGS)             \
-        $(TFLITE_CFLAGS)    \
+        $(TFLITE_CFLAGS)            \
         $(CODE_COVERAGE_CFLAGS)
 
 AM_CPPFLAGS =                       \
         $(RR_CPPFLAGS)              \
         $(CODE_COVERAGE_CPPFLAGS)
 
-AM_LDFLAGS =                        \
+LDADD =                             \
         $(RR_LIBS)                  \
-        $(TFLITE_LIBS)      \
+        $(TFLITE_LIBS)              \
         $(TESTS_LIBS)               \
         $(CODE_COVERAGE_LIBS)       \
         $(TFLITE_LDFLAGS)           \
