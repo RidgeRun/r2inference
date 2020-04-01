@@ -54,7 +54,7 @@ RR_CHECK_FEATURE_LIB(TFLITE, TensorFlow lite Installation,
                      tensorflow-lite, TfLiteTypeGetName, tensorflow/lite/model.h, no)
 
 # add specific LDFLAGS for TFLITE
-AC_SUBST([TFLITE_LDFLAGS], ["-pthread -ldl -lrt"])
+AC_SUBST([TFLITE_LIBS], ["$TFLITE_LIBS -pthread -ldl -lrt"])
 
 AC_LANG_POP([C++])
 
