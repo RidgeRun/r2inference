@@ -53,6 +53,9 @@ AC_LANG_PUSH([C++])
 RR_CHECK_FEATURE_LIB(TFLITE, TensorFlow lite Installation,
                      tensorflow-lite, TfLiteTypeGetName, tensorflow/lite/model.h, no)
 
+# add specific LIBS for TFLITE
+AC_SUBST([TFLITE_LIBS], ["$TFLITE_LIBS -pthread -ldl -lrt"])
+
 RR_CHECK_FEATURE_LIB(TENSORRT, TensorRT Installation,
                      nvinfer, createInferBuilder_INTERNAL, NvInfer.h, no)
 AC_LANG_POP([C++])
