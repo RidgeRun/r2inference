@@ -10,7 +10,7 @@
 
 # Initialize autoconf.
 AC_PREREQ([2.69])
-AC_INIT([RidgeRun inference library],[0.5.2],[https://github.com/RidgeRun/r2inference/issues],[r2inference])
+AC_INIT([RidgeRun inference library],[0.5.3],[https://github.com/RidgeRun/r2inference/issues],[r2inference])
 
 # Initialize our build utils
 RR_INIT
@@ -52,6 +52,10 @@ RR_CHECK_FEATURE_LIB(TENSORFLOW, TensorFlow Installation,
 AC_LANG_PUSH([C++])
 RR_CHECK_FEATURE_LIB(TFLITE, TensorFlow lite Installation,
                      tensorflow-lite, TfLiteTypeGetName, tensorflow/lite/model.h, no)
+
+# add specific LIBS for TFLITE
+AC_SUBST([TFLITE_LIBS], ["$TFLITE_LIBS -pthread -ldl -lrt"])
+
 AC_LANG_POP([C++])
 
 # Our Include path, to be shared in multiple makefiles
