@@ -41,5 +41,7 @@ jobs:
         cp /root/r2inference/backends/tflite/v2.0.1/binaries/libtensorflow-lite.a /usr/local/lib/    
     - name: Configure the project
       run: |
-        export CPPFLAGS="${{ env.CPPFLAGS }}" 
+        CPPFLAGS="${{ env.CPPFLAGS }}" 
         ./autogen.sh --disable-docs --enable-tflite
+        make
+
