@@ -57,6 +57,7 @@ RR_CHECK_FEATURE_LIB(TENSORRT, TensorRT Installation,
                      nvinfer, createInferBuilder_INTERNAL, NvInfer.h, no)
 AC_LANG_POP([C++])
 
+AM_CONDITIONAL([PLATFORM_IS_GPU], [false])
 AM_COND_IF([HAVE_TENSORRT], [RR_CHECK_CUDA], [])
 
 # Our Include path, to be shared in multiple makefiles
