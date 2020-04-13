@@ -43,5 +43,7 @@ jobs:
       run: |
         CPPFLAGS="${{ env.CPPFLAGS }}" 
         ./autogen.sh --disable-docs --enable-tflite
-        make
-
+    - name: Build project
+      run: make
+    - name: Check build
+      run:  make check
