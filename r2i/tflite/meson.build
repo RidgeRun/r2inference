@@ -19,7 +19,7 @@ tflite_sources = [
   'prediction.cc',
 ]
 
-tflite__headers = [
+tflite_headers = [
   'engine.h',
   'frame.h',
   'frameworkfactory.h',
@@ -29,18 +29,21 @@ tflite__headers = [
   'prediction.h',
 ]
 
+lib_tflite_dir = meson.current_source_dir()
+
 # Build library
 tflite_lib = library('tflite_-@0@'.format(project_version),
   tflite_sources,
   c_args : c_args,
   version : project_version,
   install : true,
-  install_dir : lib_install_dir,
+  install_dir : lib_tflite_dir,
   include_directories : [configinc, r2i_inc_dir],
   dependencies : [lib_tflite_dep, r2inference_lib_dep],
 )
 
-lib_tf_dir = meson.current_source_dir()
+# Install library header files
+install_headers(tflite_headers, subdir : 'r2inference-0.0' / 'r2i' / 'tensorflowlite')
 
 # Define the library as an internal dependency to the current build
 gst_internal_dep = declare_dependency(link_with: tflite_lib)

@@ -43,11 +43,14 @@ r2inference_lib = library('r2inference-@0@'.format(project_version),
   install_dir : lib_install_dir,
 )
 
-# Install library header file
-install_headers('r2i.h')
+# Install library header files
+install_headers(r2inference_headers, subdir : 'r2inference-0.0' / 'r2i')
 
 # Generate pfgconfig file
-pkgconfig.generate(r2inference_lib, description : 'r2inference libary')
+pkgconfig.generate(libraries : r2inference_lib,
+                  subdirs : 'r2inference-0.0' / 'r2i',
+                  description : 'r2inference library',
+                  name: 'r2inference-0.0')
 
 lib_r2inference_dir = meson.current_source_dir()
 
