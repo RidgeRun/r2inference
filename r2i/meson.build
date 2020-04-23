@@ -33,10 +33,12 @@ r2inference_headers = [
   'runtimeerror.h',
 ]
 
+message(c_args)
+
 # Build library
 r2inference_lib = library('r2inference-@0@'.format(project_version),
   r2inference_sources,
-  c_args : c_args,
+  cpp_args : c_args,
   version : project_version,
   include_directories : configinc,
   install : true,
@@ -44,7 +46,7 @@ r2inference_lib = library('r2inference-@0@'.format(project_version),
 )
 
 # Install library header files
-install_headers(r2inference_headers, subdir : 'r2inference-0.0' / 'r2i')
+  install_headers(r2inference_headers, subdir : 'r2inference-0.0' / 'r2i')
 
 # Generate pfgconfig file
 pkgconfig.generate(libraries : r2inference_lib,

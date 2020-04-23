@@ -34,10 +34,10 @@ lib_tf_dir = meson.current_source_dir()
 # Build library
 tf_lib = library('tf-@0@'.format(project_version),
   tf_sources,
-  c_args : c_args,
+  cpp_args : c_args,
   version : project_version,
   install : true,
-  install_dir : lib_tf_dir,
+  install_dir : lib_install_dir,
   include_directories : [configinc, r2i_inc_dir],
   dependencies : [lib_tf_dep, r2inference_lib_dep],
 )
@@ -46,4 +46,4 @@ tf_lib = library('tf-@0@'.format(project_version),
 install_headers(tf_headers, subdir : 'r2inference-0.0' / 'r2i' / 'tensorflow')
 
 # Define the library as an internal dependency to the current build
-gst_internal_dep = declare_dependency(link_with: tf_lib)
+gst_internal_tf_dep = declare_dependency(link_with: [tf_lib, r2inference_lib], dependencies: lib_tf_dep, include_directories: r2i_inc_dir)

@@ -10,7 +10,8 @@
 
 project('r2inference', ['c','cpp'],
   version : '0.6.0',
-  meson_version : '>= 0.50',)
+  meson_version : '>= 0.50',
+  default_options: ['libdir=/usr/local/lib/', 'prefix=/usr/local/'],)
 
 project_name = meson.project_name()
 project_version = meson.project_version()
@@ -50,6 +51,10 @@ if get_option('enable-tflite')
   lib_tflite_dep = [tensorflow_lite_dep, thread_dep]
 endif
 
+#Find dependencies for TESTS
+lib_tests = dependency('cpputest', required: true)
+tests_dep = declare_dependency(dependencies: lib_tests)
+
 # Verify if profiling was enabled
 if get_option('enable-profiling').enabled()
   profiler_dep = dependency('libprofiler')
@@ -71,9 +76,25 @@ r2i_inc_dir = include_directories('r2i/')
 # Define compiler args and include directories
 c_args = ['-DHAVE_CONFIG_H']
 
-# Define installation directories
+if get_option('enable-tensorflow')
+  c_args += ['-DHAVE_TENSORFLOW']
+endif
 
+if get_option('enable-tflite')
+  c_args += ['-DHAVE_TFLITE']
+endif
+
+# Define installation directories
+##lib_install_dir = '/usr/local'
+##if get_option('libdir')
+##  message('NO HAY LIBDIR')
+##  lib_install_dir = get_option('libdir')
+##endif
+
+# Define installation directories
+prefix = get_option('prefix')
 lib_install_dir = get_option('libdir')
+
 lib_pkgconfig_install_dir = join_paths(get_option('libdir'), 'pkgconfig')
 
 # Verify if the warning flags are available in the compiler
@@ -194,3 +215,6 @@ configure_file(output : 'config.h', configuration : cdata)
 
 # Enter to each subdirectory and execute the meson.build
 subdir('r2i')
+subdir('tests')
+subdir('examples')
+subdir('docs')
