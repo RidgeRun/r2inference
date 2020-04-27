@@ -8,6 +8,16 @@
 # a software license from RidgeRun.  All source code changes must be provided
 # back to RidgeRun without any encumbrance.
 
+if get_option('enable-tensorflow')
+  subdir('tensorflow')
+  r2inference_internal_dep = [gst_internal_tf_dep]
+endif
+
+if get_option('enable-tflite')
+  subdir('tflite')
+  r2inference_internal_dep += [gst_internal_tflite_dep]
+endif
+
 # Define source code
 r2inference_sources = [
   'datatype.cc',
@@ -33,20 +43,19 @@ r2inference_headers = [
   'runtimeerror.h',
 ]
 
-message(c_args)
-
 # Build library
 r2inference_lib = library('r2inference-@0@'.format(project_version),
   r2inference_sources,
   cpp_args : c_args,
   version : project_version,
-  include_directories : configinc,
+  include_directories : [configinc],
   install : true,
   install_dir : lib_install_dir,
+  dependencies : r2inference_internal_dep,
 )
 
 # Install library header files
-  install_headers(r2inference_headers, subdir : 'r2inference-0.0' / 'r2i')
+install_headers(r2inference_headers, subdir : 'r2inference-0.0' / 'r2i')
 
 # Generate pfgconfig file
 pkgconfig.generate(libraries : r2inference_lib,
@@ -57,12 +66,4 @@ pkgconfig.generate(libraries : r2inference_lib,
 lib_r2inference_dir = meson.current_source_dir()
 
 # Define the library as an internal dependency to the current build
-r2inference_lib_dep = declare_dependency(link_with: r2inference_lib)
-
-if get_option('enable-tensorflow')
-  subdir('tensorflow')
-endif
-
-if get_option('enable-tflite')
-  subdir('tflite')
-endif
+r2inference_lib_dep = declare_dependency(link_with: r2inference_lib, dependencies: r2inference_internal_dep)

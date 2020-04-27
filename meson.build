@@ -74,7 +74,7 @@ configinc = include_directories('.')
 r2i_inc_dir = include_directories('r2i/')
 
 # Define compiler args and include directories
-c_args = ['-DHAVE_CONFIG_H']
+c_args = ['-DHAVE_CONFIG_H', '-std=c++14']
 
 if get_option('enable-tensorflow')
   c_args += ['-DHAVE_TENSORFLOW']
