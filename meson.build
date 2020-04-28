@@ -11,7 +11,7 @@
 project('r2inference', ['c','cpp'],
   version : '0.6.0',
   meson_version : '>= 0.50',
-  default_options: ['libdir=/usr/local/lib/', 'prefix=/usr/local/'],)
+  default_options: ['libdir=/usr/local/lib/', 'prefix=/usr/local/', 'includedir=/usr/local/include/r2inference-0.0'],)
 
 project_name = meson.project_name()
 project_version = meson.project_version()
