@@ -55,7 +55,7 @@ r2inference_lib = library('r2inference-@0@'.format(project_version),
 )
 
 # Install library header files
-install_headers(r2inference_headers, subdir : '../')
+install_headers(r2inference_headers, subdir : '../r2inference-0.0' / 'r2i')
 
 # Generate pfgconfig file
 pkgconfig.generate(libraries : r2inference_lib,

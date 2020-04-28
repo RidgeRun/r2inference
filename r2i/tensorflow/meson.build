@@ -41,7 +41,7 @@ tf_lib = static_library('tf-@0@'.format(project_version),
 )
 
 # Install library header files
-install_headers(tf_headers, subdir : 'r2inference-0.0' / 'r2i' / 'tensorflow')
+install_headers(tf_headers, subdir : '../r2inference-0.0' / 'r2i' / 'tensorflow')
 
 # Define the library as an internal dependency to the current build
 gst_internal_tf_dep = declare_dependency(link_with: tf_lib, dependencies: lib_tf_dep, include_directories: r2i_inc_dir)
