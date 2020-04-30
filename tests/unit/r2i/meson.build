@@ -19,7 +19,7 @@ foreach t : lib_r2inference_tests
       c_args : test_flags,
       cpp_args : test_flags,
       include_directories : [configinc, r2i_inc_dir],
-      dependencies : [r2inference_lib_dep, gst_internal_tf_dep, tests_dep],
+      dependencies : [r2inference_lib_dep, tests_dep],
   )
   # Run tests
   test(test_name, exe, timeout : 60)

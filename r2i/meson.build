@@ -8,6 +8,8 @@
 # a software license from RidgeRun.  All source code changes must be provided
 # back to RidgeRun without any encumbrance.
 
+r2inference_internal_dep = []
+
 if get_option('enable-tensorflow')
   subdir('tensorflow')
   r2inference_internal_dep = [gst_internal_tf_dep]
