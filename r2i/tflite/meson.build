@@ -44,4 +44,4 @@ tflite_lib = static_library('tflite-@0@'.format(project_version),
 install_headers(tflite_headers, subdir : '../r2inference-0.0' / 'r2i' / 'tensorflowlite')
 
 # Define the library as an internal dependency to the current build
-gst_internal_tflite_dep = declare_dependency(link_with: tflite_lib, dependencies: lib_tflite_dep, include_directories: r2i_inc_dir)
+internal_tflite_dep = declare_dependency(link_with: tflite_lib, dependencies: lib_tflite_dep, include_directories: r2i_inc_dir)

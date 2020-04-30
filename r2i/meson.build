@@ -7,7 +7,7 @@ endif
 
 if get_option('enable-tflite')
   subdir('tflite')
-  r2inference_internal_dep += [gst_internal_tflite_dep]
+  r2inference_internal_dep += [internal_tflite_dep]
 endif
 
 # Define source code
