@@ -1,17 +1,6 @@
-# Copyright (C) 2020 RidgeRun, LLC (http://www.ridgerun.com)
-# All Rights Reserved.
-#
-# The contents of this software are proprietary and confidential to RidgeRun,
-# LLC.  No part of this program may be photocopied, reproduced or translated
-# into another programming language without prior written consent of
-# RidgeRun, LLC.  The user is free to modify the source code after obtaining
-# a software license from RidgeRun.  All source code changes must be provided
-# back to RidgeRun without any encumbrance.
-
 project('r2inference', ['c','cpp'],
   version : '0.6.0',
-  meson_version : '>= 0.50',
-  default_options: ['libdir=/usr/local/lib/', 'prefix=/usr/local/', 'includedir=/usr/local/include/r2inference-0.0'],)
+  meson_version : '>= 0.50',)
 
 project_name = meson.project_name()
 project_version = meson.project_version()
@@ -71,7 +60,7 @@ endif
 
 # Define header directories
 configinc = include_directories('.')
-r2i_inc_dir = include_directories('r2i/')
+r2i_inc_dir = include_directories('r2i')
 
 # Define compiler args and include directories
 c_args = ['-DHAVE_CONFIG_H', '-std=c++11']
@@ -85,17 +74,8 @@ if get_option('enable-tflite')
 endif
 
 # Define installation directories
-##lib_install_dir = '/usr/local'
-##if get_option('libdir')
-##  message('NO HAY LIBDIR')
-##  lib_install_dir = get_option('libdir')
-##endif
-
-# Define installation directories
 prefix = get_option('prefix')
 lib_install_dir = get_option('libdir')
-
-lib_pkgconfig_install_dir = join_paths(get_option('libdir'), 'pkgconfig')
 
 # Verify if the warning flags are available in the compiler
 # If the flags is availale for the compiler it wiil be used in all compiler
