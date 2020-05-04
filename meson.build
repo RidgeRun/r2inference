@@ -179,8 +179,8 @@ foreach h : check_headers
   endif
 endforeach
 
-# Gtk documentation
-gnome = import('gnome')
+# Doxygen documentation
+doxygen = find_program('doxygen', required: true)
 
 # Imports pkgconfig module
 pkgconfig = import('pkgconfig')

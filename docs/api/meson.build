@@ -1,6 +1,5 @@
 '@0@/r2i/'.format(meson.source_root())
 
-doxygen = find_program('doxygen', required: true)
 if get_option('enable-docs').enabled() and doxygen.found()
  conf_data = configuration_data()
  conf_data.set('DOXYGEN_INPUT', meson.source_root())
