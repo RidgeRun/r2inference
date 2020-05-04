@@ -29,7 +29,9 @@ jobs:
     - name: Run tests
       run: make check
     - name: Install library
-      run: make install
+      run: |
+        make install
+        ldconfig
     - name: Build example
       run: |
         cd examples/external
@@ -49,13 +51,15 @@ jobs:
     - name: Configure the project
       run: |
         CPPFLAGS="${{ env.CPPFLAGS }}"
-        ./autogen.sh --disable-docs --enable-tflite
+        ./autogen.sh --disable-docs --enable-tflite --enable-tensorflow
     - name: Build library
       run: make
     - name: Run tests
       run:  make check
     - name: Install library
-      run: make install
+      run: |
+        make install
+        ldconfig
     - name: Build example
       run: |
         cd examples/external
