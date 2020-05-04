@@ -33,7 +33,6 @@ tflite_headers = [
 tflite_lib = static_library('tflite-@0@'.format(project_version),
   tflite_sources,
   cpp_args : c_args,
-  version : project_version,
   install : true,
   install_dir : lib_install_dir,
   include_directories : [configinc, r2i_inc_dir],
