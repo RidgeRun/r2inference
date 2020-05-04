@@ -41,8 +41,7 @@ if get_option('enable-tflite')
 endif
 
 #Find dependencies for TESTS
-lib_tests = dependency('cpputest', required: true)
-tests_dep = declare_dependency(dependencies: lib_tests)
+tests_dep = dependency('cpputest', required: true)
 
 # Verify if profiling was enabled
 if get_option('enable-profiling').enabled()
