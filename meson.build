@@ -180,7 +180,10 @@ foreach h : check_headers
 endforeach
 
 # Doxygen documentation
-doxygen = find_program('doxygen', required: true)
+if get_option('enable-docs').enabled()
+  doxygen = find_program('doxygen', required: true)
+endif
+
 
 # Imports pkgconfig module
 pkgconfig = import('pkgconfig')
