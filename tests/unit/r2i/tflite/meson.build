@@ -1,3 +1,5 @@
+subdir('resources')
+
 lib_tflite_tests = [
   ['engine.cc'],
   ['frame.cc'],
