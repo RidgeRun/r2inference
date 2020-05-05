@@ -31,6 +31,8 @@ jobs:
       run: |
         make install
     - name: Build example
+      env:
+        LD_LIBRARY_PATH: /usr/local/lib/
       run: |
         cd examples/external
         make
@@ -58,6 +60,8 @@ jobs:
       run: |
         make install
     - name: Build example
+      env:
+        LD_LIBRARY_PATH: /usr/local/lib/
       run: |
         cd examples/external
         make
