@@ -28,6 +28,8 @@ foreach t : lib_tensorflow_tests
       dependencies : [r2inference_lib_dep, tests_dep, lib_tf_dep],
   )
   # Run tests
-  test(test_name, exe, timeout : 60)
+  test(test_name, exe,
+       args : '-p',
+       timeout : 60)
 
 endforeach

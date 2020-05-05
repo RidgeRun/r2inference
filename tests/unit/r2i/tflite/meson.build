@@ -30,6 +30,7 @@ foreach t : lib_tflite_tests
 
   # Run tests
   test(test_name, exe,
+       args : '-p',
        timeout : 60,
        workdir : meson.current_build_dir())
 
