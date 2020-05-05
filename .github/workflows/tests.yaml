@@ -31,7 +31,6 @@ jobs:
     - name: Install library
       run: |
         make install
-        ldconfig
     - name: Build example
       run: |
         cd examples/external
@@ -59,7 +58,6 @@ jobs:
     - name: Install library
       run: |
         make install
-        ldconfig
     - name: Build example
       run: |
         cd examples/external
