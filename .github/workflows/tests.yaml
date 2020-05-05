@@ -77,7 +77,7 @@ jobs:
         ldconfig
     - name: Configure the project
       run: |
-        meson build -Denable-tensorflow=true
+        meson build -Denable-tensorflow=true -Denable-docs=disabled
     - name: Build library
       run: ninja -C build
     - name: Run tests
@@ -103,7 +103,7 @@ jobs:
     - name: Configure the project
       run: |
         CPPFLAGS="${{ env.CPPFLAGS }}"
-        meson build -Denable-tflite=true
+        meson build -Denable-tflite=true -Denable-docs=disabled
     - name: Build library
       run: ninja -C build
     - name: Run tests
