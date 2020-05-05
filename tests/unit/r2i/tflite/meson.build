@@ -27,7 +27,10 @@ foreach t : lib_tflite_tests
       include_directories : [configinc, r2i_inc_dir],
       dependencies : [r2inference_lib_dep, tests_dep, lib_tflite_dep],
   )
+
   # Run tests
-  test(test_name, exe, timeout : 60)
+  test(test_name, exe,
+       timeout : 60,
+       workdir : meson.current_build_dir())
 
 endforeach
