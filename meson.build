@@ -1,4 +1,4 @@
-project('r2inference', ['c','cpp'],
+project('r2inference', ['c','cpp'], default_options : ['cpp_std=c++11'],
   version : '0.6.0',
   meson_version : '>= 0.50',)
 
