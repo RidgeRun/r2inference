@@ -10,7 +10,7 @@ on:
       - dev-*
 
 jobs:
-  build_tensorflow:
+  build_tensorflow_autotools:
     runs-on: ubuntu-18.04
     container: ridgerun/r2inference:v0.1.1
     steps:
@@ -37,7 +37,7 @@ jobs:
         cd examples/external
         make
         ./list-backends
-  build_tflite:
+  build_tflite_autotools:
     runs-on: ubuntu-18.04
     container: ridgerun/r2inference:v0.1.3
     env:
@@ -66,3 +66,52 @@ jobs:
         cd examples/external
         make
         ./list-backends
+  build_tensorflow_meson:
+    runs-on: ubuntu-18.04
+    container: ridgerun/r2inference:v0.1.1
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install backend version
+      run: |
+        tar -C /usr/local -xzf /root/r2inference/backends/tensorflow/v1.15.0/libtensorflow-cpu-linux-x86_64-1.15.0.tar.gz
+        ldconfig
+    - name: Configure the project
+      run: |
+        meson build -Denable-tensorflow=true
+    - name: Build library
+      run: ninja -C build
+    - name: Run tests
+      run: ninja -C build test
+    - name: Install library
+      run: |
+        ninja -C build install
+    - name: Build example
+      run: |
+        cd build/examples/external
+        ./list_backends
+  build_tflite_meson:
+    runs-on: ubuntu-18.04
+    container: ridgerun/r2inference:v0.1.3
+    env:
+      TENSORFLOW_PATH: /root/r2inference/backends/tflite/v2.0.1/include/tensorflow
+      CPPFLAGS: "-I${TENSORFLOW_PATH} -I${TENSORFLOW_PATH}/tensorflow/lite/tools/make/downloads/flatbuffers/include"
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install backend version
+      run: |
+        cp /root/r2inference/backends/tflite/v2.0.1/binaries/libtensorflow-lite.a /usr/local/lib/
+    - name: Configure the project
+      run: |
+        CPPFLAGS="${{ env.CPPFLAGS }}"
+        meson build -Denable-tflite=true
+    - name: Build library
+      run: ninja -C build
+    - name: Run tests
+      run: ninja -C build test
+    - name: Install library
+      run: |
+        ninja -C build install
+    - name: Build example
+      run: |
+        cd build/examples/external
+        ./list_backends
