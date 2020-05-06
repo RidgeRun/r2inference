@@ -1,19 +1,21 @@
-'@0@/r2i/'.format(meson.source_root())
-
 if get_option('enable-docs').enabled() and doxygen.found()
- conf_data = configuration_data()
- conf_data.set('DOXYGEN_INPUT', meson.source_root())
- conf_data.set('DOXYGEN_OUTPUT', meson.current_build_dir())
 
- doxyfile = configure_file(
-   input: '@0@/common/'.format(meson.source_root()) / 'Doxyfile',
-   output: 'Doxyfile',
-   configuration: conf_data
- )
+ #Configure env variables used in Doxyfile.in
+ cdata = configuration_data()
+ cdata.set('TOP_SRCDIR', meson.source_root())
+ cdata.set('TOP_BUILDDIR', meson.build_root())
 
- custom_target('doc',
-   build_by_default: true,
-   command: [doxygen, doxyfile],
-   output: ['html']
- )
+ doxyfile = configure_file(input: 'Doxyfile.in',
+                          output: 'Doxyfile',
+                          configuration: cdata,
+                          install: false)
+
+ install_docs_dir = join_paths(get_option('datadir'), 'doc', 'r2inference')
+
+ html_target = custom_target('r2i-docs',
+                            input: doxyfile,
+                            output: 'html',
+                            command: [doxygen, doxyfile],
+                            install: true,
+                            install_dir: install_docs_dir)
 endif
