@@ -36,9 +36,9 @@ r2inference_headers = [
 ]
 
 # Build library
-r2inference_lib = library('r2inference-@0@'.format(project_version),
+r2inference_lib = library('r2inference-@0@.0'.format(version_major),
   r2inference_sources,
-  cpp_args : c_args,
+  cpp_args : cpp_args,
   version : project_version,
   include_directories : [configinc],
   install : true,

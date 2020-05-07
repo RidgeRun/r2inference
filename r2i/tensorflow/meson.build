@@ -22,9 +22,6 @@ tf_headers = [
 # Build library
 tf_lib = static_library('tf-@0@'.format(project_version),
   tf_sources,
-  cpp_args : c_args,
-  install : true,
-  install_dir : lib_install_dir,
   include_directories : [configinc, r2i_inc_dir],
   dependencies : [lib_tf_dep],
 )

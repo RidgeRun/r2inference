@@ -1,4 +1,4 @@
-project('r2inference', ['c','cpp'], default_options : ['cpp_std=c++11'],
+project('r2inference', ['cpp'], default_options : ['cpp_std=c++11'],
   version : '0.6.0',
   meson_version : '>= 0.50',)
 
@@ -16,27 +16,26 @@ endif
 version_is_dev = version_minor % 2 == 1 and version_micro < 90
 
 # Get an object returns describing a compiler
-cc = meson.get_compiler('c')
+cpp = meson.get_compiler('cpp')
 
-# Find external dependencies
-if get_option('enable-tensorflow')
-  tensorflow = cc.find_library('tensorflow', required: true)
-  tensorflow_dep = declare_dependency(dependencies: tensorflow, include_directories: '/usr/local/include/tensorflow/')
-endif
+# Define compiler args and include directories
+cpp_args = ['-DHAVE_CONFIG_H']
 
-if get_option('enable-tflite')
-  tensorflow_lite = cc.find_library('tensorflow-lite', required: true)
-  tensorflow_lite_dep = declare_dependency(dependencies: tensorflow_lite)
-  thread_dep = dependency('threads')
-endif
+# Create an empty configuration object to set config.h information
+cdata = configuration_data()
 
-## Dependencies
 # Define library dependencies for Tensorflow support
 if get_option('enable-tensorflow')
+  tensorflow = cpp.find_library('tensorflow', required: true)
+  tensorflow_dep = declare_dependency(dependencies: tensorflow)
   lib_tf_dep = [tensorflow_dep]
 endif
+
 # Define library dependencies for Tensorflow Lite support
 if get_option('enable-tflite')
+  tensorflow_lite = cpp.find_library('tensorflow-lite', required: true)
+  tensorflow_lite_dep = declare_dependency(dependencies: tensorflow_lite)
+  thread_dep = dependency('threads')
   lib_tflite_dep = [tensorflow_lite_dep, thread_dep]
 endif
 
@@ -49,52 +48,9 @@ endif
 configinc = include_directories('.')
 r2i_inc_dir = include_directories('r2i')
 
-# Define compiler args and include directories
-c_args = ['-DHAVE_CONFIG_H', '-std=c++11']
-
-if get_option('enable-tensorflow')
-  c_args += ['-DHAVE_TENSORFLOW']
-endif
-
-if get_option('enable-tflite')
-  c_args += ['-DHAVE_TFLITE']
-endif
-
 # Define installation directories
 prefix = get_option('prefix')
 lib_install_dir = get_option('libdir')
-
-# Verify if the warning flags are available in the compiler
-# If the flags is availale for the compiler it wiil be used in all compiler
-# invocations with the exception of compile tests.
-warning_flags = [
-  '-Wmissing-declarations',
-  '-Wmissing-prototypes',
-  '-Wredundant-decls',
-  '-Wundef',
-  '-Wwrite-strings',
-  '-Wformat',
-  '-Wformat-nonliteral',
-  '-Wformat-security',
-  '-Wold-style-definition',
-  '-Winit-self',
-  '-Wmissing-include-dirs',
-  '-Waddress',
-  '-Waggregate-return',
-  '-Wno-multichar',
-  '-Wdeclaration-after-statement',
-  '-Wvla',
-  '-Wpointer-arith',
-]
-foreach extra_arg : warning_flags
-  if cc.has_argument (extra_arg)
-    # Add flag to the compiler command line
-    add_project_arguments([extra_arg], language: 'c')
-  endif
-endforeach
-
-# Create an empty configuration object to set config.h information
-cdata = configuration_data()
 
 # Set config.h information
 cdata.set_quoted('LOCALEDIR', join_paths(get_option('prefix'), get_option('localedir')))
@@ -132,40 +88,6 @@ foreach h : host_defines
 endforeach
 
 cdata.set_quoted('HOST_CPU', host_machine.cpu())
-
-# Verify if the specified header exists
-check_headers = [
-  'dlfcn.h',
-  'inttypes.h',
-  'memory.h',
-  'poll.h',
-  'stdint.h',
-  'stdlib.h',
-  'stdio_ext.h',
-  'strings.h',
-  'string.h',
-  'sys/param.h',
-  'sys/poll.h',
-  'sys/prctl.h',
-  'sys/socket.h',
-  'sys/stat.h',
-  'sys/times.h',
-  'sys/time.h',
-  'sys/types.h',
-  'sys/utsname.h',
-  'sys/wait.h',
-  'ucontext.h',
-  'unistd.h',
-  'valgrind/valgrind.h',
-  'sys/resource.h',
-]
-
-foreach h : check_headers
-  if cc.has_header(h)
-    define = 'HAVE_' + h.underscorify().to_upper()
-    cdata.set(define, 1)
-  endif
-endforeach
 
 # Doxygen documentation
 if get_option('enable-docs').enabled()
