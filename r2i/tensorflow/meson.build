@@ -22,7 +22,7 @@ tf_headers = [
 # Build library
 tf_lib = static_library('tf',
   tf_sources,
-  include_directories : [configinc, r2i_inc_dir],
+  include_directories : [configinc],
   dependencies : [lib_tf_dep],
 )
 
@@ -30,4 +30,4 @@ tf_lib = static_library('tf',
 install_headers(tf_headers, subdir : inc_install_dir + '/r2i/tensorflow')
 
 # Define the library as an internal dependency to the current build
-internal_tf_dep = declare_dependency(link_with: tf_lib, dependencies: lib_tf_dep, include_directories: r2i_inc_dir)
+internal_tf_dep = declare_dependency(link_with: tf_lib, dependencies: lib_tf_dep)

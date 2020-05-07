@@ -56,7 +56,6 @@ endif
 
 # Define header directories
 configinc = include_directories('.')
-r2i_inc_dir = include_directories('r2i')
 
 # Define installation directories
 prefix = get_option('prefix')

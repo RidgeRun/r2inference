@@ -8,7 +8,7 @@ foreach t : lib_r2inference_tests
   test_name = fname.split('.')[0].underscorify()
 
   exe = executable(test_name, fname,
-      include_directories : [configinc, r2i_inc_dir],
+      include_directories : [configinc],
       dependencies : [r2inference_lib_dep, tests_dep],
   )
   # Run tests
