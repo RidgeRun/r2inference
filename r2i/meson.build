@@ -46,14 +46,24 @@ r2inference_lib = library('r2inference-@0@.0'.format(version_major),
   dependencies : r2inference_internal_dep,
 )
 
+r2inference_static_lib = static_library('r2inference-@0@.0'.format(version_major),
+  r2inference_sources,
+  cpp_args : cpp_args,
+  include_directories : [configinc],
+  install : true,
+  install_dir : lib_install_dir,
+  dependencies : r2inference_internal_dep,
+)
+
 # Install library header files
-install_headers(r2inference_headers, subdir : 'r2i')
+install_headers(r2inference_headers, subdir : inc_install_dir + '/r2i')
 
 # Generate pfgconfig file
 pkgconfig.generate(libraries : r2inference_lib,
-                  subdirs : '.',
-                  description : 'C/C++ generic inference library for multiple backend frameworks',
-                  name: 'r2inference-@0@.0'.format(version_major))
+                  subdirs : inc_install_dir,
+                  description : project_description,
+                  name: 'r2inference-@0@.0'.format(version_major),
+                  url: project_url)
 
 # Define the library as an internal dependency to the current build
 r2inference_lib_dep = declare_dependency(link_with: r2inference_lib, dependencies: r2inference_internal_dep)

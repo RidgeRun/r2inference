@@ -2,6 +2,9 @@ project('r2inference', ['cpp'], default_options : ['cpp_std=c++11'],
   version : '0.6.0',
   meson_version : '>= 0.50',)
 
+# Set project information
+project_description = 'C/C++ generic inference library for multiple backend frameworks'
+project_url = 'https://github.com/RidgeRun/r2inference/'
 project_name = meson.project_name()
 project_version = meson.project_version()
 version_arr = project_version.split('.')
@@ -41,9 +44,14 @@ if get_option('enable-tflite')
   cdata.set('HAVE_TFLITE', 1)
 endif
 
-#Find dependencies for TESTS
+# Find dependencies for TESTS
 if get_option('enable-tests').enabled()
   tests_dep = dependency('cpputest', required: true)
+endif
+
+# Doxygen documentation
+if get_option('enable-docs').enabled()
+  doxygen = find_program('doxygen', required: true)
 endif
 
 # Define header directories
@@ -53,6 +61,7 @@ r2i_inc_dir = include_directories('r2i')
 # Define installation directories
 prefix = get_option('prefix')
 lib_install_dir = get_option('libdir')
+inc_install_dir = 'r2inference-@0@.0'.format(version_major)
 
 # Set config.h information
 cdata.set_quoted('LOCALEDIR', join_paths(get_option('prefix'), get_option('localedir')))
@@ -90,11 +99,6 @@ foreach h : host_defines
 endforeach
 
 cdata.set_quoted('HOST_CPU', host_machine.cpu())
-
-# Doxygen documentation
-if get_option('enable-docs').enabled()
-  doxygen = find_program('doxygen', required: true)
-endif
 
 # Imports pkgconfig module
 pkgconfig = import('pkgconfig')
