@@ -41,20 +41,8 @@ if get_option('enable-tflite')
 endif
 
 #Find dependencies for TESTS
-tests_dep = dependency('cpputest', required: true)
-
-# Verify if profiling was enabled
-if get_option('enable-profiling').enabled()
-  profiler_dep = dependency('libprofiler')
-  if(profiler_dep.found())
-    message('Profiling enabled: Building examples with profiling support.')
-    link_flags += ['-lprofiler']
-    c_flags += ['-DPROFILING']
-    # Update test test_deps to include profiler dependency
-    test_deps += [profiler_dep]
-  else
-    error('MESON_FAIL gperftools profiling library not found.')
-  endif
+if get_option('enable-tests').enabled()
+  tests_dep = dependency('cpputest', required: true)
 endif
 
 # Define header directories
