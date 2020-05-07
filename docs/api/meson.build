@@ -10,9 +10,9 @@ if get_option('enable-docs').enabled() and doxygen.found()
                           configuration: cdata,
                           install: false)
 
- install_docs_dir = join_paths(get_option('datadir'), 'doc', 'r2inference')
+ install_docs_dir = join_paths(get_option('datadir'), 'doc', 'r2inference-@0@.0'.format(version_major))
 
- html_target = custom_target('r2i-docs',
+ html_target = custom_target('docs',
                             input: doxyfile,
                             output: 'html',
                             command: [doxygen, doxyfile],
