@@ -90,7 +90,7 @@ TEST (TensorflowliteLoader, LoadNonExistentFile) {
 
 TEST (TensorflowliteLoader, LoadInvalidModel) {
   /* Setup */
-  std::string path = "Makefile.am";
+  std::string path = "resources/invalid.tflite";
 
   /* Attempt to load this file as a valid model */
   auto model = loader->Load(path.c_str(), error);
