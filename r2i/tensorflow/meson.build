@@ -20,7 +20,7 @@ tf_headers = [
 ]
 
 # Build library
-tf_lib = static_library('tf-@0@'.format(project_version),
+tf_lib = static_library('tf',
   tf_sources,
   include_directories : [configinc, r2i_inc_dir],
   dependencies : [lib_tf_dep],

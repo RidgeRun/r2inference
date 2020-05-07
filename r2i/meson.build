@@ -53,7 +53,7 @@ install_headers(r2inference_headers, subdir : 'r2i')
 pkgconfig.generate(libraries : r2inference_lib,
                   subdirs : '.',
                   description : 'C/C++ generic inference library for multiple backend frameworks',
-                  name: 'r2inference-0.0')
+                  name: 'r2inference-@0@.0'.format(version_major))
 
 # Define the library as an internal dependency to the current build
 r2inference_lib_dep = declare_dependency(link_with: r2inference_lib, dependencies: r2inference_internal_dep)

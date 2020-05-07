@@ -1,5 +1,5 @@
 # Define common headers directory for examples
-common_inc_dir = '../common/'
+common_inc_dir = include_directories('common')
 
 if get_option('enable-tensorflow')
   subdir('tensorflow')

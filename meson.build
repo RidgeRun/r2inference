@@ -29,6 +29,7 @@ if get_option('enable-tensorflow')
   tensorflow = cpp.find_library('tensorflow', required: true)
   tensorflow_dep = declare_dependency(dependencies: tensorflow)
   lib_tf_dep = [tensorflow_dep]
+  cdata.set('HAVE_TENSORFLOW', 1)
 endif
 
 # Define library dependencies for Tensorflow Lite support
@@ -37,6 +38,7 @@ if get_option('enable-tflite')
   tensorflow_lite_dep = declare_dependency(dependencies: tensorflow_lite)
   thread_dep = dependency('threads')
   lib_tflite_dep = [tensorflow_lite_dep, thread_dep]
+  cdata.set('HAVE_TFLITE', 1)
 endif
 
 #Find dependencies for TESTS

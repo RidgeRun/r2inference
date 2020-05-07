@@ -30,7 +30,7 @@ tflite_headers = [
 ]
 
 # Build library
-tflite_lib = static_library('tflite-@0@'.format(project_version),
+tflite_lib = static_library('tflite',
   tflite_sources,
   include_directories : [configinc, r2i_inc_dir],
   dependencies : [lib_tflite_dep],
