@@ -73,6 +73,11 @@ if get_option('enable-tensorrt')
   cdata.set('HAVE_TENSORRT', 1)
 endif
 
+# Check if at least one backend is enabled
+if not (cdata.has('HAVE_TENSORFLOW') or cdata.has('HAVE_TFLITE') or cdata.has('HAVE_TENSORRT'))
+  error ('No backend selected, you must choose at least one')
+endif
+
 # Find dependencies for TESTS
 if get_option('enable-tests').enabled()
   tests_dep = dependency('cpputest', required: true)
