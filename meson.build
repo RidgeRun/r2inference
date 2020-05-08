@@ -55,12 +55,11 @@ if get_option('enable-tensorrt')
   # Find CUDA version
   cuda_ver = ''
   foreach v : cuda_versions
-    if cuda_ver == ''
-      cuda_dep = dependency('cudart-' + v, required: false)
-      cudart_dep = dependency('cudart-' + v, required: false)
-      if cuda_dep.found() and cudart_dep.found()
-        cuda_ver = v
-      endif
+    cuda_dep = dependency('cudart-' + v, required: false)
+    cudart_dep = dependency('cudart-' + v, required: false)
+    if cuda_dep.found() and cudart_dep.found()
+      cuda_ver = v
+      break
     endif
   endforeach
 
@@ -70,7 +69,6 @@ if get_option('enable-tensorrt')
 
   tensorrt = cpp.find_library('nvinfer', required: true)
   tensorrt_dep = declare_dependency(dependencies: tensorrt)
-  cuda_inc_dir = cuda_dep.get_pkgconfig_variable('includedir')
   lib_trt_dep = [tensorrt_dep, cuda_dep, cudart_dep]
   cdata.set('HAVE_TENSORRT', 1)
 endif

@@ -22,7 +22,7 @@ trt_headers = [
 # Build library
 trt_lib = static_library('trt',
   trt_sources,
-  include_directories : [configinc, cuda_inc_dir],
+  include_directories : [configinc],
   dependencies : [lib_trt_dep],
 )
 
