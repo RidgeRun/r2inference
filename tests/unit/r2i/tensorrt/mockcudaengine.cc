@@ -85,8 +85,6 @@ class MockCudaEngine : public ICudaEngine {
 
   IErrorRecorder *getErrorRecorder() const noexcept;
 
-  bool hasImplicitBatchDimension() const;
-
   const int32_t *getProfileShapeValues(int profileIndex, int inputIndex,
                                        OptProfileSelector select) const noexcept;
 
@@ -254,8 +252,6 @@ EngineCapability MockCudaEngine::getEngineCapability() const noexcept { return E
 void MockCudaEngine::setErrorRecorder(IErrorRecorder *recorder) noexcept { return; }
 
 IErrorRecorder *MockCudaEngine::getErrorRecorder() const noexcept { return nullptr; }
-
-bool MockCudaEngine::hasImplicitBatchDimension() const { return true; }
 
 const int32_t *MockCudaEngine::getProfileShapeValues(int profileIndex,
     int inputIndex,
