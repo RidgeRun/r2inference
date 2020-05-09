@@ -13,6 +13,8 @@ jobs:
   build_tensorflow_autotools:
     runs-on: ubuntu-18.04
     container: ridgerun/r2inference:v0.1.4
+    env:
+      CXXFLAGS="-Werror"
     steps:
     - uses: actions/checkout@v2
     - name: Install backend version
@@ -21,6 +23,7 @@ jobs:
         ldconfig
     - name: Configure the project
       run: |
+        CXXFLAGS="${{ env.CXXFLAGS }}"
         NOCONFIGURE=1 ./autogen.sh
         ./configure --disable-docs --enable-tensorflow
     - name: Build library
@@ -43,6 +46,7 @@ jobs:
     env:
       TENSORFLOW_PATH: /root/r2inference/backends/tflite/v2.0.1/include/tensorflow
       CPPFLAGS: "-I${TENSORFLOW_PATH} -I${TENSORFLOW_PATH}/tensorflow/lite/tools/make/downloads/flatbuffers/include"
+      CXXFLAGS="-Werror"
     steps:
     - uses: actions/checkout@v2
     - name: Install backend version
@@ -51,6 +55,7 @@ jobs:
     - name: Configure the project
       run: |
         CPPFLAGS="${{ env.CPPFLAGS }}"
+        CXXFLAGS="${{ env.CXXFLAGS }}"
         ./autogen.sh --disable-docs --enable-tflite
     - name: Build library
       run: make
@@ -69,6 +74,8 @@ jobs:
   build_tensorflow_meson:
     runs-on: ubuntu-18.04
     container: ridgerun/r2inference:v0.1.4
+    env:
+      CXXFLAGS="-Werror"
     steps:
     - uses: actions/checkout@v2
     - name: Install backend version
@@ -77,6 +84,7 @@ jobs:
         ldconfig
     - name: Configure the project
       run: |
+        CXXFLAGS="${{ env.CXXFLAGS }}"
         meson build -Denable-tensorflow=true -Denable-docs=disabled
     - name: Build library
       run: ninja -C build
@@ -95,6 +103,7 @@ jobs:
     env:
       TENSORFLOW_PATH: /root/r2inference/backends/tflite/v2.0.1/include/tensorflow
       CPPFLAGS: "-I${TENSORFLOW_PATH} -I${TENSORFLOW_PATH}/tensorflow/lite/tools/make/downloads/flatbuffers/include"
+      CXXFLAGS="-Werror"
     steps:
     - uses: actions/checkout@v2
     - name: Install backend version
@@ -103,6 +112,7 @@ jobs:
     - name: Configure the project
       run: |
         CPPFLAGS="${{ env.CPPFLAGS }}"
+        CXXFLAGS="${{ env.CXXFLAGS }}"
         meson build -Denable-tflite=true -Denable-docs=disabled
     - name: Build library
       run: ninja -C build
