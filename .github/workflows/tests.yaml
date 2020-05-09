@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-18.04
     container: ridgerun/r2inference:v0.1.4
     env:
-      CXXFLAGS="-Werror"
+      CXXFLAGS: "-Werror"
     steps:
     - uses: actions/checkout@v2
     - name: Install backend version
@@ -46,7 +46,7 @@ jobs:
     env:
       TENSORFLOW_PATH: /root/r2inference/backends/tflite/v2.0.1/include/tensorflow
       CPPFLAGS: "-I${TENSORFLOW_PATH} -I${TENSORFLOW_PATH}/tensorflow/lite/tools/make/downloads/flatbuffers/include"
-      CXXFLAGS="-Werror"
+      CXXFLAGS: "-Werror"
     steps:
     - uses: actions/checkout@v2
     - name: Install backend version
@@ -77,7 +77,7 @@ jobs:
     env:
       TENSORFLOW_PATH: /root/r2inference/backends/tflite/v2.0.1/include/tensorflow
       CPPFLAGS: "-I${TENSORFLOW_PATH} -I${TENSORFLOW_PATH}/tensorflow/lite/tools/make/downloads/flatbuffers/include"
-      CXXFLAGS="-Werror"
+      CXXFLAGS: "-Werror"
     steps:
     - uses: actions/checkout@v2
     - name: Install backend version
@@ -108,7 +108,7 @@ jobs:
     runs-on: ubuntu-18.04
     container: ridgerun/r2inference:v0.1.4
     env:
-      CXXFLAGS="-Werror"
+      CXXFLAGS: "-Werror"
     steps:
     - uses: actions/checkout@v2
     - name: Install backend version
@@ -136,7 +136,7 @@ jobs:
     env:
       TENSORFLOW_PATH: /root/r2inference/backends/tflite/v2.0.1/include/tensorflow
       CPPFLAGS: "-I${TENSORFLOW_PATH} -I${TENSORFLOW_PATH}/tensorflow/lite/tools/make/downloads/flatbuffers/include"
-      CXXFLAGS="-Werror"
+      CXXFLAGS: "-Werror"
     steps:
     - uses: actions/checkout@v2
     - name: Install backend version
@@ -164,7 +164,7 @@ jobs:
     env:
       TENSORFLOW_PATH: /root/r2inference/backends/tflite/v2.0.1/include/tensorflow
       CPPFLAGS: "-I${TENSORFLOW_PATH} -I${TENSORFLOW_PATH}/tensorflow/lite/tools/make/downloads/flatbuffers/include"
-      CXXFLAGS="-Werror"
+      CXXFLAGS: "-Werror"
     steps:
     - uses: actions/checkout@v2
     - name: Install backend version
