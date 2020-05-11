@@ -23,3 +23,7 @@ endif
 if get_option('enable-tflite')
   subdir('tflite')
 endif
+
+if get_option('enable-tensorrt')
+  subdir('tensorrt')
+endif

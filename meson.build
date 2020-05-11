@@ -44,6 +44,40 @@ if get_option('enable-tflite')
   cdata.set('HAVE_TFLITE', 1)
 endif
 
+# Define library dependencies for TensorRT support
+if get_option('enable-tensorrt')
+
+  # CUDA versions supported
+  cuda_versions = [
+    '10.0',
+  ]
+
+  # Find CUDA version
+  cuda_ver = ''
+  foreach v : cuda_versions
+    cuda_dep = dependency('cudart-' + v, required: false)
+    cudart_dep = dependency('cudart-' + v, required: false)
+    if cuda_dep.found() and cudart_dep.found()
+      cuda_ver = v
+      break
+    endif
+  endforeach
+
+  if not cuda_dep.found() or not cudart_dep.found()
+    error ('Unable to find CUDA supported version')
+  endif
+
+  tensorrt = cpp.find_library('nvinfer', required: true)
+  tensorrt_dep = declare_dependency(dependencies: tensorrt)
+  lib_trt_dep = [tensorrt_dep, cuda_dep, cudart_dep]
+  cdata.set('HAVE_TENSORRT', 1)
+endif
+
+# Check if at least one backend is enabled
+if not (cdata.has('HAVE_TENSORFLOW') or cdata.has('HAVE_TFLITE') or cdata.has('HAVE_TENSORRT'))
+  error ('No backend selected, you must choose at least one')
+endif
+
 # Find dependencies for TESTS
 if get_option('enable-tests').enabled()
   tests_dep = dependency('cpputest', required: true)

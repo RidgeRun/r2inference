@@ -89,6 +89,7 @@ class Parameters : public IParameters {
     }
 
     RuntimeError Get () {
+      this->value = std::to_string(NV_TENSORRT_VERSION);
       return RuntimeError ();
     }
   };

@@ -10,6 +10,11 @@ if get_option('enable-tflite')
   r2inference_internal_dep += [internal_tflite_dep]
 endif
 
+if get_option('enable-tensorrt')
+  subdir('tensorrt')
+  r2inference_internal_dep += [internal_trt_dep]
+endif
+
 # Define source code
 r2inference_sources = [
   'datatype.cc',

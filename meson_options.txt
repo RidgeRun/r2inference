@@ -10,3 +10,5 @@ option('enable-tensorflow', type : 'boolean', value: false,
        description : 'Enable Tensorflow backend support')
 option('enable-tflite', type : 'boolean', value: false,
        description : 'Enable Tensorflow Lite backend support')
+option('enable-tensorrt', type : 'boolean', value: false,
+       description : 'Enable TensorRT backend support')
