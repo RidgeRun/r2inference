@@ -71,7 +71,7 @@ jobs:
         cd examples/external
         make
         ./list-backends
-  build_all_backends_autotools:
+  build_tensorflow_tflite_autotools:
     runs-on: ubuntu-18.04
     container: ridgerun/r2inference:v0.1.4
     env:
@@ -158,7 +158,7 @@ jobs:
       run: |
         cd build/examples/external
         ./list_backends
-  build_all_backends_meson:
+  build_tensorflow_tflite_meson:
     runs-on: ubuntu-18.04
     container: ridgerun/r2inference:v0.1.4
     env:
