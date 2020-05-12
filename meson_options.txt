@@ -1,0 +1,14 @@
+# Copyright (C) 2020 RidgeRun, LLC (http://www.ridgerun.com)
+
+# Feature options
+option('enable-tests', type : 'feature', value : 'enabled', yield : true, description : 'Build tests')
+option('enable-examples', type : 'feature', value : 'enabled', yield : true, description : 'Build examples')
+option('enable-docs', type : 'feature', value : 'enabled', yield : true, description : 'Build documentation with Doxygen')
+
+# Enable support for different backends
+option('enable-tensorflow', type : 'boolean', value: false,
+       description : 'Enable Tensorflow backend support')
+option('enable-tflite', type : 'boolean', value: false,
+       description : 'Enable Tensorflow Lite backend support')
+option('enable-tensorrt', type : 'boolean', value: false,
+       description : 'Enable TensorRT backend support')

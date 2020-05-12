@@ -12,8 +12,9 @@
 #ifndef R2I_IFRAME_H
 #define R2I_IFRAME_H
 
-#include <r2i/runtimeerror.h>
+#include <r2i/datatype.h>
 #include <r2i/imageformat.h>
+#include <r2i/runtimeerror.h>
 
 #include <memory>
 #include <string>
@@ -64,6 +65,12 @@ class IFrame {
    * \return Image format.
    */
   virtual ImageFormat GetFormat () = 0;
+
+  /**
+   * \brief Gets the Image data type set to the Frame.
+   * \return Image data type.
+   */
+  virtual DataType GetDataType () = 0;
 
   /**
    * \brief Default destructor

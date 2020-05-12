@@ -10,7 +10,7 @@
 
 # Initialize autoconf.
 AC_PREREQ([2.69])
-AC_INIT([RidgeRun inference library],[0.5.3],[https://github.com/RidgeRun/r2inference/issues],[r2inference])
+AC_INIT([RidgeRun inference library],[0.6.0],[https://github.com/RidgeRun/r2inference/issues],[r2inference])
 
 # Initialize our build utils
 RR_INIT
@@ -56,7 +56,12 @@ RR_CHECK_FEATURE_LIB(TFLITE, TensorFlow lite Installation,
 # add specific LIBS for TFLITE
 AC_SUBST([TFLITE_LIBS], ["$TFLITE_LIBS -pthread -ldl -lrt"])
 
+RR_CHECK_FEATURE_LIB(TENSORRT, TensorRT Installation,
+                     nvinfer, createInferBuilder_INTERNAL, NvInfer.h, no)
 AC_LANG_POP([C++])
+
+AM_CONDITIONAL([PLATFORM_IS_GPU], [false])
+AM_COND_IF([HAVE_TENSORRT], [RR_CHECK_CUDA], [])
 
 # Our Include path, to be shared in multiple makefiles
 AC_SUBST([R2IINCLUDEDIR],[$includedir/r2inference-$RR_PACKAGE_VERSION/])
@@ -71,10 +76,12 @@ examples/Makefile
 examples/r2i/Makefile
 examples/r2i/ncsdk/Makefile
 examples/r2i/tensorflow/Makefile
+examples/r2i/tensorrt/Makefile
 examples/r2i/tflite/Makefile
 r2i/Makefile
 r2i/ncsdk/Makefile
 r2i/tensorflow/Makefile
+r2i/tensorrt/Makefile
 r2i/tflite/Makefile
 r2inference-${RR_PACKAGE_VERSION}.pc:r2inference.pc.in
 tests/Makefile
@@ -83,6 +90,7 @@ tests/unit/Makefile
 tests/unit/r2i/Makefile
 tests/unit/r2i/ncsdk/Makefile
 tests/unit/r2i/tensorflow/Makefile
+tests/unit/r2i/tensorrt/Makefile
 tests/unit/r2i/tflite/Makefile
 ])
 
