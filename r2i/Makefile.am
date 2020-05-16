@@ -26,11 +26,16 @@ if HAVE_TENSORRT
 SUBDIRS += tensorrt
 endif
 
+if HAVE_EDGETPU
+SUBDIRS += edgetpu
+endif
+
 DIST_SUBDIRS =          \
         ncsdk           \
         tensorflow      \
         tensorrt        \
-        tflite
+        tflite          \
+        edgetpu
 
 lib_LTLIBRARIES = libr2inference-@RR_PACKAGE_VERSION@.la
 
@@ -94,4 +99,9 @@ endif
 if HAVE_TFLITE
 libr2inference_@RR_PACKAGE_VERSION@_la_LIBADD +=    \
         $(top_builddir)/r2i/tflite/libtflite.la
+endif
+
+if HAVE_EDGETPU
+libr2inference_@RR_PACKAGE_VERSION@_la_LIBADD +=    \
+        $(top_builddir)/r2i/edgetpu/libedgetpu.la
 endif
