@@ -50,11 +50,16 @@ RR_CHECK_FEATURE_LIB(TENSORFLOW, TensorFlow Installation,
                      tensorflow, TF_Version, tensorflow/c/c_api.h, no)
 
 AC_LANG_PUSH([C++])
+RR_CHECK_FEATURE_LIB(EDGETPU, EdgeTPU with TensorFlow lite Installation,
+                     :libedgetpu.so.1.0, edgetpu_version, edgetpu.h, no)
+
 RR_CHECK_FEATURE_LIB(TFLITE, TensorFlow lite Installation,
                      tensorflow-lite, TfLiteTypeGetName, tensorflow/lite/model.h, no)
 
 # add specific LIBS for TFLITE
 AC_SUBST([TFLITE_LIBS], ["$TFLITE_LIBS -pthread -ldl -lrt"])
+
+AM_CONDITIONAL([HAVE_EDGETPU], [AM_COND_IF([HAVE_TFLITE], [], [AC_MSG_ERROR(The EdgeTPU backend needs TFLITE enable)])])
 
 RR_CHECK_FEATURE_LIB(TENSORRT, TensorRT Installation,
                      nvinfer, createInferBuilder_INTERNAL, NvInfer.h, no)
