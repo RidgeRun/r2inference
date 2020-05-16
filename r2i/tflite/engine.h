@@ -17,6 +17,7 @@
 #include <memory>
 
 #include <r2i/tflite/model.h>
+#include <tensorflow/lite/kernels/register.h>
 
 namespace r2i {
 namespace tflite {
@@ -41,7 +42,7 @@ class Engine : public IEngine {
 
   ~Engine ();
 
- private:
+ protected:
   enum State {
     STARTED,
     STOPPED
@@ -52,6 +53,12 @@ class Engine : public IEngine {
   std::shared_ptr<Model> model;
   int number_of_threads;
   int allow_fp16;
+
+  virtual void setupResolver(::tflite::ops::builtin::BuiltinOpResolver &resolver);
+  virtual void setInterpreterContext();
+  virtual float *runInference(std::shared_ptr<r2i::IFrame> frame,
+                              const int &input, const int &width, const int &height, const int &channels,
+                              r2i::RuntimeError &error);
 };
 
 }

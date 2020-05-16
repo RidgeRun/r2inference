@@ -14,7 +14,6 @@
 #include "r2i/tflite/prediction.h"
 #include "r2i/tflite/frame.h"
 #include <tensorflow/lite/model.h>
-#include <tensorflow/lite/kernels/register.h>
 #include <tensorflow/lite/string_util.h>
 
 namespace r2i {
@@ -75,6 +74,8 @@ RuntimeError Engine::Start ()  {
 
   if (!this->interpreter) {
     ::tflite::ops::builtin::BuiltinOpResolver resolver;
+    this->setupResolver(resolver);
+
     ::tflite::ErrorReporter *error_reporter = ::tflite::DefaultErrorReporter();
 
     std::unique_ptr<::tflite::Interpreter> interpreter;
@@ -87,6 +88,8 @@ RuntimeError Engine::Start ()  {
                  "Failed to construct interpreter");
       return error;
     }
+
+    this->setInterpreterContext();
 
     std::shared_ptr<::tflite::Interpreter> tflite_interpreter_shared{std::move(interpreter)};
 
@@ -200,6 +203,36 @@ std::shared_ptr<r2i::IPrediction> Engine::Predict (std::shared_ptr<r2i::IFrame>
     return nullptr;
   }
 
+  auto tensor_data = this->runInference(frame, input, wanted_width, wanted_height,
+                                        wanted_channels, error);
+  if (r2i::RuntimeError::EOK != error.GetCode()) {
+    return nullptr;
+  }
+
+  int output = this->interpreter->outputs()[0];
+  TfLiteIntArray *output_dims = this->interpreter->tensor(output)->dims;
+  auto output_size = GetRequiredBufferSize(output_dims) * sizeof(float);
+  prediction->SetTensorValues(tensor_data, output_size);
+
+  return prediction;
+}
+
+Engine::~Engine () {
+  this->Stop();
+}
+
+void Engine::setupResolver(::tflite::ops::builtin::BuiltinOpResolver
+                           &/*resolver*/) {
+  // No implementation for tflite engine
+}
+
+void Engine::setInterpreterContext() {
+  // No implementation for tflite engine
+}
+
+float *Engine::runInference(std::shared_ptr<r2i::IFrame> frame,
+                            const int &input, const int &width, const int &height, const int &channels,
+                            r2i::RuntimeError &error) {
   auto input_tensor = this->interpreter->typed_tensor<float>(input);
   auto input_data = (float *)frame->GetData();
 
@@ -209,7 +242,7 @@ std::shared_ptr<r2i::IPrediction> Engine::Predict (std::shared_ptr<r2i::IFrame>
   }
 
   memcpy(input_tensor, input_data,
-         wanted_height * wanted_width * wanted_channels * sizeof(float));
+         height * width * channels * sizeof(float));
 
   if (this->interpreter->Invoke() != kTfLiteOk) {
     error.Set (RuntimeError::Code::FRAMEWORK_ERROR,
@@ -217,17 +250,7 @@ std::shared_ptr<r2i::IPrediction> Engine::Predict (std::shared_ptr<r2i::IFrame>
     return nullptr;
   }
 
-  int output = this->interpreter->outputs()[0];
-  TfLiteIntArray *output_dims = this->interpreter->tensor(output)->dims;
-  auto output_size = GetRequiredBufferSize(output_dims) * sizeof(float);
-  auto *tensor_data = this->interpreter->typed_output_tensor<float>(0);
-  prediction->SetTensorValues(tensor_data, output_size);
-
-  return prediction;
-}
-
-Engine::~Engine () {
-  this->Stop();
+  return this->interpreter->typed_output_tensor<float>(0);
 }
 
 } //namespace tflite
