@@ -16,7 +16,8 @@ noinst_LTLIBRARIES = libedgetpu.la
 tensorflowliteedgetpuincludedir = @R2IINCLUDEDIR@/r2i/edgetpu
 
 libedgetpu_la_SOURCES =                     \
-    engine.cc
+    engine.cc                               \
+    frameworkfactory.cc 
 
 libedgetpu_la_CPPFLAGS =                    \
     $(RR_CPPFLAGS)                          \
@@ -41,6 +42,7 @@ libedgetpu_la_LIBADD =                      \
     $(CODE_COVERAGE_LIBS)
 
 tensorflowliteedgetpuinclude_HEADERS =      \
-    engine.h
+    engine.h                                \
+    frameworkfactory.h
 
 endif # HAVE_EDGETPU
