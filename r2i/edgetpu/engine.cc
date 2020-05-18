@@ -1,4 +1,4 @@
-/* Copyright (C) 2018-2020 RidgeRun, LLC (http://www.ridgerun.com)
+/* Copyright (C) 2020 RidgeRun, LLC (http://www.ridgerun.com)
  * All Rights Reserved.
  *
  * The contents of this software are proprietary and confidential to RidgeRun,
@@ -23,43 +23,39 @@ Engine::Engine () {
   this->allow_fp16 = 0;
 }
 
-Engine::~Engine () {
-  r2i::tflite::Engine::Stop();
-}
-
-void Engine::setupResolver(::tflite::ops::builtin::BuiltinOpResolver
+void Engine::SetupResolver(::tflite::ops::builtin::BuiltinOpResolver
                            &resolver) {
   resolver.AddCustom(::edgetpu::kCustomOp, ::edgetpu::RegisterCustomOp());
 }
 
-void Engine::setInterpreterContext() {
+void Engine::SetInterpreterContext() {
   std::shared_ptr<::edgetpu::EdgeTpuContext> edgetpu_context =
     ::edgetpu::EdgeTpuManager::GetSingleton()->OpenDevice();
   this->interpreter->SetExternalContext(kTfLiteEdgeTpuContext,
                                         edgetpu_context.get());
 }
 
-float *Engine::runInference(std::shared_ptr<r2i::IFrame> frame,
-                            const int &input, const int &width, const int &height, const int &channels,
+float *Engine::RunInference(std::shared_ptr<r2i::IFrame> frame,
+                            const int &input, const int size,
                             r2i::RuntimeError &error) {
+  std::unique_ptr<float> output_data;
+
   auto input_tensor = this->interpreter->typed_tensor<uint8_t>(input);
-  auto input_data = (float *)frame->GetData();
+  auto input_data = static_cast<float *>(frame->GetData());
 
   if (!input_data) {
-    error.Set (RuntimeError::Code::FRAMEWORK_ERROR, "Failed to get image data");
+    error.Set (RuntimeError::Code::WRONG_API_USAGE, "Failed to get image data");
     return nullptr;
   }
 
   // Convert to fixed point
-  std::unique_ptr<uint8_t> input_data_fixed(new uint8_t(height * width *
-      channels));
-  int index;
-  for (index = 0; index < height * width * channels; index++) {
+  std::unique_ptr<uint8_t> input_data_fixed(new uint8_t(size));
+  for (int index = 0; index < size; index++) {
     input_data_fixed.get()[index] = static_cast<uint8_t>(input_data[index]);
   }
 
   memcpy(input_tensor, input_data_fixed.get(),
-         height * width * channels * sizeof(uint8_t));
+         size * sizeof(uint8_t));
 
   if (this->interpreter->Invoke() != kTfLiteOk) {
     error.Set (RuntimeError::Code::FRAMEWORK_ERROR,
@@ -69,7 +65,6 @@ float *Engine::runInference(std::shared_ptr<r2i::IFrame> frame,
 
   const auto &output_indices = interpreter->outputs();
   const auto *out_tensor = interpreter->tensor(output_indices[0]);
-  std::unique_ptr<float> output_data;
 
   if (out_tensor->type == kTfLiteUInt8) {
     uint8_t *output_data_fixed = interpreter->typed_output_tensor<uint8_t>(0);
@@ -79,7 +74,7 @@ float *Engine::runInference(std::shared_ptr<r2i::IFrame> frame,
     // Convert to fixed point
     auto output_size = GetRequiredBufferSize(output_dims);
     output_data = std::unique_ptr<float>(new float(output_size));
-    for (index = 0; index < output_size; index++) {
+    for (int index = 0; index < output_size; index++) {
       output_data.get()[index] = static_cast<float>(output_data_fixed[index]);
     }
   } else if (out_tensor->type == kTfLiteFloat32) {

@@ -54,10 +54,10 @@ class Engine : public IEngine {
   int number_of_threads;
   int allow_fp16;
 
-  virtual void setupResolver(::tflite::ops::builtin::BuiltinOpResolver &resolver);
-  virtual void setInterpreterContext();
-  virtual float *runInference(std::shared_ptr<r2i::IFrame> frame,
-                              const int &input, const int &width, const int &height, const int &channels,
+  virtual void SetupResolver(::tflite::ops::builtin::BuiltinOpResolver &resolver);
+  virtual void SetInterpreterContext();
+  virtual float *RunInference(std::shared_ptr<r2i::IFrame> frame,
+                              const int &input, const int size,
                               r2i::RuntimeError &error);
 };
 

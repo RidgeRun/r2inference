@@ -84,11 +84,11 @@ examples/r2i/tensorflow/Makefile
 examples/r2i/tensorrt/Makefile
 examples/r2i/tflite/Makefile
 r2i/Makefile
+r2i/edgetpu/Makefile
 r2i/ncsdk/Makefile
 r2i/tensorflow/Makefile
 r2i/tensorrt/Makefile
 r2i/tflite/Makefile
-r2i/edgetpu/Makefile
 r2inference-${RR_PACKAGE_VERSION}.pc:r2inference.pc.in
 tests/Makefile
 tests/acceptance/Makefile

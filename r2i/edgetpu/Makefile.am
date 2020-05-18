@@ -1,4 +1,4 @@
-# Copyright (C) 2018 RidgeRun, LLC (http://www.ridgerun.com)
+# Copyright (C) 2020 RidgeRun, LLC (http://www.ridgerun.com)
 # All Rights Reserved.
 #
 # The contents of this software are proprietary and confidential to RidgeRun,
@@ -25,19 +25,19 @@ libedgetpu_la_CPPFLAGS =                    \
 libedgetpu_la_CFLAGS =                      \
     $(RR_CFLAGS)                            \
     $(TFLITE_CFLAGS)                        \
-	$(EDGETPU_CFLAGS)                       \
+    $(EDGETPU_CFLAGS)                       \
     $(CODE_COVERAGE_CFLAGS)
 
 libedgetpu_la_CXXFLAGS =                    \
     $(RR_CXXFLAGS)                          \
     $(TFLITE_CFLAGS)                        \
-	$(EDGETPU_CFLAGS)                       \
+    $(EDGETPU_CFLAGS)                       \
     $(CODE_COVERAGE_CXXFLAGS)
 
 libedgetpu_la_LIBADD =                      \
     $(RR_LIBS)                              \
     $(TFLITE_LIBS)                          \
-	$(EDGETPU_LIBS)                         \
+    $(EDGETPU_LIBS)                         \
     $(CODE_COVERAGE_LIBS)
 
 tensorflowliteedgetpuinclude_HEADERS =      \

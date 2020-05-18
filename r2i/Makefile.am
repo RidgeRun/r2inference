@@ -10,6 +10,10 @@
 
 SUBDIRS =
 
+if HAVE_EDGETPU
+SUBDIRS += edgetpu
+endif
+
 if HAVE_NCSDK
 SUBDIRS += ncsdk
 endif
@@ -26,16 +30,12 @@ if HAVE_TENSORRT
 SUBDIRS += tensorrt
 endif
 
-if HAVE_EDGETPU
-SUBDIRS += edgetpu
-endif
-
 DIST_SUBDIRS =          \
+        edgetpu         \
         ncsdk           \
         tensorflow      \
         tensorrt        \
-        tflite          \
-        edgetpu
+        tflite
 
 lib_LTLIBRARIES = libr2inference-@RR_PACKAGE_VERSION@.la
 
@@ -81,6 +81,11 @@ r2iinclude_HEADERS =         \
         runtimeerror.h
 
 
+if HAVE_EDGETPU
+libr2inference_@RR_PACKAGE_VERSION@_la_LIBADD +=    \
+        $(top_builddir)/r2i/edgetpu/libedgetpu.la
+endif
+
 if HAVE_NCSDK
 libr2inference_@RR_PACKAGE_VERSION@_la_LIBADD +=    \
         $(top_builddir)/r2i/ncsdk/libncsdk.la
@@ -99,9 +104,4 @@ endif
 if HAVE_TFLITE
 libr2inference_@RR_PACKAGE_VERSION@_la_LIBADD +=    \
         $(top_builddir)/r2i/tflite/libtflite.la
-endif
-
-if HAVE_EDGETPU
-libr2inference_@RR_PACKAGE_VERSION@_la_LIBADD +=    \
-        $(top_builddir)/r2i/edgetpu/libedgetpu.la
 endif

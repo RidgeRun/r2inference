@@ -1,4 +1,4 @@
-/* Copyright (C) 2018 RidgeRun, LLC (http://www.ridgerun.com)
+/* Copyright (C) 2020 RidgeRun, LLC (http://www.ridgerun.com)
  * All Rights Reserved.
  *
  * The contents of this software are proprietary and confidential to RidgeRun,
@@ -20,18 +20,18 @@ namespace edgetpu {
 class Engine : public r2i::tflite::Engine {
  public:
   Engine ();
-  ~Engine ();
 
  protected:
 
-  void setupResolver(::tflite::ops::builtin::BuiltinOpResolver &resolver)
+  void SetupResolver(::tflite::ops::builtin::BuiltinOpResolver &resolver)
   override;
-  void setInterpreterContext() override;
-  float *runInference(std::shared_ptr<r2i::IFrame> frame, const int &input,
-                      const int &width, const int &height, const int &channels,
+  void SetInterpreterContext() override;
+  float *RunInference(std::shared_ptr<r2i::IFrame> frame, const int &input,
+                      const int size,
                       r2i::RuntimeError &error) override;
 };
 
 }
 }
+
 #endif //R2I_EDGETPU_ENGINE_H

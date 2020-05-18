@@ -74,7 +74,7 @@ RuntimeError Engine::Start ()  {
 
   if (!this->interpreter) {
     ::tflite::ops::builtin::BuiltinOpResolver resolver;
-    this->setupResolver(resolver);
+    this->SetupResolver(resolver);
 
     ::tflite::ErrorReporter *error_reporter = ::tflite::DefaultErrorReporter();
 
@@ -89,7 +89,7 @@ RuntimeError Engine::Start ()  {
       return error;
     }
 
-    this->setInterpreterContext();
+    this->SetInterpreterContext();
 
     std::shared_ptr<::tflite::Interpreter> tflite_interpreter_shared{std::move(interpreter)};
 
@@ -203,7 +203,8 @@ std::shared_ptr<r2i::IPrediction> Engine::Predict (std::shared_ptr<r2i::IFrame>
     return nullptr;
   }
 
-  auto tensor_data = this->runInference(frame, input, wanted_width, wanted_height,
+  auto tensor_data = this->RunInference(frame, input,
+                                        wanted_width * wanted_height *
                                         wanted_channels, error);
   if (r2i::RuntimeError::EOK != error.GetCode()) {
     return nullptr;
@@ -221,17 +222,17 @@ Engine::~Engine () {
   this->Stop();
 }
 
-void Engine::setupResolver(::tflite::ops::builtin::BuiltinOpResolver
+void Engine::SetupResolver(::tflite::ops::builtin::BuiltinOpResolver
                            &/*resolver*/) {
   // No implementation for tflite engine
 }
 
-void Engine::setInterpreterContext() {
+void Engine::SetInterpreterContext() {
   // No implementation for tflite engine
 }
 
-float *Engine::runInference(std::shared_ptr<r2i::IFrame> frame,
-                            const int &input, const int &width, const int &height, const int &channels,
+float *Engine::RunInference(std::shared_ptr<r2i::IFrame> frame,
+                            const int &input, const int size,
                             r2i::RuntimeError &error) {
   auto input_tensor = this->interpreter->typed_tensor<float>(input);
   auto input_data = (float *)frame->GetData();
@@ -242,7 +243,7 @@ float *Engine::runInference(std::shared_ptr<r2i::IFrame> frame,
   }
 
   memcpy(input_tensor, input_data,
-         height * width * channels * sizeof(float));
+         size * sizeof(float));
 
   if (this->interpreter->Invoke() != kTfLiteOk) {
     error.Set (RuntimeError::Code::FRAMEWORK_ERROR,
