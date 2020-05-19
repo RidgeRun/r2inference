@@ -59,7 +59,7 @@ RR_CHECK_FEATURE_LIB(TFLITE, TensorFlow lite Installation,
 # add specific LIBS for TFLITE
 AC_SUBST([TFLITE_LIBS], ["$TFLITE_LIBS -pthread -ldl -lrt"])
 
-AM_COND_IF([HAVE_EDGETPU], [AM_COND_IF([HAVE_TFLITE], [], [AC_MSG_ERROR(The EdgeTPU backend needs TFLITE enable)])], [])
+AM_COND_IF([HAVE_EDGETPU], [AM_COND_IF([HAVE_TFLITE], [], [AC_MSG_ERROR(The EdgeTPU backend needs TFLITE enabled as well)])], [])
 
 RR_CHECK_FEATURE_LIB(TENSORRT, TensorRT Installation,
                      nvinfer, createInferBuilder_INTERNAL, NvInfer.h, no)

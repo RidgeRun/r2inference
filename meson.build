@@ -55,7 +55,7 @@ if get_option('enable-edgetpu')
     lib_edgetpu_dep = [edgetpu_dep, lib_tflite_dep, dl_dep, rt_dep]
     cdata.set('HAVE_EDGETPU', 1)
   else
-    error('The EdgeTPU needs to have enable the TFlite backend.')
+    error('The EdgeTPU needs to have the TFLite backend enabled as well.')
   endif
 endif
 

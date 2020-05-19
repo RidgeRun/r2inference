@@ -7,7 +7,7 @@ option('enable-docs', type : 'feature', value : 'enabled', yield : true, descrip
 
 # Enable support for different backends
 option('enable-edgetpu', type : 'boolean', value: false,
-       description : 'Enable EdgeTPU backend support')
+       description : 'Enable EdgeTPU backend support. This backend needs to have the TFLite backend enabled.')
 option('enable-tensorflow', type : 'boolean', value: false,
        description : 'Enable Tensorflow backend support')
 option('enable-tflite', type : 'boolean', value: false,
