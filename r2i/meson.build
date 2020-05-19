@@ -10,6 +10,15 @@ if get_option('enable-tflite')
   r2inference_internal_dep += [internal_tflite_dep]
 endif
 
+if get_option('enable-edgetpu')
+  if internal_tflite_dep.found()
+    subdir('edgetpu')
+    r2inference_internal_dep += [internal_edgetpu_dep]
+  else
+    error('The EdgeTPU needs to have enable the TFlite backend.')
+  endif
+endif
+
 if get_option('enable-tensorrt')
   subdir('tensorrt')
   r2inference_internal_dep += [internal_trt_dep]

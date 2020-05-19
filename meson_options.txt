@@ -6,6 +6,8 @@ option('enable-examples', type : 'feature', value : 'enabled', yield : true, des
 option('enable-docs', type : 'feature', value : 'enabled', yield : true, description : 'Build documentation with Doxygen')
 
 # Enable support for different backends
+option('enable-edgetpu', type : 'boolean', value: false,
+       description : 'Enable EdgeTPU backend support')
 option('enable-tensorflow', type : 'boolean', value: false,
        description : 'Enable Tensorflow backend support')
 option('enable-tflite', type : 'boolean', value: false,

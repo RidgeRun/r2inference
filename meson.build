@@ -44,6 +44,21 @@ if get_option('enable-tflite')
   cdata.set('HAVE_TFLITE', 1)
 endif
 
+# Define library dependencies for Tensorflow Lite support
+if get_option('enable-edgetpu')
+  if tensorflow_lite_dep.found()
+    edgetpu = cpp.find_library(':libedgetpu.so.1.0', required: true)
+    edgetpu_dep = declare_dependency(dependencies: edgetpu)
+    thread_dep = dependency('threads')
+    dl_dep = cpp.find_library('dl', required : true)
+    rt_dep = cpp.find_library('rt', required : true)
+    lib_edgetpu_dep = [edgetpu_dep, lib_tflite_dep, dl_dep, rt_dep]
+    cdata.set('HAVE_EDGETPU', 1)
+  else
+    error('The EdgeTPU needs to have enable the TFlite backend.')
+  endif
+endif
+
 # Define library dependencies for TensorRT support
 if get_option('enable-tensorrt')
 
