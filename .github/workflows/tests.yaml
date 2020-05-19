@@ -5,14 +5,20 @@ on:
     branches:
       - master
       - dev-*
+      - feature/extend-ci-ubuntu-16.04
   pull_request:
     branches:
       - dev-*
 
 jobs:
   build_tensorflow_autotools:
-    runs-on: ubuntu-18.04
-    container: ridgerun/r2inference:v0.1.4
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+       os: [ubuntu-18.04]
+       container: ["ridgerun/r2inference:v0.1.4", "ridgerun/r2inference-ubuntu-16.04:v0.1.0"]
+    container:
+      image: ${{ matrix.container }}
     env:
       CXXFLAGS: "-Werror"
     steps:
