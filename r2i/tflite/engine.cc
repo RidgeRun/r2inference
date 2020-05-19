@@ -22,6 +22,7 @@ namespace tflite {
 Engine::Engine () : state(State::STOPPED), model(nullptr) {
   this->number_of_threads = 0;
   this->allow_fp16 = 0;
+  this->allow_quantized_models = false;
 }
 
 RuntimeError Engine::SetModel (std::shared_ptr<r2i::IModel> in_model) {
@@ -197,15 +198,26 @@ std::shared_ptr<r2i::IPrediction> Engine::Predict (std::shared_ptr<r2i::IFrame>
   }
 
   // Check the model quantization, only 32 bits allowed
-  if (kTfLiteFloat32 != interpreter->tensor(input)->type) {
+  if (kTfLiteFloat32 != interpreter->tensor(input)->type
+      && !this->allow_quantized_models) {
     error.Set (RuntimeError::Code::FRAMEWORK_ERROR,
                "The provided model quantization is not allowed, only float32 is supported");
     return nullptr;
   }
 
-  auto tensor_data = this->RunInference(frame, input,
-                                        wanted_width * wanted_height *
-                                        wanted_channels, error);
+  this->PreprocessInputData(static_cast<float *>(frame->GetData()),
+                            wanted_width * wanted_height * wanted_channels, error);
+  if (r2i::RuntimeError::EOK != error.GetCode()) {
+    return nullptr;
+  }
+
+  if (this->interpreter->Invoke() != kTfLiteOk) {
+    error.Set (RuntimeError::Code::FRAMEWORK_ERROR,
+               "Failed to invoke tflite!");
+    return nullptr;
+  }
+
+  auto tensor_data = this->GetOutputTensorData(error);
   if (r2i::RuntimeError::EOK != error.GetCode()) {
     return nullptr;
   }
@@ -231,27 +243,63 @@ void Engine::SetInterpreterContext() {
   // No implementation for tflite engine
 }
 
-float *Engine::RunInference(std::shared_ptr<r2i::IFrame> frame,
-                            const int &input, const int size,
-                            r2i::RuntimeError &error) {
-  auto input_tensor = this->interpreter->typed_tensor<float>(input);
-  auto input_data = (float *)frame->GetData();
+void Engine::PreprocessInputData(const float *input_data, const int size,
+                                 r2i::RuntimeError &error) {
+  const auto &input_indices = interpreter->inputs();
+  const auto *tensor = interpreter->tensor(input_indices[0]);
 
   if (!input_data) {
-    error.Set (RuntimeError::Code::FRAMEWORK_ERROR, "Failed to get image data");
+    error.Set (RuntimeError::Code::WRONG_API_USAGE, "Failed to get image data");
+    return;
+  }
+
+  if (kTfLiteUInt8 == tensor->type) {
+    auto input_fixed_tensor = this->interpreter->typed_tensor<uint8_t>
+                              (input_indices[0]);
+
+    // Convert to fixed point
+    std::unique_ptr<uint8_t> input_data_fixed(new uint8_t(size));
+    for (int index = 0; index < size; index++) {
+      input_data_fixed.get()[index] = static_cast<uint8_t>(input_data[index]);
+    }
+
+    memcpy(input_fixed_tensor, input_data_fixed.get(), size * sizeof(uint8_t));
+  } else if (kTfLiteFloat32 == tensor->type) {
+    auto input_tensor = this->interpreter->typed_tensor<float>(input_indices[0]);
+
+    memcpy(input_tensor, input_data, size * sizeof(float));
+  } else {
+    error.Set (RuntimeError::Code::WRONG_API_USAGE,
+               "Output tensor has unsupported output type");
+    return;
+  }
+}
+
+float *Engine::GetOutputTensorData(r2i::RuntimeError &error) {
+  float *output_data = nullptr;
+  const auto &output_indices = interpreter->outputs();
+  const auto *tensor = interpreter->tensor(output_indices[0]);
+
+  if (kTfLiteUInt8 == tensor->type) {
+    uint8_t *output_data_fixed = interpreter->typed_output_tensor<uint8_t>(0);
+    TfLiteIntArray *output_dims = this->interpreter->tensor(
+                                    output_indices[0])->dims;
+
+    // Convert to floating point
+    auto output_size = GetRequiredBufferSize(output_dims);
+    output_data = (float *)malloc(output_size * sizeof(float));
+    for (int index = 0; index < output_size; index++) {
+      output_data[index] = static_cast<float>(output_data_fixed[index]);
+    }
+  } else if (kTfLiteFloat32 == tensor->type) {
+    output_data = interpreter->typed_output_tensor<float>(0);
+  } else {
+    error.Set (RuntimeError::Code::WRONG_API_USAGE,
+               "Output tensor has unsupported output type");
     return nullptr;
   }
 
-  memcpy(input_tensor, input_data,
-         size * sizeof(float));
-
-  if (this->interpreter->Invoke() != kTfLiteOk) {
-    error.Set (RuntimeError::Code::FRAMEWORK_ERROR,
-               "Failed to invoke tflite!");
-    return nullptr;
-  }
-
-  return this->interpreter->typed_output_tensor<float>(0);
+  return output_data;
 }
 
 } //namespace tflite

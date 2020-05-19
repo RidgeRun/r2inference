@@ -53,12 +53,16 @@ class Engine : public IEngine {
   std::shared_ptr<Model> model;
   int number_of_threads;
   int allow_fp16;
+  bool allow_quantized_models;
 
   virtual void SetupResolver(::tflite::ops::builtin::BuiltinOpResolver &resolver);
   virtual void SetInterpreterContext();
-  virtual float *RunInference(std::shared_ptr<r2i::IFrame> frame,
-                              const int &input, const int size,
-                              r2i::RuntimeError &error);
+
+ private:
+  void PreprocessInputData(const float *input_data, const int size,
+                           r2i::RuntimeError &error);
+  float *GetOutputTensorData(r2i::RuntimeError &error);
+
 };
 
 }

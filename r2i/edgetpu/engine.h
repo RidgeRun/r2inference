@@ -26,9 +26,6 @@ class Engine : public r2i::tflite::Engine {
   void SetupResolver(::tflite::ops::builtin::BuiltinOpResolver &resolver)
   override;
   void SetInterpreterContext() override;
-  float *RunInference(std::shared_ptr<r2i::IFrame> frame, const int &input,
-                      const int size,
-                      r2i::RuntimeError &error) override;
 };
 
 }
