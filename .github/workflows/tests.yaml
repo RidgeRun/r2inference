@@ -47,8 +47,13 @@ jobs:
         make
         ./list-backends
   build_tflite_autotools:
-    runs-on: ubuntu-18.04
-    container: ridgerun/r2inference:v0.1.4
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+       os: [ubuntu-18.04]
+       container: ["ridgerun/r2inference:v0.1.4", "ridgerun/r2inference-ubuntu-16.04:v0.1.0"]
+    container:
+      image: ${{ matrix.container }}
     env:
       TENSORFLOW_PATH: /root/r2inference/backends/tflite/v2.0.1/include/tensorflow
       CPPFLAGS: "-I${TENSORFLOW_PATH} -I${TENSORFLOW_PATH}/tensorflow/lite/tools/make/downloads/flatbuffers/include"
@@ -78,8 +83,13 @@ jobs:
         make
         ./list-backends
   build_tensorflow_tflite_autotools:
-    runs-on: ubuntu-18.04
-    container: ridgerun/r2inference:v0.1.4
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+       os: [ubuntu-18.04]
+       container: ["ridgerun/r2inference:v0.1.4", "ridgerun/r2inference-ubuntu-16.04:v0.1.0"]
+    container:
+      image: ${{ matrix.container }}
     env:
       TENSORFLOW_PATH: /root/r2inference/backends/tflite/v2.0.1/include/tensorflow
       CPPFLAGS: "-I${TENSORFLOW_PATH} -I${TENSORFLOW_PATH}/tensorflow/lite/tools/make/downloads/flatbuffers/include"
@@ -111,8 +121,13 @@ jobs:
         make
         ./list-backends
   build_tensorflow_meson:
-    runs-on: ubuntu-18.04
-    container: ridgerun/r2inference:v0.1.4
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+       os: [ubuntu-18.04]
+       container: ["ridgerun/r2inference:v0.1.4", "ridgerun/r2inference-ubuntu-16.04:v0.1.0"]
+    container:
+      image: ${{ matrix.container }}
     env:
       CXXFLAGS: "-Werror"
     steps:
@@ -137,8 +152,13 @@ jobs:
         cd build/examples/external
         ./list_backends
   build_tflite_meson:
-    runs-on: ubuntu-18.04
-    container: ridgerun/r2inference:v0.1.4
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+       os: [ubuntu-18.04]
+       container: ["ridgerun/r2inference:v0.1.4", "ridgerun/r2inference-ubuntu-16.04:v0.1.0"]
+    container:
+      image: ${{ matrix.container }}
     env:
       TENSORFLOW_PATH: /root/r2inference/backends/tflite/v2.0.1/include/tensorflow
       CPPFLAGS: "-I${TENSORFLOW_PATH} -I${TENSORFLOW_PATH}/tensorflow/lite/tools/make/downloads/flatbuffers/include"
@@ -165,8 +185,13 @@ jobs:
         cd build/examples/external
         ./list_backends
   build_tensorflow_tflite_meson:
-    runs-on: ubuntu-18.04
-    container: ridgerun/r2inference:v0.1.4
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+       os: [ubuntu-18.04]
+       container: ["ridgerun/r2inference:v0.1.4", "ridgerun/r2inference-ubuntu-16.04:v0.1.0"]
+    container:
+      image: ${{ matrix.container }}
     env:
       TENSORFLOW_PATH: /root/r2inference/backends/tflite/v2.0.1/include/tensorflow
       CPPFLAGS: "-I${TENSORFLOW_PATH} -I${TENSORFLOW_PATH}/tensorflow/lite/tools/make/downloads/flatbuffers/include"
