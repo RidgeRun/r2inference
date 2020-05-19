@@ -11,17 +11,11 @@
 
 #include "r2i/edgetpu/engine.h"
 
-#include <edgetpu.h>
-
 namespace r2i {
 namespace edgetpu {
 
-Engine::Engine () {
-  this->state = r2i::tflite::Engine::State::STOPPED;
-  this->model = nullptr;
+Engine::Engine () : tflite::Engine() {
   this->number_of_threads = 1;
-  this->allow_fp16 = 0;
-  this->allow_quantized_models = true;
 }
 
 void Engine::SetupResolver(::tflite::ops::builtin::BuiltinOpResolver
@@ -29,11 +23,11 @@ void Engine::SetupResolver(::tflite::ops::builtin::BuiltinOpResolver
   resolver.AddCustom(::edgetpu::kCustomOp, ::edgetpu::RegisterCustomOp());
 }
 
-void Engine::SetInterpreterContext() {
-  std::shared_ptr<::edgetpu::EdgeTpuContext> edgetpu_context =
-    ::edgetpu::EdgeTpuManager::GetSingleton()->OpenDevice();
+void Engine::SetInterpreterContext(std::shared_ptr<::tflite::Interpreter>
+                                   interpreter) {
+  this->edgetpu_context = ::edgetpu::EdgeTpuManager::GetSingleton()->OpenDevice();
   this->interpreter->SetExternalContext(kTfLiteEdgeTpuContext,
-                                        edgetpu_context.get());
+                                        this->edgetpu_context.get());
 }
 
 } //namepsace edgetpu

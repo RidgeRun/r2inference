@@ -53,15 +53,17 @@ class Engine : public IEngine {
   std::shared_ptr<Model> model;
   int number_of_threads;
   int allow_fp16;
-  bool allow_quantized_models;
 
   virtual void SetupResolver(::tflite::ops::builtin::BuiltinOpResolver &resolver);
-  virtual void SetInterpreterContext();
+  virtual void SetInterpreterContext(std::shared_ptr<::tflite::Interpreter>
+                                     interpreter);
 
  private:
   void PreprocessInputData(const float *input_data, const int size,
                            r2i::RuntimeError &error);
   float *GetOutputTensorData(r2i::RuntimeError &error);
+  uint8_t ConvertToFixedPoint(const TfLiteTensor *tensor, float value);
+  float ConvertToFloatingPoint(const TfLiteTensor *tensor, uint8_t value);
 
 };
 

@@ -22,7 +22,6 @@ namespace tflite {
 Engine::Engine () : state(State::STOPPED), model(nullptr) {
   this->number_of_threads = 0;
   this->allow_fp16 = 0;
-  this->allow_quantized_models = false;
 }
 
 RuntimeError Engine::SetModel (std::shared_ptr<r2i::IModel> in_model) {
@@ -90,7 +89,7 @@ RuntimeError Engine::Start ()  {
       return error;
     }
 
-    this->SetInterpreterContext();
+    this->SetInterpreterContext(this->interpreter);
 
     std::shared_ptr<::tflite::Interpreter> tflite_interpreter_shared{std::move(interpreter)};
 
@@ -197,14 +196,6 @@ std::shared_ptr<r2i::IPrediction> Engine::Predict (std::shared_ptr<r2i::IFrame>
     return nullptr;
   }
 
-  // Check the model quantization, only 32 bits allowed
-  if (kTfLiteFloat32 != interpreter->tensor(input)->type
-      && !this->allow_quantized_models) {
-    error.Set (RuntimeError::Code::FRAMEWORK_ERROR,
-               "The provided model quantization is not allowed, only float32 is supported");
-    return nullptr;
-  }
-
   this->PreprocessInputData(static_cast<float *>(frame->GetData()),
                             wanted_width * wanted_height * wanted_channels, error);
   if (r2i::RuntimeError::EOK != error.GetCode()) {
@@ -239,7 +230,8 @@ void Engine::SetupResolver(::tflite::ops::builtin::BuiltinOpResolver
   // No implementation for tflite engine
 }
 
-void Engine::SetInterpreterContext() {
+void Engine::SetInterpreterContext(
+  std::shared_ptr<::tflite::Interpreter> /*interpreter*/) {
   // No implementation for tflite engine
 }
 
@@ -260,7 +252,8 @@ void Engine::PreprocessInputData(const float *input_data, const int size,
     // Convert to fixed point
     std::unique_ptr<uint8_t> input_data_fixed(new uint8_t(size));
     for (int index = 0; index < size; index++) {
-      input_data_fixed.get()[index] = static_cast<uint8_t>(input_data[index]);
+      input_data_fixed.get()[index] = this->ConvertToFixedPoint(tensor,
+                                      input_data[index]);
     }
 
     memcpy(input_fixed_tensor, input_data_fixed.get(), size * sizeof(uint8_t));
@@ -289,7 +282,8 @@ float *Engine::GetOutputTensorData(r2i::RuntimeError &error) {
     auto output_size = GetRequiredBufferSize(output_dims);
     output_data = (float *)malloc(output_size * sizeof(float));
     for (int index = 0; index < output_size; index++) {
-      output_data[index] = static_cast<float>(output_data_fixed[index]);
+      output_data[index] = this->ConvertToFloatingPoint(tensor,
+                           output_data_fixed[index]);
     }
   } else if (kTfLiteFloat32 == tensor->type) {
     output_data = interpreter->typed_output_tensor<float>(0);
@@ -300,6 +294,23 @@ float *Engine::GetOutputTensorData(r2i::RuntimeError &error) {
   }
 
   return output_data;
+}
+
+uint8_t Engine::ConvertToFixedPoint(const TfLiteTensor *tensor, float value) {
+  auto zero_point = tensor->params.zero_point;
+  auto scale = tensor->params.scale;
+
+  float result = (value / scale) + zero_point;
+  return static_cast<uint8_t>(result);
+}
+
+float Engine::ConvertToFloatingPoint(const TfLiteTensor *tensor,
+                                     uint8_t value) {
+  auto zero_point = tensor->params.zero_point;
+  auto scale = tensor->params.scale;
+
+  uint8_t result = (static_cast<float>(value) + zero_point) * scale;
+  return result;
 }
 
 } //namespace tflite

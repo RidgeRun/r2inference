@@ -12,6 +12,7 @@
 #include "frameworkfactory.h"
 #include "engine.h"
 
+#include <edgetpu.h>
 #include <tensorflow/lite/version.h>
 
 namespace r2i {
@@ -28,9 +29,9 @@ r2i::FrameworkMeta FrameworkFactory::GetDescription (
   RuntimeError &error) {
   const FrameworkMeta meta {
     .code = r2i::FrameworkCode::EDGETPU,
-    .name = "tensorflow-lite-edgetpu",
+    .name = "edgetpu",
     .description = "Google's TensorFlow Lite with EdgeTPU support",
-    .version = TFLITE_VERSION_STRING
+    .version = ::edgetpu::EdgeTpuManager::GetSingleton()->Version()
   };
 
   error.Clean ();

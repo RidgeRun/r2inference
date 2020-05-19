@@ -12,6 +12,7 @@
 #ifndef R2I_EDGETPU_ENGINE_H
 #define R2I_EDGETPU_ENGINE_H
 
+#include <edgetpu.h>
 #include <r2i/tflite/engine.h>
 
 namespace r2i {
@@ -25,7 +26,11 @@ class Engine : public r2i::tflite::Engine {
 
   void SetupResolver(::tflite::ops::builtin::BuiltinOpResolver &resolver)
   override;
-  void SetInterpreterContext() override;
+  void SetInterpreterContext(std::shared_ptr<::tflite::Interpreter> interpreter)
+  override;
+
+ private:
+  std::shared_ptr<::edgetpu::EdgeTpuContext> edgetpu_context;
 };
 
 }
