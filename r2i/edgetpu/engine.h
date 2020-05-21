@@ -21,12 +21,13 @@ namespace edgetpu {
 class Engine : public r2i::tflite::Engine {
  public:
   Engine ();
+  ~Engine ();
 
  protected:
 
   void SetupResolver(::tflite::ops::builtin::BuiltinOpResolver &resolver)
   override;
-  void SetInterpreterContext(std::shared_ptr<::tflite::Interpreter> interpreter)
+  void SetInterpreterContext(::tflite::Interpreter *interpreter)
   override;
 
  private:

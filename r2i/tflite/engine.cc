@@ -11,10 +11,13 @@
 
 #include "r2i/tflite/engine.h"
 
+#include <vector>
+
 #include "r2i/tflite/prediction.h"
 #include "r2i/tflite/frame.h"
 #include <tensorflow/lite/model.h>
 #include <tensorflow/lite/string_util.h>
+#include <tensorflow/lite/kernels/register.h>
 
 namespace r2i {
 namespace tflite {
@@ -88,8 +91,6 @@ RuntimeError Engine::Start ()  {
                  "Failed to construct interpreter");
       return error;
     }
-
-    this->SetInterpreterContext(this->interpreter);
 
     std::shared_ptr<::tflite::Interpreter> tflite_interpreter_shared{std::move(interpreter)};
 
@@ -169,6 +170,8 @@ std::shared_ptr<r2i::IPrediction> Engine::Predict (std::shared_ptr<r2i::IFrame>
     return nullptr;
   }
 
+  this->SetInterpreterContext(this->interpreter.get());
+
   if (this->number_of_threads > 0) {
     interpreter->SetNumThreads(this->number_of_threads);
   }
@@ -197,7 +200,7 @@ std::shared_ptr<r2i::IPrediction> Engine::Predict (std::shared_ptr<r2i::IFrame>
   }
 
   this->PreprocessInputData(static_cast<float *>(frame->GetData()),
-                            wanted_width * wanted_height * wanted_channels, error);
+                            wanted_width * wanted_height * wanted_channels, this->interpreter.get(), error);
   if (r2i::RuntimeError::EOK != error.GetCode()) {
     return nullptr;
   }
@@ -208,7 +211,7 @@ std::shared_ptr<r2i::IPrediction> Engine::Predict (std::shared_ptr<r2i::IFrame>
     return nullptr;
   }
 
-  auto tensor_data = this->GetOutputTensorData(error);
+  auto tensor_data = this->GetOutputTensorData(this->interpreter.get(), error);
   if (r2i::RuntimeError::EOK != error.GetCode()) {
     return nullptr;
   }
@@ -223,6 +226,7 @@ std::shared_ptr<r2i::IPrediction> Engine::Predict (std::shared_ptr<r2i::IFrame>
 
 Engine::~Engine () {
   this->Stop();
+  this->interpreter.reset();
 }
 
 void Engine::SetupResolver(::tflite::ops::builtin::BuiltinOpResolver
@@ -230,13 +234,12 @@ void Engine::SetupResolver(::tflite::ops::builtin::BuiltinOpResolver
   // No implementation for tflite engine
 }
 
-void Engine::SetInterpreterContext(
-  std::shared_ptr<::tflite::Interpreter> /*interpreter*/) {
+void Engine::SetInterpreterContext(::tflite::Interpreter */*interpreter*/) {
   // No implementation for tflite engine
 }
 
 void Engine::PreprocessInputData(const float *input_data, const int size,
-                                 r2i::RuntimeError &error) {
+                                 ::tflite::Interpreter *interpreter, r2i::RuntimeError &error) {
   const auto &input_indices = interpreter->inputs();
   const auto *tensor = interpreter->tensor(input_indices[0]);
 
@@ -246,19 +249,18 @@ void Engine::PreprocessInputData(const float *input_data, const int size,
   }
 
   if (kTfLiteUInt8 == tensor->type) {
-    auto input_fixed_tensor = this->interpreter->typed_tensor<uint8_t>
-                              (input_indices[0]);
+    auto *input_fixed_tensor = interpreter->typed_input_tensor<uint8_t>(0);
 
     // Convert to fixed point
-    std::unique_ptr<uint8_t> input_data_fixed(new uint8_t(size));
+    std::vector<uint8_t> input_data_fixed;
     for (int index = 0; index < size; index++) {
-      input_data_fixed.get()[index] = this->ConvertToFixedPoint(tensor,
-                                      input_data[index]);
+      input_data_fixed.push_back(this->ConvertToFixedPoint(tensor,
+                                 input_data[index]));
     }
 
-    memcpy(input_fixed_tensor, input_data_fixed.get(), size * sizeof(uint8_t));
+    memcpy(input_fixed_tensor, input_data_fixed.data(), size * sizeof(uint8_t));
   } else if (kTfLiteFloat32 == tensor->type) {
-    auto input_tensor = this->interpreter->typed_tensor<float>(input_indices[0]);
+    auto input_tensor = interpreter->typed_tensor<float>(input_indices[0]);
 
     memcpy(input_tensor, input_data, size * sizeof(float));
   } else {
@@ -268,7 +270,8 @@ void Engine::PreprocessInputData(const float *input_data, const int size,
   }
 }
 
-float *Engine::GetOutputTensorData(r2i::RuntimeError &error) {
+float *Engine::GetOutputTensorData(::tflite::Interpreter *interpreter,
+                                   r2i::RuntimeError &error) {
   float *output_data = nullptr;
   const auto &output_indices = interpreter->outputs();
   const auto *tensor = interpreter->tensor(output_indices[0]);
@@ -301,6 +304,7 @@ uint8_t Engine::ConvertToFixedPoint(const TfLiteTensor *tensor, float value) {
   auto scale = tensor->params.scale;
 
   float result = (value / scale) + zero_point;
+
   return static_cast<uint8_t>(result);
 }
 

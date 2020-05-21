@@ -55,13 +55,13 @@ class Engine : public IEngine {
   int allow_fp16;
 
   virtual void SetupResolver(::tflite::ops::builtin::BuiltinOpResolver &resolver);
-  virtual void SetInterpreterContext(std::shared_ptr<::tflite::Interpreter>
-                                     interpreter);
+  virtual void SetInterpreterContext(::tflite::Interpreter *interpreter);
 
  private:
   void PreprocessInputData(const float *input_data, const int size,
-                           r2i::RuntimeError &error);
-  float *GetOutputTensorData(r2i::RuntimeError &error);
+                           ::tflite::Interpreter *interpreter, r2i::RuntimeError &error);
+  float *GetOutputTensorData(::tflite::Interpreter *interpreter,
+                             r2i::RuntimeError &error);
   uint8_t ConvertToFixedPoint(const TfLiteTensor *tensor, float value);
   float ConvertToFloatingPoint(const TfLiteTensor *tensor, uint8_t value);
 

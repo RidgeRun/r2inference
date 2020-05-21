@@ -16,6 +16,7 @@ namespace edgetpu {
 
 Engine::Engine () : tflite::Engine() {
   this->number_of_threads = 1;
+  this->edgetpu_context = nullptr;
 }
 
 void Engine::SetupResolver(::tflite::ops::builtin::BuiltinOpResolver
@@ -23,11 +24,17 @@ void Engine::SetupResolver(::tflite::ops::builtin::BuiltinOpResolver
   resolver.AddCustom(::edgetpu::kCustomOp, ::edgetpu::RegisterCustomOp());
 }
 
-void Engine::SetInterpreterContext(std::shared_ptr<::tflite::Interpreter>
-                                   interpreter) {
+void Engine::SetInterpreterContext(::tflite::Interpreter *interpreter) {
   this->edgetpu_context = ::edgetpu::EdgeTpuManager::GetSingleton()->OpenDevice();
-  this->interpreter->SetExternalContext(kTfLiteEdgeTpuContext,
-                                        this->edgetpu_context.get());
+
+  interpreter->SetExternalContext(kTfLiteEdgeTpuContext,
+                                  this->edgetpu_context.get());
+}
+
+Engine::~Engine() {
+  this->Stop();
+  this->interpreter.reset();
+  this->edgetpu_context.reset();
 }
 
 } //namepsace edgetpu
