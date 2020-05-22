@@ -17,6 +17,7 @@
 #include <memory>
 
 #include <r2i/tflite/model.h>
+#include <r2i/tflite/prediction.h>
 #include <tensorflow/lite/kernels/register.h>
 
 namespace r2i {
@@ -60,10 +61,8 @@ class Engine : public IEngine {
  private:
   void PreprocessInputData(const float *input_data, const int size,
                            ::tflite::Interpreter *interpreter, r2i::RuntimeError &error);
-  float *GetOutputTensorData(::tflite::Interpreter *interpreter,
+  float *GetOutputTensorData(::tflite::Interpreter *interpreter, int &output_size,
                              r2i::RuntimeError &error);
-  uint8_t ConvertToFixedPoint(const TfLiteTensor *tensor, float value);
-  float ConvertToFloatingPoint(const TfLiteTensor *tensor, uint8_t value);
 
 };
 

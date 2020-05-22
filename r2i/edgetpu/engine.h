@@ -12,8 +12,9 @@
 #ifndef R2I_EDGETPU_ENGINE_H
 #define R2I_EDGETPU_ENGINE_H
 
-#include <edgetpu.h>
 #include <r2i/tflite/engine.h>
+
+#include <edgetpu.h>
 
 namespace r2i {
 namespace edgetpu {
