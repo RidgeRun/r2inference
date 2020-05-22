@@ -79,6 +79,7 @@ docs/api/Makefile
 docs/uml/Makefile
 examples/Makefile
 examples/r2i/Makefile
+examples/r2i/edgetpu/Makefile
 examples/r2i/ncsdk/Makefile
 examples/r2i/tensorflow/Makefile
 examples/r2i/tensorrt/Makefile
