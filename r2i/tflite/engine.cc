@@ -226,6 +226,17 @@ Engine::~Engine () {
   this->Stop();
 }
 
+template <typename T>
+static uint8_t ConvertToFixedPoint(const T value, const TfLiteTensor &tensor) {
+  return (value / tensor.params.scale) + tensor.params.zero_point;
+}
+
+template <typename T>
+static T ConvertToFloatingPoint(const uint8_t value,
+                                const TfLiteTensor &tensor) {
+  return (value - tensor.params.zero_point) * tensor.params.scale;
+}
+
 void Engine::SetupResolver(::tflite::ops::builtin::BuiltinOpResolver
                            &/*resolver*/) {
   // No implementation for tflite engine
@@ -246,15 +257,12 @@ void Engine::PreprocessInputData(const float *input_data, const int size,
   }
 
   if (kTfLiteUInt8 == tensor->type) {
-    auto *input_fixed_tensor = interpreter->typed_input_tensor<uint8_t>(0);
+    auto input_fixed_tensor = interpreter->typed_input_tensor<uint8_t>(0);
 
-    std::vector<uint8_t> input_data_fixed;
-    input_data_fixed.resize(size);
+    // Convert to fixed point and write the data to the input tensor
     for (int index = 0; index < size; index++) {
-      input_data_fixed[index] = (uint8_t)input_data[index];
+      input_fixed_tensor[index] = ConvertToFixedPoint(input_data[index], *tensor);
     }
-
-    memcpy(input_fixed_tensor, input_data_fixed.data(), input_data_fixed.size());
   } else if (kTfLiteFloat32 == tensor->type) {
     auto input_tensor = interpreter->typed_tensor<float>(input_indices[0]);
 
@@ -290,8 +298,8 @@ float *Engine::GetOutputTensorData(::tflite::Interpreter *interpreter,
       const uint8_t *output = interpreter->typed_output_tensor<uint8_t>(index);
 
       for (int value_index = 0; value_index < num_values; ++value_index) {
-        output_data[out_idx++] = (output[value_index] - out_tensor->params.zero_point) *
-                                 out_tensor->params.scale;
+        output_data[out_idx++] = ConvertToFloatingPoint<float>(output[value_index],
+                                 *out_tensor);
       }
     } else if (kTfLiteFloat32 == out_tensor->type) {
 
