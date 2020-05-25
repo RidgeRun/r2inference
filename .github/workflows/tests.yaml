@@ -11,10 +11,9 @@ on:
 
 jobs:
   build_tensorflow_autotools:
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-18.04
     strategy:
       matrix:
-       os: [ubuntu-18.04]
        container: ["ridgerun/r2inference:v0.1.5", "ridgerun/r2inference-ubuntu-16.04:v0.3.0"]
     container:
       image: ${{ matrix.container }}
@@ -46,10 +45,9 @@ jobs:
         make
         ./list-backends
   build_tflite_autotools:
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-18.04
     strategy:
       matrix:
-       os: [ubuntu-18.04]
        container: ["ridgerun/r2inference:v0.1.5"]
     container:
       image: ${{ matrix.container }}
@@ -82,10 +80,9 @@ jobs:
         make
         ./list-backends
   build_tensorflow_tflite_autotools:
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-18.04
     strategy:
       matrix:
-       os: [ubuntu-18.04]
        container: ["ridgerun/r2inference:v0.1.5"]
     container:
       image: ${{ matrix.container }}
@@ -120,10 +117,9 @@ jobs:
         make
         ./list-backends
   build_tensorflow_meson:
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-18.04
     strategy:
       matrix:
-       os: [ubuntu-18.04]
        container: ["ridgerun/r2inference:v0.1.5", "ridgerun/r2inference-ubuntu-16.04:v0.3.0"]
     container:
       image: ${{ matrix.container }}
@@ -151,10 +147,9 @@ jobs:
         cd build/examples/external
         ./list_backends
   build_tflite_meson:
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-18.04
     strategy:
       matrix:
-       os: [ubuntu-18.04]
        container: ["ridgerun/r2inference:v0.1.5"]
     container:
       image: ${{ matrix.container }}
@@ -184,10 +179,9 @@ jobs:
         cd build/examples/external
         ./list_backends
   build_tensorflow_tflite_meson:
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-18.04
     strategy:
       matrix:
-       os: [ubuntu-18.04]
        container: ["ridgerun/r2inference:v0.1.5"]
     container:
       image: ${{ matrix.container }}
