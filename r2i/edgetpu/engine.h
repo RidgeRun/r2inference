@@ -14,7 +14,7 @@
 
 #include <r2i/tflite/engine.h>
 
-#include <edgetpu.h>
+#include <libedgetpu/edgetpu.h>
 
 namespace r2i {
 namespace edgetpu {

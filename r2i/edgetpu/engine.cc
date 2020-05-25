@@ -37,5 +37,5 @@ Engine::~Engine() {
   this->edgetpu_context.reset();
 }
 
-} //namepsace edgetpu
-} //namepsace r2i
+} //namespace edgetpu
+} //namespace r2i

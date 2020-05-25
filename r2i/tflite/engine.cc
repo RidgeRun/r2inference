@@ -11,12 +11,12 @@
 
 #include "r2i/tflite/engine.h"
 
-#include <vector>
-
-#include "r2i/tflite/prediction.h"
-#include "r2i/tflite/frame.h"
 #include <tensorflow/lite/model.h>
 #include <tensorflow/lite/string_util.h>
+#include <vector>
+
+#include "r2i/tflite/frame.h"
+#include "r2i/tflite/prediction.h"
 
 namespace r2i {
 namespace tflite {
@@ -224,7 +224,6 @@ std::shared_ptr<r2i::IPrediction> Engine::Predict (std::shared_ptr<r2i::IFrame>
 
 Engine::~Engine () {
   this->Stop();
-  this->interpreter.reset();
 }
 
 void Engine::SetupResolver(::tflite::ops::builtin::BuiltinOpResolver

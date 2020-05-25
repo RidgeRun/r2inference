@@ -1,4 +1,4 @@
-# Copyright (C) 2018 RidgeRun, LLC (http://www.ridgerun.com)
+# Copyright (C) 2020 RidgeRun, LLC (http://www.ridgerun.com)
 # All Rights Reserved.
 #
 # The contents of this software are proprietary and confidential to RidgeRun,

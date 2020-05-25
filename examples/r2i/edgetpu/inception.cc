@@ -153,7 +153,7 @@ int main (int argc, char *argv[]) {
                    error);
 
   if (nullptr == factory) {
-    std::cerr << "TensorFlow backend is not built: " << error << std::endl;
+    std::cerr << "EdgeTPU backend is not built: " << error << std::endl;
     exit(EXIT_FAILURE);
   }
 

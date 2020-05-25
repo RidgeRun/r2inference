@@ -12,8 +12,7 @@
 #include "frameworkfactory.h"
 #include "engine.h"
 
-#include <edgetpu.h>
-#include <tensorflow/lite/version.h>
+#include <libedgetpu/edgetpu.h>
 
 namespace r2i {
 namespace edgetpu {
