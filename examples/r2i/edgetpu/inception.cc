@@ -39,9 +39,6 @@ void PrintTopPrediction (std::shared_ptr<r2i::IPrediction> prediction) {
   std::cout << "Highest probability is label "
             << std::distance(results.begin(), it) << " (" << *it << ")"
             << std::endl;
-
-  /*std::cout << "Highest probability is label "
-            << index << " (" << max << ")" << std::endl;*/
 }
 
 void PrintUsage() {
