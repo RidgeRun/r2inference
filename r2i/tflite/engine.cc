@@ -226,15 +226,16 @@ Engine::~Engine () {
   this->Stop();
 }
 
-template <typename T>
-static uint8_t ConvertToFixedPoint(const T value, const TfLiteTensor &tensor) {
-  return (value / tensor.params.scale) + tensor.params.zero_point;
+template <typename T1, typename T2>
+static T2 ConvertToFixedPoint(const T1 value, const float scale,
+                              const int zero_point) {
+  return static_cast<T2>((value / scale) + zero_point);
 }
 
-template <typename T>
-static T ConvertToFloatingPoint(const uint8_t value,
-                                const TfLiteTensor &tensor) {
-  return (value - tensor.params.zero_point) * tensor.params.scale;
+template <typename T1, typename T2>
+static T1 ConvertToFloatingPoint(const T2 value, const float scale,
+                                 const int zero_point) {
+  return static_cast<T1>((value - zero_point) * scale);
 }
 
 void Engine::SetupResolver(::tflite::ops::builtin::BuiltinOpResolver
@@ -242,7 +243,7 @@ void Engine::SetupResolver(::tflite::ops::builtin::BuiltinOpResolver
   // No implementation for tflite engine
 }
 
-void Engine::SetInterpreterContext(::tflite::Interpreter */*interpreter*/) {
+void Engine::SetInterpreterContext(::tflite::Interpreter * /*interpreter*/) {
   // No implementation for tflite engine
 }
 
@@ -261,7 +262,8 @@ void Engine::PreprocessInputData(const float *input_data, const int size,
 
     // Convert to fixed point and write the data to the input tensor
     for (int index = 0; index < size; index++) {
-      input_fixed_tensor[index] = ConvertToFixedPoint(input_data[index], *tensor);
+      input_fixed_tensor[index] = ConvertToFixedPoint<float, uint8_t>
+                                  (input_data[index], tensor->params.scale, tensor->params.zero_point);
     }
   } else if (kTfLiteFloat32 == tensor->type) {
     auto input_tensor = interpreter->typed_tensor<float>(input_indices[0]);
@@ -298,8 +300,9 @@ float *Engine::GetOutputTensorData(::tflite::Interpreter *interpreter,
       const uint8_t *output = interpreter->typed_output_tensor<uint8_t>(index);
 
       for (int value_index = 0; value_index < num_values; ++value_index) {
-        output_data[out_idx++] = ConvertToFloatingPoint<float>(output[value_index],
-                                 *out_tensor);
+        output_data[out_idx++] = ConvertToFloatingPoint<float, uint8_t>
+                                 (output[value_index],
+                                  out_tensor->params.scale, out_tensor->params.zero_point);
       }
     } else if (kTfLiteFloat32 == out_tensor->type) {
 
