@@ -15,6 +15,7 @@
 #include <r2i/iengine.h>
 
 #include <memory>
+#include <vector>
 
 #include <r2i/tflite/model.h>
 #include <r2i/tflite/prediction.h>
@@ -61,8 +62,9 @@ class Engine : public IEngine {
  private:
   void PreprocessInputData(const float *input_data, const int size,
                            ::tflite::Interpreter *interpreter, r2i::RuntimeError &error);
-  float *GetOutputTensorData(::tflite::Interpreter *interpreter, int &output_size,
-                             r2i::RuntimeError &error);
+  void GetOutputTensorData(::tflite::Interpreter *interpreter,
+                           std::vector<float> &output_data,
+                           r2i::RuntimeError &error);
 
 };
 

@@ -13,7 +13,6 @@
 
 #include <tensorflow/lite/model.h>
 #include <tensorflow/lite/string_util.h>
-#include <vector>
 
 #include "r2i/tflite/frame.h"
 #include "r2i/tflite/prediction.h"
@@ -210,14 +209,13 @@ std::shared_ptr<r2i::IPrediction> Engine::Predict (std::shared_ptr<r2i::IFrame>
     return nullptr;
   }
 
-  int output_size;
-  auto tensor_data = this->GetOutputTensorData(this->interpreter.get(),
-                     output_size, error);
+  std::vector<float> tensor_data;
+  this->GetOutputTensorData(this->interpreter.get(), tensor_data, error);
   if (r2i::RuntimeError::EOK != error.GetCode()) {
     return nullptr;
   }
 
-  prediction->SetTensorValues(tensor_data, output_size);
+  prediction->SetTensorValues(tensor_data.data(), tensor_data.size());
 
   return prediction;
 }
@@ -233,9 +231,28 @@ static T2 ConvertToFixedPoint(const T1 value, const float scale,
 }
 
 template <typename T1, typename T2>
+static void ConvertArrayToFixedPoint(const T1 *data, T2 *output_data,
+                                     const int size, const float scale, const int zero_point) {
+  for (int index = 0; index < size; index++) {
+    output_data[index] = static_cast<T2>(ConvertToFixedPoint<T1, T2>(data[index],
+                                         scale, zero_point));
+  }
+}
+
+template <typename T1, typename T2>
 static T1 ConvertToFloatingPoint(const T2 value, const float scale,
                                  const int zero_point) {
   return static_cast<T1>((value - zero_point) * scale);
+}
+
+template <typename T1, typename T2>
+static void ConvertArrayToFloatingPoint(const T2 *data,
+                                        std::vector<T1> &output_data, const int size, const float scale,
+                                        const int zero_point) {
+  for (int index = 0; index < size; index++) {
+    output_data[index] = ConvertToFloatingPoint<T1, T2>(data[index], scale,
+                         zero_point);
+  }
 }
 
 void Engine::SetupResolver(::tflite::ops::builtin::BuiltinOpResolver
@@ -259,15 +276,10 @@ void Engine::PreprocessInputData(const float *input_data, const int size,
 
   if (kTfLiteUInt8 == tensor->type) {
     auto input_fixed_tensor = interpreter->typed_input_tensor<uint8_t>(0);
-
-    // Convert to fixed point and write the data to the input tensor
-    for (int index = 0; index < size; index++) {
-      input_fixed_tensor[index] = ConvertToFixedPoint<float, uint8_t>
-                                  (input_data[index], tensor->params.scale, tensor->params.zero_point);
-    }
+    ConvertArrayToFixedPoint<float, uint8_t>(input_data, input_fixed_tensor, size,
+        tensor->params.scale, tensor->params.zero_point);
   } else if (kTfLiteFloat32 == tensor->type) {
     auto input_tensor = interpreter->typed_tensor<float>(input_indices[0]);
-
     memcpy(input_tensor, input_data, size * sizeof(float));
   } else {
     error.Set (RuntimeError::Code::WRONG_API_USAGE,
@@ -276,52 +288,35 @@ void Engine::PreprocessInputData(const float *input_data, const int size,
   }
 }
 
-float *Engine::GetOutputTensorData(::tflite::Interpreter *interpreter,
-                                   int &output_size,
-                                   r2i::RuntimeError &error) {
-  std::vector<float> output_data;
+void Engine::GetOutputTensorData(::tflite::Interpreter *interpreter,
+                                 std::vector<float> &output_data,
+                                 r2i::RuntimeError &error) {
+
   const auto &output_indices = interpreter->outputs();
-  const int num_outputs = output_indices.size();
+  const auto *out_tensor = interpreter->tensor(output_indices[0]);
 
-  int out_idx = 0;
-  for (int index = 0; index < num_outputs; ++index) {
-    const auto *out_tensor = interpreter->tensor(output_indices[index]);
-
-    if (nullptr == out_tensor) {
-      error.Set (RuntimeError::Code::FRAMEWORK_ERROR,
-                 "Output tensor is null");
-      return nullptr;
-    }
-
-    if (kTfLiteUInt8 == out_tensor->type) {
-
-      const int num_values = out_tensor->bytes;
-      output_data.resize(out_idx + num_values);
-      const uint8_t *output = interpreter->typed_output_tensor<uint8_t>(index);
-
-      for (int value_index = 0; value_index < num_values; ++value_index) {
-        output_data[out_idx++] = ConvertToFloatingPoint<float, uint8_t>
-                                 (output[value_index],
-                                  out_tensor->params.scale, out_tensor->params.zero_point);
-      }
-    } else if (kTfLiteFloat32 == out_tensor->type) {
-
-      const int num_values = out_tensor->bytes / sizeof(float);
-      output_data.resize(out_idx + num_values);
-      const float *output = interpreter->typed_output_tensor<float>(index);
-
-      for (int value_index = 0; value_index < num_values; ++value_index) {
-        output_data[out_idx++] = output[value_index];
-      }
-    } else {
-      error.Set (RuntimeError::Code::WRONG_API_USAGE,
-                 "Output tensor has unsupported output type");
-      return nullptr;
-    }
+  if (nullptr == out_tensor) {
+    error.Set (RuntimeError::Code::FRAMEWORK_ERROR,
+               "Output tensor is null");
+    return;
   }
 
-  output_size = output_data.size();
-  return output_data.data();
+  if (kTfLiteUInt8 == out_tensor->type) {
+    const int num_values = out_tensor->bytes;
+    output_data.resize(num_values);
+    const uint8_t *output = interpreter->typed_output_tensor<uint8_t>(0);
+    ConvertArrayToFloatingPoint<float, uint8_t>(output, output_data, num_values,
+        out_tensor->params.scale, out_tensor->params.zero_point);
+  } else if (kTfLiteFloat32 == out_tensor->type) {
+    const int num_values = out_tensor->bytes / sizeof(float);
+    output_data.resize(num_values);
+    const float *output = interpreter->typed_output_tensor<float>(0);
+    memcpy(&output_data[0], output, num_values * sizeof(float));
+  } else {
+    error.Set (RuntimeError::Code::WRONG_API_USAGE,
+               "Output tensor has unsupported output type");
+    return;
+  }
 }
 
 } //namespace tflite
