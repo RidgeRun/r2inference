@@ -13,6 +13,10 @@ foreach app : app_examples
     install: false)
 endforeach
 
+if get_option('enable-edgetpu')
+  subdir('edgetpu')
+endif
+
 if get_option('enable-tensorflow')
   subdir('tensorflow')
 endif

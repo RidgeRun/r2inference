@@ -11,12 +11,17 @@
 AM_DEFAULT_SOURCE_EXT = .cc
 
 DIST_SUBDIRS =                    \
+        edgetpu                   \
         ncsdk                     \
         tensorflow                \
         tflite
 SUBDIRS =
 
 if ENABLE_EXAMPLES
+
+if HAVE_EDGETPU
+SUBDIRS += edgetpu
+endif
 
 if HAVE_NCSDK
 SUBDIRS += ncsdk
