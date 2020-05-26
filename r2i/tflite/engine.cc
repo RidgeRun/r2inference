@@ -90,6 +90,8 @@ RuntimeError Engine::Start ()  {
       return error;
     }
 
+    this->SetInterpreterContext(interpreter.get());
+
     std::shared_ptr<::tflite::Interpreter> tflite_interpreter_shared{std::move(interpreter)};
 
     this->interpreter = tflite_interpreter_shared;
@@ -167,8 +169,6 @@ std::shared_ptr<r2i::IPrediction> Engine::Predict (std::shared_ptr<r2i::IFrame>
                "The provided frame is not an tensorflow lite frame");
     return nullptr;
   }
-
-  this->SetInterpreterContext(this->interpreter.get());
 
   if (this->number_of_threads > 0) {
     interpreter->SetNumThreads(this->number_of_threads);
