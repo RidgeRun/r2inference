@@ -28,7 +28,22 @@ TEST_GROUP (OnnxrtModel) {
 
 TEST (OnnxrtModel, StartEmptyName) {
   error = model.Start ("");
-  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode());
+  LONGS_EQUAL (r2i::RuntimeError::Code::FRAMEWORK_ERROR, error.GetCode());
+}
+
+TEST (OnnxrtModel, InvalidName) {
+  error = model.Start ("*\"?");
+  LONGS_EQUAL (r2i::RuntimeError::Code::FRAMEWORK_ERROR, error.GetCode());
+}
+
+TEST (OnnxrtModel, InvalidFile) {
+  error = model.Start (__FILE__);
+  LONGS_EQUAL (r2i::RuntimeError::Code::FRAMEWORK_ERROR, error.GetCode());
+}
+
+TEST (OnnxrtModel, UnableToReadFile) {
+  error = model.Start ("/root");
+  LONGS_EQUAL (r2i::RuntimeError::Code::FRAMEWORK_ERROR, error.GetCode());
 }
 
 int main (int ac, char **av) {

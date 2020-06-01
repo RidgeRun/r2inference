@@ -12,22 +12,43 @@
 #include "r2i/onnxrt/model.h"
 
 #include <onnxruntime/core/session/onnxruntime_cxx_api.h>
+#include <onnxruntime/core/common/exceptions.h>
 
-#include "/usr/local/include/onnxruntime/core/common/exceptions.h"
-
+#include <iostream>
+#include <string>
 
 namespace r2i {
 namespace onnxrt {
 
-Model::Model() {
-
-}
+Model::Model() { this->session_ptr = nullptr; }
 
 RuntimeError Model::Start(const std::string &name) {
   RuntimeError error;
+  try {
+    Ort::Env env(ORT_LOGGING_LEVEL_WARNING, "r2i");
+    Ort::SessionOptions session_options;
+    session_options.SetIntraOpNumThreads(1);
+    session_options.SetGraphOptimizationLevel(
+      GraphOptimizationLevel::ORT_ENABLE_EXTENDED);
+    Ort::Session session(env, name.c_str(), session_options);
+    this->session_ptr = &session;
+  }
+
+  catch (const Ort::Exception &OrtException) {
+    std::cerr << OrtException.what() << std::endl;
+    error.Set(RuntimeError::Code::FRAMEWORK_ERROR,
+              "Failed creating ORT session");
+  }
+
+  catch (const onnxruntime::OnnxRuntimeException &OnnxRuntimeException) {
+    std::cerr << OnnxRuntimeException.what() << std::endl;
+    error.Set(RuntimeError::Code::FRAMEWORK_ERROR, "Incompatible ONNX model");
+  }
 
   return error;
 }
 
-}  // namespace onnx
+Ort::Session *Model::GetSession() { return this->session_ptr; }
+
+}  // namespace onnxrt
 }  // namespace r2i

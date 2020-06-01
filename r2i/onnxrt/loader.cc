@@ -11,9 +11,11 @@
 
 #include "r2i/onnxrt/loader.h"
 
+#include <onnxruntime/core/session/onnxruntime_cxx_api.h>
+
 #include <fstream>
 #include <memory>
-#include <onnxruntime/core/session/onnxruntime_cxx_api.h>
+#include <string>
 
 #include "r2i/imodel.h"
 #include "r2i/onnxrt/model.h"
@@ -21,26 +23,27 @@
 namespace r2i {
 namespace onnxrt {
 
-std::shared_ptr<r2i::IModel> Loader::Load (const std::string &in_path,
+std::shared_ptr<r2i::IModel> Loader::Load(const std::string &in_path,
     r2i::RuntimeError &error) {
 
   if (in_path.empty()) {
-    error.Set (RuntimeError::Code::WRONG_API_USAGE, "Received NULL path to file");
+    error.Set(RuntimeError::Code::WRONG_API_USAGE,
+              "Received NULL path to file");
     return nullptr;
   }
 
   std::ifstream graphdef_file;
-  graphdef_file.open (in_path, std::ios::binary | std::ios::ate);
+  graphdef_file.open(in_path, std::ios::binary | std::ios::ate);
   if (false == graphdef_file.is_open()) {
-    error.Set (RuntimeError::Code::FILE_ERROR, "Unable to open file");
+    error.Set(RuntimeError::Code::FILE_ERROR, "Unable to open file");
     return nullptr;
   }
   graphdef_file.close();
 
   auto model = std::make_shared<Model>();
-  error = model->Start (in_path);
+  error = model->Start(in_path);
 
-  if (error.IsError ()) {
+  if (error.IsError()) {
     return nullptr;
   }
 
@@ -48,6 +51,5 @@ std::shared_ptr<r2i::IModel> Loader::Load (const std::string &in_path,
 
   return this->model;
 }
-
-}
-}
+}  // namespace onnxrt
+}  // namespace r2i

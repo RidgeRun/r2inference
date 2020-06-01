@@ -1,7 +1,6 @@
 lib_onnxrt_tests = [
   ['frameworkfactory.cc'],
   ['loader.cc'],
-  ['model.cc'],
 ]
 
 # Build and run tests

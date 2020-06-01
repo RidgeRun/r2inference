@@ -27,9 +27,10 @@ class Model : public IModel {
   Model ();
 
   RuntimeError Start (const std::string &name) override;
+  Ort::Session *GetSession ();
 
  private:
-
+  Ort::Session *session_ptr;
 };
 
 }
