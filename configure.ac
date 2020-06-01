@@ -1,4 +1,4 @@
-# Copyright (C) 2018 RidgeRun, LLC (http://www.ridgerun.com)
+# Copyright (C) 2018-2020 RidgeRun, LLC (http://www.ridgerun.com)
 # All Rights Reserved.
 #
 # The contents of this software are proprietary and confidential to RidgeRun,
@@ -63,6 +63,9 @@ AM_COND_IF([HAVE_EDGETPU], [AM_COND_IF([HAVE_TFLITE], [], [AC_MSG_ERROR(The Edge
 
 RR_CHECK_FEATURE_LIB(TENSORRT, TensorRT Installation,
                      nvinfer, createInferBuilder_INTERNAL, NvInfer.h, no)
+
+RR_CHECK_FEATURE_LIB(ONNXRT, ONNX Runtime Installation,
+                     onnxruntime, OrtGetApiBase, onnxruntime/core/session/onnxruntime_cxx_api.h, no)
 AC_LANG_POP([C++])
 
 AM_CONDITIONAL([PLATFORM_IS_GPU], [false])
@@ -87,6 +90,7 @@ examples/r2i/tflite/Makefile
 r2i/Makefile
 r2i/edgetpu/Makefile
 r2i/ncsdk/Makefile
+r2i/onnxrt/Makefile
 r2i/tensorflow/Makefile
 r2i/tensorrt/Makefile
 r2i/tflite/Makefile
@@ -96,6 +100,7 @@ tests/acceptance/Makefile
 tests/unit/Makefile
 tests/unit/r2i/Makefile
 tests/unit/r2i/ncsdk/Makefile
+tests/unit/r2i/onnxrt/Makefile
 tests/unit/r2i/tensorflow/Makefile
 tests/unit/r2i/tensorrt/Makefile
 tests/unit/r2i/tflite/Makefile

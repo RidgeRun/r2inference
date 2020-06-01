@@ -14,11 +14,11 @@
 
 namespace r2i {
 /**
- * Numerical codes identifying supported frameworks. Not that not
+ * Numerical codes identifying supported frameworks. Note that not
  * all frameworks will be available at runtime. For example, some of
  * them may be disabled at configure by the user, automatically if
  * no development where found or if the system doesn't seem to have
- * to appropriate hardware.
+ * the appropriate hardware.
  */
 enum FrameworkCode {
 
@@ -46,6 +46,11 @@ enum FrameworkCode {
    * NVIDIA's TensorRT
    */
   TENSORRT,
+
+  /**
+   * Open Neural Network Exchange Runtime
+   */
+  ONNXRT,
 
   /**
    * Number of supported frameworks, mostly for testing purposes.
