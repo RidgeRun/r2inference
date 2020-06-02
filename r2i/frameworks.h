@@ -33,6 +33,11 @@ enum FrameworkCode {
   NCSDK,
 
   /**
+   * Open Neural Network Exchange Runtime
+   */
+  ONNXRT,
+
+  /**
    * Google's TensorFlow
    */
   TENSORFLOW,
@@ -46,11 +51,6 @@ enum FrameworkCode {
    * NVIDIA's TensorRT
    */
   TENSORRT,
-
-  /**
-   * Open Neural Network Exchange Runtime
-   */
-  ONNXRT,
 
   /**
    * Number of supported frameworks, mostly for testing purposes.
