@@ -11,8 +11,6 @@
 
 #include "r2i/onnxrt/loader.h"
 
-#include <onnxruntime/core/session/onnxruntime_cxx_api.h>
-
 #include <fstream>
 #include <memory>
 #include <string>
