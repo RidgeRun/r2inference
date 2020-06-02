@@ -41,10 +41,12 @@ MakeNcsdkFactory (RuntimeError &error) {
 
 #ifdef HAVE_ONNXRT
 static std::unique_ptr<IFrameworkFactory>
-MakeOnnxrtFactory (RuntimeError &error) {
-  return std::unique_ptr<onnxrt::FrameworkFactory> (new onnxrt::FrameworkFactory);
+MakeOnnxrtFactory(RuntimeError &error) {
+  return std::unique_ptr<onnxrt::FrameworkFactory>(new
+         onnxrt::FrameworkFactory);
 }
 #endif // HAVE_ONNXRT
+
 
 #ifdef HAVE_TENSORFLOW
 static std::unique_ptr<IFrameworkFactory>
