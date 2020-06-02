@@ -22,7 +22,8 @@ libonnxrt_la_SOURCES =            \
 
 libonnxrt_la_CPPFLAGS =          \
     $(RR_CPPFLAGS)               \
-    $(CODE_COVERAGE_CPPFLAGS)
+    $(CODE_COVERAGE_CPPFLAGS)    \
+    -I/usr/local/include/onnxruntime/
 
 libonnxrt_la_CFLAGS =            \
     $(RR_CFLAGS)                 \

@@ -14,6 +14,7 @@ onnxrt_headers = [
 # Build library
 onnxrt_lib = static_library('onnxrt',
   onnxrt_sources,
+  cpp_args : cpp_args,
   include_directories : [configinc],
   dependencies : [lib_onnxrt_dep],
 )
