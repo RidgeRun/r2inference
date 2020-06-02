@@ -26,6 +26,8 @@ RuntimeError Model::Start(const std::string &name) {
   RuntimeError error;
   try {
     Ort::Env env(ORT_LOGGING_LEVEL_WARNING, "r2i");
+    // TODO: This options should be paramaters in the class. Add method
+    // to pass this options inside the class.
     Ort::SessionOptions session_options;
     session_options.SetIntraOpNumThreads(1);
     session_options.SetGraphOptimizationLevel(
@@ -35,13 +37,11 @@ RuntimeError Model::Start(const std::string &name) {
   }
 
   catch (const Ort::Exception &OrtException) {
-    std::cerr << OrtException.what() << std::endl;
     error.Set(RuntimeError::Code::FRAMEWORK_ERROR,
               "Failed creating ORT session");
   }
 
   catch (const onnxruntime::OnnxRuntimeException &OnnxRuntimeException) {
-    std::cerr << OnnxRuntimeException.what() << std::endl;
     error.Set(RuntimeError::Code::FRAMEWORK_ERROR, "Incompatible ONNX model");
   }
 
