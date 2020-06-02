@@ -17,7 +17,8 @@ tensorflowliteedgetpuincludedir = @R2IINCLUDEDIR@/r2i/edgetpu
 
 libedgetpu_la_SOURCES =                     \
     engine.cc                               \
-    frameworkfactory.cc 
+    frameworkfactory.cc                     \
+    parameters.cc 
 
 libedgetpu_la_CPPFLAGS =                    \
     $(RR_CPPFLAGS)                          \
@@ -43,6 +44,7 @@ libedgetpu_la_LIBADD =                      \
 
 tensorflowliteedgetpuinclude_HEADERS =      \
     engine.h                                \
-    frameworkfactory.h
+    frameworkfactory.h                      \
+    parameters.h
 
 endif # HAVE_EDGETPU

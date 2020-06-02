@@ -2,11 +2,13 @@
 edgetpu_sources = [
   'engine.cc',
   'frameworkfactory.cc',
+  'parameters.cc'
 ]
 
 edgetpu_headers = [
   'engine.h',
   'frameworkfactory.h',
+  'parameters.h'
 ]
 
 # Build library
