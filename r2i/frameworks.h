@@ -21,6 +21,12 @@ namespace r2i {
  * to appropriate hardware.
  */
 enum FrameworkCode {
+
+  /**
+   * Google's EdgeTPU
+   */
+  EDGETPU,
+
   /**
    * Intel Movidius Neural Compute software developer kit
    */
