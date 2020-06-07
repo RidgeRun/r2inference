@@ -16,36 +16,33 @@
 #include <CppUTest/CommandLineTestRunner.h>
 #include <CppUTest/TestHarness.h>
 
-TEST_GROUP (OnnxrtModel) {
+TEST_GROUP(OnnxrtModel) {
   r2i::RuntimeError error;
   r2i::onnxrt::Model model;
 
-  void setup () {
+  void setup() {
     error.Clean();
     model = r2i::onnxrt::Model();
   }
 };
 
-TEST (OnnxrtModel, StartEmptyName) {
-  error = model.Start ("");
-  LONGS_EQUAL (r2i::RuntimeError::Code::FRAMEWORK_ERROR, error.GetCode());
+TEST(OnnxrtModel, SessionNull) {
+  error = model.Set(nullptr);
+  LONGS_EQUAL(r2i::RuntimeError::Code::NULL_PARAMETER, error.GetCode());
 }
 
-TEST (OnnxrtModel, InvalidName) {
-  error = model.Start ("*\"?");
-  LONGS_EQUAL (r2i::RuntimeError::Code::FRAMEWORK_ERROR, error.GetCode());
+TEST(OnnxrtModel, GetInputNodeInfoSessionNull) {
+  model.GetInputNodeNames(error);
+  LONGS_EQUAL(r2i::RuntimeError::Code::NULL_PARAMETER, error.GetCode());
 }
 
-TEST (OnnxrtModel, InvalidFile) {
-  error = model.Start (__FILE__);
-  LONGS_EQUAL (r2i::RuntimeError::Code::FRAMEWORK_ERROR, error.GetCode());
+TEST(OnnxrtModel, GetOutputNodeInfoSessionNull) {
+  model.GetOutputNodeNames(error);
+  LONGS_EQUAL(r2i::RuntimeError::Code::NULL_PARAMETER, error.GetCode());
 }
 
-TEST (OnnxrtModel, UnableToReadFile) {
-  error = model.Start ("/root");
-  LONGS_EQUAL (r2i::RuntimeError::Code::FRAMEWORK_ERROR, error.GetCode());
+int main(int ac, char **av) {
+  MemoryLeakWarningPlugin::turnOffNewDeleteOverloads();
+  return CommandLineTestRunner::RunAllTests(ac, av);
 }
 
-int main (int ac, char **av) {
-  return CommandLineTestRunner::RunAllTests (ac, av);
-}
