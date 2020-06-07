@@ -12,28 +12,36 @@
 #ifndef R2I_ONNX_MODEL_H
 #define R2I_ONNX_MODEL_H
 
-#include <memory>
-
 #include <r2i/imodel.h>
 #include <r2i/runtimeerror.h>
 
 #include <onnxruntime/core/session/onnxruntime_cxx_api.h>
+
+#include <memory>
+#include <string>
+#include <vector>
 
 namespace r2i {
 namespace onnxrt {
 
 class Model : public IModel {
  public:
-  Model ();
+  Model();
 
-  RuntimeError Start (const std::string &name) override;
-  Ort::Session *GetSession ();
+  std::shared_ptr<Ort::Session> GetOnnxrtSession();
+
+  RuntimeError Start(const std::string &name) override;
+
+  RuntimeError Set(std::shared_ptr<Ort::Session> onnxrt_session);
+  std::vector<const char *> GetInputNodeNames(RuntimeError &error);
+  std::vector<const char *> GetOutputNodeNames(RuntimeError &error);
 
  private:
-  Ort::Session *session_ptr;
+  std::shared_ptr<Ort::Session> session_ptr;
+  std::vector<const char *> input_node_names;
+  std::vector<const char *> output_node_names;
 };
+}  // namespace onnxrt
+}  // namespace r2i
 
-}
-}
-
-#endif //R2I_ONNX_MODEL_H
+#endif  // R2I_ONNX_MODEL_H
