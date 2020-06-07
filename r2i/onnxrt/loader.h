@@ -16,18 +16,30 @@
 #include <r2i/imodel.h>
 #include <r2i/onnxrt/model.h>
 
+#include <onnxruntime/core/session/onnxruntime_cxx_api.h>
+
+#include <memory>
+#include <string>
+
 namespace r2i {
 namespace onnxrt {
 
 class Loader : public ILoader {
  public:
-  virtual std::shared_ptr<r2i::IModel> Load (const std::string &in_path,
+  virtual std::shared_ptr<r2i::IModel> Load(const std::string &in_path,
       r2i::RuntimeError &error) override;
+  void CreateEnv(OrtLoggingLevel log_level, const std::string &log_id);
+  void CreateSessionOptions();
+  void CreateSession(std::shared_ptr<Ort::Env> env, const std::string &name,
+                     std::shared_ptr<Ort::SessionOptions> options);
+
  private:
   std::shared_ptr<Model> model;
+  std::shared_ptr<Ort::Env> env_ptr;
+  std::shared_ptr<Ort::SessionOptions> session_options_ptr;
+  std::shared_ptr<Ort::Session> session_ptr;
 };
+}  // namespace onnxrt
+}  // namespace r2i
 
-}
-}
-
-#endif //R2I_ONNX_LOADER_H
+#endif  // R2I_ONNX_LOADER_H

@@ -11,6 +11,9 @@
 
 #include "r2i/onnxrt/loader.h"
 
+#include <onnxruntime/core/common/exceptions.h>
+#include <onnxruntime/core/session/onnxruntime_cxx_api.h>
+
 #include <fstream>
 #include <memory>
 #include <string>
@@ -23,7 +26,6 @@ namespace onnxrt {
 
 std::shared_ptr<r2i::IModel> Loader::Load(const std::string &in_path,
     r2i::RuntimeError &error) {
-
   if (in_path.empty()) {
     error.Set(RuntimeError::Code::WRONG_API_USAGE,
               "Received NULL path to file");
@@ -38,16 +40,50 @@ std::shared_ptr<r2i::IModel> Loader::Load(const std::string &in_path,
   }
   graphdef_file.close();
 
-  auto model = std::make_shared<Model>();
-  error = model->Start(in_path);
+  try {
+    this->CreateEnv(ORT_LOGGING_LEVEL_WARNING, in_path);
+    this->CreateSessionOptions();
+    this->CreateSession(this->env_ptr, in_path, this->session_options_ptr);
+  }
+
+  catch (std::exception &excep) {
+    error.Set(RuntimeError::Code::FRAMEWORK_ERROR, excep.what());
+  }
 
   if (error.IsError()) {
     return nullptr;
   }
 
-  this->model = model;
+  auto model = std::make_shared<Model>();
 
-  return this->model;
+  error = model->Set(this->session_ptr);
+
+  if (error.IsError()) {
+    return nullptr;
+  }
+
+  return model;
 }
+
+void Loader::CreateEnv(OrtLoggingLevel log_level, const std::string &log_id) {
+  this->env_ptr = std::make_shared<Ort::Env>(log_level, log_id.c_str());
+}
+
+void Loader::CreateSessionOptions() {
+  // TODO: This options should be paramaters in the class. Add method
+  // to pass this options inside the class.
+  this->session_options_ptr = std::make_shared<Ort::SessionOptions>();
+  this->session_options_ptr->SetIntraOpNumThreads(1);
+  session_options_ptr->SetGraphOptimizationLevel(
+    GraphOptimizationLevel::ORT_ENABLE_EXTENDED);
+}
+
+void Loader::CreateSession(std::shared_ptr<Ort::Env> env,
+                           const std::string &name,
+                           std::shared_ptr<Ort::SessionOptions> options) {
+  this->session_ptr =
+    std::make_shared<Ort::Session>(*env, name.c_str(), *options);
+}
+
 }  // namespace onnxrt
 }  // namespace r2i
