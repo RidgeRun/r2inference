@@ -1,6 +1,9 @@
+subdir('resources')
+
 lib_onnxrt_tests = [
   ['frameworkfactory.cc'],
   ['loader.cc'],
+  ['model.cc'],
 ]
 
 # Build and run tests
@@ -16,6 +19,7 @@ foreach t : lib_onnxrt_tests
   # Run tests
   test(test_name, exe,
        args : '-p',
-       timeout : 60)
+       timeout : 60,
+       workdir : meson.current_build_dir())
 
 endforeach

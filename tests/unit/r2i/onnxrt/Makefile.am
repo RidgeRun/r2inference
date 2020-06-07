@@ -15,7 +15,8 @@ if HAVE_ONNXRT
 
 TESTS =                   \
         frameworkfactory  \
-        loader
+        loader            \
+        model
 
 check_PROGRAMS=$(TESTS)
 
