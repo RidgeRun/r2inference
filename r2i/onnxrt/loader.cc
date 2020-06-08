@@ -74,7 +74,7 @@ void Loader::CreateSessionOptions() {
   // to pass this options inside the class.
   this->session_options_ptr = std::make_shared<Ort::SessionOptions>();
   this->session_options_ptr->SetIntraOpNumThreads(1);
-  session_options_ptr->SetGraphOptimizationLevel(
+  this->session_options_ptr->SetGraphOptimizationLevel(
     GraphOptimizationLevel::ORT_ENABLE_EXTENDED);
 }
 
