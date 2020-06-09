@@ -11,8 +11,8 @@
 
 #include "r2i/onnxrt/model.h"
 
-#include <onnxruntime/core/common/exceptions.h>
-#include <onnxruntime/core/session/onnxruntime_cxx_api.h>
+#include <core/common/exceptions.h>
+#include <core/session/onnxruntime_cxx_api.h>
 
 #include <iostream>
 #include <string>

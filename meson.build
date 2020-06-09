@@ -94,7 +94,6 @@ if get_option('enable-onnxrt')
   onnxrt_dep = declare_dependency(dependencies: onnxrt)
   lib_onnxrt_dep = [onnxrt_dep]
   cdata.set('HAVE_ONNXRT', 1)
-  cpp_args += ['-I/usr/local/include/onnxruntime/']
 endif
 
 # Check if at least one backend is enabled

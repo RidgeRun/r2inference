@@ -15,7 +15,7 @@
 #include <r2i/imodel.h>
 #include <r2i/runtimeerror.h>
 
-#include <onnxruntime/core/session/onnxruntime_cxx_api.h>
+#include <core/session/onnxruntime_cxx_api.h>
 
 #include <memory>
 #include <string>

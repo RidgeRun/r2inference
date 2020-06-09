@@ -11,8 +11,6 @@
 
 #include "frameworkfactory.h"
 
-#include <onnxruntime/core/session/onnxruntime_cxx_api.h>
-
 #include "loader.h"
 
 namespace r2i {

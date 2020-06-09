@@ -22,8 +22,7 @@ libonnxrt_la_SOURCES =            \
 
 libonnxrt_la_CPPFLAGS =          \
     $(RR_CPPFLAGS)               \
-    $(CODE_COVERAGE_CPPFLAGS)    \
-    -I/usr/local/include/onnxruntime/
+    $(CODE_COVERAGE_CPPFLAGS)
 
 libonnxrt_la_CFLAGS =            \
     $(RR_CFLAGS)                 \
@@ -40,7 +39,7 @@ libonnxrt_la_LIBADD =            \
     $(ONNXRT_LIBS)               \
     $(CODE_COVERAGE_LIBS)
 
-onnxrtinclude_HEADERS =      \
+onnxrtinclude_HEADERS =          \
     frameworkfactory.h           \
     loader.h                     \
     model.h                      
