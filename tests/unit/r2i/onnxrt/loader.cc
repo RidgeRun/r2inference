@@ -74,11 +74,11 @@ void r2i::onnxrt::Loader::CreateSessionOptions() {
 
 TEST_GROUP(OnnxrtLoader) {
   r2i::RuntimeError error;
-  r2i::onnxrt::Loader loader;
+  std::shared_ptr<r2i::onnxrt::Loader> loader =
+    std::make_shared<r2i::onnxrt::Loader>();
 
   void setup() {
     error.Clean();
-    loader = r2i::onnxrt::Loader();
     incompatible_model = false;
     env_allocation_fail = false;
     session_options_allocation_fail = false;
@@ -90,7 +90,7 @@ TEST(OnnxrtLoader, WrongApiUsage) {
   std::string empty_string = "";
 
   /* Attempt to load this file as a valid model */
-  auto model = loader.Load(empty_string, error);
+  auto model = loader->Load(empty_string, error);
 
   CHECK_TEXT(error.IsError(), error.GetDescription().c_str());
   LONGS_EQUAL(r2i::RuntimeError::Code::WRONG_API_USAGE, error.GetCode());
@@ -100,7 +100,7 @@ TEST(OnnxrtLoader, UnableToOpenFile) {
   std::string non_existent_file = "resources/squeezenet_typo.onnx";
 
   /* Attempt to load this file as a valid model */
-  auto model = loader.Load(non_existent_file, error);
+  auto model = loader->Load(non_existent_file, error);
 
   CHECK_TEXT(error.IsError(), error.GetDescription().c_str());
   LONGS_EQUAL(r2i::RuntimeError::Code::FILE_ERROR, error.GetCode());
@@ -109,7 +109,7 @@ TEST(OnnxrtLoader, UnableToOpenFile) {
 TEST(OnnxrtLoader, EnvAllocationFail) {
   env_allocation_fail = true;
   std::string model_path = "resources/squeezenet.onnx";
-  auto model = loader.Load(model_path, error);
+  auto model = loader->Load(model_path, error);
 
   LONGS_EQUAL(r2i::RuntimeError::Code::FRAMEWORK_ERROR, error.GetCode());
 }
@@ -117,7 +117,7 @@ TEST(OnnxrtLoader, EnvAllocationFail) {
 TEST(OnnxrtLoader, SessionOptionsAllocationFail) {
   session_options_allocation_fail = true;
   std::string model_path = "resources/squeezenet.onnx";
-  auto model = loader.Load(model_path, error);
+  auto model = loader->Load(model_path, error);
 
   LONGS_EQUAL(r2i::RuntimeError::Code::FRAMEWORK_ERROR, error.GetCode());
 }
@@ -125,7 +125,7 @@ TEST(OnnxrtLoader, SessionOptionsAllocationFail) {
 TEST(OnnxrtLoader, SessionAllocationFail) {
   session_allocation_fail = true;
   std::string model_path = "resources/squeezenet.onnx";
-  auto model = loader.Load(model_path, error);
+  auto model = loader->Load(model_path, error);
 
   LONGS_EQUAL(r2i::RuntimeError::Code::FRAMEWORK_ERROR, error.GetCode());
 }
@@ -133,20 +133,18 @@ TEST(OnnxrtLoader, SessionAllocationFail) {
 TEST(OnnxrtLoader, LoadInvalidFile) {
   incompatible_model = true;
   std::string model_path = "resources/invalid.onnx";
-  auto model = loader.Load(model_path, error);
+  auto model = loader->Load(model_path, error);
 
   LONGS_EQUAL(r2i::RuntimeError::Code::FRAMEWORK_ERROR, error.GetCode());
 }
 
 TEST(OnnxrtLoader, LoadValidFile) {
-  incompatible_model = false;
   std::string model_path = "resources/squeezenet.onnx";
-  auto model = loader.Load(model_path, error);
+  auto model = loader->Load(model_path, error);
 
   LONGS_EQUAL(r2i::RuntimeError::Code::EOK, error.GetCode());
 }
 
 int main(int ac, char **av) {
-  MemoryLeakWarningPlugin::turnOffNewDeleteOverloads();
   return CommandLineTestRunner::RunAllTests(ac, av);
 }
