@@ -34,13 +34,9 @@ class Model : public IModel {
   RuntimeError Start(const std::string &name) override;
 
   RuntimeError Set(std::shared_ptr<Ort::Session> onnxrt_session);
-  std::vector<const char *> GetInputNodeNames(RuntimeError &error);
-  std::vector<const char *> GetOutputNodeNames(RuntimeError &error);
 
  private:
   std::shared_ptr<Ort::Session> session_ptr;
-  std::vector<const char *> input_node_names;
-  std::vector<const char *> output_node_names;
 };
 }  // namespace onnxrt
 }  // namespace r2i

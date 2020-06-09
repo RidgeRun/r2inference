@@ -33,18 +33,7 @@ TEST(OnnxrtModel, SessionNull) {
   LONGS_EQUAL(r2i::RuntimeError::Code::NULL_PARAMETER, error.GetCode());
 }
 
-TEST(OnnxrtModel, GetInputNodeInfoSessionNull) {
-  model.GetInputNodeNames(error);
-  LONGS_EQUAL(r2i::RuntimeError::Code::NULL_PARAMETER, error.GetCode());
-}
-
-TEST(OnnxrtModel, GetOutputNodeInfoSessionNull) {
-  model.GetOutputNodeNames(error);
-  LONGS_EQUAL(r2i::RuntimeError::Code::NULL_PARAMETER, error.GetCode());
-}
-
 int main(int ac, char **av) {
-  MemoryLeakWarningPlugin::turnOffNewDeleteOverloads();
   return CommandLineTestRunner::RunAllTests(ac, av);
 }
 

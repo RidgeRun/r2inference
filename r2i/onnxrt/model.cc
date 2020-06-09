@@ -49,45 +49,5 @@ std::shared_ptr<Ort::Session> Model::GetOnnxrtSession() {
   return this->session_ptr;
 }
 
-std::vector<const char *> Model::GetInputNodeNames(RuntimeError &error) {
-  Ort::AllocatorWithDefaultOptions allocator;
-
-  if (nullptr == this->session_ptr) {
-    error.Set(RuntimeError::Code::NULL_PARAMETER,
-              "Trying to obtain input info from null session pointer");
-    return this->input_node_names;
-  }
-
-  size_t num_input_nodes = this->session_ptr->GetInputCount();
-  this->input_node_names.resize(num_input_nodes);
-
-  for (unsigned int i = 0; i < num_input_nodes; i++) {
-    char *input_name = this->session_ptr->GetInputName(i, allocator);
-    this->input_node_names[i] = input_name;
-  }
-
-  return this->input_node_names;
-}
-
-std::vector<const char *> Model::GetOutputNodeNames(RuntimeError &error) {
-  Ort::AllocatorWithDefaultOptions allocator;
-
-  if (nullptr == this->session_ptr) {
-    error.Set(RuntimeError::Code::NULL_PARAMETER,
-              "Trying to obtain output info from null session pointer");
-    return this->output_node_names;
-  }
-
-  size_t num_output_nodes = this->session_ptr->GetOutputCount();
-  this->output_node_names.resize(num_output_nodes);
-
-  for (unsigned int i = 0; i < num_output_nodes; i++) {
-    char *output_name = this->session_ptr->GetOutputName(i, allocator);
-    this->output_node_names[i] = output_name;
-  }
-
-  return this->output_node_names;
-}
-
 }  // namespace onnxrt
 }  // namespace r2i
