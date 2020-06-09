@@ -1,6 +1,7 @@
 subdir('resources')
 
 lib_onnxrt_tests = [
+  ['frame.cc'],
   ['frameworkfactory.cc'],
   ['loader.cc'],
   ['model.cc'],

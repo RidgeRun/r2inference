@@ -11,6 +11,7 @@
 
 #include "frameworkfactory.h"
 
+#include "frame.h"
 #include "loader.h"
 
 namespace r2i {
@@ -41,7 +42,7 @@ std::unique_ptr<r2i::IFrame> FrameworkFactory::MakeFrame (
   RuntimeError &error) {
   error.Clean ();
 
-  return nullptr;
+  return std::unique_ptr<IFrame> (new Frame);
 }
 
 r2i::FrameworkMeta FrameworkFactory::GetDescription (RuntimeError &error) {

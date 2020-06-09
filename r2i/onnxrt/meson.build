@@ -1,11 +1,13 @@
 # Define source code
 onnxrt_sources = [
+  'frame.cc',
   'frameworkfactory.cc',
   'loader.cc',
   'model.cc',
 ]
 
 onnxrt_headers = [
+  'frame.h',
   'frameworkfactory.h',
   'loader.h',
   'model.h',

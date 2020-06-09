@@ -14,6 +14,7 @@ if ENABLE_TESTS
 if HAVE_ONNXRT
 
 TESTS =                   \
+        frame             \
         frameworkfactory  \
         loader            \
         model
