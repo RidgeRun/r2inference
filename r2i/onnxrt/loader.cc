@@ -48,9 +48,6 @@ std::shared_ptr<r2i::IModel> Loader::Load(const std::string &in_path,
 
   catch (std::exception &excep) {
     error.Set(RuntimeError::Code::FRAMEWORK_ERROR, excep.what());
-  }
-
-  if (error.IsError()) {
     return nullptr;
   }
 
