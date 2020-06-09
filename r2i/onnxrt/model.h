@@ -13,13 +13,14 @@
 #define R2I_ONNX_MODEL_H
 
 #include <r2i/imodel.h>
-#include <r2i/runtimeerror.h>
 
 #include <core/session/onnxruntime_cxx_api.h>
 
 #include <memory>
 #include <string>
 #include <vector>
+
+#include <r2i/runtimeerror.h>
 
 namespace r2i {
 namespace onnxrt {

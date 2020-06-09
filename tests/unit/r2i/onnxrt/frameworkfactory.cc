@@ -9,16 +9,17 @@
  * back to RidgeRun without any encumbrance.
 */
 
-#include <memory>
-
 #include <r2i/iframeworkfactory.h>
 #include <r2i/onnxrt/frameworkfactory.h>
-#include <r2i/onnxrt/loader.h>
+
+#include <memory>
 
 #include <CppUTest/CommandLineTestRunner.h>
 #include <CppUTest/MemoryLeakDetectorNewMacros.h>
 #include <CppUTest/MemoryLeakDetectorMallocMacros.h>
 #include <CppUTest/TestHarness.h>
+
+#include <r2i/onnxrt/loader.h>
 
 TEST_GROUP (OnnxFrameworkFactory) {
 };

@@ -10,7 +10,6 @@
 */
 
 #include <r2i/onnxrt/loader.h>
-#include <r2i/r2i.h>
 
 #include <onnxruntime/core/common/exceptions.h>
 #include <onnxruntime/core/session/onnxruntime_cxx_api.h>
@@ -21,6 +20,8 @@
 #include <CppUTest/MemoryLeakDetectorMallocMacros.h>
 #include <CppUTest/MemoryLeakDetectorNewMacros.h>
 #include <CppUTest/TestHarness.h>
+
+#include <r2i/r2i.h>
 
 static bool incompatible_model = false;
 static bool env_allocation_fail = false;
@@ -33,7 +34,8 @@ class OnnxrtExcep : public std::exception {
   virtual const char *what() const throw() { return "ONNXRT exception thrown"; }
 } onnxrtexcep;
 
-r2i::onnxrt::Model::Model() {}
+r2i::onnxrt::Model::Model() {
+}
 
 r2i::RuntimeError r2i::onnxrt::Model::Set(
   std::shared_ptr<Ort::Session> onnxrt_session) {

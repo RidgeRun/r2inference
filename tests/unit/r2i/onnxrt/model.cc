@@ -9,12 +9,14 @@
  * back to RidgeRun without any encumbrance.
 */
 
-#include <memory>
-#include <r2i/r2i.h>
 #include <r2i/onnxrt/model.h>
+
+#include <memory>
 
 #include <CppUTest/CommandLineTestRunner.h>
 #include <CppUTest/TestHarness.h>
+
+#include <r2i/r2i.h>
 
 TEST_GROUP(OnnxrtModel) {
   r2i::RuntimeError error;

@@ -21,7 +21,9 @@
 namespace r2i {
 namespace onnxrt {
 
-Model::Model() { this->session_ptr = nullptr; }
+Model::Model() {
+  this->session_ptr = nullptr;
+}
 
 RuntimeError Model::Start(const std::string &name) {
   RuntimeError error;
