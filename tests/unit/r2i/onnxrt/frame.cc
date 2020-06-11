@@ -108,15 +108,6 @@ TEST (OnnxrtFrame, FrameGetFormat) {
   LONGS_EQUAL (format->GetId(), local_format.GetId());
 }
 
-TEST (OnnxrtFrame, GetInputTensorNullSession) {
-  r2i::RuntimeError error;
-  std::shared_ptr<Ort::Session> session {nullptr};
-
-  frame->GetInputTensor(session, error);
-  LONGS_EQUAL (r2i::RuntimeError::Code::NULL_PARAMETER,
-               error.GetCode());
-}
-
 int main (int ac, char **av) {
   return CommandLineTestRunner::RunAllTests (ac, av);
 }

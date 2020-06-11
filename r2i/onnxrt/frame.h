@@ -14,8 +14,6 @@
 
 #include <r2i/iframe.h>
 
-#include <core/session/onnxruntime_cxx_api.h>
-
 namespace r2i {
 namespace onnxrt {
 
@@ -36,25 +34,11 @@ class Frame : public IFrame {
 
   virtual DataType GetDataType () override;
 
-  std::shared_ptr<Ort::Value> GetInputTensor (std::shared_ptr<Ort::Session>
-      session, RuntimeError &error);
-
  private:
   float *frame_data;
   int frame_width;
   int frame_height;
   ImageFormat frame_format;
-  std::shared_ptr<Ort::TypeInfo> type_info_ptr;
-  std::shared_ptr<Ort::TensorTypeAndShapeInfo> tensor_info_ptr;
-  std::shared_ptr<Ort::MemoryInfo> memory_info_ptr;
-  std::shared_ptr<Ort::Value> input_tensor_ptr;
-
-  std::vector<int64_t> GetTensorShape();
-  RuntimeError ValidateTensorShape (int64_t *shape);
-  void CreateTypeInfo(std::shared_ptr<Ort::Session> session, int input_index);
-  void CreateTensorTypeAndShapeInfo();
-  void CreateMemoryInfo(OrtAllocatorType allocator_type, OrtMemType mem_type);
-  void CreateTensor(size_t element_count, int64_t *shape, size_t shape_len);
 
 };
 
