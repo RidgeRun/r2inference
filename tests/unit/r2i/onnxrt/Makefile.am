@@ -14,10 +14,12 @@ if ENABLE_TESTS
 if HAVE_ONNXRT
 
 TESTS =                   \
+        engine            \
         frame             \
         frameworkfactory  \
         loader            \
-        model
+        model             \
+        prediction
 
 check_PROGRAMS=$(TESTS)
 

@@ -1,10 +1,12 @@
 subdir('resources')
 
 lib_onnxrt_tests = [
+  ['engine.cc'],
   ['frame.cc'],
   ['frameworkfactory.cc'],
   ['loader.cc'],
   ['model.cc'],
+  ['prediction.cc'],
 ]
 
 # Build and run tests
