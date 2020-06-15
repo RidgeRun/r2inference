@@ -15,7 +15,8 @@ noinst_LTLIBRARIES = libonnxrt.la
 # Define a custom area for our headers
 onnxrtincludedir = @R2IINCLUDEDIR@/r2i/onnxrt
 
-libonnxrt_la_SOURCES =            \
+libonnxrt_la_SOURCES =           \
+    frame.cc                     \
     frameworkfactory.cc          \
     loader.cc                    \
     model.cc                     
@@ -40,6 +41,7 @@ libonnxrt_la_LIBADD =            \
     $(CODE_COVERAGE_LIBS)
 
 onnxrtinclude_HEADERS =          \
+    frame.h                      \
     frameworkfactory.h           \
     loader.h                     \
     model.h                      
