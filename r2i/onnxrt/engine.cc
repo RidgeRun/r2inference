@@ -101,7 +101,6 @@ std::shared_ptr<r2i::IPrediction> Engine::Predict (std::shared_ptr<r2i::IFrame>
   int frame_width = 0;
   int frame_height = 0;
   int frame_channels = 0;
-  std::vector<Ort::Value> output_tensor;
   std::vector<int64_t> input_node_dims;
   size_t input_image_size = 0;
 
