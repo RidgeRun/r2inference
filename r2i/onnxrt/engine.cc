@@ -55,10 +55,6 @@ RuntimeError Engine::SetModel (std::shared_ptr<r2i::IModel> in_model) {
     return error;
   }
 
-  if (nullptr != this->model) {
-    this->model = nullptr;
-  }
-
   this->model = model;
 
   this->session = this->model->GetOnnxrtSession();
