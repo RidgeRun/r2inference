@@ -134,6 +134,12 @@ std::shared_ptr<r2i::IPrediction> Engine::Predict (std::shared_ptr<r2i::IFrame>
     return nullptr;
   }
 
+  if (this->session->GetOutputCount() > 1) {
+    error.Set(RuntimeError::Code::INCOMPATIBLE_MODEL,
+              "Number of outputs in the model is greater than 1, this is not supported");
+    return nullptr;
+  }
+
   // Warning: We support batches of size 1 and models with
   // 1 input only.
   try {
