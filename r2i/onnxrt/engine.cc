@@ -61,6 +61,8 @@ RuntimeError Engine::SetModel (std::shared_ptr<r2i::IModel> in_model) {
 
   this->model = model;
 
+  this->session = this->model->GetOnnxrtSession();
+
   return error;
 }
 
@@ -124,14 +126,13 @@ std::shared_ptr<r2i::IPrediction> Engine::Predict (std::shared_ptr<r2i::IFrame>
     return nullptr;
   }
 
-  std::shared_ptr<Ort::Session> session = this->model->GetOnnxrtSession();
-  if (!session) {
+  if (!this->session) {
     error.Set(RuntimeError::Code::NULL_PARAMETER,
-              "Received null onnxrt session pointer");
+              "Received null onnxrt session pointer, can not do prediction");
     return nullptr;
   }
 
-  if (session->GetInputCount() > 1) {
+  if (this->session->GetInputCount() > 1) {
     error.Set(RuntimeError::Code::INCOMPATIBLE_MODEL,
               "Number of inputs in the model is greater than 1, this is not supported");
     return nullptr;
@@ -140,7 +141,7 @@ std::shared_ptr<r2i::IPrediction> Engine::Predict (std::shared_ptr<r2i::IFrame>
   // Warning: We support batches of size 1 and models with
   // 1 input only.
   try {
-    input_node_dims = session->GetInputTypeInfo(
+    input_node_dims = this->session->GetInputTypeInfo(
                         0).GetTensorTypeAndShapeInfo().GetShape();
   }
 
@@ -164,8 +165,10 @@ std::shared_ptr<r2i::IPrediction> Engine::Predict (std::shared_ptr<r2i::IFrame>
   // Score model with input tensor, get back Prediction set with pointer
   // of the output tensor result.
   // Note that this implementation only supports 1 input and 1 output models.
-  error = this->ScoreModel(session, frame, input_image_size, input_node_dims,
+  error = this->ScoreModel(this->session, frame, input_image_size,
+                           input_node_dims,
                            prediction);
+
   if (error.IsError ()) {
     return nullptr;
   }
@@ -219,8 +222,8 @@ RuntimeError Engine::ScoreModel (std::shared_ptr<Ort::Session> session,
   RuntimeError error;
   float *result;
   int64_t output_size;
-  size_t num_input_nodes = session->GetInputCount();
-  size_t num_output_nodes = session->GetOutputCount();
+  size_t num_input_nodes = this->session->GetInputCount();
+  size_t num_output_nodes = this->session->GetOutputCount();
   std::vector<int64_t> output_node_dims;
   Ort::Value input_tensor{nullptr};
   Ort::AllocatorWithDefaultOptions input_allocator;
@@ -229,9 +232,9 @@ RuntimeError Engine::ScoreModel (std::shared_ptr<Ort::Session> session,
   // Warning: We support batches of size 1 and models with
   // 1 output only.
   try {
-    output_node_dims = session->GetOutputTypeInfo(
+    output_node_dims = this->session->GetOutputTypeInfo(
                          0).GetTensorTypeAndShapeInfo().GetShape();
-    output_size = session->GetOutputTypeInfo(
+    output_size = this->session->GetOutputTypeInfo(
                     0).GetTensorTypeAndShapeInfo().GetElementCount();
   }
 
@@ -240,16 +243,16 @@ RuntimeError Engine::ScoreModel (std::shared_ptr<Ort::Session> session,
     return error;
   }
 
-  num_input_nodes = session->GetInputCount();
-  num_output_nodes = session->GetOutputCount();
+  num_input_nodes = this->session->GetInputCount();
+  num_output_nodes = this->session->GetOutputCount();
 
   std::vector<const char *> input_node_names(num_input_nodes);
   std::vector<const char *> output_node_names(num_output_nodes);
 
   // Warning: only 1 input and output supported
-  char *input_name = session->GetInputName(0, input_allocator);
+  char *input_name = this->session->GetInputName(0, input_allocator);
   input_node_names[0] = input_name;
-  char *output_name = session->GetOutputName(0, output_allocator);
+  char *output_name = this->session->GetOutputName(0, output_allocator);
   output_node_names[0] = output_name;
 
   try {
@@ -261,9 +264,10 @@ RuntimeError Engine::ScoreModel (std::shared_ptr<Ort::Session> session,
                    input_node_dims.data(),
                    input_node_dims.size());
     auto output_tensor =
-      session->Run(Ort::RunOptions{nullptr}, input_node_names.data(),
-                   &input_tensor, num_input_nodes, output_node_names.data(),
-                   num_output_nodes);
+      this->session->Run(Ort::RunOptions{nullptr}, input_node_names.data(),
+                         &input_tensor, num_input_nodes, output_node_names.data(),
+                         num_output_nodes);
+
     result = output_tensor.at(0).GetTensorMutableData<float>();
   }
 

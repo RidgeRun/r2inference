@@ -38,7 +38,7 @@ class Engine : public IEngine {
   std::shared_ptr<r2i::IPrediction> Predict (std::shared_ptr<r2i::IFrame>
       in_frame, r2i::RuntimeError &error) override;
 
- protected:
+ private:
   enum State {
     STARTED,
     STOPPED
@@ -46,8 +46,8 @@ class Engine : public IEngine {
 
   State state;
   std::shared_ptr<Model> model;
+  std::shared_ptr<Ort::Session> session;
 
- private:
   RuntimeError ValidateInputTensorShape (int channels, int height, int width,
                                          std::vector<int64_t> input_dims);
   RuntimeError ScoreModel (std::shared_ptr<Ort::Session> session,
