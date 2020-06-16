@@ -30,7 +30,7 @@ class Prediction: public IPrediction {
   RuntimeError SetTensorValues(float *output_data, int tensor_size);
 
  private:
-  float *output_data = NULL;
+  std::shared_ptr<float> output_data;
   int tensor_size;
 };
 

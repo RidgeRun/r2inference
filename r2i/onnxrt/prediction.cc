@@ -16,14 +16,19 @@
 namespace r2i {
 namespace onnxrt {
 
+// Custom deleter
+template< typename T >
+struct array_deleter {
+  void operator ()( T const *p) {
+    delete[] p;
+  }
+};
+
 Prediction::Prediction ():
   output_data(nullptr), tensor_size(0) {
 }
 
 Prediction::~Prediction () {
-  if (nullptr != this->output_data) {
-    delete[] this->output_data;
-  }
 }
 
 RuntimeError Prediction::SetTensorValues(float *output_data, int data_size) {
@@ -43,9 +48,11 @@ RuntimeError Prediction::SetTensorValues(float *output_data, int data_size) {
 
   this->tensor_size = data_size;
 
-  this->output_data = new float [this->tensor_size * sizeof(float)];
+  this->output_data = std::shared_ptr<float>(new float[this->tensor_size],
+                      array_deleter<float>());
 
-  std::memcpy(this->output_data, output_data, this->tensor_size * sizeof(float));
+  std::memcpy(this->output_data.get(), output_data,
+              this->tensor_size * sizeof(float));
 
   return error;
 }
@@ -65,11 +72,11 @@ double Prediction::At (unsigned int index,  r2i::RuntimeError &error) {
                "Triying to access an non-existing index");
     return 0;
   }
-  return this->output_data[index];
+  return this->output_data.get()[index];
 }
 
 void *Prediction::GetResultData () {
-  return reinterpret_cast<void *>(this->output_data);
+  return reinterpret_cast<void *>(this->output_data.get());
 }
 
 unsigned int Prediction::GetResultSize () {
