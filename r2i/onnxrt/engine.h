@@ -14,6 +14,8 @@
 
 #include <r2i/iengine.h>
 
+#include <core/session/onnxruntime_cxx_api.h>
+
 #include <memory>
 #include <vector>
 
@@ -46,15 +48,40 @@ class Engine : public IEngine {
 
   State state;
   std::shared_ptr<Model> model;
-  std::shared_ptr<Ort::Session> session;
+  std::vector<int64_t> input_node_dims;
+  std::vector<const char *> input_node_names;
+  std::vector<const char *> output_node_names;
+  size_t output_size;
+  size_t num_input_nodes;
+  size_t num_output_nodes;
 
-  RuntimeError ValidateInputTensorShape (int channels, int height, int width,
-                                         std::vector<int64_t> input_dims);
-  RuntimeError ScoreModel (std::shared_ptr<Ort::Session> session,
-                           std::shared_ptr<Frame> frame,
-                           size_t input_image_size,
-                           std::vector<int64_t> input_node_dims,
-                           std::shared_ptr<Prediction> prediction);
+  size_t GetSessionInputCount(std::shared_ptr<Ort::Session> session);
+  size_t GetSessionOutputCount(std::shared_ptr<Ort::Session> session);
+  std::vector<int64_t> GetSessionInputNodeDims(std::shared_ptr<Ort::Session>
+      session, size_t index);
+  size_t GetSessionOutputSize(std::shared_ptr<Ort::Session> session,
+                              size_t index);
+  char *GetSessionInputName(std::shared_ptr<Ort::Session> session, size_t index,
+                            OrtAllocator *allocator);
+  char *GetSessionOutputName(std::shared_ptr<Ort::Session> session, size_t index,
+                             OrtAllocator *allocator);
+  float *SessionRun (std::shared_ptr<Ort::Session> session,
+                     std::shared_ptr<Frame> frame,
+                     size_t input_image_size,
+                     std::vector<int64_t> input_node_dims,
+                     Ort::Value &input_tensor,
+                     std::vector<Ort::Value> &output_tensor,
+                     RuntimeError &error);
+  r2i::RuntimeError GetSessionInfo(std::shared_ptr<Ort::Session> session,
+                                   size_t index);
+  r2i::RuntimeError ValidateInputTensorShape (int channels, int height, int width,
+      std::vector<int64_t> input_dims);
+  r2i::RuntimeError ScoreModel (std::shared_ptr<Ort::Session> session,
+                                std::shared_ptr<Frame> frame,
+                                size_t input_size,
+                                size_t output_size,
+                                std::vector<int64_t> input_node_dims,
+                                std::shared_ptr<Prediction> prediction);
 };
 
 }  // namespace onnxrt

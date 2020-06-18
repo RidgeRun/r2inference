@@ -57,8 +57,6 @@ RuntimeError Engine::SetModel (std::shared_ptr<r2i::IModel> in_model) {
 
   this->model = model;
 
-  this->session = this->model->GetOnnxrtSession();
-
   return error;
 }
 
@@ -74,6 +72,39 @@ RuntimeError Engine::Start ()  {
   if (nullptr == this->model) {
     error.Set (RuntimeError::Code:: NULL_PARAMETER,
                "Model not set yet");
+    return error;
+  }
+
+  try {
+    this->num_input_nodes = this->GetSessionInputCount(
+                              this->model->GetOnnxrtSession());
+    this->num_output_nodes = this->GetSessionOutputCount(
+                               this->model->GetOnnxrtSession());
+  }
+
+  catch (std::exception &excep) {
+    error.Set(RuntimeError::Code::FRAMEWORK_ERROR, excep.what());
+    return error;
+  }
+
+  if (this->num_input_nodes > 1) {
+    error.Set(RuntimeError::Code::INCOMPATIBLE_MODEL,
+              "Number of inputs in the model is greater than 1, this is not supported");
+    return error;
+  }
+
+  if (this->num_output_nodes > 1) {
+    error.Set(RuntimeError::Code::INCOMPATIBLE_MODEL,
+              "Number of outputs in the model is greater than 1, this is not supported");
+    return error;
+  }
+
+  this->input_node_names.resize(num_input_nodes);
+  this->output_node_names.resize(num_output_nodes);
+
+  // Warning: only 1 input and output supported
+  error = GetSessionInfo(this->model->GetOnnxrtSession(), 0);
+  if (error.IsError ()) {
     return error;
   }
 
@@ -101,7 +132,6 @@ std::shared_ptr<r2i::IPrediction> Engine::Predict (std::shared_ptr<r2i::IFrame>
   int frame_width = 0;
   int frame_height = 0;
   int frame_channels = 0;
-  std::vector<int64_t> input_node_dims;
   size_t input_image_size = 0;
 
   auto prediction = std::make_shared<Prediction>();
@@ -121,36 +151,6 @@ std::shared_ptr<r2i::IPrediction> Engine::Predict (std::shared_ptr<r2i::IFrame>
     return nullptr;
   }
 
-  if (!this->session) {
-    error.Set(RuntimeError::Code::NULL_PARAMETER,
-              "Received null onnxrt session pointer, can not do prediction");
-    return nullptr;
-  }
-
-  if (this->session->GetInputCount() > 1) {
-    error.Set(RuntimeError::Code::INCOMPATIBLE_MODEL,
-              "Number of inputs in the model is greater than 1, this is not supported");
-    return nullptr;
-  }
-
-  if (this->session->GetOutputCount() > 1) {
-    error.Set(RuntimeError::Code::INCOMPATIBLE_MODEL,
-              "Number of outputs in the model is greater than 1, this is not supported");
-    return nullptr;
-  }
-
-  // Warning: We support batches of size 1 and models with
-  // 1 input only.
-  try {
-    input_node_dims = this->session->GetInputTypeInfo(
-                        0).GetTensorTypeAndShapeInfo().GetShape();
-  }
-
-  catch (std::exception &excep) {
-    error.Set(RuntimeError::Code::FRAMEWORK_ERROR, excep.what());
-    return nullptr;
-  }
-
   frame_format = frame->GetFormat();
   frame_channels = frame_format.GetNumPlanes();
   frame_height = frame->GetHeight();
@@ -158,7 +158,7 @@ std::shared_ptr<r2i::IPrediction> Engine::Predict (std::shared_ptr<r2i::IFrame>
   input_image_size = frame_height * frame_width * frame_channels;
 
   error = this->ValidateInputTensorShape(frame_channels, frame_height,
-                                         frame_width, input_node_dims);
+                                         frame_width, this->input_node_dims);
   if (error.IsError ()) {
     return nullptr;
   }
@@ -166,8 +166,10 @@ std::shared_ptr<r2i::IPrediction> Engine::Predict (std::shared_ptr<r2i::IFrame>
   // Score model with input tensor, get back Prediction set with pointer
   // of the output tensor result.
   // Note that this implementation only supports 1 input and 1 output models.
-  error = this->ScoreModel(this->session, frame, input_image_size,
-                           input_node_dims,
+  error = this->ScoreModel(this->model->GetOnnxrtSession(), frame,
+                           input_image_size,
+                           this->output_size,
+                           this->input_node_dims,
                            prediction);
 
   if (error.IsError ()) {
@@ -175,6 +177,60 @@ std::shared_ptr<r2i::IPrediction> Engine::Predict (std::shared_ptr<r2i::IFrame>
   }
 
   return prediction;
+}
+
+size_t Engine::GetSessionInputCount(std::shared_ptr<Ort::Session> session) {
+  return session->GetInputCount();
+}
+
+size_t Engine::GetSessionOutputCount(std::shared_ptr<Ort::Session> session) {
+  return session->GetOutputCount();
+}
+
+std::vector<int64_t> Engine::GetSessionInputNodeDims(
+  std::shared_ptr<Ort::Session> session, size_t index) {
+  return session->GetInputTypeInfo(
+           index).GetTensorTypeAndShapeInfo().GetShape();
+}
+
+size_t Engine::GetSessionOutputSize(std::shared_ptr<Ort::Session> session,
+                                    size_t index) {
+  return session->GetOutputTypeInfo(
+           index).GetTensorTypeAndShapeInfo().GetElementCount();
+}
+
+char *Engine::GetSessionInputName(std::shared_ptr<Ort::Session> session,
+                                  size_t index, OrtAllocator *allocator) {
+  return session->GetInputName(index, allocator);
+}
+
+char *Engine::GetSessionOutputName(std::shared_ptr<Ort::Session> session,
+                                   size_t index, OrtAllocator *allocator) {
+  return session->GetOutputName(index, allocator);
+}
+
+RuntimeError Engine::GetSessionInfo(std::shared_ptr<Ort::Session> session,
+                                    size_t index) {
+  RuntimeError error;
+
+  Ort::AllocatorWithDefaultOptions input_allocator;
+  Ort::AllocatorWithDefaultOptions output_allocator;
+
+  try {
+    this->input_node_dims = this->GetSessionInputNodeDims(session, index);
+    this->output_size = this->GetSessionOutputSize(session, index);
+    this->input_node_names[index] = this->GetSessionInputName(session, index,
+                                    input_allocator);
+    this->output_node_names[index] = this->GetSessionOutputName(session, index,
+                                     output_allocator);
+  }
+
+  catch (std::exception &excep) {
+    error.Set(RuntimeError::Code::FRAMEWORK_ERROR, excep.what());
+    return error;
+  }
+
+  return error;
 }
 
 RuntimeError Engine::ValidateInputTensorShape (int channels, int height,
@@ -215,28 +271,47 @@ RuntimeError Engine::ValidateInputTensorShape (int channels, int height,
   return error;
 }
 
+float *Engine::SessionRun (std::shared_ptr<Ort::Session> session,
+                           std::shared_ptr<Frame> frame,
+                           size_t input_image_size,
+                           std::vector<int64_t> input_node_dims,
+                           Ort::Value &input_tensor,
+                           std::vector<Ort::Value> &output_tensor,
+                           RuntimeError &error) {
+  Ort::MemoryInfo memory_info = Ort::MemoryInfo::CreateCpu(OrtArenaAllocator,
+                                OrtMemTypeDefault);
+  input_tensor = Ort::Value::CreateTensor<float>(memory_info,
+                 reinterpret_cast<float *>(frame->GetData()),
+                 input_image_size,
+                 input_node_dims.data(),
+                 input_node_dims.size());
+  output_tensor =
+    session->Run(Ort::RunOptions{nullptr}, input_node_names.data(),
+                 &input_tensor, num_input_nodes, output_node_names.data(),
+                 num_output_nodes);
+  return output_tensor.at(0).GetTensorMutableData<float>();
+}
+
 RuntimeError Engine::ScoreModel (std::shared_ptr<Ort::Session> session,
                                  std::shared_ptr<Frame> frame,
-                                 size_t input_image_size,
+                                 size_t input_size,
+                                 size_t output_size,
                                  std::vector<int64_t> input_node_dims,
                                  std::shared_ptr<Prediction> prediction) {
   RuntimeError error;
   float *result;
-  int64_t output_size;
-  size_t num_input_nodes = this->session->GetInputCount();
-  size_t num_output_nodes = this->session->GetOutputCount();
-  std::vector<int64_t> output_node_dims;
   Ort::Value input_tensor{nullptr};
-  Ort::AllocatorWithDefaultOptions input_allocator;
-  Ort::AllocatorWithDefaultOptions output_allocator;
+  std::vector<Ort::Value> output_tensor;
 
-  // Warning: We support batches of size 1 and models with
-  // 1 output only.
+  if (!frame->GetData()) {
+    error.Set (RuntimeError::Code::NULL_PARAMETER,
+               "The provided frame does not contain valid data");
+    return error;
+  }
+
   try {
-    output_node_dims = this->session->GetOutputTypeInfo(
-                         0).GetTensorTypeAndShapeInfo().GetShape();
-    output_size = this->session->GetOutputTypeInfo(
-                    0).GetTensorTypeAndShapeInfo().GetElementCount();
+    result = this->SessionRun(session, frame, input_size, input_node_dims,
+                              input_tensor, output_tensor, error);
   }
 
   catch (std::exception &excep) {
@@ -244,40 +319,10 @@ RuntimeError Engine::ScoreModel (std::shared_ptr<Ort::Session> session,
     return error;
   }
 
-  num_input_nodes = this->session->GetInputCount();
-  num_output_nodes = this->session->GetOutputCount();
-
-  std::vector<const char *> input_node_names(num_input_nodes);
-  std::vector<const char *> output_node_names(num_output_nodes);
-
-  // Warning: only 1 input and output supported
-  char *input_name = this->session->GetInputName(0, input_allocator);
-  input_node_names[0] = input_name;
-  char *output_name = this->session->GetOutputName(0, output_allocator);
-  output_node_names[0] = output_name;
-
-  try {
-    Ort::MemoryInfo memory_info = Ort::MemoryInfo::CreateCpu(OrtArenaAllocator,
-                                  OrtMemTypeDefault);
-    input_tensor = Ort::Value::CreateTensor<float>(memory_info,
-                   reinterpret_cast<float *>(frame->GetData()),
-                   input_image_size,
-                   input_node_dims.data(),
-                   input_node_dims.size());
-    auto output_tensor =
-      this->session->Run(Ort::RunOptions{nullptr}, input_node_names.data(),
-                         &input_tensor, num_input_nodes, output_node_names.data(),
-                         num_output_nodes);
-
-    result = output_tensor.at(0).GetTensorMutableData<float>();
-  }
-
-  catch (std::exception &excep) {
-    error.Set(RuntimeError::Code::FRAMEWORK_ERROR, excep.what());
+  error = prediction->SetTensorValues(result, output_size);
+  if (error.IsError ()) {
     return error;
   }
-
-  prediction->SetTensorValues(result, output_size);
 
   return error;
 }

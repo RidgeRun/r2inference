@@ -18,7 +18,7 @@ namespace onnxrt {
 
 // Custom deleter
 template< typename T >
-struct array_deleter {
+struct ArrayDeleter {
   void operator ()( T const *p) {
     delete[] p;
   }
@@ -49,7 +49,7 @@ RuntimeError Prediction::SetTensorValues(float *output_data, int data_size) {
   this->tensor_size = data_size;
 
   this->output_data = std::shared_ptr<float>(new float[this->tensor_size],
-                      array_deleter<float>());
+                      ArrayDeleter<float>());
 
   std::memcpy(this->output_data.get(), output_data,
               this->tensor_size * sizeof(float));
