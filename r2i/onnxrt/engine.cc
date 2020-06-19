@@ -37,7 +37,7 @@ RuntimeError Engine::SetModel (std::shared_ptr<r2i::IModel> in_model) {
 
   if (State::STOPPED != this->state) {
     error.Set (RuntimeError::Code::WRONG_ENGINE_STATE,
-               "Stopped model before setting a new state");
+               "Attempting to set model in stopped state");
     return error;
   }
 
