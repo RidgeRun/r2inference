@@ -102,7 +102,7 @@ RuntimeError Engine::Start ()  {
   this->input_node_names.resize(num_input_nodes);
   this->output_node_names.resize(num_output_nodes);
 
-  // Warning: only 1 input and output supported
+  /* Warning: only 1 input and output supported */
   error = GetSessionInfo(this->model->GetOnnxrtSession(), 0);
   if (error.IsError ()) {
     return error;
@@ -163,9 +163,10 @@ std::shared_ptr<r2i::IPrediction> Engine::Predict (std::shared_ptr<r2i::IFrame>
     return nullptr;
   }
 
-  // Score model with input tensor, get back Prediction set with pointer
-  // of the output tensor result.
-  // Note that this implementation only supports 1 input and 1 output models.
+  /* Score model with input tensor, get back Prediction set with pointer
+  * of the output tensor result.
+  * Note that this implementation only supports 1 input and 1 output models.
+  */
   error = this->ScoreModel(this->model->GetOnnxrtSession(), frame,
                            input_image_size,
                            this->output_size,
@@ -237,14 +238,14 @@ RuntimeError Engine::ValidateInputTensorShape (int channels, int height,
     int width, std::vector<int64_t> input_dims) {
   RuntimeError error;
 
-  // We only support 1 batch
+  /* We only support 1 batch */
   if (1 != input_dims.at(0)) {
     error.Set (RuntimeError::Code::INVALID_FRAMEWORK_PARAMETER,
                "We only support a batch of 1 image(s) in our frames");
     return error;
   }
 
-  // Check that channels match
+  /* Check that channels match */
   if (channels != input_dims.at(1)) {
     std::string error_msg;
     error_msg = "Channels per image:" + std::to_string(channels) +
@@ -254,14 +255,14 @@ RuntimeError Engine::ValidateInputTensorShape (int channels, int height,
     return error;
   }
 
-  // Check that heights match
+  /* Check that heights match */
   if (height != input_dims.at(2)) {
     error.Set (RuntimeError::Code::INVALID_FRAMEWORK_PARAMETER,
                "Unsupported image height");
     return error;
   }
 
-  // Check that widths match
+  /* Check that widths match */
   if (width != input_dims.at(3)) {
     error.Set (RuntimeError::Code::INVALID_FRAMEWORK_PARAMETER,
                "Unsupported image width");

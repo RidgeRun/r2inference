@@ -16,7 +16,7 @@
 namespace r2i {
 namespace onnxrt {
 
-// Custom deleter
+/* Custom deleter */
 template< typename T >
 struct ArrayDeleter {
   void operator ()( T const *p) {
