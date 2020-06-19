@@ -27,6 +27,10 @@ if HAVE_NCSDK
 SUBDIRS += ncsdk
 endif
 
+if HAVE_ONNXRT
+SUBDIRS += onnxrt
+endif
+
 if HAVE_TENSORFLOW
 SUBDIRS += tensorflow
 endif
