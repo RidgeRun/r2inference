@@ -30,13 +30,9 @@ class Engine : public IEngine {
  public:
   Engine ();
   ~Engine ();
-
   r2i::RuntimeError SetModel (std::shared_ptr<r2i::IModel> in_model) override;
-
   r2i::RuntimeError Start () override;
-
   r2i::RuntimeError Stop () override;
-
   std::shared_ptr<r2i::IPrediction> Predict (std::shared_ptr<r2i::IFrame>
       in_frame, r2i::RuntimeError &error) override;
 
