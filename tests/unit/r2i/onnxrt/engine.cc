@@ -43,6 +43,7 @@ static bool null_input_name = false;
 static bool invalid_input_number = false;
 static bool get_input_number_fail = false;
 static bool invalid_frame = false;
+static bool session_run_fail = false;
 
 // To simulate exceptions thrown by onnxruntime API. Exceptions in this
 // API are derived from std::exception.
@@ -141,6 +142,10 @@ float *Engine::SessionRun (std::shared_ptr<Ort::Session> session,
                            Ort::Value &input_tensor,
                            std::vector<Ort::Value> &output_tensor,
                            RuntimeError &error) {
+  if (session_run_fail) {
+    throw onnxrtexcep;
+    return nullptr;
+  }
   return dummy_out_data_ptr;
 }
 
@@ -303,6 +308,21 @@ TEST (OnnxrtEngine, EnginePredictInvalidFrame) {
   prediction = engine->Predict (frame, error);
   LONGS_EQUAL (r2i::RuntimeError::Code::INVALID_FRAMEWORK_PARAMETER,
                error.GetCode ());
+}
+
+TEST (OnnxrtEngine, EngineSessionRunFail) {
+  r2i::RuntimeError error;
+  std::shared_ptr<r2i::IPrediction> prediction;
+  session_run_fail = true;
+
+  error = engine->SetModel (model);
+  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
+
+  error = engine->Start ();
+  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
+
+  prediction = engine->Predict (frame, error);
+  LONGS_EQUAL (r2i::RuntimeError::Code::FRAMEWORK_ERROR, error.GetCode ());
 }
 
 TEST (OnnxrtEngine, EnginePredictSuccess) {
