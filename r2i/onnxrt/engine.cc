@@ -164,9 +164,9 @@ std::shared_ptr<r2i::IPrediction> Engine::Predict (std::shared_ptr<r2i::IFrame>
   }
 
   /* Score model with input tensor, get back Prediction set with pointer
-  * of the output tensor result.
-  * Note that this implementation only supports 1 input and 1 output models.
-  */
+   * of the output tensor result.
+   * Note that this implementation only supports 1 input and 1 output models.
+   */
   error = this->ScoreModel(this->model->GetOnnxrtSession(), frame,
                            input_image_size,
                            this->output_size,

@@ -45,8 +45,9 @@ static bool get_input_number_fail = false;
 static bool invalid_frame = false;
 static bool session_run_fail = false;
 
-// To simulate exceptions thrown by onnxruntime API. Exceptions in this
-// API are derived from std::exception.
+/* To simulate exceptions thrown by onnxruntime API. Exceptions in this
+ * API are derived from std::exception.
+ */
 class OnnxrtExcep : public std::exception {
   virtual const char *what() const throw() { return "ONNXRT exception thrown"; }
 } onnxrtexcep;
@@ -134,7 +135,7 @@ char *Engine::GetSessionOutputName(std::shared_ptr<Ort::Session> session,
   return (char *)dummy_char;
 }
 
-// Mock for wrapper of Ort::Session::Run method
+/* Mock for wrapper of Ort::Session::Run method */
 float *Engine::SessionRun (std::shared_ptr<Ort::Session> session,
                            std::shared_ptr<Frame> frame,
                            size_t input_image_size,
@@ -218,7 +219,6 @@ TEST (OnnxrtEngine, StartEngineEmpty) {
 
 TEST (OnnxrtEngine, StartEngineTwice) {
   r2i::RuntimeError error;
-  //~ invalid_model=true;
 
   error = engine->SetModel (model);
   LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
