@@ -246,7 +246,7 @@ RuntimeError Engine::ValidateInputTensorShape (int channels, int height,
   }
 
   /* Check that channels match */
-  if (channels != input_dims.at(1)) {
+  if (channels != input_dims.at(3)) {
     std::string error_msg;
     error_msg = "Channels per image:" + std::to_string(channels) +
                 ", needs to be equal to model input channels:" +
@@ -263,7 +263,7 @@ RuntimeError Engine::ValidateInputTensorShape (int channels, int height,
   }
 
   /* Check that widths match */
-  if (width != input_dims.at(3)) {
+  if (width != input_dims.at(1)) {
     error.Set (RuntimeError::Code::INVALID_FRAMEWORK_PARAMETER,
                "Unsupported image width");
     return error;

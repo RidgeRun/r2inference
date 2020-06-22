@@ -108,7 +108,7 @@ size_t Engine::GetSessionOutputCount(std::shared_ptr<Ort::Session> session) {
 
 std::vector<int64_t> Engine::GetSessionInputNodeDims(
   std::shared_ptr<Ort::Session> session, size_t index) {
-  std::vector<int64_t> vect{ BATCH_SIZE, CHANNELS, FRAME_HEIGHT, FRAME_WIDTH };
+  std::vector<int64_t> vect{ BATCH_SIZE, FRAME_HEIGHT, FRAME_WIDTH, CHANNELS };
   return vect;
 }
 
