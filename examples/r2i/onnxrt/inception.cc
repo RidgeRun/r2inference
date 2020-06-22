@@ -66,9 +66,9 @@ std::unique_ptr<float[]> PreProcessImage (const unsigned char *input,
 
   for (int i = 0; i < scaled_size; i += channels) {
     /* RGB = (RGB - Mean)*StdDev */
-    adjusted[i + 0] = (static_cast<float>(scaled[i + 0]) - 127.5) / 127.5;
-    adjusted[i + 1] = (static_cast<float>(scaled[i + 1]) - 127.5) / 127.5;
-    adjusted[i + 2] = (static_cast<float>(scaled[i + 2]) - 127.5) / 127.5;
+    adjusted[i + 0] = (static_cast<float>(scaled[i + 0]) - 128) / 128.0;
+    adjusted[i + 1] = (static_cast<float>(scaled[i + 1]) - 128) / 128.0;
+    adjusted[i + 2] = (static_cast<float>(scaled[i + 2]) - 128) / 128.0;
   }
 
   return adjusted;
