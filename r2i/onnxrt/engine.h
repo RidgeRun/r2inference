@@ -57,10 +57,12 @@ class Engine : public IEngine {
       session, size_t index);
   size_t GetSessionOutputSize(std::shared_ptr<Ort::Session> session,
                               size_t index);
-  char *GetSessionInputName(std::shared_ptr<Ort::Session> session, size_t index,
-                            OrtAllocator *allocator);
-  char *GetSessionOutputName(std::shared_ptr<Ort::Session> session, size_t index,
-                             OrtAllocator *allocator);
+  const char *GetSessionInputName(std::shared_ptr<Ort::Session> session,
+                                  size_t index,
+                                  OrtAllocator *allocator);
+  const char *GetSessionOutputName(std::shared_ptr<Ort::Session> session,
+                                   size_t index,
+                                   OrtAllocator *allocator);
   float *SessionRun (std::shared_ptr<Ort::Session> session,
                      std::shared_ptr<Frame> frame,
                      size_t input_image_size,

@@ -200,13 +200,13 @@ size_t Engine::GetSessionOutputSize(std::shared_ptr<Ort::Session> session,
            index).GetTensorTypeAndShapeInfo().GetElementCount();
 }
 
-char *Engine::GetSessionInputName(std::shared_ptr<Ort::Session> session,
-                                  size_t index, OrtAllocator *allocator) {
+const char *Engine::GetSessionInputName(std::shared_ptr<Ort::Session> session,
+                                        size_t index, OrtAllocator *allocator) {
   return session->GetInputName(index, allocator);
 }
 
-char *Engine::GetSessionOutputName(std::shared_ptr<Ort::Session> session,
-                                   size_t index, OrtAllocator *allocator) {
+const char *Engine::GetSessionOutputName(std::shared_ptr<Ort::Session> session,
+    size_t index, OrtAllocator *allocator) {
   return session->GetOutputName(index, allocator);
 }
 

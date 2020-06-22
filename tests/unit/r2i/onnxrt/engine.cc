@@ -35,15 +35,18 @@
 #define INVALID_INPUT_NUMBER 2
 #define BATCH_SIZE 1
 #define OUTPUT_SIZE 1000
+#define EXPECTED_OUT_TENSOR_VAL 0
 
-void *dummy_char = nullptr;
-void *dummy_frame_ptr = nullptr;
-float *dummy_out_data_ptr = nullptr;
 static bool null_input_name = false;
 static bool invalid_input_number = false;
 static bool get_input_number_fail = false;
 static bool invalid_frame = false;
 static bool session_run_fail = false;
+
+std::string dummy_string_input = "input";
+std::string dummy_string_output = "output";
+std::vector<float> dummy_output_tensor_values(OUTPUT_SIZE);
+std::vector<float> dummy_frame_data(CHANNELS *FRAME_WIDTH *FRAME_HEIGHT);
 
 /* To simulate exceptions thrown by onnxruntime API. Exceptions in this
  * API are derived from std::exception.
@@ -72,7 +75,7 @@ namespace onnxrt {
 
 Frame::Frame () {}
 void *Frame::GetData () {
-  return dummy_frame_ptr;
+  return dummy_frame_data.data();
 }
 
 int Frame::GetWidth () {
@@ -97,7 +100,6 @@ size_t Engine::GetSessionInputCount(std::shared_ptr<Ort::Session> session) {
   }
   if (get_input_number_fail) {
     throw onnxrtexcep;
-    return 0;
   }
   return INPUT_NUMBER;
 }
@@ -117,22 +119,20 @@ size_t Engine::GetSessionOutputSize(std::shared_ptr<Ort::Session> session,
   return OUTPUT_SIZE;
 }
 
-char *Engine::GetSessionInputName(std::shared_ptr<Ort::Session> session,
-                                  size_t index, OrtAllocator *allocator) {
+const char *Engine::GetSessionInputName(std::shared_ptr<Ort::Session> session,
+                                        size_t index, OrtAllocator *allocator) {
   if (null_input_name) {
     throw onnxrtexcep;
-    return nullptr;
   }
-  return (char *)dummy_char;
+  return dummy_string_input.c_str();
 }
 
-char *Engine::GetSessionOutputName(std::shared_ptr<Ort::Session> session,
-                                   size_t index, OrtAllocator *allocator) {
+const char *Engine::GetSessionOutputName(std::shared_ptr<Ort::Session> session,
+    size_t index, OrtAllocator *allocator) {
   if (null_input_name) {
     throw onnxrtexcep;
-    return nullptr;
   }
-  return (char *)dummy_char;
+  return dummy_string_output.c_str();
 }
 
 /* Mock for wrapper of Ort::Session::Run method */
@@ -144,9 +144,13 @@ float *Engine::SessionRun (std::shared_ptr<Ort::Session> session,
                            RuntimeError &error) {
   if (session_run_fail) {
     throw onnxrtexcep;
-    return nullptr;
   }
-  return dummy_out_data_ptr;
+
+  /* Fill data with dummy values */
+  for (unsigned int i = 0; i < OUTPUT_SIZE; i++)
+    dummy_output_tensor_values[i] = (float)i / (OUTPUT_SIZE + 1);
+
+  return dummy_output_tensor_values.data();
 }
 
 }
@@ -163,17 +167,6 @@ TEST_GROUP (OnnxrtEngine) {
     inc_model = std::make_shared<MockModel> ();
     engine = std::make_shared<r2i::onnxrt::Engine> ();
     frame = std::make_shared<r2i::onnxrt::Frame> ();
-    dummy_char = malloc(sizeof(char));
-    dummy_frame_ptr = malloc(sizeof(float));
-    dummy_out_data_ptr = new float [OUTPUT_SIZE * sizeof(float)];
-  }
-  void teardown () {
-    free(dummy_char);
-    dummy_char = nullptr;
-    free(dummy_frame_ptr);
-    dummy_frame_ptr = nullptr;
-    delete[] dummy_out_data_ptr;
-    dummy_out_data_ptr = nullptr;
   }
 };
 
@@ -198,7 +191,7 @@ TEST (OnnxrtEngine, SetModelInvalid) {
   LONGS_EQUAL (r2i::RuntimeError::Code::FRAMEWORK_ERROR, error.GetCode ());
 }
 
-TEST (OnnxrtEngine, StartEngineNullSession) {
+TEST (OnnxrtEngine, NullInputNameException) {
   r2i::RuntimeError error;
   null_input_name = true;
 
@@ -250,16 +243,6 @@ TEST (OnnxrtEngine, StopEngine) {
   LONGS_EQUAL (r2i::RuntimeError::Code::WRONG_ENGINE_STATE, error.GetCode ());
 }
 
-TEST (OnnxrtEngine, InvalidModel) {
-  r2i::RuntimeError error;
-
-  error = engine->SetModel (model);
-  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
-
-  error = engine->Stop ();
-  LONGS_EQUAL (r2i::RuntimeError::Code::WRONG_ENGINE_STATE, error.GetCode ());
-}
-
 TEST (OnnxrtEngine, StopStopEngine) {
   r2i::RuntimeError error;
 
@@ -271,7 +254,7 @@ TEST (OnnxrtEngine, StopStopEngine) {
   LONGS_EQUAL (r2i::RuntimeError::Code::WRONG_ENGINE_STATE, error.GetCode ());
 }
 
-TEST (OnnxrtEngine, GetInputNumber) {
+TEST (OnnxrtEngine, GetInputNumberException) {
   r2i::RuntimeError error;
   get_input_number_fail = true;
 
@@ -336,6 +319,12 @@ TEST (OnnxrtEngine, EnginePredictSuccess) {
 
   prediction = engine->Predict (frame, error);
   LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
+
+  auto prediction_onnxrt =
+    std::dynamic_pointer_cast<r2i::onnxrt::Prediction, r2i::IPrediction>
+    (prediction);
+
+  LONGS_EQUAL (prediction_onnxrt->At(0, error), EXPECTED_OUT_TENSOR_VAL);
 }
 
 int main (int ac, char **av) {
