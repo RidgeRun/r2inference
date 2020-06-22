@@ -28,7 +28,7 @@ AM_CPPFLAGS =                      \
         $(RR_CPPFLAGS)             \
         $(CODE_COVERAGE_CPPFLAGS)
 
-LDADD =                            \
+AM_LDFLAGS =                       \
         $(RR_LIBS)                 \
         $(CODE_COVERAGE_LIBS)      \
         $(top_builddir)/r2i/libr2inference-@RR_PACKAGE_VERSION@.la
