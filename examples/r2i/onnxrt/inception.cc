@@ -64,24 +64,11 @@ std::unique_ptr<float[]> PreProcessImage (const unsigned char *input,
   stbir_resize_uint8(input, width, height, 0, scaled.get(), reqwidth,
                      reqheight, 0, channels);
 
-  /* Rearrange image and swap channels (RGB->BGR) */
-  for (int c = 0; c < channels; c++) {
-    for (int i = 0; i < reqheight; i++) {
-      for (int j = 0; j < reqwidth; j++) {
-        if (c == 2) {
-          adjusted[c * reqheight * reqwidth + i * reqwidth + j] =
-            (static_cast<float>(scaled[channels * (j + i * reqwidth)]));
-        }
-        if (c == 1) {
-          adjusted[c * reqheight * reqwidth + i * reqwidth + j] =
-            (static_cast<float>(scaled[channels * (j + i * reqwidth) + 1]));
-        }
-        if (c == 0) {
-          adjusted[c * reqheight * reqwidth + i * reqwidth + j] =
-            (static_cast<float>(scaled[channels * (j + i * reqwidth + 1) - 1]));
-        }
-      }
-    }
+  for (int i = 0; i < scaled_size; i += channels) {
+    /* RGB = (RGB - Mean)*StdDev */
+    adjusted[i + 0] = (static_cast<float>(scaled[i + 0]) - 127.5) / 127.5;
+    adjusted[i + 1] = (static_cast<float>(scaled[i + 1]) - 127.5) / 127.5;
+    adjusted[i + 2] = (static_cast<float>(scaled[i + 2]) - 127.5) / 127.5;
   }
 
   return adjusted;
