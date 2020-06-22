@@ -11,6 +11,9 @@
 
 #include "frameworkfactory.h"
 
+#include <memory>
+
+#include "engine.h"
 #include "frame.h"
 #include "loader.h"
 
@@ -28,7 +31,7 @@ std::unique_ptr<r2i::IEngine> FrameworkFactory::MakeEngine (
   RuntimeError &error) {
   error.Clean ();
 
-  return nullptr;
+  return std::unique_ptr<IEngine> (new Engine);
 }
 
 std::unique_ptr<r2i::IParameters> FrameworkFactory::MakeParameters (

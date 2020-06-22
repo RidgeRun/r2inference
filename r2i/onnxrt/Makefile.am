@@ -16,10 +16,12 @@ noinst_LTLIBRARIES = libonnxrt.la
 onnxrtincludedir = @R2IINCLUDEDIR@/r2i/onnxrt
 
 libonnxrt_la_SOURCES =           \
+    engine.cc                    \
     frame.cc                     \
     frameworkfactory.cc          \
     loader.cc                    \
-    model.cc                     
+    model.cc                     \
+    prediction.cc
 
 libonnxrt_la_CPPFLAGS =          \
     $(RR_CPPFLAGS)               \

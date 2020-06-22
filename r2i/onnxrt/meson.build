@@ -1,16 +1,20 @@
 # Define source code
 onnxrt_sources = [
+  'engine.cc',
   'frame.cc',
   'frameworkfactory.cc',
   'loader.cc',
   'model.cc',
+  'prediction.cc',
 ]
 
 onnxrt_headers = [
+  'engine.h',
   'frame.h',
   'frameworkfactory.h',
   'loader.h',
   'model.h',
+  'prediction.h',
 ]
 
 # Build library
