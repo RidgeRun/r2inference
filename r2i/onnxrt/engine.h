@@ -65,7 +65,6 @@ class Engine : public IEngine {
                      std::shared_ptr<Frame> frame,
                      size_t input_image_size,
                      std::vector<int64_t> input_node_dims,
-                     Ort::Value &input_tensor,
                      std::vector<Ort::Value> &output_tensor,
                      RuntimeError &error);
   r2i::RuntimeError GetSessionInfo(std::shared_ptr<Ort::Session> session,

@@ -276,9 +276,9 @@ float *Engine::SessionRun (std::shared_ptr<Ort::Session> session,
                            std::shared_ptr<Frame> frame,
                            size_t input_image_size,
                            std::vector<int64_t> input_node_dims,
-                           Ort::Value &input_tensor,
                            std::vector<Ort::Value> &output_tensor,
                            RuntimeError &error) {
+  Ort::Value input_tensor{nullptr};
   Ort::MemoryInfo memory_info = Ort::MemoryInfo::CreateCpu(OrtArenaAllocator,
                                 OrtMemTypeDefault);
   input_tensor = Ort::Value::CreateTensor<float>(memory_info,
@@ -301,7 +301,6 @@ RuntimeError Engine::ScoreModel (std::shared_ptr<Ort::Session> session,
                                  std::shared_ptr<Prediction> prediction) {
   RuntimeError error;
   float *result;
-  Ort::Value input_tensor{nullptr};
   std::vector<Ort::Value> output_tensor;
 
   if (!frame->GetData()) {
@@ -312,7 +311,7 @@ RuntimeError Engine::ScoreModel (std::shared_ptr<Ort::Session> session,
 
   try {
     result = this->SessionRun(session, frame, input_size, input_node_dims,
-                              input_tensor, output_tensor, error);
+                              output_tensor, error);
   }
 
   catch (std::exception &excep) {

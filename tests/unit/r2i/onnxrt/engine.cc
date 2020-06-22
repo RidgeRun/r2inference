@@ -140,7 +140,6 @@ float *Engine::SessionRun (std::shared_ptr<Ort::Session> session,
                            std::shared_ptr<Frame> frame,
                            size_t input_image_size,
                            std::vector<int64_t> input_node_dims,
-                           Ort::Value &input_tensor,
                            std::vector<Ort::Value> &output_tensor,
                            RuntimeError &error) {
   if (session_run_fail) {
