@@ -52,6 +52,7 @@ r2i::FrameworkMeta FrameworkFactory::GetDescription (RuntimeError &error) {
   const FrameworkMeta meta {
     .code = r2i::FrameworkCode::ONNXRT,
     .name = "OnnxRuntime",
+    .label = "onnxrt",
     .description = "Microsoft ONNX Runtime",
     .version = std::to_string(ORT_API_VERSION)
   };

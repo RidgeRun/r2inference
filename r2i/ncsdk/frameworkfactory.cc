@@ -51,6 +51,7 @@ r2i::FrameworkMeta FrameworkFactory::GetDescription (RuntimeError &error) {
   const FrameworkMeta meta {
     .code = r2i::FrameworkCode::NCSDK,
     .name = "Ncsdk",
+    .label = "ncsdk",
     .description = "Intel Movidius Neural Compute software developer kit",
     .version = "2"
   };

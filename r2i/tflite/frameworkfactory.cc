@@ -53,6 +53,7 @@ r2i::FrameworkMeta FrameworkFactory::GetDescription (RuntimeError &error) {
   const FrameworkMeta meta {
     .code = r2i::FrameworkCode::TFLITE,
     .name = "TensorflowLite",
+    .label = "tflite",
     .description = "Google's TensorFlow Lite",
     .version = TFLITE_VERSION_STRING
   };
