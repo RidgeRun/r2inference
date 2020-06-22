@@ -51,7 +51,7 @@ std::unique_ptr<r2i::IFrame> FrameworkFactory::MakeFrame (
 r2i::FrameworkMeta FrameworkFactory::GetDescription (RuntimeError &error) {
   const FrameworkMeta meta {
     .code = r2i::FrameworkCode::ONNXRT,
-    .name = "OnnxRuntime",
+    .name = "ONNXRuntime",
     .label = "onnxrt",
     .description = "Microsoft ONNX Runtime",
     .version = std::to_string(ORT_API_VERSION)
