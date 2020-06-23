@@ -51,6 +51,7 @@ r2i::FrameworkMeta FrameworkFactory::GetDescription (RuntimeError &error) {
   const FrameworkMeta meta {
     .code = r2i::FrameworkCode::TENSORRT,
     .name = "TensorRT",
+    .label = "tensorrt",
     .description = "NVIDIA's TensorRT",
     .version = std::to_string(NV_TENSORRT_VERSION)
   };

@@ -52,7 +52,8 @@ std::unique_ptr<r2i::IFrame> FrameworkFactory::MakeFrame (
 r2i::FrameworkMeta FrameworkFactory::GetDescription (RuntimeError &error) {
   const FrameworkMeta meta {
     .code = r2i::FrameworkCode::TFLITE,
-    .name = "tensorflow-lite",
+    .name = "TensorflowLite",
+    .label = "tflite",
     .description = "Google's TensorFlow Lite",
     .version = TFLITE_VERSION_STRING
   };

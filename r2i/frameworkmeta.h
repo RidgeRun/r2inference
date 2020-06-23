@@ -36,6 +36,11 @@ struct FrameworkMeta {
   const std::string name;
 
   /**
+   * A short string to identify the framework
+   */
+  const std::string label;
+
+  /**
   * A string with a description for the framework
   */
   const std::string description;
