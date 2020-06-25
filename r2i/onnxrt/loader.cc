@@ -11,9 +11,6 @@
 
 #include "r2i/onnxrt/loader.h"
 
-#include <core/common/exceptions.h>
-#include <core/session/onnxruntime_cxx_api.h>
-
 #include <fstream>
 #include <memory>
 #include <string>
@@ -23,6 +20,14 @@
 
 namespace r2i {
 namespace onnxrt {
+
+/* Custom deleter */
+template< typename T >
+struct ArrayDeleter {
+  void operator ()( T const *p) {
+    delete[] p;
+  }
+};
 
 std::shared_ptr<r2i::IModel> Loader::Load(const std::string &in_path,
     r2i::RuntimeError &error) {
@@ -38,48 +43,31 @@ std::shared_ptr<r2i::IModel> Loader::Load(const std::string &in_path,
     error.Set(RuntimeError::Code::FILE_ERROR, "Unable to open file");
     return nullptr;
   }
-  graphdef_file.close();
 
-  try {
-    this->CreateEnv(ORT_LOGGING_LEVEL_WARNING, in_path);
-    this->CreateSessionOptions();
-    this->CreateSession(this->env_ptr, in_path, this->session_options_ptr);
-  }
+  size_t graphdef_size = graphdef_file.tellg();
+  graphdef_file.seekg (0, std::ios::beg);
 
-  catch (std::exception &excep) {
-    error.Set(RuntimeError::Code::FRAMEWORK_ERROR, excep.what());
+  this->model_data = std::shared_ptr<char>(new char[graphdef_size],
+                     ArrayDeleter<char>());
+  if (nullptr == this->model_data) {
+    error.Set (RuntimeError::Code::MEMORY_ERROR,
+               "Can not allocate memory for graphdef");
     return nullptr;
   }
 
+  graphdef_file.read (model_data.get(), graphdef_size);
+  graphdef_file.close();
+
   auto model = std::make_shared<Model>();
 
-  error = model->Set(this->session_ptr);
+  error = model->SetOnnxrtModel(std::static_pointer_cast<void>(this->model_data),
+                                graphdef_size);
 
   if (error.IsError()) {
     return nullptr;
   }
 
   return model;
-}
-
-void Loader::CreateEnv(OrtLoggingLevel log_level, const std::string &log_id) {
-  this->env_ptr = std::make_shared<Ort::Env>(log_level, log_id.c_str());
-}
-
-void Loader::CreateSessionOptions() {
-  // TODO: This options should be paramaters in the class. Add method
-  // to pass this options inside the class.
-  this->session_options_ptr = std::make_shared<Ort::SessionOptions>();
-  this->session_options_ptr->SetIntraOpNumThreads(1);
-  this->session_options_ptr->SetGraphOptimizationLevel(
-    GraphOptimizationLevel::ORT_ENABLE_EXTENDED);
-}
-
-void Loader::CreateSession(std::shared_ptr<Ort::Env> env,
-                           const std::string &name,
-                           std::shared_ptr<Ort::SessionOptions> options) {
-  this->session_ptr =
-    std::make_shared<Ort::Session>(*env, name.c_str(), *options);
 }
 
 }  // namespace onnxrt

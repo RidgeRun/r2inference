@@ -94,6 +94,18 @@ int Frame::GetHeight () {
   return FRAME_HEIGHT;
 }
 
+void Engine::CreateEnv(OrtLoggingLevel log_level, const std::string &log_id) {
+
+}
+
+void Engine::CreateSessionOptions() {
+
+}
+
+void Engine::CreateSession(const void *model_data,
+                           size_t model_data_size) {
+}
+
 size_t Engine::GetSessionInputCount(std::shared_ptr<Ort::Session> session) {
   if (invalid_input_number) {
     return INVALID_INPUT_NUMBER;

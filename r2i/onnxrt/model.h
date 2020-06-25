@@ -30,13 +30,15 @@ class Model : public IModel {
   Model();
 
   std::shared_ptr<Ort::Session> GetOnnxrtSession();
-
   RuntimeError Start(const std::string &name) override;
-
-  RuntimeError Set(std::shared_ptr<Ort::Session> onnxrt_session);
+  RuntimeError SetOnnxrtModel(std::shared_ptr<void> model_data,
+                              size_t model_data_size);
+  std::shared_ptr<void> GetOnnxrtModel();
+  size_t GetOnnxrtModelSize();
 
  private:
-  std::shared_ptr<Ort::Session> session_ptr;
+  std::shared_ptr<void> model_data;
+  size_t model_data_size;
 };
 }  // namespace onnxrt
 }  // namespace r2i

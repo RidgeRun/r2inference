@@ -60,6 +60,24 @@ RuntimeError Engine::SetModel (std::shared_ptr<r2i::IModel> in_model) {
   return error;
 }
 
+void Engine::CreateEnv(OrtLoggingLevel log_level, const std::string &log_id) {
+  env = Ort::Env(ORT_LOGGING_LEVEL_WARNING, "test");
+}
+
+void Engine::CreateSessionOptions() {
+  session_options = Ort::SessionOptions();
+  session_options.SetIntraOpNumThreads(1);
+  session_options.SetGraphOptimizationLevel(
+    GraphOptimizationLevel::ORT_ENABLE_EXTENDED);
+
+}
+
+void Engine::CreateSession(const void *model_data,
+                           size_t model_data_size) {
+  this->session = std::make_shared<Ort::Session>(this->env, model_data,
+                  model_data_size, this->session_options);
+}
+
 RuntimeError Engine::Start ()  {
   RuntimeError error;
 
@@ -76,10 +94,12 @@ RuntimeError Engine::Start ()  {
   }
 
   try {
-    this->num_input_nodes = this->GetSessionInputCount(
-                              this->model->GetOnnxrtSession());
-    this->num_output_nodes = this->GetSessionOutputCount(
-                               this->model->GetOnnxrtSession());
+    this->CreateEnv(ORT_LOGGING_LEVEL_WARNING, "r2inference");
+    this->CreateSessionOptions();
+    this->CreateSession((void *) this->model->GetOnnxrtModel().get(),
+                        this->model->GetOnnxrtModelSize());
+    this->num_input_nodes = this->GetSessionInputCount(this->session);
+    this->num_output_nodes = this->GetSessionOutputCount(this->session);
   }
 
   catch (std::exception &excep) {
@@ -103,7 +123,7 @@ RuntimeError Engine::Start ()  {
   this->output_node_names.resize(num_output_nodes);
 
   /* Warning: only 1 input and output supported */
-  error = GetSessionInfo(this->model->GetOnnxrtSession(), 0);
+  error = GetSessionInfo(this->session, 0);
   if (error.IsError ()) {
     return error;
   }
@@ -167,7 +187,7 @@ std::shared_ptr<r2i::IPrediction> Engine::Predict (std::shared_ptr<r2i::IFrame>
    * of the output tensor result.
    * Note that this implementation only supports 1 input and 1 output models.
    */
-  error = this->ScoreModel(this->model->GetOnnxrtSession(), frame,
+  error = this->ScoreModel(this->session, frame,
                            input_image_size,
                            this->output_size,
                            this->input_node_dims,

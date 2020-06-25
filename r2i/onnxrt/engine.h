@@ -50,7 +50,13 @@ class Engine : public IEngine {
   size_t output_size;
   size_t num_input_nodes;
   size_t num_output_nodes;
+  Ort::Env env {nullptr};
+  Ort::SessionOptions session_options {nullptr};
+  std::shared_ptr<Ort::Session> session;
 
+  void CreateEnv(OrtLoggingLevel log_level, const std::string &log_id);
+  void CreateSessionOptions();
+  void CreateSession(const void *model_data, size_t model_data_size);
   size_t GetSessionInputCount(std::shared_ptr<Ort::Session> session);
   size_t GetSessionOutputCount(std::shared_ptr<Ort::Session> session);
   std::vector<int64_t> GetSessionInputNodeDims(std::shared_ptr<Ort::Session>

@@ -1,6 +1,5 @@
 onnx_tests_resources = [
   ['squeezenet.onnx'],
-  ['invalid.onnx'],
 ]
 
 # Copy resources files
