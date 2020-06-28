@@ -163,6 +163,21 @@ int main (int argc, char *argv[]) {
   std::shared_ptr<r2i::IEngine> engine = factory->MakeEngine (error);
   error = engine->SetModel (model);
 
+  std::cout << "Configuring ONNXRT session parameters" << std::endl;
+  auto params = factory->MakeParameters (error);
+  error = params->Configure(engine, model);
+  /* Set OrtLoggingLevel::ORT_LOGGING_LEVEL_WARNING */
+  error = params->Set ("logging-level", 2);
+  error = params->Set ("log-id", "onnxrt_example");
+  error = params->Set ("intra-num-threads", 1);
+  /* Set GraphOptimizationLevel::ORT_ENABLE_EXTENDED */
+  error = params->Set ("graph-optimization-level", 2);
+
+  if (error.IsError ()) {
+    std::cerr << "Parameters error: " << error << std::endl;
+    exit(EXIT_FAILURE);
+  }
+
   std::cout << "Loading image: " << image_path << std::endl;
   std::unique_ptr<float[]> image_data = LoadImage (image_path, size,
                                         size);

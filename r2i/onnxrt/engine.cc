@@ -60,16 +60,15 @@ RuntimeError Engine::SetModel (std::shared_ptr<r2i::IModel> in_model) {
   return error;
 }
 
-void Engine::CreateEnv(OrtLoggingLevel log_level, const std::string &log_id) {
-  env = Ort::Env(ORT_LOGGING_LEVEL_WARNING, "test");
+void Engine::CreateEnv() {
+  env = Ort::Env(this->logging_level, this->log_id.c_str());
 }
 
 void Engine::CreateSessionOptions() {
   session_options = Ort::SessionOptions();
-  session_options.SetIntraOpNumThreads(1);
+  session_options.SetIntraOpNumThreads(this->intra_num_threads);
   session_options.SetGraphOptimizationLevel(
-    GraphOptimizationLevel::ORT_ENABLE_EXTENDED);
-
+    this->graph_opt_level);
 }
 
 void Engine::CreateSession(const void *model_data,
@@ -94,16 +93,21 @@ RuntimeError Engine::Start ()  {
   }
 
   try {
-    this->CreateEnv(ORT_LOGGING_LEVEL_WARNING, "r2inference");
+    this->CreateEnv();
     this->CreateSessionOptions();
     this->CreateSession((void *) this->model->GetOnnxrtModel().get(),
                         this->model->GetOnnxrtModelSize());
-    this->num_input_nodes = this->GetSessionInputCount(this->session);
-    this->num_output_nodes = this->GetSessionOutputCount(this->session);
+    this->num_input_nodes = this->GetSessionInputCount(this->session, error);
+    this->num_output_nodes = this->GetSessionOutputCount(this->session, error);
   }
 
   catch (std::exception &excep) {
     error.Set(RuntimeError::Code::FRAMEWORK_ERROR, excep.what());
+    return error;
+  }
+
+  /* In case it fails but not by an exception */
+  if (error.IsError ()) {
     return error;
   }
 
@@ -200,34 +204,72 @@ std::shared_ptr<r2i::IPrediction> Engine::Predict (std::shared_ptr<r2i::IFrame>
   return prediction;
 }
 
-size_t Engine::GetSessionInputCount(std::shared_ptr<Ort::Session> session) {
+size_t Engine::GetSessionInputCount(std::shared_ptr<Ort::Session> session,
+                                    RuntimeError &error) {
+  if (nullptr == session) {
+    error.Set (RuntimeError::Code:: NULL_PARAMETER,
+               "Received null session pointer");
+    return 0;
+  }
   return session->GetInputCount();
 }
 
-size_t Engine::GetSessionOutputCount(std::shared_ptr<Ort::Session> session) {
+size_t Engine::GetSessionOutputCount(std::shared_ptr<Ort::Session> session,
+                                     RuntimeError &error) {
+  if (nullptr == session) {
+    error.Set (RuntimeError::Code:: NULL_PARAMETER,
+               "Received null session pointer");
+    return 0;
+  }
   return session->GetOutputCount();
 }
 
 std::vector<int64_t> Engine::GetSessionInputNodeDims(
-  std::shared_ptr<Ort::Session> session, size_t index) {
-  return session->GetInputTypeInfo(
+  std::shared_ptr<Ort::Session> session, size_t index, RuntimeError &error) {
+  std::vector<int64_t> dims;
+  if (nullptr == session) {
+    error.Set (RuntimeError::Code:: NULL_PARAMETER,
+               "Received null session pointer");
+    return dims;
+  }
+  dims = session->GetInputTypeInfo(
            index).GetTensorTypeAndShapeInfo().GetShape();
+  return dims;
 }
 
 size_t Engine::GetSessionOutputSize(std::shared_ptr<Ort::Session> session,
-                                    size_t index) {
+                                    size_t index, RuntimeError &error) {
+  if (nullptr == session) {
+    error.Set (RuntimeError::Code:: NULL_PARAMETER,
+               "Received null session pointer");
+    return 0;
+  }
   return session->GetOutputTypeInfo(
            index).GetTensorTypeAndShapeInfo().GetElementCount();
 }
 
 const char *Engine::GetSessionInputName(std::shared_ptr<Ort::Session> session,
-                                        size_t index, OrtAllocator *allocator) {
-  return session->GetInputName(index, allocator);
+                                        size_t index, OrtAllocator *allocator, RuntimeError &error) {
+  const char *name = "";
+  if (nullptr == session) {
+    error.Set (RuntimeError::Code:: NULL_PARAMETER,
+               "Received null session pointer");
+    return name;
+  }
+  name = session->GetInputName(index, allocator);
+  return name;
 }
 
 const char *Engine::GetSessionOutputName(std::shared_ptr<Ort::Session> session,
-    size_t index, OrtAllocator *allocator) {
-  return session->GetOutputName(index, allocator);
+    size_t index, OrtAllocator *allocator, RuntimeError &error) {
+  const char *name = "";
+  if (nullptr == session) {
+    error.Set (RuntimeError::Code:: NULL_PARAMETER,
+               "Received null session pointer");
+    return name;
+  }
+  name = session->GetOutputName(index, allocator);
+  return name;
 }
 
 RuntimeError Engine::GetSessionInfo(std::shared_ptr<Ort::Session> session,
@@ -238,12 +280,12 @@ RuntimeError Engine::GetSessionInfo(std::shared_ptr<Ort::Session> session,
   Ort::AllocatorWithDefaultOptions output_allocator;
 
   try {
-    this->input_node_dims = this->GetSessionInputNodeDims(session, index);
-    this->output_size = this->GetSessionOutputSize(session, index);
+    this->input_node_dims = this->GetSessionInputNodeDims(session, index, error);
+    this->output_size = this->GetSessionOutputSize(session, index, error);
     this->input_node_names[index] = this->GetSessionInputName(session, index,
-                                    input_allocator);
+                                    input_allocator, error);
     this->output_node_names[index] = this->GetSessionOutputName(session, index,
-                                     output_allocator);
+                                     output_allocator, error);
   }
 
   catch (std::exception &excep) {
@@ -345,6 +387,83 @@ RuntimeError Engine::ScoreModel (std::shared_ptr<Ort::Session> session,
   }
 
   return error;
+}
+
+RuntimeError Engine::SetLoggingLevel (int logging_level) {
+  RuntimeError error;
+
+  if (State::STARTED == this->state) {
+    error.Set (RuntimeError::Code::WRONG_ENGINE_STATE,
+               "Parameter can't be set, engine already started");
+    return error;
+  }
+
+  /* We need to convert int to OrtLoggingLevel enum */
+  this->logging_level = static_cast<OrtLoggingLevel>(logging_level);
+
+  return error;
+}
+
+RuntimeError Engine::SetIntraNumThreads (int intra_num_threads) {
+  RuntimeError error;
+
+  if (State::STARTED == this->state) {
+    error.Set (RuntimeError::Code::WRONG_ENGINE_STATE,
+               "Parameter can't be set, engine already started");
+    return error;
+  }
+
+  this->intra_num_threads = intra_num_threads;
+
+  return error;
+}
+
+RuntimeError Engine::SetGraphOptLevel (int graph_opt_level) {
+  RuntimeError error;
+
+  if (State::STARTED == this->state) {
+    error.Set (RuntimeError::Code::WRONG_ENGINE_STATE,
+               "Parameter can't be set, engine already started");
+    return error;
+  }
+
+  /* We need to convert int to GraphOptimizationLevel enum */
+  this->graph_opt_level = static_cast<GraphOptimizationLevel>(graph_opt_level);
+
+  return error;
+}
+
+RuntimeError Engine::SetLogId (const std::string &log_id) {
+  RuntimeError error;
+
+  if (State::STARTED == this->state) {
+    error.Set (RuntimeError::Code::WRONG_ENGINE_STATE,
+               "Parameter can't be set, engine already started");
+    return error;
+  }
+
+  this->log_id = log_id;
+
+  return error;
+}
+
+int Engine::GetLoggingLevel () {
+  /* We need to convert OrtLoggingLevel enum to int */
+  return static_cast<int>(this->logging_level);
+}
+
+int Engine::GetIntraNumThreads () {
+
+  return this->intra_num_threads;
+}
+
+int Engine::GetGraphOptLevel () {
+  /* We need to convert GraphOptimizationLevel enum to int */
+  return static_cast<int>(this->graph_opt_level);
+}
+
+const std::string Engine::GetLogId () {
+  return this->log_id;
 }
 
 }  // namespace onnxrt
