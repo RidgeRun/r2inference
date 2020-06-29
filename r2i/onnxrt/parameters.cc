@@ -126,7 +126,8 @@ RuntimeError Parameters::Get (const std::string &in_parameter, int &value) {
   RuntimeError error;
 
   ParamDesc param = this->Validate (in_parameter,
-                                    r2i::ParameterMeta::Type::INTEGER, "integer", error);
+                                    r2i::ParameterMeta::Type::INTEGER,
+                                    "integer", error);
   if (error.IsError ()) {
     return error;
   }
@@ -152,7 +153,8 @@ RuntimeError Parameters::Get (const std::string &in_parameter,
   RuntimeError error;
 
   ParamDesc param = this->Validate (in_parameter,
-                                    r2i::ParameterMeta::Type::STRING, "string", error);
+                                    r2i::ParameterMeta::Type::STRING,
+                                    "string", error);
   if (error.IsError ()) {
     return error;
   }
@@ -172,7 +174,8 @@ RuntimeError Parameters::Set (const std::string &in_parameter, int in_value) {
   RuntimeError error;
 
   ParamDesc param = this->Validate (in_parameter,
-                                    r2i::ParameterMeta::Type::INTEGER, "integer", error);
+                                    r2i::ParameterMeta::Type::INTEGER,
+                                    "integer", error);
   if (error.IsError ()) {
     return error;
   }
@@ -188,7 +191,8 @@ RuntimeError Parameters::Set (const std::string &in_parameter,
   RuntimeError error;
 
   ParamDesc param = this->Validate (in_parameter,
-                                    r2i::ParameterMeta::Type::STRING, std::string ("string"), error);
+                                    r2i::ParameterMeta::Type::STRING,
+                                    std::string ("string"), error);
   if (error.IsError ()) {
     return error;
   }
