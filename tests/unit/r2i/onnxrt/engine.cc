@@ -162,6 +162,7 @@ const char *Engine::GetSessionInputName(std::shared_ptr<Ort::Session> session,
   if (session_null) {
     error.Set (RuntimeError::Code:: NULL_PARAMETER,
                "Received null session pointer");
+    return dummy_string_input.c_str();
   }
   if (null_input_name) {
     throw onnxrtexcep;
@@ -174,6 +175,7 @@ const char *Engine::GetSessionOutputName(std::shared_ptr<Ort::Session> session,
   if (session_null) {
     error.Set (RuntimeError::Code:: NULL_PARAMETER,
                "Received null session pointer");
+    return dummy_string_input.c_str();
   }
   if (null_input_name) {
     throw onnxrtexcep;
