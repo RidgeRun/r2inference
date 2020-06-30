@@ -70,12 +70,6 @@ class Parameters: public IParameters {
     int value;
   };
 
-  class DoubleAccessor : public Accessor {
-   public:
-    DoubleAccessor (Parameters *target) : Accessor(target) {}
-    double value;
-  };
-
   class LoggingLevelAccessor : public IntAccessor {
    public:
     LoggingLevelAccessor (Parameters *target) : IntAccessor(target) {}
