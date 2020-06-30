@@ -192,7 +192,7 @@ RuntimeError Parameters::Set (const std::string &in_parameter,
 
   ParamDesc param = this->Validate (in_parameter,
                                     r2i::ParameterMeta::Type::STRING,
-                                    std::string ("string"), error);
+                                    "string", error);
   if (error.IsError ()) {
     return error;
   }
