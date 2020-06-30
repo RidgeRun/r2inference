@@ -51,11 +51,10 @@ class Engine : public IEngine {
   };
 
   /* ONNXRT parameters must be initialized in case user does not set any */
-  OrtLoggingLevel logging_level = OrtLoggingLevel::ORT_LOGGING_LEVEL_WARNING;
-  int intra_num_threads = 1;
-  GraphOptimizationLevel graph_opt_level =
-    GraphOptimizationLevel::ORT_DISABLE_ALL;
-  std::string log_id = "";
+  OrtLoggingLevel logging_level;
+  int intra_num_threads;
+  GraphOptimizationLevel graph_opt_level;
+  std::string log_id;
   State state;
   std::shared_ptr<Model> model;
   std::vector<int64_t> input_node_dims;
@@ -64,8 +63,8 @@ class Engine : public IEngine {
   size_t output_size;
   size_t num_input_nodes;
   size_t num_output_nodes;
-  Ort::Env env {nullptr};
-  Ort::SessionOptions session_options {nullptr};
+  Ort::Env env = Ort::Env(nullptr);
+  Ort::SessionOptions session_options = Ort::SessionOptions(nullptr);
   std::shared_ptr<Ort::Session> session;
 
   void CreateEnv();

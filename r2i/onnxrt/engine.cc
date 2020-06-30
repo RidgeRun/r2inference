@@ -25,7 +25,17 @@
 namespace r2i {
 namespace onnxrt {
 
-Engine::Engine () : state(State::STOPPED), model(nullptr) {
+Engine::Engine () {
+  /* Initialize all variable members */
+  logging_level = OrtLoggingLevel::ORT_LOGGING_LEVEL_WARNING;
+  intra_num_threads = 1;
+  graph_opt_level = GraphOptimizationLevel::ORT_DISABLE_ALL;
+  log_id = "";
+  state = State::STOPPED;
+  model = nullptr;
+  output_size = 0;
+  num_input_nodes = 0;
+  num_output_nodes = 0;
 }
 
 Engine::~Engine () {
