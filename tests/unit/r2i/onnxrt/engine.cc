@@ -44,6 +44,7 @@ static bool invalid_frame = false;
 static bool session_create_fail = false;
 static bool session_run_fail = false;
 static bool session_null = false;
+static bool session_create_null_env = false;
 
 std::string dummy_string_input = "input";
 std::string dummy_string_output = "output";
@@ -105,7 +106,13 @@ void Engine::CreateSessionOptions() {
 }
 
 void Engine::CreateSession(const void *model_data,
-                           size_t model_data_size) {
+                           size_t model_data_size,
+                           RuntimeError &error) {
+  if (session_create_null_env) {
+    error.Set (RuntimeError::Code:: NULL_PARAMETER,
+               "Received null Ort::Env pointer");
+  }
+
   if (session_create_fail) {
     throw onnxrtexcep;
   }
@@ -248,6 +255,17 @@ TEST (OnnxrtEngine, NullInputNameException) {
 
   error = engine->Start ();
   LONGS_EQUAL (r2i::RuntimeError::Code::FRAMEWORK_ERROR, error.GetCode ());
+}
+
+TEST (OnnxrtEngine, CreateSessionNullEnvError) {
+  r2i::RuntimeError error;
+  session_create_null_env = true;
+
+  error = engine->SetModel (model);
+  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
+
+  error = engine->Start ();
+  LONGS_EQUAL (r2i::RuntimeError::Code::NULL_PARAMETER, error.GetCode ());
 }
 
 TEST (OnnxrtEngine, CreateSessionException) {

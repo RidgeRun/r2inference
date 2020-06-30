@@ -82,7 +82,24 @@ void Engine::CreateSessionOptions() {
 }
 
 void Engine::CreateSession(const void *model_data,
-                           size_t model_data_size) {
+                           size_t model_data_size,
+                           RuntimeError &error) {
+
+  if (nullptr == this->env) {
+    error.Set (RuntimeError::Code:: NULL_PARAMETER,
+               "Received null Ort::Env pointer");
+  }
+
+  if (nullptr == this->session_options) {
+    error.Set (RuntimeError::Code:: NULL_PARAMETER,
+               "Received null Ort::SessionOptions pointer");
+  }
+
+  if (nullptr == model_data) {
+    error.Set (RuntimeError::Code:: NULL_PARAMETER,
+               "Received null model data pointer");
+  }
+
   this->session = std::make_shared<Ort::Session>(this->env, model_data,
                   model_data_size, this->session_options);
 }
@@ -106,7 +123,7 @@ RuntimeError Engine::Start ()  {
     this->CreateEnv();
     this->CreateSessionOptions();
     this->CreateSession((void *) this->model->GetOnnxrtModel().get(),
-                        this->model->GetOnnxrtModelSize());
+                        this->model->GetOnnxrtModelSize(), error);
     this->num_input_nodes = this->GetSessionInputCount(this->session, error);
     this->num_output_nodes = this->GetSessionOutputCount(this->session, error);
   }
@@ -259,25 +276,43 @@ size_t Engine::GetSessionOutputSize(std::shared_ptr<Ort::Session> session,
 }
 
 const char *Engine::GetSessionInputName(std::shared_ptr<Ort::Session> session,
-                                        size_t index, OrtAllocator *allocator, RuntimeError &error) {
+                                        size_t index, OrtAllocator *allocator,
+                                        RuntimeError &error) {
   const char *name = "";
+
   if (nullptr == session) {
     error.Set (RuntimeError::Code:: NULL_PARAMETER,
                "Received null session pointer");
     return name;
   }
+
+  if (nullptr == allocator) {
+    error.Set (RuntimeError::Code:: NULL_PARAMETER,
+               "Received null allocator pointer");
+    return name;
+  }
+
   name = session->GetInputName(index, allocator);
   return name;
 }
 
 const char *Engine::GetSessionOutputName(std::shared_ptr<Ort::Session> session,
-    size_t index, OrtAllocator *allocator, RuntimeError &error) {
+    size_t index, OrtAllocator *allocator,
+    RuntimeError &error) {
   const char *name = "";
+
   if (nullptr == session) {
     error.Set (RuntimeError::Code:: NULL_PARAMETER,
                "Received null session pointer");
     return name;
   }
+
+  if (nullptr == allocator) {
+    error.Set (RuntimeError::Code:: NULL_PARAMETER,
+               "Received null allocator pointer");
+    return name;
+  }
+
   name = session->GetOutputName(index, allocator);
   return name;
 }

@@ -69,7 +69,8 @@ class Engine : public IEngine {
 
   void CreateEnv();
   void CreateSessionOptions();
-  void CreateSession(const void *model_data, size_t model_data_size);
+  void CreateSession(const void *model_data, size_t model_data_size,
+                     RuntimeError &error);
   size_t GetSessionInputCount(std::shared_ptr<Ort::Session> session,
                               RuntimeError &error);
   size_t GetSessionOutputCount(std::shared_ptr<Ort::Session> session,
