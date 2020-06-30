@@ -9,8 +9,8 @@
  * back to RidgeRun without any encumbrance.
 */
 
-#ifndef R2I_TFLITE_PARAMETERS_H
-#define R2I_TFLITE_PARAMETERS_H
+#ifndef R2I_ONNXRT_PARAMETERS_H
+#define R2I_ONNXRT_PARAMETERS_H
 
 #include <memory>
 #include <string>
