@@ -20,14 +20,6 @@
 
 #define SIZE 1
 
-/* Custom deleter */
-template< typename T >
-struct ArrayDeleter {
-  void operator ()( T const *p) {
-    delete[] p;
-  }
-};
-
 TEST_GROUP(OnnxrtModel) {
   r2i::RuntimeError error;
   r2i::onnxrt::Model model;
@@ -45,7 +37,8 @@ TEST(OnnxrtModel, SetModelNull) {
 }
 
 TEST(OnnxrtModel, SetModelAllocated) {
-  model_data = std::shared_ptr<char>(new char[SIZE], ArrayDeleter<char>());
+  model_data = std::shared_ptr<char>(new char[SIZE],
+                                     std::default_delete<char[]>());
   error = model.SetOnnxrtModel(std::static_pointer_cast<void>(model_data), SIZE);
   LONGS_EQUAL(r2i::RuntimeError::Code::EOK, error.GetCode());
   POINTERS_EQUAL((void *)model_data.get(), (void *)model.GetOnnxrtModel().get());

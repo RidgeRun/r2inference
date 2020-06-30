@@ -16,14 +16,6 @@
 namespace r2i {
 namespace onnxrt {
 
-/* Custom deleter */
-template< typename T >
-struct ArrayDeleter {
-  void operator ()( T const *p) {
-    delete[] p;
-  }
-};
-
 Prediction::Prediction ():
   output_data(nullptr), tensor_size(0) {
 }
@@ -49,7 +41,7 @@ RuntimeError Prediction::SetTensorValues(float *output_data, int data_size) {
   this->tensor_size = data_size;
 
   this->output_data = std::shared_ptr<float>(new float[this->tensor_size],
-                      ArrayDeleter<float>());
+                      std::default_delete<float[]>());
 
   std::memcpy(this->output_data.get(), output_data,
               this->tensor_size * sizeof(float));

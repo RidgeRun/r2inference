@@ -21,14 +21,6 @@
 namespace r2i {
 namespace onnxrt {
 
-/* Custom deleter */
-template< typename T >
-struct ArrayDeleter {
-  void operator ()( T const *p) {
-    delete[] p;
-  }
-};
-
 std::shared_ptr<r2i::IModel> Loader::Load(const std::string &in_path,
     r2i::RuntimeError &error) {
   if (in_path.empty()) {
@@ -48,7 +40,7 @@ std::shared_ptr<r2i::IModel> Loader::Load(const std::string &in_path,
   graphdef_file.seekg (0, std::ios::beg);
 
   this->model_data = std::shared_ptr<char>(new char[graphdef_size],
-                     ArrayDeleter<char>());
+                     std::default_delete<char[]>());
   if (nullptr == this->model_data) {
     error.Set (RuntimeError::Code::MEMORY_ERROR,
                "Can not allocate memory for graphdef");
