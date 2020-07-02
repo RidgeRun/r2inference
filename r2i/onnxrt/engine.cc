@@ -87,12 +87,12 @@ void Engine::CreateSession(const void *model_data,
 
   if (nullptr == this->env) {
     error.Set (RuntimeError::Code:: NULL_PARAMETER,
-               "Received null Ort::Env pointer");
+               "Ort::Env not initialized");
   }
 
   if (nullptr == this->session_options) {
     error.Set (RuntimeError::Code:: NULL_PARAMETER,
-               "Received null Ort::SessionOptions pointer");
+               "Ort::SessionOptions not initialized");
   }
 
   if (nullptr == model_data) {
