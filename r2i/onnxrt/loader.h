@@ -32,14 +32,7 @@ class Loader : public ILoader {
 
  private:
   std::shared_ptr<Model> model;
-  std::shared_ptr<Ort::Env> env_ptr;
-  std::shared_ptr<Ort::SessionOptions> session_options_ptr;
-  std::shared_ptr<Ort::Session> session_ptr;
-
-  void CreateEnv(OrtLoggingLevel log_level, const std::string &log_id);
-  void CreateSessionOptions();
-  void CreateSession(std::shared_ptr<Ort::Env> env, const std::string &name,
-                     std::shared_ptr<Ort::SessionOptions> options);
+  std::shared_ptr<char> model_data;
 };
 }  // namespace onnxrt
 }  // namespace r2i

@@ -41,7 +41,10 @@ static bool null_input_name = false;
 static bool invalid_input_number = false;
 static bool get_input_number_fail = false;
 static bool invalid_frame = false;
+static bool session_create_fail = false;
 static bool session_run_fail = false;
+static bool session_null = false;
+static bool session_create_null_env = false;
 
 std::string dummy_string_input = "input";
 std::string dummy_string_output = "output";
@@ -94,7 +97,34 @@ int Frame::GetHeight () {
   return FRAME_HEIGHT;
 }
 
-size_t Engine::GetSessionInputCount(std::shared_ptr<Ort::Session> session) {
+void Engine::CreateEnv() {
+
+}
+
+void Engine::CreateSessionOptions() {
+
+}
+
+void Engine::CreateSession(const void *model_data,
+                           size_t model_data_size,
+                           RuntimeError &error) {
+  if (session_create_null_env) {
+    error.Set (RuntimeError::Code:: NULL_PARAMETER,
+               "Received null Ort::Env pointer");
+  }
+
+  if (session_create_fail) {
+    throw onnxrtexcep;
+  }
+}
+
+size_t Engine::GetSessionInputCount(std::shared_ptr<Ort::Session> session,
+                                    RuntimeError &error) {
+  if (session_null) {
+    error.Set (RuntimeError::Code:: NULL_PARAMETER,
+               "Received null session pointer");
+    return 0;
+  }
   if (invalid_input_number) {
     return INVALID_INPUT_NUMBER;
   }
@@ -104,23 +134,43 @@ size_t Engine::GetSessionInputCount(std::shared_ptr<Ort::Session> session) {
   return INPUT_NUMBER;
 }
 
-size_t Engine::GetSessionOutputCount(std::shared_ptr<Ort::Session> session) {
+size_t Engine::GetSessionOutputCount(std::shared_ptr<Ort::Session> session,
+                                     RuntimeError &error) {
+  if (session_null) {
+    error.Set (RuntimeError::Code:: NULL_PARAMETER,
+               "Received null session pointer");
+    return 0;
+  }
   return OUTPUT_NUMBER;
 }
 
 std::vector<int64_t> Engine::GetSessionInputNodeDims(
-  std::shared_ptr<Ort::Session> session, size_t index) {
+  std::shared_ptr<Ort::Session> session, size_t index, RuntimeError &error) {
   std::vector<int64_t> vect{ BATCH_SIZE, FRAME_HEIGHT, FRAME_WIDTH, CHANNELS };
+  if (session_null) {
+    error.Set (RuntimeError::Code:: NULL_PARAMETER,
+               "Received null session pointer");
+  }
   return vect;
 }
 
 size_t Engine::GetSessionOutputSize(std::shared_ptr<Ort::Session> session,
-                                    size_t index) {
+                                    size_t index, RuntimeError &error) {
+  if (session_null) {
+    error.Set (RuntimeError::Code:: NULL_PARAMETER,
+               "Received null session pointer");
+    return 0;
+  }
   return OUTPUT_SIZE;
 }
 
 const char *Engine::GetSessionInputName(std::shared_ptr<Ort::Session> session,
-                                        size_t index, OrtAllocator *allocator) {
+                                        size_t index, OrtAllocator *allocator, RuntimeError &error) {
+  if (session_null) {
+    error.Set (RuntimeError::Code:: NULL_PARAMETER,
+               "Received null session pointer");
+    return dummy_string_input.c_str();
+  }
   if (null_input_name) {
     throw onnxrtexcep;
   }
@@ -128,7 +178,12 @@ const char *Engine::GetSessionInputName(std::shared_ptr<Ort::Session> session,
 }
 
 const char *Engine::GetSessionOutputName(std::shared_ptr<Ort::Session> session,
-    size_t index, OrtAllocator *allocator) {
+    size_t index, OrtAllocator *allocator, RuntimeError &error) {
+  if (session_null) {
+    error.Set (RuntimeError::Code:: NULL_PARAMETER,
+               "Received null session pointer");
+    return dummy_string_input.c_str();
+  }
   if (null_input_name) {
     throw onnxrtexcep;
   }
@@ -200,6 +255,39 @@ TEST (OnnxrtEngine, NullInputNameException) {
 
   error = engine->Start ();
   LONGS_EQUAL (r2i::RuntimeError::Code::FRAMEWORK_ERROR, error.GetCode ());
+}
+
+TEST (OnnxrtEngine, CreateSessionNullEnvError) {
+  r2i::RuntimeError error;
+  session_create_null_env = true;
+
+  error = engine->SetModel (model);
+  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
+
+  error = engine->Start ();
+  LONGS_EQUAL (r2i::RuntimeError::Code::NULL_PARAMETER, error.GetCode ());
+}
+
+TEST (OnnxrtEngine, CreateSessionException) {
+  r2i::RuntimeError error;
+  session_create_fail = true;
+
+  error = engine->SetModel (model);
+  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
+
+  error = engine->Start ();
+  LONGS_EQUAL (r2i::RuntimeError::Code::FRAMEWORK_ERROR, error.GetCode ());
+}
+
+TEST (OnnxrtEngine, GetInfoSessionNull) {
+  r2i::RuntimeError error;
+  session_null = true;
+
+  error = engine->SetModel (model);
+  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
+
+  error = engine->Start ();
+  LONGS_EQUAL (r2i::RuntimeError::Code::NULL_PARAMETER, error.GetCode ());
 }
 
 TEST (OnnxrtEngine, StartEngineEmpty) {

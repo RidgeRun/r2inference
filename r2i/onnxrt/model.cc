@@ -5,14 +5,11 @@
  * LLC.  No part of this program may be photocopied, reproduced or translated
  * into another programming language without prior written consent of
  * RidgeRun, LLC.  The user is free to modify the source code after obtaining
- * a software license from RidgeRun.  All source code changes must be provided
+ * a software license from RidgeRun. All source code changes must be provided
  * back to RidgeRun without any encumbrance.
 */
 
 #include "r2i/onnxrt/model.h"
-
-#include <core/common/exceptions.h>
-#include <core/session/onnxruntime_cxx_api.h>
 
 #include <string>
 #include <vector>
@@ -21,7 +18,7 @@ namespace r2i {
 namespace onnxrt {
 
 Model::Model() {
-  this->session_ptr = nullptr;
+  this->model_data = nullptr;
 }
 
 RuntimeError Model::Start(const std::string &name) {
@@ -30,22 +27,28 @@ RuntimeError Model::Start(const std::string &name) {
   return error;
 }
 
-RuntimeError Model::Set(std::shared_ptr<Ort::Session> onnxrt_session) {
+RuntimeError Model::SetOnnxrtModel(std::shared_ptr<void> model_data,
+                                   size_t model_data_size) {
   RuntimeError error;
 
-  if (nullptr == onnxrt_session) {
+  if (nullptr == model_data) {
     error.Set(RuntimeError::Code::NULL_PARAMETER,
-              "Trying to set model session with null session pointer");
+              "Trying to set model data with null pointer");
     return error;
   }
 
-  this->session_ptr = onnxrt_session;
+  this->model_data = model_data;
+  this->model_data_size = model_data_size;
 
   return error;
 }
 
-std::shared_ptr<Ort::Session> Model::GetOnnxrtSession() {
-  return this->session_ptr;
+std::shared_ptr<void> Model::GetOnnxrtModel() {
+  return this->model_data;
+}
+
+size_t Model::GetOnnxrtModelSize() {
+  return this->model_data_size;
 }
 
 }  // namespace onnxrt

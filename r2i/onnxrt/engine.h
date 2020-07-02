@@ -35,6 +35,14 @@ class Engine : public IEngine {
   r2i::RuntimeError Stop () override;
   std::shared_ptr<r2i::IPrediction> Predict (std::shared_ptr<r2i::IFrame>
       in_frame, r2i::RuntimeError &error) override;
+  r2i::RuntimeError SetLoggingLevel (int logging_level);
+  r2i::RuntimeError SetLogId (const std::string &log_id);
+  r2i::RuntimeError SetIntraNumThreads (int intra_num_threads);
+  r2i::RuntimeError SetGraphOptLevel (int graph_opt_level);
+  int GetLoggingLevel ();
+  int GetIntraNumThreads ();
+  int GetGraphOptLevel ();
+  const std::string GetLogId ();
 
  private:
   enum State {
@@ -42,6 +50,11 @@ class Engine : public IEngine {
     STOPPED
   };
 
+  /* ONNXRT parameters must be initialized in case user does not set any */
+  OrtLoggingLevel logging_level;
+  int intra_num_threads;
+  GraphOptimizationLevel graph_opt_level;
+  std::string log_id;
   State state;
   std::shared_ptr<Model> model;
   std::vector<int64_t> input_node_dims;
@@ -50,19 +63,28 @@ class Engine : public IEngine {
   size_t output_size;
   size_t num_input_nodes;
   size_t num_output_nodes;
+  Ort::Env env = Ort::Env(nullptr);
+  Ort::SessionOptions session_options = Ort::SessionOptions(nullptr);
+  std::shared_ptr<Ort::Session> session;
 
-  size_t GetSessionInputCount(std::shared_ptr<Ort::Session> session);
-  size_t GetSessionOutputCount(std::shared_ptr<Ort::Session> session);
+  void CreateEnv();
+  void CreateSessionOptions();
+  void CreateSession(const void *model_data, size_t model_data_size,
+                     RuntimeError &error);
+  size_t GetSessionInputCount(std::shared_ptr<Ort::Session> session,
+                              RuntimeError &error);
+  size_t GetSessionOutputCount(std::shared_ptr<Ort::Session> session,
+                               RuntimeError &error);
   std::vector<int64_t> GetSessionInputNodeDims(std::shared_ptr<Ort::Session>
-      session, size_t index);
+      session, size_t index, RuntimeError &error);
   size_t GetSessionOutputSize(std::shared_ptr<Ort::Session> session,
-                              size_t index);
+                              size_t index, RuntimeError &error);
   const char *GetSessionInputName(std::shared_ptr<Ort::Session> session,
                                   size_t index,
-                                  OrtAllocator *allocator);
+                                  OrtAllocator *allocator, RuntimeError &error);
   const char *GetSessionOutputName(std::shared_ptr<Ort::Session> session,
                                    size_t index,
-                                   OrtAllocator *allocator);
+                                   OrtAllocator *allocator, RuntimeError &error);
   float *SessionRun (std::shared_ptr<Ort::Session> session,
                      std::shared_ptr<Frame> frame,
                      size_t input_image_size,

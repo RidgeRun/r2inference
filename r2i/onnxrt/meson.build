@@ -5,6 +5,7 @@ onnxrt_sources = [
   'frameworkfactory.cc',
   'loader.cc',
   'model.cc',
+  'parameters.cc',
   'prediction.cc',
 ]
 
@@ -14,6 +15,7 @@ onnxrt_headers = [
   'frameworkfactory.h',
   'loader.h',
   'model.h',
+  'parameters.h',
   'prediction.h',
 ]
 
