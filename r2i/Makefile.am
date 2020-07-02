@@ -1,4 +1,4 @@
-# Copyright (C) 2018 RidgeRun, LLC (http://www.ridgerun.com)
+# Copyright (C) 2018-2020 RidgeRun, LLC (http://www.ridgerun.com)
 # All Rights Reserved.
 #
 # The contents of this software are proprietary and confidential to RidgeRun,
@@ -18,6 +18,10 @@ if HAVE_NCSDK
 SUBDIRS += ncsdk
 endif
 
+if HAVE_ONNXRT
+SUBDIRS += onnxrt
+endif
+
 if HAVE_TENSORFLOW
 SUBDIRS += tensorflow
 endif
@@ -33,6 +37,7 @@ endif
 DIST_SUBDIRS =          \
         edgetpu         \
         ncsdk           \
+        onnxrt          \
         tensorflow      \
         tensorrt        \
         tflite
@@ -89,6 +94,11 @@ endif
 if HAVE_NCSDK
 libr2inference_@RR_PACKAGE_VERSION@_la_LIBADD +=    \
         $(top_builddir)/r2i/ncsdk/libncsdk.la
+endif
+
+if HAVE_ONNXRT
+libr2inference_@RR_PACKAGE_VERSION@_la_LIBADD +=    \
+        $(top_builddir)/r2i/onnxrt/libonnxrt.la
 endif
 
 if HAVE_TENSORFLOW

@@ -1,5 +1,5 @@
 project('r2inference', ['cpp'], default_options : ['cpp_std=c++11'],
-  version : '0.7.0',
+  version : '0.8.0',
   meson_version : '>= 0.50',)
 
 # Set project information
@@ -88,8 +88,17 @@ if get_option('enable-tensorrt')
   cdata.set('HAVE_TENSORRT', 1)
 endif
 
+# Define library dependencies for ONNX support
+if get_option('enable-onnxrt')
+  onnxrt = cpp.find_library('onnxruntime', required: true)
+  onnxrt_dep = declare_dependency(dependencies: onnxrt)
+  lib_onnxrt_dep = [onnxrt_dep]
+  cdata.set('HAVE_ONNXRT', 1)
+endif
+
 # Check if at least one backend is enabled
-if not (cdata.has('HAVE_TENSORFLOW') or cdata.has('HAVE_TFLITE') or cdata.has('HAVE_TENSORRT'))
+if not (cdata.has('HAVE_TENSORFLOW') or cdata.has('HAVE_TFLITE') or
+        cdata.has('HAVE_TENSORRT') or cdata.has('HAVE_ONNXRT'))
   error ('No backend selected, you must choose at least one')
 endif
 

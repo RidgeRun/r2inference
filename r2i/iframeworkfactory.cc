@@ -17,6 +17,7 @@
 #include "config.h"
 #include "edgetpu/frameworkfactory.h"
 #include "ncsdk/frameworkfactory.h"
+#include "onnxrt/frameworkfactory.h"
 #include "tensorflow/frameworkfactory.h"
 #include "tensorrt/frameworkfactory.h"
 #include "tflite/frameworkfactory.h"
@@ -37,6 +38,15 @@ MakeNcsdkFactory (RuntimeError &error) {
   return std::unique_ptr<ncsdk::FrameworkFactory> (new ncsdk::FrameworkFactory);
 }
 #endif // HAVE_NCSDK
+
+#ifdef HAVE_ONNXRT
+static std::unique_ptr<IFrameworkFactory>
+MakeOnnxrtFactory(RuntimeError &error) {
+  return std::unique_ptr<onnxrt::FrameworkFactory>(new
+         onnxrt::FrameworkFactory);
+}
+#endif // HAVE_ONNXRT
+
 
 #ifdef HAVE_TENSORFLOW
 static std::unique_ptr<IFrameworkFactory>
@@ -73,6 +83,10 @@ const std::unordered_map<int, MakeFactory> frameworks ({
 #ifdef HAVE_NCSDK
   {FrameworkCode::NCSDK, MakeNcsdkFactory},
 #endif //HAVE_NCSDK
+
+#ifdef HAVE_ONNXRT
+  {FrameworkCode::ONNXRT, MakeOnnxrtFactory},
+#endif //HAVE_ONNXRT
 
 #ifdef HAVE_TENSORFLOW
   {FrameworkCode::TENSORFLOW, MakeTensorflowFactory},

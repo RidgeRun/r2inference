@@ -16,6 +16,7 @@ void PrintFramework (r2i::FrameworkMeta &meta) {
   std::cout << "Name        : " << meta.name << std::endl;
   std::cout << "Description : " << meta.description << std::endl;
   std::cout << "Version     : " << meta.version << std::endl;
+  std::cout << "Label       : " << meta.label << std::endl;
   std::cout << "---" << std::endl;
 }
 

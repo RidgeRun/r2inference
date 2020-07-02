@@ -28,7 +28,8 @@ r2i::FrameworkMeta FrameworkFactory::GetDescription (
   RuntimeError &error) {
   const FrameworkMeta meta {
     .code = r2i::FrameworkCode::EDGETPU,
-    .name = "edgetpu",
+    .name = "EdgeTPU",
+    .label = "edgetpu",
     .description = "Google's TensorFlow Lite with EdgeTPU support",
     .version = ::edgetpu::EdgeTpuManager::GetSingleton()->Version()
   };

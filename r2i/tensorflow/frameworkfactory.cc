@@ -53,6 +53,7 @@ r2i::FrameworkMeta FrameworkFactory::GetDescription (RuntimeError &error) {
   const FrameworkMeta meta {
     .code = r2i::FrameworkCode::TENSORFLOW,
     .name = "Tensorflow",
+    .label = "tensorflow",
     .description = "Google's TensorFlow",
     .version = TF_Version ()
   };

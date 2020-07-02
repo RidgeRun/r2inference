@@ -16,6 +16,10 @@ foreach t : lib_r2inference_tests
 
 endforeach
 
+if get_option('enable-onnxrt')
+  subdir('onnxrt')
+endif
+
 if get_option('enable-tensorflow')
   subdir('tensorflow')
 endif

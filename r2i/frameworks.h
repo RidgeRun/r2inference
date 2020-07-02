@@ -14,11 +14,11 @@
 
 namespace r2i {
 /**
- * Numerical codes identifying supported frameworks. Not that not
+ * Numerical codes identifying supported frameworks. Note that not
  * all frameworks will be available at runtime. For example, some of
  * them may be disabled at configure by the user, automatically if
  * no development where found or if the system doesn't seem to have
- * to appropriate hardware.
+ * the appropriate hardware.
  */
 enum FrameworkCode {
 
@@ -31,6 +31,11 @@ enum FrameworkCode {
    * Intel Movidius Neural Compute software developer kit
    */
   NCSDK,
+
+  /**
+   * Open Neural Network Exchange Runtime
+   */
+  ONNXRT,
 
   /**
    * Google's TensorFlow
