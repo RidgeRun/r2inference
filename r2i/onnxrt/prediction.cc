@@ -58,7 +58,7 @@ double Prediction::At (unsigned int index,  r2i::RuntimeError &error) {
     return 0;
   }
 
-  unsigned int n_results =  this->GetResultSize();
+  unsigned int n_results =  this->GetResultSize() / sizeof(float);
   if (n_results < index) {
     error.Set (RuntimeError::Code::MEMORY_ERROR,
                "Triying to access an non-existing index");
@@ -72,7 +72,7 @@ void *Prediction::GetResultData () {
 }
 
 unsigned int Prediction::GetResultSize () {
-  return this->tensor_size;
+  return this->tensor_size * sizeof(float);
 }
 
 }  // namespace onnxrt
