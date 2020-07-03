@@ -97,6 +97,30 @@ TEST (OnnxrtPrediction, PredictionNonExistentIndex) {
   LONGS_EQUAL (r2i::RuntimeError::Code::MEMORY_ERROR, error.GetCode());
 }
 
+TEST (OnnxrtPrediction, GetResultSize) {
+  r2i::RuntimeError error;
+
+  tensordata = &matrix[0];
+
+  error = prediction->SetTensorValues(tensordata, INPUTS);
+  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode());
+
+  int output_size = prediction->GetResultSize ();
+  LONGS_EQUAL (output_size, INPUTS * sizeof(float));
+}
+
+TEST (OnnxrtPrediction, GetResultData) {
+  r2i::RuntimeError error;
+
+  tensordata = &matrix[0];
+
+  error = prediction->SetTensorValues(tensordata, INPUTS);
+  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode());
+
+  void *internal_ptr = prediction->GetResultData ();
+  MEMCMP_EQUAL (tensordata, internal_ptr, INPUTS * sizeof(float));
+}
+
 int main (int ac, char **av) {
   return CommandLineTestRunner::RunAllTests (ac, av);
 }
