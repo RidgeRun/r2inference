@@ -105,6 +105,10 @@ void Engine::CreateSessionOptions() {
 
 }
 
+void Engine::AppendSessionOptionsExecutionProvider(RuntimeError &error) {
+
+}
+
 void Engine::CreateSession(const void *model_data,
                            size_t model_data_size,
                            RuntimeError &error) {

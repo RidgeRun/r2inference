@@ -49,6 +49,10 @@ Parameters::Parameters () :
         r2i::ParameterMeta::Flags::READWRITE | r2i::ParameterMeta::Flags::WRITE_BEFORE_START,
         r2i::ParameterMeta::Type::INTEGER,
         std::make_shared<GraphOptLevelAccessor>(this)),
+  PARAM("execution-provider", "ONNX Runtime execution provider selection",
+        r2i::ParameterMeta::Flags::READWRITE | r2i::ParameterMeta::Flags::WRITE_BEFORE_START,
+        r2i::ParameterMeta::Type::INTEGER,
+        std::make_shared<ExecutionProviderAccessor>(this)),
 }) {
 }
 

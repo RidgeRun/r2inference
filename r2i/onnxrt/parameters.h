@@ -125,6 +125,20 @@ class Parameters: public IParameters {
     }
   };
 
+  class ExecutionProviderAccessor : public IntAccessor {
+   public:
+    ExecutionProviderAccessor (Parameters *target) : IntAccessor(target) {}
+
+    RuntimeError Set () {
+      return target->engine->SetExecutionProvider(this->value);
+    }
+
+    RuntimeError Get () {
+      this->value = target->engine->GetExecutionProvider();
+      return RuntimeError ();
+    }
+  };
+
   struct ParamDesc {
     ParameterMeta meta;
     std::shared_ptr<Accessor> accessor;

@@ -314,6 +314,30 @@ TEST (OnnxrtParameters, SetAndGetGraphOptLevel) {
   LONGS_EQUAL(in_value, out_value);
 }
 
+TEST (OnnxrtParameters, SetAndGetExecutionProvider) {
+  r2i::RuntimeError error;
+  r2i::onnxrt::Parameters parameters;
+  int in_value;
+  int out_value;
+
+  std::shared_ptr<r2i::IEngine> engine(new r2i::onnxrt::Engine);
+  std::shared_ptr<r2i::IModel> model(new r2i::onnxrt::Model);
+
+  error = parameters.Configure(engine, model);
+
+  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
+
+  /* Value different from the default */
+  in_value = 1;
+  error = parameters.Set("execution-provider", in_value);
+
+  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
+
+  error = parameters.Get("execution-provider", out_value);
+
+  LONGS_EQUAL(in_value, out_value);
+}
+
 TEST (OnnxrtParameters, SetLogIdAtWrongEngineState) {
   r2i::RuntimeError error;
   r2i::onnxrt::Parameters parameters;
@@ -395,6 +419,27 @@ TEST (OnnxrtParameters, SetGraphOptLevelAtWrongEngineState) {
   /* Value different from the default */
   in_value = 2;
   error = parameters.Set("graph-optimization-level", in_value);
+  LONGS_EQUAL (r2i::RuntimeError::Code::WRONG_ENGINE_STATE, error.GetCode ());
+}
+
+TEST (OnnxrtParameters, SetExecutionAtWrongEngineState) {
+  r2i::RuntimeError error;
+  r2i::onnxrt::Parameters parameters;
+  int in_value;
+
+  std::shared_ptr<r2i::IEngine> engine(new r2i::onnxrt::Engine);
+  std::shared_ptr<r2i::IModel> model(new r2i::onnxrt::Model);
+
+  error = engine->Start();
+
+  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
+
+  error = parameters.Configure(engine, model);
+  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
+
+  /* Value different from the default */
+  in_value = 1;
+  error = parameters.Set("execution-provider", in_value);
   LONGS_EQUAL (r2i::RuntimeError::Code::WRONG_ENGINE_STATE, error.GetCode ());
 }
 
