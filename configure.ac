@@ -75,10 +75,10 @@ AS_HELP_STRING([--enable-onnxrt-acl],
 
 if test x$enable_onnxrt_acl = xyes; then
     AC_MSG_NOTICE([Building the ONNXRT backend with ACL support])
-    AM_COND_IF([HAVE_ONNXRT], [], [AC_MSG_ERROR(The ONNXRT ACL needs ONNRT backend enabled aswell)])
+    AM_COND_IF([HAVE_ONNXRT], [], [AC_MSG_ERROR(The ONNXRT ACL needs ONNXRT backend enabled aswell)])
 
     AC_SUBST([ONNXRT_LIBS], ["$ONNXRT_LIBS -larm_compute -larm_compute_core -larm_compute_graph"])
-    AC_DEFINE(HAVE_ONNXRT_ACL, 1, [Define this to build the ACL support])
+    AC_DEFINE(HAVE_ONNXRT_ACL, 1, [Define this to build the ACL support for ONNXRT backend])
 fi
 
 AC_LANG_POP([C++])
