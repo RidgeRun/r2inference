@@ -96,6 +96,23 @@ if get_option('enable-onnxrt')
   cdata.set('HAVE_ONNXRT', 1)
 endif
 
+# Define library dependencies for ONNXRT with ACL execution provider support
+if get_option('enable-onnxrt-acl')
+  if onnxrt_dep.found()
+    arm_compute = cpp.find_library('arm_compute', required: true)
+    arm_compute_dep = declare_dependency(dependencies: arm_compute)
+    arm_compute_core = cpp.find_library('arm_compute', required: true)
+    arm_compute_core_dep = declare_dependency(dependencies: arm_compute_core)
+    arm_compute_graph = cpp.find_library('arm_compute', required: true)
+    arm_compute_graph_dep = declare_dependency(dependencies: arm_compute_graph)
+    lib_onnxrt_acl_dep = [arm_compute_dep, arm_compute_core_dep, arm_compute_graph_dep, lib_onnxrt_dep]
+    lib_onnxrt_dep += [lib_onnxrt_acl_dep]
+    cdata.set('HAVE_ONNXRT_ACL', 1)
+  else
+    error('The ACL execution provider support requires ONNXRT enabled aswell')
+  endif
+endif
+
 # Check if at least one backend is enabled
 if not (cdata.has('HAVE_TENSORFLOW') or cdata.has('HAVE_TFLITE') or
         cdata.has('HAVE_TENSORRT') or cdata.has('HAVE_ONNXRT'))
