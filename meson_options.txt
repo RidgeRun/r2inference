@@ -17,4 +17,4 @@ option('enable-tensorrt', type : 'boolean', value: false,
 option('enable-onnxrt', type : 'boolean', value: false,
        description : 'Enable ONNX Runtime backend support')
 option('enable-onnxrt-acl', type : 'boolean', value: false,
-       description : 'Enable ONNX Runtime backend ACL execution provider support')
+       description : 'Enable ONNX Runtime backend with ACL execution provider support')
