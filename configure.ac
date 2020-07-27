@@ -68,18 +68,11 @@ RR_CHECK_FEATURE_LIB(TENSORRT, TensorRT Installation,
 RR_CHECK_FEATURE_LIB(ONNXRT, ONNX Runtime Installation,
                      onnxruntime, OrtGetApiBase, onnxruntime/core/session/onnxruntime_cxx_api.h, no)
 
-AC_ARG_ENABLE(onnxrt_acl,[
-AS_HELP_STRING([--enable-onnxrt-acl],
-[Build ONNXRT backend with Arm Computer Library (ACL) execution provider (disabled by default)])
-])
-
-if test x$enable_onnxrt_acl = xyes; then
-    AC_MSG_NOTICE([Building the ONNXRT backend with ACL support])
-    AM_COND_IF([HAVE_ONNXRT], [], [AC_MSG_ERROR(The ONNXRT ACL needs ONNXRT backend enabled aswell)])
-
-    AC_SUBST([ONNXRT_LIBS], ["$ONNXRT_LIBS -larm_compute -larm_compute_core -larm_compute_graph"])
-    AC_DEFINE(HAVE_ONNXRT_ACL, 1, [Define this to build the ACL support for ONNXRT backend])
-fi
+RR_CHECK_FEATURE_LIB(ONNXRT_ACL, ONNX Runtime Installation with Arm Compute Library support,
+                     onnxruntime, OrtSessionOptionsAppendExecutionProvider_ACL, onnxruntime/core/providers/acl/acl_provider_factory.h, no)
+AM_COND_IF([HAVE_ONNXRT_ACL], [AM_COND_IF([HAVE_ONNXRT], [],
+ [AC_MSG_ERROR(The ONNXRT ACL needs ONNXRT backend enabled aswell)])], [])
+AC_SUBST([ONNXRT_ACL_LIBS], ["$ONNXRT_LIBS -larm_compute -larm_compute_core -larm_compute_graph"])
 
 AC_LANG_POP([C++])
 
@@ -100,6 +93,7 @@ examples/r2i/Makefile
 examples/r2i/edgetpu/Makefile
 examples/r2i/ncsdk/Makefile
 examples/r2i/onnxrt/Makefile
+examples/r2i/onnxrt_acl/Makefile
 examples/r2i/tensorflow/Makefile
 examples/r2i/tensorrt/Makefile
 examples/r2i/tflite/Makefile
@@ -107,6 +101,7 @@ r2i/Makefile
 r2i/edgetpu/Makefile
 r2i/ncsdk/Makefile
 r2i/onnxrt/Makefile
+r2i/onnxrt_acl/Makefile
 r2i/tensorflow/Makefile
 r2i/tensorrt/Makefile
 r2i/tflite/Makefile

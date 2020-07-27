@@ -105,7 +105,8 @@ void Engine::CreateSessionOptions() {
 
 }
 
-void Engine::AppendSessionOptionsExecutionProvider(RuntimeError &error) {
+void Engine::AppendSessionOptionsExecutionProvider(Ort::SessionOptions
+    &session_options, r2i::RuntimeError &error) {
 
 }
 

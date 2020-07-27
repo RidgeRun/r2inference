@@ -39,23 +39,15 @@ class Engine : public IEngine {
   r2i::RuntimeError SetLogId (const std::string &log_id);
   r2i::RuntimeError SetIntraNumThreads (int intra_num_threads);
   r2i::RuntimeError SetGraphOptLevel (int graph_opt_level);
-  r2i::RuntimeError SetExecutionProvider (int execution_provider_id);
   int GetLoggingLevel ();
   int GetIntraNumThreads ();
   int GetGraphOptLevel ();
-  int GetExecutionProvider ();
   const std::string GetLogId ();
 
  private:
   enum State {
     STARTED,
     STOPPED
-  };
-
-  /* For supported execution providers */
-  enum ExecutionProviders {
-    DEFAULT_CPU = 0,
-    ACL = 1 /* Arm Compute Library */
   };
 
   /* ONNXRT parameters must be initialized in case user does not set any */
@@ -74,11 +66,9 @@ class Engine : public IEngine {
   Ort::Env env = Ort::Env(nullptr);
   Ort::SessionOptions session_options = Ort::SessionOptions(nullptr);
   std::shared_ptr<Ort::Session> session;
-  ExecutionProviders execution_provider_id;
 
   void CreateEnv();
   void CreateSessionOptions();
-  void AppendSessionOptionsExecutionProvider(r2i::RuntimeError &error);
   void CreateSession(const void *model_data, size_t model_data_size,
                      RuntimeError &error);
   size_t GetSessionInputCount(std::shared_ptr<Ort::Session> session,
@@ -111,6 +101,11 @@ class Engine : public IEngine {
                                 size_t output_size,
                                 std::vector<int64_t> input_node_dims,
                                 std::shared_ptr<Prediction> prediction);
+
+ protected:
+  virtual void AppendSessionOptionsExecutionProvider(Ort::SessionOptions
+      &session_options, r2i::RuntimeError &error);
+
 };
 
 }  // namespace onnxrt

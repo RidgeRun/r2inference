@@ -21,6 +21,10 @@ if get_option('enable-onnxrt')
   subdir('onnxrt')
 endif
 
+if get_option('enable-onnxrt-acl')
+  subdir('onnxrt_acl')
+endif
+
 if get_option('enable-tensorflow')
   subdir('tensorflow')
 endif

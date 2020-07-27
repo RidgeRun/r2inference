@@ -15,10 +15,6 @@
 #include <core/common/exceptions.h>
 #include <core/session/onnxruntime_cxx_api.h>
 
-#ifdef HAVE_ONNXRT_ACL
-#include <core/providers/acl/acl_provider_factory.h>
-#endif // HAVE_ONNXRT_ACL
-
 #include <memory>
 #include <string>
 #include <vector>
@@ -26,10 +22,6 @@
 #include "r2i/onnxrt/frame.h"
 #include "r2i/onnxrt/model.h"
 #include "r2i/onnxrt/prediction.h"
-
-#define USE_ARENA 1
-
-const OrtApi *g_ort = OrtGetApiBase()->GetApi(ORT_API_VERSION);
 
 namespace r2i {
 namespace onnxrt {
@@ -45,7 +37,6 @@ Engine::Engine () {
   output_size = 0;
   num_input_nodes = 0;
   num_output_nodes = 0;
-  execution_provider_id = ExecutionProviders::DEFAULT_CPU;
 }
 
 Engine::~Engine () {
@@ -91,29 +82,10 @@ void Engine::CreateSessionOptions() {
     this->graph_opt_level);
 }
 
+void Engine::AppendSessionOptionsExecutionProvider(Ort::SessionOptions
+    &session_options, r2i::RuntimeError &error) {
 
-void Engine::AppendSessionOptionsExecutionProvider(RuntimeError &error) {
-#ifdef HAVE_ONNXRT_ACL
-  OrtStatus *status;
-#endif // HAVE_ONNXRT_ACL
-
-  switch (execution_provider_id) {
-    case ExecutionProviders::DEFAULT_CPU:
-      break;
-#ifdef HAVE_ONNXRT_ACL
-    case ExecutionProviders::ACL:
-      status = OrtSessionOptionsAppendExecutionProvider_ACL(session_options,
-               USE_ARENA);
-      if (status != NULL) {
-        error.Set (RuntimeError::Code::FRAMEWORK_ERROR,
-                   "Failed setting execution provider different from default CPU");
-      }
-      g_ort->ReleaseStatus(status);
-      break;
-#endif // HAVE_ONNXRT_ACL
-    default:
-      break;
-  }
+  /* No implementation needed to use default CPU execution provider */
 
 }
 
@@ -158,7 +130,7 @@ RuntimeError Engine::Start ()  {
   try {
     this->CreateEnv();
     this->CreateSessionOptions();
-    this->AppendSessionOptionsExecutionProvider(error);
+    this->AppendSessionOptionsExecutionProvider(this->session_options, error);
     this->CreateSession((void *) this->model->GetOnnxrtModel().get(),
                         this->model->GetOnnxrtModelSize(), error);
     this->num_input_nodes = this->GetSessionInputCount(this->session, error);
@@ -515,22 +487,6 @@ RuntimeError Engine::SetGraphOptLevel (int graph_opt_level) {
   return error;
 }
 
-RuntimeError Engine::SetExecutionProvider (int execution_provider_id) {
-  RuntimeError error;
-
-  if (State::STARTED == this->state) {
-    error.Set (RuntimeError::Code::WRONG_ENGINE_STATE,
-               "Parameter can't be set, engine already started");
-    return error;
-  }
-
-  /* We need to convert int to ExecutionProviders enum */
-  this->execution_provider_id = static_cast<ExecutionProviders>
-                                (execution_provider_id);
-
-  return error;
-}
-
 RuntimeError Engine::SetLogId (const std::string &log_id) {
   RuntimeError error;
 
@@ -558,11 +514,6 @@ int Engine::GetIntraNumThreads () {
 int Engine::GetGraphOptLevel () {
   /* We need to convert GraphOptimizationLevel enum to int */
   return static_cast<int>(this->graph_opt_level);
-}
-
-int Engine::GetExecutionProvider () {
-  /* We need to convert ExecutionProviders enum to int */
-  return static_cast<int>(this->execution_provider_id);
 }
 
 const std::string Engine::GetLogId () {
