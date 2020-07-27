@@ -147,7 +147,8 @@ int main (int argc, char *argv[]) {
                    error);
 
   if (nullptr == factory) {
-    std::cerr << "ONNXRT backend is not built: " << error << std::endl;
+    std::cerr << "ONNXRT backend with ACL support is not built: " << error <<
+              std::endl;
     exit(EXIT_FAILURE);
   }
 
