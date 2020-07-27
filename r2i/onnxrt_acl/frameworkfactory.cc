@@ -37,5 +37,5 @@ r2i::FrameworkMeta FrameworkFactory::GetDescription (
   return meta;
 }
 
-} // namespace tflite
+} // namespace onnxrt_acl
 } // namespace r2i

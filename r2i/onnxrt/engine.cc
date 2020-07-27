@@ -9,7 +9,6 @@
  * back to RidgeRun without any encumbrance.
  */
 
-#include "config.h"
 #include "r2i/onnxrt/engine.h"
 
 #include <core/common/exceptions.h>

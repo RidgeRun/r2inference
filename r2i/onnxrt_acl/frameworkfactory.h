@@ -25,6 +25,6 @@ class FrameworkFactory : public r2i::onnxrt::FrameworkFactory {
 };
 
 } // namespace onnxrt_acl
-} // namespace r2k
+} // namespace r2i
 
 #endif //R2I_ONNXRT_ACL_FRAMEWORK_FACTORY_H

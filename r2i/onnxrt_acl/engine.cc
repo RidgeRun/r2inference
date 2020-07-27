@@ -19,6 +19,7 @@ namespace r2i {
 namespace onnxrt_acl {
 
 Engine::Engine () : onnxrt::Engine() {
+
 }
 
 void Engine::AppendSessionOptionsExecutionProvider(Ort::SessionOptions
@@ -29,7 +30,7 @@ void Engine::AppendSessionOptionsExecutionProvider(Ort::SessionOptions
            USE_ARENA);
   if (status != NULL) {
     error.Set (RuntimeError::Code::FRAMEWORK_ERROR,
-               "Failed setting execution provider different from default CPU");
+               "Failed setting Arm Computer Library (ACL) execution provider");
     g_ort->ReleaseStatus(status);
   }
 }
