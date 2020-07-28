@@ -46,7 +46,7 @@ endif
 
 # Define library dependencies for Tensorflow Lite support
 if get_option('enable-edgetpu')
-  if tensorflow_lite_dep.found()
+  if get_option('enable-tflite')
     edgetpu = cpp.find_library(':libedgetpu.so.1.0', required: true)
     edgetpu_dep = declare_dependency(dependencies: edgetpu)
     thread_dep = dependency('threads')
@@ -55,7 +55,8 @@ if get_option('enable-edgetpu')
     lib_edgetpu_dep = [edgetpu_dep, lib_tflite_dep, dl_dep, rt_dep]
     cdata.set('HAVE_EDGETPU', 1)
   else
-    error('The EdgeTPU needs to have the TFLite backend enabled as well.')
+    error('The EdgeTPU needs to have the TFLite backend enabled as well.
+    Please enable it with enable-tflite option')
   endif
 endif
 
@@ -98,18 +99,19 @@ endif
 
 # Define library dependencies for ONNXRT with ACL execution provider support
 if get_option('enable-onnxrt-acl')
-  if onnxrt_dep.found()
+  if get_option('enable-onnxrt')
     arm_compute = cpp.find_library('arm_compute', required: true)
     arm_compute_dep = declare_dependency(dependencies: arm_compute)
-    arm_compute_core = cpp.find_library('arm_compute', required: true)
+    arm_compute_core = cpp.find_library('arm_compute_core', required: true)
     arm_compute_core_dep = declare_dependency(dependencies: arm_compute_core)
-    arm_compute_graph = cpp.find_library('arm_compute', required: true)
+    arm_compute_graph = cpp.find_library('arm_compute_graph', required: true)
     arm_compute_graph_dep = declare_dependency(dependencies: arm_compute_graph)
     lib_onnxrt_acl_dep = [arm_compute_dep, arm_compute_core_dep, arm_compute_graph_dep, lib_onnxrt_dep]
     lib_onnxrt_dep += [lib_onnxrt_acl_dep]
     cdata.set('HAVE_ONNXRT_ACL', 1)
   else
-    error('The ACL execution provider support requires ONNXRT enabled aswell')
+    error('The ACL execution provider support requires ONNXRT enabled aswell.
+     Please enable it with enable-onnxrt option')
   endif
 endif
 
