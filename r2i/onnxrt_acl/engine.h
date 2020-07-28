@@ -14,8 +14,6 @@
 
 #include <r2i/onnxrt/engine.h>
 
-#include <core/providers/acl/acl_provider_factory.h>
-
 namespace r2i {
 namespace onnxrt_acl {
 

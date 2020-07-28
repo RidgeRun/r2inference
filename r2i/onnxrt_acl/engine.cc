@@ -11,6 +11,8 @@
 
 #include "r2i/onnxrt_acl/engine.h"
 
+#include <core/providers/acl/acl_provider_factory.h>
+
 #define USE_ARENA 1
 
 static const OrtApi *g_ort = OrtGetApiBase()->GetApi(ORT_API_VERSION);
