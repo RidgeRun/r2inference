@@ -31,8 +31,8 @@ void Engine::AppendSessionOptionsExecutionProvider(Ort::SessionOptions
   status = OrtSessionOptionsAppendExecutionProvider_ACL(session_options,
            USE_ARENA);
   if (status != NULL) {
-    error.Set (RuntimeError::Code::FRAMEWORK_ERROR,
-               "Failed setting Arm Computer Library (ACL) execution provider");
+    std::string status_msg = std::string(g_ort->GetErrorMessage(status));
+    error.Set (RuntimeError::Code::FRAMEWORK_ERROR, status_msg);
     g_ort->ReleaseStatus(status);
   }
 }
