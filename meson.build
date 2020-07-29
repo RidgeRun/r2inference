@@ -55,8 +55,8 @@ if get_option('enable-edgetpu')
     lib_edgetpu_dep = [edgetpu_dep, lib_tflite_dep, dl_dep, rt_dep]
     cdata.set('HAVE_EDGETPU', 1)
   else
-    error('The EdgeTPU needs to have the TFLite backend enabled as well.
-    Please enable it with enable-tflite option')
+    error('''The EdgeTPU needs to have the TFLite backend enabled as well.
+    Please enable it with enable-tflite option''')
   endif
 endif
 
@@ -110,8 +110,8 @@ if get_option('enable-onnxrt-acl')
     lib_onnxrt_dep += [lib_onnxrt_acl_dep]
     cdata.set('HAVE_ONNXRT_ACL', 1)
   else
-    error('The ACL execution provider support requires ONNXRT enabled aswell.
-     Please enable it with enable-onnxrt option')
+    error('''The ACL execution provider support requires ONNXRT enabled aswell.
+     Please enable it with enable-onnxrt option''')
   endif
 endif
 
