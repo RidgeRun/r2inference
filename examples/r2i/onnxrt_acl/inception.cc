@@ -143,11 +143,12 @@ int main (int argc, char *argv[]) {
   }
 
   auto factory = r2i::IFrameworkFactory::MakeFactory(
-                   r2i::FrameworkCode::ONNXRT,
+                   r2i::FrameworkCode::ONNXRT_ACL,
                    error);
 
   if (nullptr == factory) {
-    std::cerr << "ONNXRT backend is not built: " << error << std::endl;
+    std::cerr << "ONNXRT backend with ACL support is not built: " << error <<
+              std::endl;
     exit(EXIT_FAILURE);
   }
 

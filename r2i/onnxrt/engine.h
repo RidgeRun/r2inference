@@ -101,6 +101,11 @@ class Engine : public IEngine {
                                 size_t output_size,
                                 std::vector<int64_t> input_node_dims,
                                 std::shared_ptr<Prediction> prediction);
+
+ protected:
+  virtual void AppendSessionOptionsExecutionProvider(Ort::SessionOptions
+      &session_options, r2i::RuntimeError &error);
+
 };
 
 }  // namespace onnxrt

@@ -59,13 +59,28 @@ RR_CHECK_FEATURE_LIB(TFLITE, TensorFlow lite Installation,
 # add specific LIBS for TFLITE
 AC_SUBST([TFLITE_LIBS], ["$TFLITE_LIBS -pthread -ldl -lrt"])
 
-AM_COND_IF([HAVE_EDGETPU], [AM_COND_IF([HAVE_TFLITE], [], [AC_MSG_ERROR(The EdgeTPU backend needs TFLITE enabled as well)])], [])
+AM_COND_IF([HAVE_EDGETPU], [AM_COND_IF([HAVE_TFLITE], [],
+ [AC_MSG_ERROR(The EdgeTPU backend needs TFLITE enabled as well. Please enable it with enable-tflite option)])], [])
 
 RR_CHECK_FEATURE_LIB(TENSORRT, TensorRT Installation,
                      nvinfer, createInferBuilder_INTERNAL, NvInfer.h, no)
 
 RR_CHECK_FEATURE_LIB(ONNXRT, ONNX Runtime Installation,
                      onnxruntime, OrtGetApiBase, onnxruntime/core/session/onnxruntime_cxx_api.h, no)
+
+RR_CHECK_FEATURE_LIB(ONNXRT_ACL, ONNX Runtime Installation with Arm Compute Library support,
+                     onnxruntime, OrtSessionOptionsAppendExecutionProvider_ACL, onnxruntime/core/providers/acl/acl_provider_factory.h, no)
+
+if test x$enable_onnxrt_acl = xyes; then
+    AC_MSG_NOTICE([Building the ONNXRT backend with ACL support])
+    AM_COND_IF([HAVE_ONNXRT_ACL], [AM_COND_IF([HAVE_ONNXRT], [],
+     [AC_MSG_ERROR(The ONNXRT ACL needs ONNXRT backend enabled aswell. Please enable it with enable-onnxrt option)])], [])
+    AC_CHECK_LIB(arm_compute, _init, [], [AC_MSG_ERROR(Can not find Arm Compute Library dependencies)], [])
+    AC_CHECK_LIB(arm_compute_core, _init, [], [AC_MSG_ERROR(Can not find Arm Compute Library dependencies)], [])
+    AC_CHECK_LIB(arm_compute_graph, _init, [], [AC_MSG_ERROR(Can not find Arm Compute Library dependencies)], [])
+    AC_SUBST([ONNXRT_ACL_LIBS], ["$ONNXRT_LIBS -larm_compute -larm_compute_core -larm_compute_graph"])
+fi
+
 AC_LANG_POP([C++])
 
 AM_CONDITIONAL([PLATFORM_IS_GPU], [false])
@@ -85,6 +100,7 @@ examples/r2i/Makefile
 examples/r2i/edgetpu/Makefile
 examples/r2i/ncsdk/Makefile
 examples/r2i/onnxrt/Makefile
+examples/r2i/onnxrt_acl/Makefile
 examples/r2i/tensorflow/Makefile
 examples/r2i/tensorrt/Makefile
 examples/r2i/tflite/Makefile
@@ -92,6 +108,7 @@ r2i/Makefile
 r2i/edgetpu/Makefile
 r2i/ncsdk/Makefile
 r2i/onnxrt/Makefile
+r2i/onnxrt_acl/Makefile
 r2i/tensorflow/Makefile
 r2i/tensorrt/Makefile
 r2i/tflite/Makefile

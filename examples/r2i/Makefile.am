@@ -13,6 +13,8 @@ AM_DEFAULT_SOURCE_EXT = .cc
 DIST_SUBDIRS =                    \
         edgetpu                   \
         ncsdk                     \
+        onnxrt                    \
+        onnxrt_acl                \
         tensorflow                \
         tflite
 SUBDIRS =
@@ -29,6 +31,10 @@ endif
 
 if HAVE_ONNXRT
 SUBDIRS += onnxrt
+endif
+
+if HAVE_ONNXRT_ACL
+SUBDIRS += onnxrt_acl
 endif
 
 if HAVE_TENSORFLOW

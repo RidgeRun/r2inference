@@ -81,6 +81,13 @@ void Engine::CreateSessionOptions() {
     this->graph_opt_level);
 }
 
+void Engine::AppendSessionOptionsExecutionProvider(Ort::SessionOptions
+    &session_options, r2i::RuntimeError &error) {
+
+  /* No implementation needed to use default CPU execution provider */
+
+}
+
 void Engine::CreateSession(const void *model_data,
                            size_t model_data_size,
                            RuntimeError &error) {
@@ -122,6 +129,7 @@ RuntimeError Engine::Start ()  {
   try {
     this->CreateEnv();
     this->CreateSessionOptions();
+    this->AppendSessionOptionsExecutionProvider(this->session_options, error);
     this->CreateSession((void *) this->model->GetOnnxrtModel().get(),
                         this->model->GetOnnxrtModelSize(), error);
     this->num_input_nodes = this->GetSessionInputCount(this->session, error);

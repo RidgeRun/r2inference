@@ -25,6 +25,11 @@ if get_option('enable-onnxrt')
   r2inference_internal_dep += [internal_onnxrt_dep]
 endif
 
+if get_option('enable-onnxrt-acl')
+  subdir('onnxrt_acl')
+  r2inference_internal_dep += [internal_onnxrt_acl_dep]
+endif
+
 # Define source code
 r2inference_sources = [
   'datatype.cc',
