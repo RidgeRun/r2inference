@@ -26,6 +26,10 @@ if HAVE_ONNXRT_ACL
 SUBDIRS += onnxrt_acl
 endif
 
+if HAVE_ONNXRT_OPENVINO
+SUBDIRS += onnxrt_openvino
+endif
+
 if HAVE_TENSORFLOW
 SUBDIRS += tensorflow
 endif
@@ -43,6 +47,7 @@ DIST_SUBDIRS =          \
         ncsdk           \
         onnxrt          \
         onnxrt_acl      \
+        onnxrt_openvino \
         tensorflow      \
         tensorrt        \
         tflite
@@ -109,6 +114,11 @@ endif
 if HAVE_ONNXRT_ACL
 libr2inference_@RR_PACKAGE_VERSION@_la_LIBADD +=    \
         $(top_builddir)/r2i/onnxrt_acl/libonnxrt_acl.la
+endif
+
+if HAVE_ONNXRT_OPENVINO
+libr2inference_@RR_PACKAGE_VERSION@_la_LIBADD +=    \
+        $(top_builddir)/r2i/onnxrt_openvino/libonnxrt_openvino.la
 endif
 
 if HAVE_TENSORFLOW

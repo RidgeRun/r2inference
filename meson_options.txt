@@ -18,3 +18,5 @@ option('enable-onnxrt', type : 'boolean', value: false,
        description : 'Enable ONNX Runtime backend support')
 option('enable-onnxrt-acl', type : 'boolean', value: false,
        description : 'Enable ONNX Runtime backend with ACL execution provider support')
+option('enable-onnxrt-openvino', type : 'boolean', value: false,
+       description : 'Enable ONNX Runtime backend with OpenVINO execution provider support')
