@@ -15,6 +15,7 @@ DIST_SUBDIRS =                    \
         ncsdk                     \
         onnxrt                    \
         onnxrt_acl                \
+        onnxrt_openvino           \
         tensorflow                \
         tflite
 SUBDIRS =
@@ -35,6 +36,10 @@ endif
 
 if HAVE_ONNXRT_ACL
 SUBDIRS += onnxrt_acl
+endif
+
+if HAVE_ONNXRT_OPENVINO
+SUBDIRS += onnxrt_openvino
 endif
 
 if HAVE_TENSORFLOW
