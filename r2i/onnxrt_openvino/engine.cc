@@ -25,6 +25,7 @@ Engine::Engine () : onnxrt::Engine() {
 void Engine::AppendSessionOptionsExecutionProvider(Ort::SessionOptions
     &session_options, r2i::RuntimeError &error) {
   OrtStatus *status = NULL;
+  error.Clean ();
 
   status = OrtSessionOptionsAppendExecutionProvider_OpenVINO(session_options,
            this->hardware_option.c_str());
