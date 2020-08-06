@@ -18,7 +18,6 @@ noinst_PROGRAMS =                  \
 AM_CXXFLAGS =                      \
         $(RR_CXXFLAGS)             \
         $(CODE_COVERAGE_CXXFLAGS)  \
-        -I../common/
 
 AM_CFLAGS =                        \
         $(RR_CFLAGS)               \
@@ -26,7 +25,8 @@ AM_CFLAGS =                        \
 
 AM_CPPFLAGS =                      \
         $(RR_CPPFLAGS)             \
-        $(CODE_COVERAGE_CPPFLAGS)
+        $(CODE_COVERAGE_CPPFLAGS)  \
+        -I../common/
 
 AM_LDFLAGS =                       \
         $(RR_LIBS)                 \
