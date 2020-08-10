@@ -1,8 +1,9 @@
 r2inference_internal_dep = []
+r2inference_internal_dep += [glib, gmodule]
 
 if cdata.get('HAVE_TENSORFLOW') == true
   subdir('tensorflow')
-  r2inference_internal_dep = [internal_tf_dep]
+  r2inference_internal_dep += [internal_tf_dep]
 endif
 
 if cdata.get('HAVE_TFLITE') == true
@@ -40,6 +41,7 @@ r2inference_sources = [
   'datatype.cc',
   'iframeworkfactory.cc',
   'imageformat.cc',
+  'iloader.cc',
   'runtimeerror.cc',
 ]
 
