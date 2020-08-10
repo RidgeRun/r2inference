@@ -13,8 +13,12 @@
 #define R2I_ILOADER_H
 
 #include <r2i/imodel.h>
+#include <r2i/ipreprocessing.h>
+#include <r2i/ipostprocessing.h>
 #include <r2i/runtimeerror.h>
 
+#include <glib.h>
+#include <gmodule.h>
 #include <memory>
 #include <string>
 
@@ -22,6 +26,12 @@
  * R2Inference Namespace
  */
 namespace r2i {
+
+typedef
+IPreprocessing *(*PreprocessFactoryFunc) (void);
+typedef
+IPostprocessing *(*PostprocessFactoryFunc) (void);
+
 /**
  *  Implements the interface to validate a IModel implementation
  *  for an IEngine implementation
@@ -38,10 +48,24 @@ class ILoader {
   virtual std::shared_ptr<r2i::IModel> Load (const std::string &in_path,
       r2i::RuntimeError &error) = 0;
 
+  /*
+  */
+  std::shared_ptr<IPreprocessing> LoadPreprocessing (const std::string &in_path,
+      RuntimeError &error);
+
+  /*
+  */
+  std::shared_ptr<IPostprocessing> LoadPostprocessing (const std::string &in_path,
+      RuntimeError &error);
+
   /**
    * \brief Default destructor
    */
   virtual ~ILoader () {};
+
+ private:
+  /**/
+  RuntimeError LoadModule(const gchar *in_path, GModule *module);
 };
 
 }
