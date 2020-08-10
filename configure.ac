@@ -42,6 +42,14 @@ AC_CONFIG_MACRO_DIRS([m4 common/m4])
 # Generate a header with useful definitions
 AC_CONFIG_HEADER([config.h])
 
+# Set common dependencies
+PKG_PROG_PKG_CONFIG
+PKG_CHECK_MODULES([GLIB], [glib-2.0])
+PKG_CHECK_MODULES([GMODULE], [gmodule-2.0])
+AC_SUBST([RR_LIBS], ["$RR_LIBS $GLIB_LIBS $GMODULE_LIBS"])
+#AC_SUBST([RR_CPPFLAGS], ["$RR_CPPFLAGS $GLIB_CFLAGS $GMODULE_CFLAGS"])
+AC_SUBST([RR_CXXFLAGS], ["$RR_CXXFLAGS $GLIB_CFLAGS $GMODULE_CFLAGS"])
+
 # Check for NCSDK
 RR_CHECK_FEATURE_LIB(NCSDK, NCSDK Installation,
                      mvnc, ncGlobalSetOption, mvnc.h, no)
