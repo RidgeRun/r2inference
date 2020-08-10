@@ -50,6 +50,11 @@ RR_CHECK_FEATURE_LIB(TENSORFLOW, TensorFlow Installation,
                      tensorflow, TF_Version, tensorflow/c/c_api.h, no)
 
 AC_LANG_PUSH([C++])
+
+if test x$enable_edgetpu = xyes; then
+    enable_tflite=yes
+fi
+
 RR_CHECK_FEATURE_LIB(EDGETPU, EdgeTPU with TensorFlow lite Installation,
                      :libedgetpu.so.1.0, edgetpu_version, edgetpu.h, no)
 
@@ -59,11 +64,13 @@ RR_CHECK_FEATURE_LIB(TFLITE, TensorFlow lite Installation,
 # add specific LIBS for TFLITE
 AC_SUBST([TFLITE_LIBS], ["$TFLITE_LIBS -pthread -ldl -lrt"])
 
-AM_COND_IF([HAVE_EDGETPU], [AM_COND_IF([HAVE_TFLITE], [],
- [AC_MSG_ERROR(The EdgeTPU backend needs TFLITE enabled as well. Please enable it with enable-tflite option)])], [])
-
 RR_CHECK_FEATURE_LIB(TENSORRT, TensorRT Installation,
                      nvinfer, createInferBuilder_INTERNAL, NvInfer.h, no)
+
+# ONNXRT backend
+if test x$enable_onnxrt_acl = xyes || test x$enable_onnxrt_openvino = xyes; then
+    enable_onnxrt=yes
+fi
 
 RR_CHECK_FEATURE_LIB(ONNXRT, ONNX Runtime Installation,
                      onnxruntime, OrtGetApiBase, onnxruntime/core/session/onnxruntime_cxx_api.h, no)
@@ -72,9 +79,6 @@ RR_CHECK_FEATURE_LIB(ONNXRT_ACL, ONNX Runtime Installation with Arm Compute Libr
                      onnxruntime, OrtSessionOptionsAppendExecutionProvider_ACL, onnxruntime/core/providers/acl/acl_provider_factory.h, no)
 
 if test x$enable_onnxrt_acl = xyes; then
-    AC_MSG_NOTICE([Building the ONNXRT backend with ACL support])
-    AM_COND_IF([HAVE_ONNXRT_ACL], [AM_COND_IF([HAVE_ONNXRT], [],
-     [AC_MSG_ERROR(The ONNXRT ACL support needs ONNXRT backend enabled aswell. Please enable it with enable-onnxrt option)])], [])
     AC_CHECK_LIB(arm_compute, _init, [], [AC_MSG_ERROR(Can not find Arm Compute Library dependencies)], [])
     AC_CHECK_LIB(arm_compute_core, _init, [], [AC_MSG_ERROR(Can not find Arm Compute Library dependencies)], [])
     AC_CHECK_LIB(arm_compute_graph, _init, [], [AC_MSG_ERROR(Can not find Arm Compute Library dependencies)], [])
@@ -83,8 +87,6 @@ fi
 
 RR_CHECK_FEATURE_LIB(ONNXRT_OPENVINO, ONNX Runtime Installation with OpenVINO support,
                      onnxruntime, OrtSessionOptionsAppendExecutionProvider_OpenVINO, onnxruntime/core/providers/openvino/openvino_provider_factory.h, no)
-AM_COND_IF([HAVE_ONNXRT_OPENVINO], [AM_COND_IF([HAVE_ONNXRT], [],
- [AC_MSG_ERROR(The ONNXRT OpenVINO support needs ONNXRT backend enabled aswell. Please enable it with enable-onnxrt option)])], [])
 
 AC_LANG_POP([C++])
 
