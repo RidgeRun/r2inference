@@ -30,6 +30,11 @@ if get_option('enable-onnxrt-acl')
   r2inference_internal_dep += [internal_onnxrt_acl_dep]
 endif
 
+if get_option('enable-onnxrt-openvino')
+  subdir('onnxrt_openvino')
+  r2inference_internal_dep += [internal_onnxrt_openvino_dep]
+endif
+
 # Define source code
 r2inference_sources = [
   'datatype.cc',

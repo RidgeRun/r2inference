@@ -19,6 +19,7 @@
 #include "ncsdk/frameworkfactory.h"
 #include "onnxrt/frameworkfactory.h"
 #include "onnxrt_acl/frameworkfactory.h"
+#include "onnxrt_openvino/frameworkfactory.h"
 #include "tensorflow/frameworkfactory.h"
 #include "tensorrt/frameworkfactory.h"
 #include "tflite/frameworkfactory.h"
@@ -55,6 +56,14 @@ MakeOnnxrtAclFactory (RuntimeError &error) {
          onnxrt_acl::FrameworkFactory);
 }
 #endif // HAVE_ONNXRT_ACL
+
+#ifdef HAVE_ONNXRT_OPENVINO
+static std::unique_ptr<IFrameworkFactory>
+MakeOnnxrtOpenvinoFactory (RuntimeError &error) {
+  return std::unique_ptr<onnxrt_openvino::FrameworkFactory> (new
+         onnxrt_openvino::FrameworkFactory);
+}
+#endif // HAVE_ONNXRT_OPENVINO
 
 #ifdef HAVE_TENSORFLOW
 static std::unique_ptr<IFrameworkFactory>
@@ -99,6 +108,10 @@ const std::unordered_map<int, MakeFactory> frameworks ({
 #ifdef HAVE_ONNXRT_ACL
   {FrameworkCode::ONNXRT_ACL, MakeOnnxrtAclFactory},
 #endif //HAVE_ONNXRT_ACL
+
+#ifdef HAVE_ONNXRT_OPENVINO
+  {FrameworkCode::ONNXRT_OPENVINO, MakeOnnxrtOpenvinoFactory},
+#endif //HAVE_ONNXRT_OPENVINO
 
 #ifdef HAVE_TENSORFLOW
   {FrameworkCode::TENSORFLOW, MakeTensorflowFactory},

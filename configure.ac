@@ -74,12 +74,17 @@ RR_CHECK_FEATURE_LIB(ONNXRT_ACL, ONNX Runtime Installation with Arm Compute Libr
 if test x$enable_onnxrt_acl = xyes; then
     AC_MSG_NOTICE([Building the ONNXRT backend with ACL support])
     AM_COND_IF([HAVE_ONNXRT_ACL], [AM_COND_IF([HAVE_ONNXRT], [],
-     [AC_MSG_ERROR(The ONNXRT ACL needs ONNXRT backend enabled aswell. Please enable it with enable-onnxrt option)])], [])
+     [AC_MSG_ERROR(The ONNXRT ACL support needs ONNXRT backend enabled aswell. Please enable it with enable-onnxrt option)])], [])
     AC_CHECK_LIB(arm_compute, _init, [], [AC_MSG_ERROR(Can not find Arm Compute Library dependencies)], [])
     AC_CHECK_LIB(arm_compute_core, _init, [], [AC_MSG_ERROR(Can not find Arm Compute Library dependencies)], [])
     AC_CHECK_LIB(arm_compute_graph, _init, [], [AC_MSG_ERROR(Can not find Arm Compute Library dependencies)], [])
     AC_SUBST([ONNXRT_ACL_LIBS], ["$ONNXRT_LIBS -larm_compute -larm_compute_core -larm_compute_graph"])
 fi
+
+RR_CHECK_FEATURE_LIB(ONNXRT_OPENVINO, ONNX Runtime Installation with OpenVINO support,
+                     onnxruntime, OrtSessionOptionsAppendExecutionProvider_OpenVINO, onnxruntime/core/providers/openvino/openvino_provider_factory.h, no)
+AM_COND_IF([HAVE_ONNXRT_OPENVINO], [AM_COND_IF([HAVE_ONNXRT], [],
+ [AC_MSG_ERROR(The ONNXRT OpenVINO support needs ONNXRT backend enabled aswell. Please enable it with enable-onnxrt option)])], [])
 
 AC_LANG_POP([C++])
 
@@ -101,6 +106,7 @@ examples/r2i/edgetpu/Makefile
 examples/r2i/ncsdk/Makefile
 examples/r2i/onnxrt/Makefile
 examples/r2i/onnxrt_acl/Makefile
+examples/r2i/onnxrt_openvino/Makefile
 examples/r2i/tensorflow/Makefile
 examples/r2i/tensorrt/Makefile
 examples/r2i/tflite/Makefile
@@ -109,6 +115,7 @@ r2i/edgetpu/Makefile
 r2i/ncsdk/Makefile
 r2i/onnxrt/Makefile
 r2i/onnxrt_acl/Makefile
+r2i/onnxrt_openvino/Makefile
 r2i/tensorflow/Makefile
 r2i/tensorrt/Makefile
 r2i/tflite/Makefile

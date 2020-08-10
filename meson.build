@@ -115,6 +115,16 @@ if get_option('enable-onnxrt-acl')
   endif
 endif
 
+# Define library dependencies for ONNXRT with OpenVINO execution provider support
+if get_option('enable-onnxrt-openvino')
+  if get_option('enable-onnxrt')
+    cdata.set('HAVE_ONNXRT_OPENVINO', 1)
+  else
+    error('''The OpenVINO execution provider support requires ONNXRT enabled aswell.
+     Please enable it with enable-onnxrt option''')
+  endif
+endif
+
 # Check if at least one backend is enabled
 if not (cdata.has('HAVE_TENSORFLOW') or cdata.has('HAVE_TFLITE') or
         cdata.has('HAVE_TENSORRT') or cdata.has('HAVE_ONNXRT'))
