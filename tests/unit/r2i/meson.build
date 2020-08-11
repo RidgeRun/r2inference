@@ -16,18 +16,18 @@ foreach t : lib_r2inference_tests
 
 endforeach
 
-if get_option('enable-onnxrt')
+if cdata.get('HAVE_ONNXRT') == true
   subdir('onnxrt')
 endif
 
-if get_option('enable-tensorflow')
+if cdata.get('HAVE_TENSORFLOW') == true
   subdir('tensorflow')
 endif
 
-if get_option('enable-tflite')
+if cdata.get('HAVE_TFLITE') == true
   subdir('tflite')
 endif
 
-if get_option('enable-tensorrt')
+if cdata.get('HAVE_TENSORRT') == true
   subdir('tensorrt')
 endif
