@@ -91,7 +91,9 @@ r2iinclude_HEADERS =         \
         imageformat.h        \
         imodel.h             \
         iparameters.h        \
+        ipostprocessing.h    \
         iprediction.h        \
+        ipreprocessing.h     \
         parametermeta.h      \
         r2i.h                \
         runtimeerror.h

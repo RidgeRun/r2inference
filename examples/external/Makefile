@@ -10,8 +10,8 @@
 
 R2IVERSION=0.0
 
-CXXFLAGS:= -std=c++11 $(shell pkg-config --cflags r2inference-$(R2IVERSION)) -pthread
-LIBS:=$(shell pkg-config --libs r2inference-$(R2IVERSION)) -pthread
+CXXFLAGS:= -std=c++11 $(shell pkg-config --cflags r2inference-$(R2IVERSION)) -pthread $(shell pkg-config --cflags glib-2.0) $(shell pkg-config --cflags gmodule-2.0) 
+LIBS:=$(shell pkg-config --libs r2inference-$(R2IVERSION)) -pthread $(shell pkg-config --libs glib-2.0) $(shell pkg-config --libs gmodule-2.0)
 
 OUT=list-backends
 SOURCES=list_backends.cc
