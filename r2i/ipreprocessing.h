@@ -29,15 +29,22 @@ namespace r2i {
 class IPreprocessing {
 
  public:
-  /*
+  /**
+   * \brief Apply a custom preprocessin to the input data.
+   * \param data Frame input data.
+   * \return Error with a description message.
    */
   virtual RuntimeError apply(IFrame &data) = 0;
 
-  /*
+  /**
+   * \brief Gets the availabel image formats that can be processed.
+   * \return Vector with all the available formats.
    */
   virtual std::vector<ImageFormat> getAvailableFormats() = 0;
 
-  /*
+  /**
+   * \brief Getsthe available dimensions for the input images
+   * \return Vector with a tuples (width, height) of the available dimensions.
    */
   virtual std::vector<std::vector<int>> getAvailableDataSizes() = 0;
 

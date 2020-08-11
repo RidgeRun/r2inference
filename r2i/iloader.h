@@ -43,13 +43,21 @@ class ILoader {
   virtual std::shared_ptr<r2i::IModel> Load (const std::string &in_path,
       r2i::RuntimeError &error) = 0;
 
-  /*
-  */
+  /**
+   * \brief Load preprocessing module.
+   * \param in_path A string of the absolute path to the preprocessing module to load.
+   * \param error [out] RuntimeError with a description of an error.
+   * \return A loaded IPreprocessing module.
+   */
   std::shared_ptr<IPreprocessing> LoadPreprocessing (const std::string &in_path,
       RuntimeError &error);
 
-  /*
-  */
+  /**
+   * \brief Load postprocessing module.
+   * \param in_path A string of the absolute path to the postprocessing module to load.
+   * \param error [out] RuntimeError with a description of an error.
+   * \return A loaded IPostprocessing module.
+   */
   std::shared_ptr<IPostprocessing> LoadPostprocessing (const std::string &in_path,
       RuntimeError &error);
 
@@ -59,7 +67,12 @@ class ILoader {
   virtual ~ILoader () {};
 
  private:
-  /**/
+  /**
+   * \brief Load dynamic libraries modules.
+   * \param in_path A string with the path to the dynamic library.
+   * \param error [out] RuntimeError with a description of an error.
+   * \return Loaded module or Null if the loading failed.
+   */
   GModule *LoadModule(const gchar *in_path, RuntimeError &error);
 };
 

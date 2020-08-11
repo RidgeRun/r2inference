@@ -27,7 +27,10 @@ namespace r2i {
 class IPostprocessing {
 
  public:
-  /*
+  /**
+   * \brief Applys a custom postprocessing to the predicted data.
+   * \param prediction returned from the model inference.
+   * \return Error with a description message.
    */
   virtual RuntimeError apply(IPrediction &prediction) = 0;
 
