@@ -55,7 +55,7 @@ class IPreprocessing {
 };
 
 
-}
+} // namespace r2i
 
 extern "C" {
 

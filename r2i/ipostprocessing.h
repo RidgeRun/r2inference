@@ -41,7 +41,7 @@ class IPostprocessing {
 
 };
 
-}
+} // namespace r2i
 
 extern "C" {
 
