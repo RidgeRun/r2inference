@@ -59,6 +59,38 @@ TEST (NcsdkLoader, LoadNonExistentFile) {
   LONGS_EQUAL (r2i::RuntimeError::Code::FILE_ERROR, error.GetCode());
 }
 
+TEST (NcsdkLoader, LoadPreprocessingWithNullPath) {
+  std::string string_path;
+
+  std::shared_ptr<r2i::IPreprocessing> preprocessing = loader.LoadPreprocessing(
+        string_path, error);
+
+  CHECK (r2i::RuntimeError::EOK != error.GetCode());
+}
+
+TEST (NcsdkLoader, LoadPreprocessingSetWrongFile) {
+  std::shared_ptr<r2i::IPreprocessing> preprocessing = loader.LoadPreprocessing(
+        __FILE__, error);
+
+  CHECK (r2i::RuntimeError::EOK != error.GetCode());
+}
+
+TEST (NcsdkLoader, LoadPostprocessingWithNullPath) {
+  std::string string_path;
+
+  std::shared_ptr<r2i::IPostprocessing> preprocessing = loader.LoadPostprocessing(
+        string_path, error);
+
+  CHECK (r2i::RuntimeError::EOK != error.GetCode());
+}
+
+TEST (NcsdkLoader, LoadPostprocessingSetWrongFile) {
+  std::shared_ptr<r2i::IPostprocessing> preprocessing = loader.LoadPostprocessing(
+        __FILE__, error);
+
+  CHECK (r2i::RuntimeError::EOK != error.GetCode());
+}
+
 int main (int ac, char **av) {
   return CommandLineTestRunner::RunAllTests (ac, av);
 }
