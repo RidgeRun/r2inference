@@ -1,28 +1,38 @@
 r2inference_internal_dep = []
 
-if get_option('enable-tensorflow')
+if cdata.get('HAVE_TENSORFLOW') == true
   subdir('tensorflow')
   r2inference_internal_dep = [internal_tf_dep]
 endif
 
-if get_option('enable-tflite')
+if cdata.get('HAVE_TFLITE') == true
   subdir('tflite')
   r2inference_internal_dep += [internal_tflite_dep]
 endif
 
-if get_option('enable-edgetpu')
+if cdata.get('HAVE_EDGETPU') == true
   subdir('edgetpu')
   r2inference_internal_dep += [internal_edgetpu_dep]
 endif
 
-if get_option('enable-tensorrt')
+if cdata.get('HAVE_TENSORRT') == true
   subdir('tensorrt')
   r2inference_internal_dep += [internal_trt_dep]
 endif
 
-if get_option('enable-onnxrt')
+if cdata.get('HAVE_ONNXRT') == true
   subdir('onnxrt')
   r2inference_internal_dep += [internal_onnxrt_dep]
+endif
+
+if cdata.get('HAVE_ONNXRT_ACL') == true
+  subdir('onnxrt_acl')
+  r2inference_internal_dep += [internal_onnxrt_acl_dep]
+endif
+
+if cdata.get('HAVE_ONNXRT_OPENVINO') == true
+  subdir('onnxrt_openvino')
+  r2inference_internal_dep += [internal_onnxrt_openvino_dep]
 endif
 
 # Define source code

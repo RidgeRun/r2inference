@@ -38,6 +38,16 @@ enum FrameworkCode {
   ONNXRT,
 
   /**
+   * Open Neural Network Exchange Runtime (ARM Compute Library support)
+   */
+  ONNXRT_ACL,
+
+  /**
+   * Open Neural Network Exchange Runtime (OpenVINO support)
+   */
+  ONNXRT_OPENVINO,
+
+  /**
    * Google's TensorFlow
    */
   TENSORFLOW,

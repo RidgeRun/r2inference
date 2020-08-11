@@ -143,11 +143,12 @@ int main (int argc, char *argv[]) {
   }
 
   auto factory = r2i::IFrameworkFactory::MakeFactory(
-                   r2i::FrameworkCode::ONNXRT,
+                   r2i::FrameworkCode::ONNXRT_OPENVINO,
                    error);
 
   if (nullptr == factory) {
-    std::cerr << "ONNXRT backend is not built: " << error << std::endl;
+    std::cerr << "ONNXRT backend with OpenVINO support is not built: " << error <<
+              std::endl;
     exit(EXIT_FAILURE);
   }
 
@@ -170,8 +171,10 @@ int main (int argc, char *argv[]) {
   error = params->Set ("logging-level", 2);
   error = params->Set ("log-id", "onnxrt_example");
   error = params->Set ("intra-num-threads", 1);
-  /* Set GraphOptimizationLevel::ORT_ENABLE_EXTENDED */
-  error = params->Set ("graph-optimization-level", 2);
+  /* Set GraphOptimizationLevel::ORT_DISABLE_ALL
+   * OpenVINO performs optimizations based on hardware available
+   */
+  error = params->Set ("graph-optimization-level", 0);
 
   if (error.IsError ()) {
     std::cerr << "Parameters error: " << error << std::endl;

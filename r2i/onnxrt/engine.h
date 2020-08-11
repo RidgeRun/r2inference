@@ -45,17 +45,11 @@ class Engine : public IEngine {
   const std::string GetLogId ();
 
  private:
-  enum State {
-    STARTED,
-    STOPPED
-  };
-
   /* ONNXRT parameters must be initialized in case user does not set any */
   OrtLoggingLevel logging_level;
   int intra_num_threads;
   GraphOptimizationLevel graph_opt_level;
   std::string log_id;
-  State state;
   std::shared_ptr<Model> model;
   std::vector<int64_t> input_node_dims;
   std::vector<const char *> input_node_names;
@@ -101,6 +95,17 @@ class Engine : public IEngine {
                                 size_t output_size,
                                 std::vector<int64_t> input_node_dims,
                                 std::shared_ptr<Prediction> prediction);
+
+ protected:
+  enum State {
+    STARTED,
+    STOPPED
+  };
+  State state;
+
+  virtual void AppendSessionOptionsExecutionProvider(Ort::SessionOptions
+      &session_options, r2i::RuntimeError &error);
+
 };
 
 }  // namespace onnxrt

@@ -13,22 +13,30 @@ foreach app : app_examples
     install: false)
 endforeach
 
-if get_option('enable-edgetpu')
+if cdata.get('HAVE_EDGETPU') == true
   subdir('edgetpu')
 endif
 
-if get_option('enable-onnxrt')
+if cdata.get('HAVE_ONNXRT') == true
   subdir('onnxrt')
 endif
 
-if get_option('enable-tensorflow')
+if cdata.get('HAVE_ONNXRT_ACL') == true
+  subdir('onnxrt_acl')
+endif
+
+if cdata.get('HAVE_ONNXRT_OPENVINO') == true
+  subdir('onnxrt_openvino')
+endif
+
+if cdata.get('HAVE_TENSORFLOW') == true
   subdir('tensorflow')
 endif
 
-if get_option('enable-tflite')
+if cdata.get('HAVE_TFLITE') == true
   subdir('tflite')
 endif
 
-if get_option('enable-tensorrt')
+if cdata.get('HAVE_TENSORRT') == true
   subdir('tensorrt')
 endif

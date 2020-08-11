@@ -1,5 +1,5 @@
 project('r2inference', ['cpp'], default_options : ['cpp_std=c++11'],
-  version : '0.8.1',
+  version : '0.9.0',
   meson_version : '>= 0.50',)
 
 # Set project information
@@ -27,36 +27,41 @@ cpp_args = ['-DHAVE_CONFIG_H']
 # Create an empty configuration object to set config.h information
 cdata = configuration_data()
 
+# Initialize preprocessor definitions
+cdata.set('HAVE_TENSORFLOW', false)
+cdata.set('HAVE_TFLITE', false)
+cdata.set('HAVE_EDGETPU', false)
+cdata.set('HAVE_TENSORRT', false)
+cdata.set('HAVE_ONNXRT', false)
+cdata.set('HAVE_ONNXRT_ACL', false)
+cdata.set('HAVE_ONNXRT_OPENVINO', false)
+
 # Define library dependencies for Tensorflow support
 if get_option('enable-tensorflow')
   tensorflow = cpp.find_library('tensorflow', required: true)
   tensorflow_dep = declare_dependency(dependencies: tensorflow)
   lib_tf_dep = [tensorflow_dep]
-  cdata.set('HAVE_TENSORFLOW', 1)
+  cdata.set('HAVE_TENSORFLOW', true)
 endif
 
 # Define library dependencies for Tensorflow Lite support
-if get_option('enable-tflite')
+if get_option('enable-tflite') or get_option('enable-edgetpu')
   tensorflow_lite = cpp.find_library('tensorflow-lite', required: true)
   tensorflow_lite_dep = declare_dependency(dependencies: tensorflow_lite)
   thread_dep = dependency('threads')
   lib_tflite_dep = [tensorflow_lite_dep, thread_dep]
-  cdata.set('HAVE_TFLITE', 1)
+  cdata.set('HAVE_TFLITE', true)
 endif
 
 # Define library dependencies for Tensorflow Lite support
 if get_option('enable-edgetpu')
-  if tensorflow_lite_dep.found()
     edgetpu = cpp.find_library(':libedgetpu.so.1.0', required: true)
     edgetpu_dep = declare_dependency(dependencies: edgetpu)
     thread_dep = dependency('threads')
     dl_dep = cpp.find_library('dl', required : true)
     rt_dep = cpp.find_library('rt', required : true)
     lib_edgetpu_dep = [edgetpu_dep, lib_tflite_dep, dl_dep, rt_dep]
-    cdata.set('HAVE_EDGETPU', 1)
-  else
-    error('The EdgeTPU needs to have the TFLite backend enabled as well.')
-  endif
+    cdata.set('HAVE_EDGETPU', true)
 endif
 
 # Define library dependencies for TensorRT support
@@ -85,20 +90,39 @@ if get_option('enable-tensorrt')
   tensorrt = cpp.find_library('nvinfer', required: true)
   tensorrt_dep = declare_dependency(dependencies: tensorrt)
   lib_trt_dep = [tensorrt_dep, cuda_dep, cudart_dep]
-  cdata.set('HAVE_TENSORRT', 1)
+  cdata.set('HAVE_TENSORRT', true)
 endif
 
 # Define library dependencies for ONNX support
-if get_option('enable-onnxrt')
+if get_option('enable-onnxrt') or get_option('enable-onnxrt-acl') or get_option('enable-onnxrt-openvino')
   onnxrt = cpp.find_library('onnxruntime', required: true)
   onnxrt_dep = declare_dependency(dependencies: onnxrt)
   lib_onnxrt_dep = [onnxrt_dep]
-  cdata.set('HAVE_ONNXRT', 1)
+  cdata.set('HAVE_ONNXRT', true)
+endif
+
+# Define library dependencies for ONNXRT with ACL execution provider support
+if get_option('enable-onnxrt-acl')
+  arm_compute = cpp.find_library('arm_compute', required: true)
+  arm_compute_dep = declare_dependency(dependencies: arm_compute)
+  arm_compute_core = cpp.find_library('arm_compute_core', required: true)
+  arm_compute_core_dep = declare_dependency(dependencies: arm_compute_core)
+  arm_compute_graph = cpp.find_library('arm_compute_graph', required: true)
+  arm_compute_graph_dep = declare_dependency(dependencies: arm_compute_graph)
+  lib_onnxrt_acl_dep = [arm_compute_dep, arm_compute_core_dep, arm_compute_graph_dep, lib_onnxrt_dep]
+  lib_onnxrt_dep += [lib_onnxrt_acl_dep]
+  cdata.set('HAVE_ONNXRT_ACL', true)
+endif
+
+# Define library dependencies for ONNXRT with OpenVINO execution provider support
+if get_option('enable-onnxrt-openvino')
+  cdata.set('HAVE_ONNXRT_OPENVINO', true)
 endif
 
 # Check if at least one backend is enabled
-if not (cdata.has('HAVE_TENSORFLOW') or cdata.has('HAVE_TFLITE') or
-        cdata.has('HAVE_TENSORRT') or cdata.has('HAVE_ONNXRT'))
+if (cdata.get('HAVE_TENSORFLOW') == false and cdata.get('HAVE_TFLITE') == false and
+        cdata.get('HAVE_TENSORRT') == false and cdata.get('HAVE_ONNXRT') == false and
+        cdata.get('HAVE_ONNXRT_ACL') == false and cdata.get('HAVE_ONNXRT_OPENVINO') == false)
   error ('No backend selected, you must choose at least one')
 endif
 
