@@ -16,6 +16,7 @@
 #include <r2i/imageformat.h>
 #include <r2i/runtimeerror.h>
 
+#include <gmodule.h>
 #include <vector>
 
 /**
@@ -47,6 +48,18 @@ class IPreprocessing {
 };
 
 
+}
+
+extern "C" {
+
+  /**
+    * factory_make_preprocessing:
+    *
+    * Return a newly allocated algorithm to be used by IPreprocessing
+    *
+    * Returns: A newly allocated algorithm to be used by IPreprocessing
+    */
+  G_MODULE_EXPORT r2i::IPreprocessing *factory_make_preprocessing (void);
 }
 
 #endif // R2I_IPREPROCESSING_H

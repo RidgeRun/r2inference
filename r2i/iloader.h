@@ -27,11 +27,6 @@
  */
 namespace r2i {
 
-typedef
-IPreprocessing *(*PreprocessFactoryFunc) (void);
-typedef
-IPostprocessing *(*PostprocessFactoryFunc) (void);
-
 /**
  *  Implements the interface to validate a IModel implementation
  *  for an IEngine implementation
@@ -65,7 +60,7 @@ class ILoader {
 
  private:
   /**/
-  RuntimeError LoadModule(const gchar *in_path, GModule *module);
+  GModule *LoadModule(const gchar *in_path, RuntimeError &error);
 };
 
 }

@@ -15,6 +15,8 @@
 #include <r2i/runtimeerror.h>
 #include <r2i/iprediction.h>
 
+#include <gmodule.h>
+
 /**
  * R2Inference Namespace
  */
@@ -36,6 +38,18 @@ class IPostprocessing {
 
 };
 
+}
+
+extern "C" {
+
+  /**
+    * factory_make_postprocessing:
+    *
+    * Return a newly allocated algorithm to be used by IPostprocessing
+    *
+    * Returns: A newly allocated algorithm to be used by IPostprocessing
+    */
+  G_MODULE_EXPORT r2i::IPostprocessing *factory_make_postprocessing (void);
 }
 
 #endif // R2I_IPOSTPROCESSING_H

@@ -11,23 +11,28 @@
 
 #include "iloader.h"
 
-#define MODULE_FACTORY_SYMBOL "factory_make"
+#define MODULE_FACTORY_PREPROCESSING_SYMBOL "factory_make_preprocessing"
+#define MODULE_FACTORY_POSTPROCESSING_SYMBOL "factory_make_postprocessing"
+
+typedef
+r2i::IPreprocessing *(*PreprocessFactoryFunc) (void);
+typedef
+r2i::IPostprocessing *(*PostprocessFactoryFunc) (void);
 
 namespace r2i {
 
 std::shared_ptr<IPreprocessing> ILoader::LoadPreprocessing(
   const std::string &in_path, RuntimeError &error) {
-  GModule *module = nullptr;
   PreprocessFactoryFunc factory;
 
-  error = LoadModule(in_path.c_str(), module);
+  GModule *module = LoadModule(in_path.c_str(), error);
   if (RuntimeError::EOK != error.GetCode()) {
     return nullptr;
   }
 
-  if (!g_module_symbol (module, MODULE_FACTORY_SYMBOL,
+  if (!g_module_symbol (module, MODULE_FACTORY_PREPROCESSING_SYMBOL,
                         (gpointer *) & factory)) {
-    error.Set(RuntimeError::UNKNOWN_ERROR, "Error loading preprocessing symbols.");
+    error.Set(RuntimeError::UNKNOWN_ERROR, g_module_error ());
     return nullptr;
   }
 
@@ -37,24 +42,21 @@ std::shared_ptr<IPreprocessing> ILoader::LoadPreprocessing(
     return nullptr;
   }
 
-  g_free (module);
-
   return std::shared_ptr<IPreprocessing>(preprocessing);
 }
 
 std::shared_ptr<IPostprocessing> ILoader::LoadPostprocessing(
   const std::string &in_path, RuntimeError &error) {
-  GModule *module = nullptr;
   PostprocessFactoryFunc factory;
 
-  error = LoadModule(in_path.c_str(), module);
+  GModule *module = LoadModule(in_path.c_str(), error);
   if (RuntimeError::EOK != error.GetCode()) {
     return nullptr;
   }
 
-  if (!g_module_symbol (module, MODULE_FACTORY_SYMBOL,
+  if (!g_module_symbol (module, MODULE_FACTORY_POSTPROCESSING_SYMBOL,
                         (gpointer *) & factory)) {
-    error.Set(RuntimeError::UNKNOWN_ERROR, "Error loading postprocessing symbols.");
+    error.Set(RuntimeError::UNKNOWN_ERROR, g_module_error ());
     return nullptr;
   }
 
@@ -64,31 +66,26 @@ std::shared_ptr<IPostprocessing> ILoader::LoadPostprocessing(
     return nullptr;
   }
 
-  g_free (module);
-
   return std::shared_ptr<IPostprocessing>(postprocessing);
 }
 
-RuntimeError ILoader::LoadModule(const gchar *in_path, GModule *module) {
-  RuntimeError error;
-  gchar *filename = nullptr;
+GModule *ILoader::LoadModule(const gchar *in_path, RuntimeError &error) {
+  GModule *module = nullptr;
 
   if (!in_path) {
     error.Set (RuntimeError::Code::NULL_PARAMETER,
                "Null input path for loading dynamic module.");
-    return error;
+    return nullptr;
   }
-
-  filename = g_filename_from_uri (in_path, nullptr, nullptr);
-  module = g_module_open (filename, (GModuleFlags) G_MODULE_BIND_LOCAL);
-  g_free (filename);
+  module = g_module_open (in_path, G_MODULE_BIND_LOCAL);
 
   if (!module) {
     error.Set (RuntimeError::Code::WRONG_API_USAGE,
                "Error loading dynamic module.");
-    return error;
+    return nullptr;
   } else {
-    return error;
+    return module;
   }
 }
+
 }
