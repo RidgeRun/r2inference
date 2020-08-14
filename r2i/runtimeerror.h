@@ -41,6 +41,11 @@ class RuntimeError {
     WRONG_API_USAGE,
 
     /**
+     * Functionality has not been implemented
+     */
+    NOT_IMPLEMENTED,
+
+    /**
      * A mandatory parameter was passed in as null
      */
     NULL_PARAMETER,

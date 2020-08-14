@@ -60,7 +60,7 @@ r2iincludedir = @R2IINCLUDEDIR@/r2i
 libr2inference_@RR_PACKAGE_VERSION@_la_SOURCES =    \
         datatype.cc                                 \
         iframeworkfactory.cc                        \
-        iloader.cc                                  \
+        loader.cc                                   \
         runtimeerror.cc                             \
         imageformat.cc
 
@@ -94,6 +94,7 @@ r2iinclude_HEADERS =         \
         ipostprocessing.h    \
         iprediction.h        \
         ipreprocessing.h     \
+        loader.h             \
         parametermeta.h      \
         r2i.h                \
         runtimeerror.h

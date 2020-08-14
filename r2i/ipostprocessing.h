@@ -12,8 +12,8 @@
 #ifndef R2I_IPOSTPROCESSING_H
 #define R2I_IPOSTPROCESSING_H
 
-#include <r2i/runtimeerror.h>
 #include <r2i/iprediction.h>
+#include <r2i/runtimeerror.h>
 
 #include <gmodule.h>
 

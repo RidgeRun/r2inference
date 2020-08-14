@@ -9,7 +9,7 @@
  * back to RidgeRun without any encumbrance.
 */
 
-#include "iloader.h"
+#include "loader.h"
 
 #define MODULE_FACTORY_PREPROCESSING_SYMBOL "factory_make_preprocessing"
 #define MODULE_FACTORY_POSTPROCESSING_SYMBOL "factory_make_postprocessing"
@@ -21,7 +21,13 @@ r2i::IPostprocessing *(*PostprocessFactoryFunc) (void);
 
 namespace r2i {
 
-std::shared_ptr<IPreprocessing> ILoader::LoadPreprocessing(
+std::shared_ptr<r2i::IModel> Loader::Load (const std::string & /*in_path*/,
+    r2i::RuntimeError &error) {
+  error.Set(RuntimeError::NOT_IMPLEMENTED, "Loader::Load method not implemented");
+  return nullptr;
+}
+
+std::shared_ptr<IPreprocessing> Loader::LoadPreprocessing(
   const std::string &in_path, RuntimeError &error) {
   PreprocessFactoryFunc factory;
 
@@ -45,7 +51,7 @@ std::shared_ptr<IPreprocessing> ILoader::LoadPreprocessing(
   return std::shared_ptr<IPreprocessing>(preprocessing);
 }
 
-std::shared_ptr<IPostprocessing> ILoader::LoadPostprocessing(
+std::shared_ptr<IPostprocessing> Loader::LoadPostprocessing(
   const std::string &in_path, RuntimeError &error) {
   PostprocessFactoryFunc factory;
 
@@ -69,7 +75,7 @@ std::shared_ptr<IPostprocessing> ILoader::LoadPostprocessing(
   return std::shared_ptr<IPostprocessing>(postprocessing);
 }
 
-GModule *ILoader::LoadModule(const gchar *in_path, RuntimeError &error) {
+GModule *Loader::LoadModule(const gchar *in_path, RuntimeError &error) {
   GModule *module = nullptr;
 
   if (!in_path) {

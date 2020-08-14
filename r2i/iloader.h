@@ -17,8 +17,6 @@
 #include <r2i/ipostprocessing.h>
 #include <r2i/runtimeerror.h>
 
-#include <glib.h>
-#include <gmodule.h>
 #include <memory>
 #include <string>
 
@@ -49,8 +47,9 @@ class ILoader {
    * \param error [out] RuntimeError with a description of an error.
    * \return A loaded IPreprocessing module.
    */
-  std::shared_ptr<IPreprocessing> LoadPreprocessing (const std::string &in_path,
-      RuntimeError &error);
+  virtual std::shared_ptr<IPreprocessing> LoadPreprocessing (
+    const std::string &in_path,
+    RuntimeError &error) = 0;
 
   /**
    * \brief Load postprocessing module.
@@ -58,22 +57,14 @@ class ILoader {
    * \param error [out] RuntimeError with a description of an error.
    * \return A loaded IPostprocessing module.
    */
-  std::shared_ptr<IPostprocessing> LoadPostprocessing (const std::string &in_path,
-      RuntimeError &error);
+  virtual std::shared_ptr<IPostprocessing> LoadPostprocessing (
+    const std::string &in_path,
+    RuntimeError &error) = 0;
 
   /**
    * \brief Default destructor
    */
   virtual ~ILoader () {};
-
- private:
-  /**
-   * \brief Load dynamic libraries modules.
-   * \param in_path A string with the path to the dynamic library.
-   * \param error [out] RuntimeError with a description of an error.
-   * \return Loaded module or Null if the loading failed.
-   */
-  GModule *LoadModule(const gchar *in_path, RuntimeError &error);
 };
 
 }

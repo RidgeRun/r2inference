@@ -12,7 +12,7 @@
 #ifndef R2I_ONNX_LOADER_H
 #define R2I_ONNX_LOADER_H
 
-#include <r2i/iloader.h>
+#include <r2i/loader.h>
 
 #include <core/session/onnxruntime_cxx_api.h>
 
@@ -25,7 +25,7 @@
 namespace r2i {
 namespace onnxrt {
 
-class Loader : public ILoader {
+class Loader : public r2i::Loader {
  public:
   virtual std::shared_ptr<r2i::IModel> Load(const std::string &in_path,
       r2i::RuntimeError &error) override;

@@ -41,7 +41,7 @@ r2inference_sources = [
   'datatype.cc',
   'iframeworkfactory.cc',
   'imageformat.cc',
-  'iloader.cc',
+  'loader.cc',
   'runtimeerror.cc',
 ]
 
@@ -59,6 +59,7 @@ r2inference_headers = [
   'ipostprocessing.h',
   'iprediction.h',
   'ipreprocessing.h',
+  'loader.h',
   'parametermeta.h',
   'r2i.h',
   'runtimeerror.h',
