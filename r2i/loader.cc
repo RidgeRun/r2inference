@@ -38,13 +38,13 @@ std::shared_ptr<IPreprocessing> Loader::LoadPreprocessing(
 
   if (!g_module_symbol (module, MODULE_FACTORY_PREPROCESSING_SYMBOL,
                         (gpointer *) & factory)) {
-    error.Set(RuntimeError::UNKNOWN_ERROR, g_module_error ());
+    error.Set(RuntimeError::MODULE_ERROR, g_module_error ());
     return nullptr;
   }
 
   IPreprocessing *preprocessing = (IPreprocessing *) factory();
   if (!preprocessing) {
-    error.Set(RuntimeError::UNKNOWN_ERROR, "Error casting preprocessing object.");
+    error.Set(RuntimeError::MODULE_ERROR, "Error getting preprocessing object.");
     return nullptr;
   }
 
@@ -62,13 +62,13 @@ std::shared_ptr<IPostprocessing> Loader::LoadPostprocessing(
 
   if (!g_module_symbol (module, MODULE_FACTORY_POSTPROCESSING_SYMBOL,
                         (gpointer *) & factory)) {
-    error.Set(RuntimeError::UNKNOWN_ERROR, g_module_error ());
+    error.Set(RuntimeError::MODULE_ERROR, g_module_error ());
     return nullptr;
   }
 
   IPostprocessing *postprocessing = (IPostprocessing *) factory();
   if (!postprocessing) {
-    error.Set(RuntimeError::UNKNOWN_ERROR, "Error casting postprocessing object.");
+    error.Set(RuntimeError::MODULE_ERROR, "Error getting postprocessing object.");
     return nullptr;
   }
 

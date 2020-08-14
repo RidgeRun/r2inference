@@ -76,6 +76,11 @@ class RuntimeError {
     MEMORY_ERROR,
 
     /**
+     * Error with a dynamic loading of a module
+     */
+    MODULE_ERROR,
+
+    /**
      * The provided engine is incompatible with the current operation
      */
     INCOMPATIBLE_ENGINE,
