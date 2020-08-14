@@ -112,50 +112,6 @@ TEST (TensorflowLoader, LoadSuccess) {
   LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
 }
 
-TEST (TensorflowLoader, LoadPreprocessingWithNullPath) {
-  r2i::RuntimeError error;
-  std::shared_ptr<r2i::tensorflow::Loader> loader (new r2i::tensorflow::Loader);
-
-  std::string string_path;
-
-  std::shared_ptr<r2i::IPreprocessing> preprocessing = loader->LoadPreprocessing(
-        string_path, error);
-
-  CHECK (r2i::RuntimeError::EOK != error.GetCode());
-}
-
-TEST (TensorflowLoader, LoadPreprocessingSetWrongFile) {
-  r2i::RuntimeError error;
-  std::shared_ptr<r2i::tensorflow::Loader> loader (new r2i::tensorflow::Loader);
-
-  std::shared_ptr<r2i::IPreprocessing> preprocessing = loader->LoadPreprocessing(
-        __FILE__, error);
-
-  CHECK (r2i::RuntimeError::EOK != error.GetCode());
-}
-
-TEST (TensorflowLoader, LoadPostprocessingWithNullPath) {
-  r2i::RuntimeError error;
-  std::shared_ptr<r2i::tensorflow::Loader> loader (new r2i::tensorflow::Loader);
-
-  std::string string_path;
-
-  std::shared_ptr<r2i::IPostprocessing> preprocessing =
-    loader->LoadPostprocessing(string_path, error);
-
-  CHECK (r2i::RuntimeError::EOK != error.GetCode());
-}
-
-TEST (TensorflowLoader, LoadPostprocessingSetWrongFile) {
-  r2i::RuntimeError error;
-  std::shared_ptr<r2i::tensorflow::Loader> loader (new r2i::tensorflow::Loader);
-
-  std::shared_ptr<r2i::IPostprocessing> preprocessing =
-    loader->LoadPostprocessing(__FILE__, error);
-
-  CHECK (r2i::RuntimeError::EOK != error.GetCode());
-}
-
 int main (int ac, char **av) {
   return CommandLineTestRunner::RunAllTests (ac, av);
 }

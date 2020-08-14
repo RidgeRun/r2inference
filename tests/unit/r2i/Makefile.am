@@ -13,7 +13,8 @@ AM_DEFAULT_SOURCE_EXT = .cc
 if ENABLE_TESTS
 
 TESTS =                         \
-        iframeworkfactory
+        iframeworkfactory       \
+        loader
 
 check_PROGRAMS=$(TESTS)
 
