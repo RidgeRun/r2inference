@@ -20,11 +20,12 @@
 #include <r2i/runtimeerror.h>
 #include <r2i/onnxrt_openvino/engine.h>
 #include <r2i/onnxrt/model.h>
+#include <r2i/onnxrt/parameters.h>
 
 namespace r2i {
 namespace onnxrt_openvino {
 
-class Parameters: public IParameters {
+class Parameters: public r2i::onnxrt::Parameters {
  public:
   Parameters ();
   RuntimeError Configure (std::shared_ptr<IEngine> in_engine,
@@ -144,11 +145,17 @@ class Parameters: public IParameters {
   };
 
   typedef std::unordered_map<std::string, ParamDesc> ParamMap;
-  const ParamMap parameter_map;
+  ParamMap parameter_map;
 
   ParamDesc Validate (const std::string &in_parameter, int type,
                       const std::string &stype, RuntimeError &error);
 
+  ParameterMeta hardware_id_meta = {
+    .name = "hardware-id",
+    .description = "OpenVINO hardware device id",
+    .flags = r2i::ParameterMeta::Flags::READWRITE | r2i::ParameterMeta::Flags::WRITE_BEFORE_START,
+    .type = r2i::ParameterMeta::Type::STRING
+  };
 };
 
 }  // namespace onnxrt_openvino

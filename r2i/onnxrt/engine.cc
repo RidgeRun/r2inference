@@ -28,7 +28,7 @@ namespace onnxrt {
 Engine::Engine () {
   /* Initialize all variable members */
   logging_level = OrtLoggingLevel::ORT_LOGGING_LEVEL_WARNING;
-  intra_num_threads = 1;
+  intra_num_threads = 0;
   graph_opt_level = GraphOptimizationLevel::ORT_DISABLE_ALL;
   log_id = "";
   state = State::STOPPED;

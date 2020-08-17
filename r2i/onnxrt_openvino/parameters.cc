@@ -16,44 +16,39 @@
 namespace r2i {
 namespace onnxrt_openvino {
 
-#define PARAM(_name, _desc, _flags, _type, _acc) \
-  {						 \
-    (_name),					 \
-    {						 \
-      .meta = {					 \
-	.name = (_name),			 \
-	.description = (_desc),			 \
-	.flags = (_flags),			 \
-	.type = (_type),			 \
-      },					 \
-      .accessor = (_acc)			 \
-    }						 \
-  }
+Parameters::Parameters () {
+  ParamDesc logging_level_desc = {
+    {logging_level_meta},
+    std::make_shared<LoggingLevelAccessor>(this)
+  };
+  parameter_map.emplace(std::make_pair(logging_level_meta.name,
+                                       logging_level_desc));
 
-Parameters::Parameters () :
-  parameter_map ({
-  /* Engine parameters */
-  PARAM("logging-level", "ONNXRT Logging Level",
-        r2i::ParameterMeta::Flags::READWRITE | r2i::ParameterMeta::Flags::WRITE_BEFORE_START,
-        r2i::ParameterMeta::Type::INTEGER,
-        std::make_shared<LoggingLevelAccessor>(this)),
-  PARAM("log-id", "String identification for ONNXRT environment",
-        r2i::ParameterMeta::Flags::READWRITE | r2i::ParameterMeta::Flags::WRITE_BEFORE_START,
-        r2i::ParameterMeta::Type::STRING,
-        std::make_shared<LogIdAccessor>(this)),
-  PARAM("intra-num-threads", "Number of threads to parallelize execution within model nodes",
-        r2i::ParameterMeta::Flags::READWRITE | r2i::ParameterMeta::Flags::WRITE_BEFORE_START,
-        r2i::ParameterMeta::Type::INTEGER,
-        std::make_shared<IntraNumThreadsAccessor>(this)),
-  PARAM("graph-optimization-level", "ONNXRT graph optimization level",
-        r2i::ParameterMeta::Flags::READWRITE | r2i::ParameterMeta::Flags::WRITE_BEFORE_START,
-        r2i::ParameterMeta::Type::INTEGER,
-        std::make_shared<GraphOptLevelAccessor>(this)),
-  PARAM("hardware-id", "OpenVINO hardware device id",
-        r2i::ParameterMeta::Flags::READWRITE | r2i::ParameterMeta::Flags::WRITE_BEFORE_START,
-        r2i::ParameterMeta::Type::STRING,
-        std::make_shared<HardwareIdAccessor>(this)),
-}) {
+  ParamDesc log_id_desc = {
+    {log_id_meta},
+    std::make_shared<LogIdAccessor>(this)
+  };
+  parameter_map.emplace(std::make_pair(log_id_meta.name, log_id_desc));
+
+  ParamDesc intra_num_threads_desc = {
+    {intra_num_threads_meta},
+    std::make_shared<IntraNumThreadsAccessor>(this)
+  };
+  parameter_map.emplace(std::make_pair(intra_num_threads_meta.name,
+                                       intra_num_threads_desc));
+
+  ParamDesc graph_optimization_level_desc = {
+    {graph_optimization_level_meta},
+    std::make_shared<GraphOptLevelAccessor>(this)
+  };
+  parameter_map.emplace(std::make_pair(graph_optimization_level_meta.name,
+                                       graph_optimization_level_desc));
+
+  ParamDesc hardware_id_desc = {
+    {hardware_id_meta},
+    std::make_shared<HardwareIdAccessor>(this)
+  };
+  parameter_map.emplace(std::make_pair(hardware_id_meta.name, hardware_id_desc));
 }
 
 RuntimeError Parameters::Configure (std::shared_ptr<r2i::IEngine> in_engine,
