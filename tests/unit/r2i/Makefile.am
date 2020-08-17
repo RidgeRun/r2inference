@@ -65,6 +65,10 @@ if HAVE_ONNXRT
 SUBDIRS += onnxrt
 endif
 
+if HAVE_ONNXRT_OPENVINO
+SUBDIRS += onnxrt_openvino
+endif
+
 if HAVE_TENSORFLOW
 SUBDIRS += tensorflow
 endif

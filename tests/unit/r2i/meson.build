@@ -20,6 +20,10 @@ if cdata.get('HAVE_ONNXRT') == true
   subdir('onnxrt')
 endif
 
+if cdata.get('HAVE_ONNXRT_OPENVINO') == true
+  subdir('onnxrt_openvino')
+endif
+
 if cdata.get('HAVE_TENSORFLOW') == true
   subdir('tensorflow')
 endif

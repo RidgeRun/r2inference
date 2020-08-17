@@ -128,6 +128,7 @@ tests/unit/Makefile
 tests/unit/r2i/Makefile
 tests/unit/r2i/ncsdk/Makefile
 tests/unit/r2i/onnxrt/Makefile
+tests/unit/r2i/onnxrt_openvino/Makefile
 tests/unit/r2i/tensorflow/Makefile
 tests/unit/r2i/tensorrt/Makefile
 tests/unit/r2i/tflite/Makefile
