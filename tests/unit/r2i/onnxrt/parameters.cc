@@ -280,7 +280,7 @@ TEST (OnnxrtParameters, SetAndGetIntraNumThreads) {
   LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
 
   /* Value different from the default */
-  in_value = 0;
+  in_value = 1;
   error = parameters.Set("intra-num-threads", in_value);
 
   LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());

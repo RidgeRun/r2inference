@@ -43,7 +43,6 @@ class Parameters: public IParameters {
 
  private:
   std::shared_ptr <Engine> engine;
-  std::shared_ptr <Model> model;
 
   friend class Accessor;
 
@@ -137,6 +136,8 @@ class Parameters: public IParameters {
                       const std::string &stype, RuntimeError &error);
 
  protected:
+  std::shared_ptr <Model> model;
+
   ParameterMeta logging_level_meta = {
     .name = "logging-level",
     .description = "ONNXRT Logging Level",

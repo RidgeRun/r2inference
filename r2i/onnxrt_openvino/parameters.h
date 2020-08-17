@@ -19,7 +19,6 @@
 #include <r2i/iparameters.h>
 #include <r2i/runtimeerror.h>
 #include <r2i/onnxrt_openvino/engine.h>
-#include <r2i/onnxrt/model.h>
 #include <r2i/onnxrt/parameters.h>
 
 namespace r2i {
@@ -31,7 +30,6 @@ class Parameters: public r2i::onnxrt::Parameters {
   RuntimeError Configure (std::shared_ptr<IEngine> in_engine,
                           std::shared_ptr<IModel> in_model) override;
   std::shared_ptr<IEngine> GetEngine () override;
-  std::shared_ptr<IModel> GetModel ( ) override;
   RuntimeError Get (const std::string &in_parameter, int &value) override;
   RuntimeError Get (const std::string &in_parameter, double &value) override;
   RuntimeError Get (const std::string &in_parameter,
@@ -44,7 +42,6 @@ class Parameters: public r2i::onnxrt::Parameters {
 
  private:
   std::shared_ptr <Engine> engine;
-  std::shared_ptr <onnxrt::Model> model;
 
   friend class Accessor;
 

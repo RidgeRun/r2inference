@@ -89,11 +89,6 @@ std::shared_ptr<r2i::IEngine> Parameters::GetEngine () {
   return this->engine;
 }
 
-
-std::shared_ptr<r2i::IModel> Parameters::GetModel () {
-  return this->model;
-}
-
 Parameters::ParamDesc Parameters::Validate (const std::string &in_parameter,
     int type, const std::string &stype, RuntimeError &error) {
   ParamDesc undefined = {{.name = "", .description = ""}, nullptr};
