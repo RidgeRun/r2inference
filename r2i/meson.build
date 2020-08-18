@@ -1,5 +1,4 @@
 r2inference_internal_dep = []
-r2inference_internal_dep += [glib, gmodule]
 
 if cdata.get('HAVE_TENSORFLOW') == true
   subdir('tensorflow')
