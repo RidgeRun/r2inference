@@ -34,13 +34,17 @@ libonnxrt_openvino_la_CXXFLAGS =            \
     $(RR_CXXFLAGS)                          \
     $(ONNXRT_CFLAGS)                        \
     $(ONNXRT_OPENVINO_CFLAGS)               \
-    $(CODE_COVERAGE_CXXFLAGS)
+    $(CODE_COVERAGE_CXXFLAGS)               \
+    $(GLIB_CFLAGS)                          \ 
+    $(GMODULE_CFLAGS)
 
 libonnxrt_openvino_la_LIBADD =              \
     $(RR_LIBS)                              \
     $(ONNXRT_LIBS)                          \
     $(ONNXRT_OPENVINO_LIBS)                 \
-    $(CODE_COVERAGE_LIBS)
+    $(CODE_COVERAGE_LIBS)                   \
+    $(GLIB_LIBS)                            \ 
+    $(GMODULE_LIBS)
 
 onnxrt_openvinoinclude_HEADERS =            \
     engine.h                                \

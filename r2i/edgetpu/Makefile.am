@@ -33,13 +33,17 @@ libedgetpu_la_CXXFLAGS =                    \
     $(RR_CXXFLAGS)                          \
     $(TFLITE_CFLAGS)                        \
     $(EDGETPU_CFLAGS)                       \
-    $(CODE_COVERAGE_CXXFLAGS)
+    $(CODE_COVERAGE_CXXFLAGS)               \
+    $(GLIB_CFLAGS)                          \ 
+    $(GMODULE_CFLAGS)
 
 libedgetpu_la_LIBADD =                      \
     $(RR_LIBS)                              \
     $(TFLITE_LIBS)                          \
     $(EDGETPU_LIBS)                         \
-    $(CODE_COVERAGE_LIBS)
+    $(CODE_COVERAGE_LIBS)                   \
+    $(GLIB_LIBS)                            \ 
+    $(GMODULE_LIBS)
 
 tensorflowliteedgetpuinclude_HEADERS =      \
     engine.h                                \

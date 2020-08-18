@@ -33,13 +33,17 @@ libonnxrt_acl_la_CXXFLAGS =                 \
     $(RR_CXXFLAGS)                          \
     $(ONNXRT_CFLAGS)                        \
     $(ONNXRT_ACL_CFLAGS)                    \
-    $(CODE_COVERAGE_CXXFLAGS)
+    $(CODE_COVERAGE_CXXFLAGS)               \
+    $(GLIB_CFLAGS)                          \ 
+    $(GMODULE_CFLAGS)
 
 libonnxrt_acl_la_LIBADD =                   \
     $(RR_LIBS)                              \
     $(ONNXRT_LIBS)                          \
     $(ONNXRT_ACL_LIBS)                      \
-    $(CODE_COVERAGE_LIBS)
+    $(CODE_COVERAGE_LIBS)                   \
+    $(GLIB_LIBS)                            \ 
+    $(GMODULE_LIBS)
 
 onnxrt_aclinclude_HEADERS =                 \
     engine.h                                \

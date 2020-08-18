@@ -74,11 +74,15 @@ libr2inference_@RR_PACKAGE_VERSION@_la_CFLAGS =     \
 
 libr2inference_@RR_PACKAGE_VERSION@_la_CXXFLAGS =   \
         $(RR_CXXFLAGS)                              \
-        $(CODE_COVERAGE_CXXFLAGS)
+        $(CODE_COVERAGE_CXXFLAGS)                   \
+        $(GLIB_CFLAGS)                              \ 
+        $(GMODULE_CFLAGS)
 
 libr2inference_@RR_PACKAGE_VERSION@_la_LIBADD =     \
         $(RR_LIBS)                                  \
-        $(CODE_COVERAGE_LIBS)
+        $(CODE_COVERAGE_LIBS)                       \
+        $(GLIB_LIBS)                                \ 
+        $(GMODULE_LIBS)
 
 r2iinclude_HEADERS =         \
         datatype.h           \
