@@ -15,6 +15,8 @@
 #include <r2i/iframe.h>
 #include <r2i/imodel.h>
 #include <r2i/iprediction.h>
+#include <r2i/ipreprocessing.h>
+#include <r2i/ipostprocessing.h>
 #include <r2i/runtimeerror.h>
 
 #include <memory>
@@ -61,6 +63,32 @@ class IEngine {
   virtual std::shared_ptr<r2i::IPrediction> Predict (std::shared_ptr<r2i::IFrame>
       in_frame,
       r2i::RuntimeError &error) = 0;
+
+  /**
+   * \brief Set an instance of IPreprocessing into Engine.
+   * \param preprocessing Shared pointer on an IPreprocessing object.
+   * \return RuntimeError with a description of an error.
+   */
+  virtual RuntimeError SetPreprocessing (std::shared_ptr<IPreprocessing> preprocessing) = 0;
+
+  /**
+   * \brief Get an instance of IPreprocessing from Engine.
+   * \return An instance of the shared pointer if IPreprocessing stored in Engine.
+   */
+  virtual std::shared_ptr<IPreprocessing> GetPreprocessing () = 0;
+
+  /**
+   * \brief Set an instance of IPostprocessing into Engine.
+   * \param postprocessing Shared pointer on an IPostprocessing object.
+   * \return RuntimeError with a description of an error.
+   */
+  virtual RuntimeError SetPostprocessing (std::shared_ptr<IPostprocessing> postprocessing) = 0;
+
+  /**
+   * \brief Get an instance of IPostprocessing into Engine.
+   * \return An instance of the shared pointer if IPostprocessing stored in Engine.
+   */
+  virtual std::shared_ptr<IPostprocessing> GetPostprocessing () = 0;
 
   /**
    * \brief Default destructor

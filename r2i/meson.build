@@ -38,6 +38,7 @@ endif
 # Define source code
 r2inference_sources = [
   'datatype.cc',
+  'engine.cc',
   'iframeworkfactory.cc',
   'imageformat.cc',
   'loader.cc',
@@ -46,6 +47,7 @@ r2inference_sources = [
 
 r2inference_headers = [
   'datatype.h',
+  'engine.h',
   'frameworkmeta.h',
   'frameworks.h',
   'iengine.h',

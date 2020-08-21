@@ -29,7 +29,6 @@ class Model : public IModel {
  public:
   Model();
 
-  std::shared_ptr<Ort::Session> GetOnnxrtSession();
   RuntimeError Start(const std::string &name) override;
   RuntimeError SetOnnxrtModel(std::shared_ptr<void> model_data,
                               size_t model_data_size);
