@@ -213,6 +213,12 @@ std::shared_ptr<r2i::IPrediction> Engine::Predict (
     return nullptr;
   }
 
+  /* Apply preprocessing, if any */
+  error =  DoPreprocessing (*frame);
+  if (error.IsError ()) {
+    return nullptr;
+  }
+
   frame_format = frame->GetFormat();
   frame_channels = frame_format.GetNumPlanes();
   frame_height = frame->GetHeight();
@@ -235,6 +241,12 @@ std::shared_ptr<r2i::IPrediction> Engine::Predict (
                            this->input_node_dims,
                            prediction);
 
+  if (error.IsError ()) {
+    return nullptr;
+  }
+
+  /* Apply postprocessing, if any */
+  error =  DoPostprocessing (*prediction);
   if (error.IsError ()) {
     return nullptr;
   }

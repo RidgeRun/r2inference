@@ -35,6 +35,11 @@ class Engine : public IEngine {
  private:
   std::shared_ptr<IPreprocessing> preprocessing;
   std::shared_ptr<IPostprocessing> postprocessing;
+
+protected:
+  RuntimeError DoPreprocessing (IFrame &data);
+  RuntimeError DoPostprocessing (IPrediction &prediction);
+
 };
 
 }

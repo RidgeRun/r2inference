@@ -73,4 +73,30 @@ std::shared_ptr<IPostprocessing> Engine::GetPostprocessing () {
   return this->postprocessing;
 }
 
+RuntimeError Engine::DoPreprocessing (IFrame &data) {
+  RuntimeError error;
+
+  /* No preprocessing module set, don't do preprocessing then */
+  if (nullptr == this->preprocessing) {
+    return error;
+  }
+
+  error = this->preprocessing->apply(data);
+
+  return error;
+}
+
+RuntimeError Engine::DoPostprocessing (IPrediction &prediction) {
+  RuntimeError error;
+
+  /* No postprocessing module set, don't do postprocessing then */
+  if (nullptr == this->postprocessing) {
+    return error;
+  }
+
+  error = this->postprocessing->apply(prediction);
+
+  return error;
+}
+
 }
