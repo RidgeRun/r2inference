@@ -35,6 +35,8 @@ class Loader : public ILoader {
     const std::string &in_path,
     RuntimeError &error) override;
 
+  ~Loader () {};
+
  private:
   /**
    * \brief Load dynamic libraries modules.
