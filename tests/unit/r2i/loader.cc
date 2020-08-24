@@ -31,14 +31,14 @@ TEST (Loader, LoadPreprocessingWithNullPath) {
   std::shared_ptr<r2i::IPreprocessing> preprocessing = loader.LoadPreprocessing(
         string_path, error);
 
-  CHECK (r2i::RuntimeError::EOK != error.GetCode());
+  CHECK (r2i::RuntimeError::WRONG_API_USAGE == error.GetCode());
 }
 
 TEST (Loader, LoadPreprocessingSetWrongFile) {
   std::shared_ptr<r2i::IPreprocessing> preprocessing = loader.LoadPreprocessing(
         __FILE__, error);
 
-  CHECK (r2i::RuntimeError::EOK != error.GetCode());
+  CHECK (r2i::RuntimeError::WRONG_API_USAGE == error.GetCode());
 }
 
 TEST (Loader, LoadPostprocessingWithNullPath) {
@@ -47,14 +47,14 @@ TEST (Loader, LoadPostprocessingWithNullPath) {
   std::shared_ptr<r2i::IPostprocessing> preprocessing = loader.LoadPostprocessing(
         string_path, error);
 
-  CHECK (r2i::RuntimeError::EOK != error.GetCode());
+  CHECK (r2i::RuntimeError::WRONG_API_USAGE == error.GetCode());
 }
 
 TEST (Loader, LoadPostprocessingSetWrongFile) {
   std::shared_ptr<r2i::IPostprocessing> preprocessing = loader.LoadPostprocessing(
         __FILE__, error);
 
-  CHECK (r2i::RuntimeError::EOK != error.GetCode());
+  CHECK (r2i::RuntimeError::WRONG_API_USAGE == error.GetCode());
 }
 
 int main (int ac, char **av) {
