@@ -12,7 +12,7 @@
 #ifndef R2I_TENSORFLOW_ENGINE_H
 #define R2I_TENSORFLOW_ENGINE_H
 
-#include <r2i/iengine.h>
+#include <r2i/engine.h>
 
 #include <memory>
 
@@ -21,7 +21,7 @@
 namespace r2i {
 namespace tensorflow {
 
-class Engine : public IEngine {
+class Engine : public r2i::Engine {
  public:
   Engine ();
 

@@ -170,6 +170,12 @@ std::shared_ptr<r2i::IPrediction> Engine::Predict (std::shared_ptr<r2i::IFrame>
     return nullptr;
   }
 
+  /* Apply preprocessing, if any */
+  error =  DoPreprocessing (*frame);
+  if (error.IsError ()) {
+    return nullptr;
+  }
+
   if (this->number_of_threads > 0) {
     interpreter->SetNumThreads(this->number_of_threads);
   }
@@ -216,6 +222,12 @@ std::shared_ptr<r2i::IPrediction> Engine::Predict (std::shared_ptr<r2i::IFrame>
   }
 
   prediction->SetTensorValues(tensor_data.data(), tensor_data.size());
+
+  /* Apply postprocessing, if any */
+  error =  DoPostprocessing (*prediction);
+  if (error.IsError ()) {
+    return nullptr;
+  }
 
   return prediction;
 }

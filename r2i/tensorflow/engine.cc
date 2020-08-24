@@ -188,6 +188,12 @@ std::shared_ptr<r2i::IPrediction> Engine::Predict (std::shared_ptr<r2i::IFrame>
     return nullptr;
   }
 
+  /* Apply preprocessing, if any */
+  error =  DoPreprocessing (*frame);
+  if (error.IsError ()) {
+    return nullptr;
+  }
+
   auto pin_tensor = frame->GetTensor (pgraph, in_operation, error);
   if (error.IsError ()) {
     return nullptr;
@@ -218,6 +224,12 @@ std::shared_ptr<r2i::IPrediction> Engine::Predict (std::shared_ptr<r2i::IFrame>
 
   std::shared_ptr<TF_Tensor> pout_tensor (out_tensor, TF_DeleteTensor);
   prediction->SetTensor (pgraph, out_operation, pout_tensor);
+
+  /* Apply postprocessing, if any */
+  error =  DoPostprocessing (*prediction);
+  if (error.IsError ()) {
+    return nullptr;
+  }
 
   return prediction;
 }

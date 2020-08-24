@@ -93,12 +93,20 @@ std::shared_ptr<r2i::IPrediction> Engine::Predict (std::shared_ptr<r2i::IFrame>
     return nullptr;
   }
 
-  if (!in_frame) {
+  auto frame = std::dynamic_pointer_cast<Frame, IFrame> (in_frame);
+  if (!frame) {
     error.Set (RuntimeError::Code::NULL_PARAMETER,
                "Engine received null frame for prediction");
     return nullptr;
   }
-  data_size = in_frame->GetDataType().GetBytesPerPixel();
+
+  /* Apply preprocessing, if any */
+  error =  DoPreprocessing (*frame);
+  if (error.IsError ()) {
+    return nullptr;
+  }
+
+  data_size = frame->GetDataType().GetBytesPerPixel();
 
   cuda_engine = this->model->GetTRCudaEngine();
   auto prediction = std::make_shared<Prediction>();
@@ -112,7 +120,7 @@ std::shared_ptr<r2i::IPrediction> Engine::Predict (std::shared_ptr<r2i::IFrame>
     nvinfer1::Dims dims = cuda_engine->getBindingDimensions (i);
 
     if (cuda_engine->bindingIsInput(i)) {
-      buffers.emplace_back (in_frame->GetData());
+      buffers.emplace_back (frame->GetData());
     } else {
       output_size = 1;
       for (int d = 0; d < dims.nbDims; ++d) {
@@ -142,8 +150,14 @@ std::shared_ptr<r2i::IPrediction> Engine::Predict (std::shared_ptr<r2i::IFrame>
   }
 
   prediction->SetResultBuffer(output_buff,
-                              output_size / in_frame->GetDataType().GetBytesPerPixel(),
-                              in_frame->GetDataType());
+                              output_size / frame->GetDataType().GetBytesPerPixel(),
+                              frame->GetDataType());
+
+  /* Apply postprocessing, if any */
+  error =  DoPostprocessing (*prediction);
+  if (error.IsError ()) {
+    return nullptr;
+  }
 
   return prediction;
 }

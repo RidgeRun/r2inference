@@ -27,6 +27,46 @@
 
 #define INPUTS 3
 
+static bool preprocessing_fail = false;
+static bool postprocessing_fail = false;
+
+/* Mocks for Pre/Post processing modules */
+namespace mock {
+class Preprocessing : public r2i::IPreprocessing {
+ public:
+  Preprocessing () {}
+  r2i::RuntimeError apply(r2i::IFrame &data) {
+    r2i::RuntimeError error;
+    if (preprocessing_fail) {
+      error.Set (r2i::RuntimeError::Code::NOT_IMPLEMENTED,
+                 "Functionality not implement");
+    }
+    return error;
+  }
+  std::vector<r2i::ImageFormat> getAvailableFormats() {
+    std::vector<r2i::ImageFormat> image_format;
+    return image_format;
+  }
+  std::vector<std::vector<int>> getAvailableDataSizes() {
+    std::vector<std::vector<int>> data_sizes;
+    return data_sizes;
+  }
+};
+
+class Postprocessing : public r2i::IPostprocessing {
+ public:
+  Postprocessing () {}
+  r2i::RuntimeError apply(r2i::IPrediction &prediction) {
+    r2i::RuntimeError error;
+    if (postprocessing_fail) {
+      error.Set (r2i::RuntimeError::Code::NOT_IMPLEMENTED,
+                 "Functionality not implement");
+    }
+    return error;
+  }
+};
+}
+
 class MockModel : public r2i::IModel {
   r2i::RuntimeError Start (const std::string &name) override {
     r2i::RuntimeError error; return error;
@@ -263,6 +303,46 @@ TEST (TensorRTEngine, PredictEngineOutputCudaMallocError) {
   cudaMallocError = true;
   prediction = engine.Predict (frame, error);
   LONGS_EQUAL (r2i::RuntimeError::Code::MEMORY_ERROR, error.GetCode ());
+}
+
+TEST (TensorRTEngine, EnginePredictPreprocessFail) {
+  preprocessing_fail = true;
+  r2i::RuntimeError error;
+  std::shared_ptr<r2i::IPrediction> prediction;
+  std::shared_ptr<r2i::IPreprocessing> preprocessing =
+    std::make_shared<mock::Preprocessing>();
+
+  error = engine.SetModel (model);
+  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
+
+  error = engine.Start ();
+  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
+
+  error = engine.SetPreprocessing(preprocessing);
+
+  prediction = engine.Predict (frame, error);
+  LONGS_EQUAL (r2i::RuntimeError::Code::NOT_IMPLEMENTED,
+               error.GetCode ());
+}
+
+TEST (TensorRTEngine, EnginePredictPostprocessFail) {
+  postprocessing_fail = true;
+  r2i::RuntimeError error;
+  std::shared_ptr<r2i::IPrediction> prediction;
+  std::shared_ptr<r2i::IPostprocessing> postprocessing =
+    std::make_shared<mock::Postprocessing>();
+
+  error = engine.SetModel (model);
+  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
+
+  error = engine.Start ();
+  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
+
+  error = engine.SetPostprocessing(postprocessing);
+
+  prediction = engine.Predict (frame, error);
+  LONGS_EQUAL (r2i::RuntimeError::Code::NOT_IMPLEMENTED,
+               error.GetCode ());
 }
 
 int main (int ac, char **av) {

@@ -12,7 +12,7 @@
 #ifndef R2I_TFLITE_ENGINE_H
 #define R2I_TFLITE_ENGINE_H
 
-#include <r2i/iengine.h>
+#include <r2i/engine.h>
 
 #include <memory>
 #include <vector>
@@ -24,7 +24,7 @@
 namespace r2i {
 namespace tflite {
 
-class Engine : public IEngine {
+class Engine : public r2i::Engine {
  public:
   Engine ();
 

@@ -325,6 +325,12 @@ std::shared_ptr<r2i::IPrediction> Engine::Predict (std::shared_ptr<r2i::IFrame>
     goto engine_error;
   }
 
+  /* Apply preprocessing, if any */
+  error =  DoPreprocessing (*frame);
+  if (error.IsError ()) {
+    return nullptr;
+  }
+
   engine_status = this->GetStatus();
 
   if ( Status:: IDLE == engine_status) {
@@ -400,6 +406,12 @@ std::shared_ptr<r2i::IPrediction> Engine::Predict (std::shared_ptr<r2i::IFrame>
   error = prediction->SetResult(presult, output_data_size);
   if (RuntimeError::Code::EOK != error.GetCode()) {
     goto exit;
+  }
+
+  /* Apply postprocessing, if any */
+  error =  DoPostprocessing (*prediction);
+  if (error.IsError ()) {
+    return nullptr;
   }
 
   return prediction;

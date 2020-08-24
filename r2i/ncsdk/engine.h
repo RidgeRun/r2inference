@@ -12,13 +12,13 @@
 #ifndef R2I_NCSDK_ENGINE_H
 #define R2I_NCSDK_ENGINE_H
 
-#include <r2i/iengine.h>
+#include <r2i/engine.h>
 #include <r2i/ncsdk/model.h>
 
 namespace r2i {
 namespace ncsdk {
 
-class Engine : public IEngine {
+class Engine : public r2i::Engine {
  public:
   Engine ();
 

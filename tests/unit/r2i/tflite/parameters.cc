@@ -19,7 +19,7 @@
 
 namespace mock {
 
-class Engine : public r2i::IEngine {
+class Engine : public r2i::Engine {
  public:
   r2i::RuntimeError Start () {
     return r2i::RuntimeError();

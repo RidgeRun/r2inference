@@ -102,7 +102,6 @@ class Postprocessing : public r2i::IPostprocessing {
     return error;
   }
 };
-
 }
 
 namespace r2i {

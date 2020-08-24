@@ -14,13 +14,13 @@
 
 #include <memory>
 
-#include <r2i/iengine.h>
+#include <r2i/engine.h>
 #include <r2i/tensorrt/model.h>
 
 namespace r2i {
 namespace tensorrt {
 
-class Engine : public IEngine {
+class Engine : public r2i::Engine {
  public:
   Engine ();
 
