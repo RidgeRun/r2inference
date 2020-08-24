@@ -1,5 +1,6 @@
 lib_r2inference_tests = [
   ['iframeworkfactory.cc'],
+  ['engine.cc'],
   ['loader.cc'],
 ]
 
