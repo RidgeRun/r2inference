@@ -52,7 +52,7 @@ class Parameters: public r2i::onnxrt::Parameters {
     virtual RuntimeError Get () = 0;
     virtual ~Accessor() {}
 
-   public:
+   protected:
     Parameters *target;
   };
 

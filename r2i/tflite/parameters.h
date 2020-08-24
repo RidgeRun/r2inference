@@ -67,7 +67,7 @@ class Parameters: public IParameters {
     virtual ~ Accessor () {
     }
 
-   public:
+   protected:
     Parameters *target;
   };
 

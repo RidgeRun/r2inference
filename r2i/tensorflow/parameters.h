@@ -64,7 +64,7 @@ class Parameters : public IParameters {
     virtual RuntimeError Get () = 0;
     virtual ~Accessor() {}
 
-   public:
+   protected:
     Parameters *target;
   };
 
