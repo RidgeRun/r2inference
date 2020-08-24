@@ -14,6 +14,7 @@ if ENABLE_TESTS
 
 TESTS =                         \
         iframeworkfactory       \
+        engine                  \
         loader
 
 check_PROGRAMS=$(TESTS)
