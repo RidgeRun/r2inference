@@ -1,4 +1,4 @@
-/* Copyright (C) 2018-2020 RidgeRun, LLC (http://www.ridgerun.com)
+/* Copyright (C) 2020 RidgeRun, LLC (http://www.ridgerun.com)
  * All Rights Reserved.
  *
  * The contents of this software are proprietary and confidential to RidgeRun,
@@ -9,8 +9,8 @@
  * back to RidgeRun without any encumbrance.
 */
 
-#ifndef R2I_TENSORRT_PARAMETERS_H
-#define R2I_TENSORRT_PARAMETERS_H
+#ifndef R2I_ONNXRT_OPENVINO_PARAMETERS_H
+#define R2I_ONNXRT_OPENVINO_PARAMETERS_H
 
 #include <memory>
 #include <string>
@@ -18,42 +18,30 @@
 
 #include <r2i/iparameters.h>
 #include <r2i/runtimeerror.h>
-#include <r2i/tensorrt/engine.h>
-#include <r2i/tensorrt/model.h>
+#include <r2i/onnxrt_openvino/engine.h>
+#include <r2i/onnxrt/parameters.h>
 
 namespace r2i {
-namespace tensorrt {
+namespace onnxrt_openvino {
 
-class Parameters : public IParameters {
+class Parameters: public r2i::onnxrt::Parameters {
  public:
   Parameters ();
-
   RuntimeError Configure (std::shared_ptr<IEngine> in_engine,
                           std::shared_ptr<IModel> in_model) override;
-
   std::shared_ptr<IEngine> GetEngine () override;
-
-  std::shared_ptr<IModel> GetModel ( ) override;
-
   RuntimeError Get (const std::string &in_parameter, int &value) override;
-
   RuntimeError Get (const std::string &in_parameter, double &value) override;
-
   RuntimeError Get (const std::string &in_parameter,
                     std::string &value) override;
-
   RuntimeError Set (const std::string &in_parameter,
                     const std::string &in_value) override;
-
   RuntimeError Set (const std::string &in_parameter, int in_value) override;
-
   RuntimeError Set (const std::string &in_parameter, double in_value) override;
-
   RuntimeError List (std::vector<ParameterMeta> &metas) override;
 
  private:
-  std::shared_ptr<Engine> engine;
-  std::shared_ptr<Model> model;
+  std::shared_ptr <Engine> engine;
 
   friend class Accessor;
 
@@ -80,30 +68,70 @@ class Parameters : public IParameters {
     int value;
   };
 
-  class VersionAccessor : public StringAccessor {
+  class LoggingLevelAccessor : public IntAccessor {
    public:
-    VersionAccessor (Parameters *target) : StringAccessor(target) {}
+    LoggingLevelAccessor (Parameters *target) : IntAccessor(target) {}
+
     RuntimeError Set () {
-      return RuntimeError (RuntimeError::Code::WRONG_API_USAGE,
-                           "Parameter is not writeable");
+      return target->engine->SetLoggingLevel(this->value);
     }
 
     RuntimeError Get () {
-      this->value = std::to_string(NV_TENSORRT_VERSION);
+      this->value = target->engine->GetLoggingLevel();
       return RuntimeError ();
     }
   };
 
-  class BatchSizeAccessor : public IntAccessor {
+  class LogIdAccessor : public StringAccessor {
    public:
-    BatchSizeAccessor (Parameters *target) : IntAccessor(target) {}
-
+    LogIdAccessor (Parameters *target) : StringAccessor(target) {}
     RuntimeError Set () {
-      return target->engine->SetBatchSize(this->value);
+      return target->engine->SetLogId(this->value);
     }
 
     RuntimeError Get () {
-      this->value = target->engine->GetBatchSize();
+      this->value = target->engine->GetLogId();
+      return RuntimeError ();
+    }
+  };
+
+  class IntraNumThreadsAccessor : public IntAccessor {
+   public:
+    IntraNumThreadsAccessor (Parameters *target) : IntAccessor(target) {}
+
+    RuntimeError Set () {
+      return target->engine->SetIntraNumThreads(this->value);
+    }
+
+    RuntimeError Get () {
+      this->value = target->engine->GetIntraNumThreads();
+      return RuntimeError ();
+    }
+  };
+
+  class GraphOptLevelAccessor : public IntAccessor {
+   public:
+    GraphOptLevelAccessor (Parameters *target) : IntAccessor(target) {}
+
+    RuntimeError Set () {
+      return target->engine->SetGraphOptLevel(this->value);
+    }
+
+    RuntimeError Get () {
+      this->value = target->engine->GetGraphOptLevel();
+      return RuntimeError ();
+    }
+  };
+
+  class HardwareIdAccessor : public StringAccessor {
+   public:
+    HardwareIdAccessor (Parameters *target) : StringAccessor(target) {}
+    RuntimeError Set () {
+      return target->engine->SetHardwareId(this->value);
+    }
+
+    RuntimeError Get () {
+      this->value = target->engine->GetHardwareId();
       return RuntimeError ();
     }
   };
@@ -114,13 +142,20 @@ class Parameters : public IParameters {
   };
 
   typedef std::unordered_map<std::string, ParamDesc> ParamMap;
-  const ParamMap parameter_map;
+  ParamMap parameter_map;
 
   ParamDesc Validate (const std::string &in_parameter, int type,
                       const std::string &stype, RuntimeError &error);
+
+  ParameterMeta hardware_id_meta = {
+    .name = "hardware-id",
+    .description = "OpenVINO hardware device id",
+    .flags = r2i::ParameterMeta::Flags::READWRITE | r2i::ParameterMeta::Flags::WRITE_BEFORE_START,
+    .type = r2i::ParameterMeta::Type::STRING
+  };
 };
 
-} // namespace tensorrt
-} // namespace r2i
+}  // namespace onnxrt_openvino
+}  // namespace r2i
 
-#endif //R2I_TENSORRT_PARAMETERS_H
+#endif //R2I_ONNXRT_OPENVINO_PARAMETERS_H

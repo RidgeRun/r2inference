@@ -2,11 +2,13 @@
 onnxrt_openvino_sources = [
   'engine.cc',
   'frameworkfactory.cc',
+  'parameters.cc',
 ]
 
 onnxrt_openvino_headers = [
   'engine.h',
   'frameworkfactory.h',
+  'parameters.h',
 ]
 
 # Build library

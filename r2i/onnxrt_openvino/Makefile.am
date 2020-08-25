@@ -17,7 +17,8 @@ onnxrt_openvinoincludedir = @R2IINCLUDEDIR@/r2i/onnxrt_openvino
 
 libonnxrt_openvino_la_SOURCES =             \
     engine.cc                               \
-    frameworkfactory.cc 
+    frameworkfactory.cc                     \
+    parameters.cc
 
 libonnxrt_openvino_la_CPPFLAGS =            \
     $(RR_CPPFLAGS)                          \
@@ -43,6 +44,7 @@ libonnxrt_openvino_la_LIBADD =              \
 
 onnxrt_openvinoinclude_HEADERS =            \
     engine.h                                \
-    frameworkfactory.h
+    frameworkfactory.h                      \
+    parameters.h
 
 endif # HAVE_ONNXRT_OPENVINO

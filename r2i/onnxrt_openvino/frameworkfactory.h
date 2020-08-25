@@ -20,6 +20,7 @@ namespace onnxrt_openvino {
 class FrameworkFactory : public r2i::onnxrt::FrameworkFactory {
  public:
   std::unique_ptr<r2i::IEngine> MakeEngine (RuntimeError &error) override;
+  std::unique_ptr<r2i::IParameters> MakeParameters (RuntimeError &error) override;
 
   r2i::FrameworkMeta GetDescription (RuntimeError &error) override;
 };

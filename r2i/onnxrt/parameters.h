@@ -43,7 +43,6 @@ class Parameters: public IParameters {
 
  private:
   std::shared_ptr <Engine> engine;
-  std::shared_ptr <Model> model;
 
   friend class Accessor;
 
@@ -54,7 +53,7 @@ class Parameters: public IParameters {
     virtual RuntimeError Get () = 0;
     virtual ~Accessor() {}
 
-   public:
+   protected:
     Parameters *target;
   };
 
@@ -131,11 +130,38 @@ class Parameters: public IParameters {
   };
 
   typedef std::unordered_map<std::string, ParamDesc> ParamMap;
-  const ParamMap parameter_map;
+  ParamMap parameter_map;
 
   ParamDesc Validate (const std::string &in_parameter, int type,
                       const std::string &stype, RuntimeError &error);
 
+ protected:
+  std::shared_ptr <Model> model;
+
+  ParameterMeta logging_level_meta = {
+    .name = "logging-level",
+    .description = "ONNXRT Logging Level",
+    .flags = r2i::ParameterMeta::Flags::READWRITE | r2i::ParameterMeta::Flags::WRITE_BEFORE_START,
+    .type = r2i::ParameterMeta::Type::INTEGER
+  };
+  ParameterMeta log_id_meta = {
+    .name = "log-id",
+    .description = "String identification for ONNXRT environment",
+    .flags = r2i::ParameterMeta::Flags::READWRITE | r2i::ParameterMeta::Flags::WRITE_BEFORE_START,
+    .type = r2i::ParameterMeta::Type::STRING
+  };
+  ParameterMeta intra_num_threads_meta = {
+    .name = "intra-num-threads",
+    .description = "Number of threads to parallelize execution within model nodes",
+    .flags = r2i::ParameterMeta::Flags::READWRITE | r2i::ParameterMeta::Flags::WRITE_BEFORE_START,
+    .type = r2i::ParameterMeta::Type::INTEGER
+  };
+  ParameterMeta graph_optimization_level_meta = {
+    .name = "graph-optimization-level",
+    .description = "ONNXRT graph optimization level",
+    .flags = r2i::ParameterMeta::Flags::READWRITE | r2i::ParameterMeta::Flags::WRITE_BEFORE_START,
+    .type = r2i::ParameterMeta::Type::INTEGER
+  };
 };
 
 }  // namespace onnxrt

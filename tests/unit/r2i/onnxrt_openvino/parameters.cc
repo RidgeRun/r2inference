@@ -10,9 +10,10 @@
 */
 
 #include <r2i/r2i.h>
-#include <r2i/onnxrt/engine.h>
 #include <r2i/onnxrt/model.h>
-#include <r2i/onnxrt/parameters.h>
+#include <r2i/onnxrt/engine.h>
+#include <r2i/onnxrt_openvino/engine.h>
+#include <r2i/onnxrt_openvino/parameters.h>
 
 #include <CppUTest/CommandLineTestRunner.h>
 #include <CppUTest/TestHarness.h>
@@ -43,24 +44,26 @@ class Engine : public r2i::IEngine {
 }
 
 namespace r2i {
-namespace onnxrt {
 
-Engine::Engine ()  { }
-RuntimeError Engine::Start () {
+RuntimeError r2i::onnxrt::Engine::Start () {
   RuntimeError error;
   this->state = State::STARTED;
   return error;
 }
 
+namespace onnxrt_openvino {
+
+Engine::Engine ()  { }
+
 }
 }
 
-TEST_GROUP (OnnxrtParameters) {
+TEST_GROUP (OnnxrtOpenVinoParameters) {
 };
 
-TEST (OnnxrtParameters, ConfigureIncompatibleEngine) {
+TEST (OnnxrtOpenVinoParameters, ConfigureIncompatibleEngine) {
   r2i::RuntimeError error;
-  r2i::onnxrt::Parameters parameters;
+  r2i::onnxrt_openvino::Parameters parameters;
 
   std::shared_ptr<r2i::IEngine> engine(new mock::Engine);
   std::shared_ptr<r2i::IModel> model(new r2i::onnxrt::Model);
@@ -71,11 +74,11 @@ TEST (OnnxrtParameters, ConfigureIncompatibleEngine) {
   LONGS_EQUAL (r2i::RuntimeError::Code::INCOMPATIBLE_ENGINE, error.GetCode ());
 }
 
-TEST (OnnxrtParameters, ConfigureIncompatibleModel) {
+TEST (OnnxrtOpenVinoParameters, ConfigureIncompatibleModel) {
   r2i::RuntimeError error;
-  r2i::onnxrt::Parameters parameters;
+  r2i::onnxrt_openvino::Parameters parameters;
 
-  std::shared_ptr<r2i::IEngine> engine(new r2i::onnxrt::Engine);
+  std::shared_ptr<r2i::IEngine> engine(new r2i::onnxrt_openvino::Engine);
   std::shared_ptr<r2i::IModel> model(new mock::Model);
 
   error = parameters.Configure(engine, model);
@@ -84,9 +87,9 @@ TEST (OnnxrtParameters, ConfigureIncompatibleModel) {
   LONGS_EQUAL (r2i::RuntimeError::Code::INCOMPATIBLE_MODEL, error.GetCode ());
 }
 
-TEST (OnnxrtParameters, ConfigureNullEngine) {
+TEST (OnnxrtOpenVinoParameters, ConfigureNullEngine) {
   r2i::RuntimeError error;
-  r2i::onnxrt::Parameters parameters;
+  r2i::onnxrt_openvino::Parameters parameters;
 
   std::shared_ptr<r2i::IModel> model(new r2i::onnxrt::Model);
 
@@ -96,11 +99,11 @@ TEST (OnnxrtParameters, ConfigureNullEngine) {
   LONGS_EQUAL (r2i::RuntimeError::Code::NULL_PARAMETER, error.GetCode ());
 }
 
-TEST (OnnxrtParameters, ConfigureNullModel) {
+TEST (OnnxrtOpenVinoParameters, ConfigureNullModel) {
   r2i::RuntimeError error;
-  r2i::onnxrt::Parameters parameters;
+  r2i::onnxrt_openvino::Parameters parameters;
 
-  std::shared_ptr<r2i::IEngine> engine(new r2i::onnxrt::Engine);
+  std::shared_ptr<r2i::IEngine> engine(new r2i::onnxrt_openvino::Engine);
 
   error = parameters.Configure(engine, nullptr);
 
@@ -108,11 +111,11 @@ TEST (OnnxrtParameters, ConfigureNullModel) {
   LONGS_EQUAL (r2i::RuntimeError::Code::NULL_PARAMETER, error.GetCode ());
 }
 
-TEST (OnnxrtParameters, ConfigureSuccess) {
+TEST (OnnxrtOpenVinoParameters, ConfigureSuccess) {
   r2i::RuntimeError error;
-  r2i::onnxrt::Parameters parameters;
+  r2i::onnxrt_openvino::Parameters parameters;
 
-  std::shared_ptr<r2i::IEngine> engine(new r2i::onnxrt::Engine);
+  std::shared_ptr<r2i::IEngine> engine(new r2i::onnxrt_openvino::Engine);
   std::shared_ptr<r2i::IModel> model(new r2i::onnxrt::Model);
 
   error = parameters.Configure(engine, model);
@@ -120,27 +123,11 @@ TEST (OnnxrtParameters, ConfigureSuccess) {
   LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
 }
 
-TEST (OnnxrtParameters, SetAndGetModel) {
+TEST (OnnxrtOpenVinoParameters, SetAndGetEngine) {
   r2i::RuntimeError error;
-  r2i::onnxrt::Parameters parameters;
+  r2i::onnxrt_openvino::Parameters parameters;
 
-  std::shared_ptr<r2i::IEngine> engine(new r2i::onnxrt::Engine);
-  std::shared_ptr<r2i::IModel> model(new r2i::onnxrt::Model);
-
-  error = parameters.Configure(engine, model);
-
-  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
-
-  std::shared_ptr<r2i::IModel> internalModel = parameters.GetModel();
-
-  POINTERS_EQUAL(internalModel.get(), model.get());
-}
-
-TEST (OnnxrtParameters, SetAndGetEngine) {
-  r2i::RuntimeError error;
-  r2i::onnxrt::Parameters parameters;
-
-  std::shared_ptr<r2i::IEngine> engine(new r2i::onnxrt::Engine);
+  std::shared_ptr<r2i::IEngine> engine(new r2i::onnxrt_openvino::Engine);
   std::shared_ptr<r2i::IModel> model(new r2i::onnxrt::Model);
 
   error = parameters.Configure(engine, model);
@@ -152,12 +139,12 @@ TEST (OnnxrtParameters, SetAndGetEngine) {
   POINTERS_EQUAL(internalEngine.get(), engine.get());
 }
 
-TEST (OnnxrtParameters, SetUndefinedIntegerParameter) {
+TEST (OnnxrtOpenVinoParameters, SetUndefinedIntegerParameter) {
   r2i::RuntimeError error;
-  r2i::onnxrt::Parameters parameters;
+  r2i::onnxrt_openvino::Parameters parameters;
   int value;
 
-  std::shared_ptr<r2i::IEngine> engine(new r2i::onnxrt::Engine);
+  std::shared_ptr<r2i::IEngine> engine(new r2i::onnxrt_openvino::Engine);
   std::shared_ptr<r2i::IModel> model(new r2i::onnxrt::Model);
 
   error = parameters.Configure(engine, model);
@@ -169,12 +156,12 @@ TEST (OnnxrtParameters, SetUndefinedIntegerParameter) {
                error.GetCode ());
 }
 
-TEST (OnnxrtParameters, GetUndefinedIntegerParameter) {
+TEST (OnnxrtOpenVinoParameters, GetUndefinedIntegerParameter) {
   r2i::RuntimeError error;
-  r2i::onnxrt::Parameters parameters;
+  r2i::onnxrt_openvino::Parameters parameters;
   int value;
 
-  std::shared_ptr<r2i::IEngine> engine(new r2i::onnxrt::Engine);
+  std::shared_ptr<r2i::IEngine> engine(new r2i::onnxrt_openvino::Engine);
   std::shared_ptr<r2i::IModel> model(new r2i::onnxrt::Model);
 
   error = parameters.Configure(engine, model);
@@ -185,12 +172,12 @@ TEST (OnnxrtParameters, GetUndefinedIntegerParameter) {
                error.GetCode ());
 }
 
-TEST (OnnxrtParameters, SetUndefinedStringParameter) {
+TEST (OnnxrtOpenVinoParameters, SetUndefinedStringParameter) {
   r2i::RuntimeError error;
-  r2i::onnxrt::Parameters parameters;
+  r2i::onnxrt_openvino::Parameters parameters;
   std::string value;
 
-  std::shared_ptr<r2i::IEngine> engine(new r2i::onnxrt::Engine);
+  std::shared_ptr<r2i::IEngine> engine(new r2i::onnxrt_openvino::Engine);
   std::shared_ptr<r2i::IModel> model(new r2i::onnxrt::Model);
 
   error = parameters.Configure(engine, model);
@@ -202,12 +189,12 @@ TEST (OnnxrtParameters, SetUndefinedStringParameter) {
                error.GetCode ());
 }
 
-TEST (OnnxrtParameters, GetUndefinedStringParameter) {
+TEST (OnnxrtOpenVinoParameters, GetUndefinedStringParameter) {
   r2i::RuntimeError error;
-  r2i::onnxrt::Parameters parameters;
+  r2i::onnxrt_openvino::Parameters parameters;
   std::string value;
 
-  std::shared_ptr<r2i::IEngine> engine(new r2i::onnxrt::Engine);
+  std::shared_ptr<r2i::IEngine> engine(new r2i::onnxrt_openvino::Engine);
   std::shared_ptr<r2i::IModel> model(new r2i::onnxrt::Model);
 
   error = parameters.Configure(engine, model);
@@ -218,13 +205,13 @@ TEST (OnnxrtParameters, GetUndefinedStringParameter) {
                error.GetCode ());
 }
 
-TEST (OnnxrtParameters, SetAndGetLogId) {
+TEST (OnnxrtOpenVinoParameters, SetAndGetLogId) {
   r2i::RuntimeError error;
-  r2i::onnxrt::Parameters parameters;
+  r2i::onnxrt_openvino::Parameters parameters;
   std::string in_value;
   std::string out_value;
 
-  std::shared_ptr<r2i::IEngine> engine(new r2i::onnxrt::Engine);
+  std::shared_ptr<r2i::IEngine> engine(new r2i::onnxrt_openvino::Engine);
   std::shared_ptr<r2i::IModel> model(new r2i::onnxrt::Model);
 
   error = parameters.Configure(engine, model);
@@ -242,13 +229,13 @@ TEST (OnnxrtParameters, SetAndGetLogId) {
   STRCMP_EQUAL(in_value.c_str(), out_value.c_str());
 }
 
-TEST (OnnxrtParameters, SetAndGetLoggingLevel) {
+TEST (OnnxrtOpenVinoParameters, SetAndGetLoggingLevel) {
   r2i::RuntimeError error;
-  r2i::onnxrt::Parameters parameters;
+  r2i::onnxrt_openvino::Parameters parameters;
   int in_value;
   int out_value;
 
-  std::shared_ptr<r2i::IEngine> engine(new r2i::onnxrt::Engine);
+  std::shared_ptr<r2i::IEngine> engine(new r2i::onnxrt_openvino::Engine);
   std::shared_ptr<r2i::IModel> model(new r2i::onnxrt::Model);
 
   error = parameters.Configure(engine, model);
@@ -266,13 +253,13 @@ TEST (OnnxrtParameters, SetAndGetLoggingLevel) {
   LONGS_EQUAL(in_value, out_value);
 }
 
-TEST (OnnxrtParameters, SetAndGetIntraNumThreads) {
+TEST (OnnxrtOpenVinoParameters, SetAndGetIntraNumThreads) {
   r2i::RuntimeError error;
-  r2i::onnxrt::Parameters parameters;
+  r2i::onnxrt_openvino::Parameters parameters;
   int in_value;
   int out_value;
 
-  std::shared_ptr<r2i::IEngine> engine(new r2i::onnxrt::Engine);
+  std::shared_ptr<r2i::IEngine> engine(new r2i::onnxrt_openvino::Engine);
   std::shared_ptr<r2i::IModel> model(new r2i::onnxrt::Model);
 
   error = parameters.Configure(engine, model);
@@ -290,13 +277,13 @@ TEST (OnnxrtParameters, SetAndGetIntraNumThreads) {
   LONGS_EQUAL(in_value, out_value);
 }
 
-TEST (OnnxrtParameters, SetAndGetGraphOptLevel) {
+TEST (OnnxrtOpenVinoParameters, SetAndGetGraphOptLevel) {
   r2i::RuntimeError error;
-  r2i::onnxrt::Parameters parameters;
+  r2i::onnxrt_openvino::Parameters parameters;
   int in_value;
   int out_value;
 
-  std::shared_ptr<r2i::IEngine> engine(new r2i::onnxrt::Engine);
+  std::shared_ptr<r2i::IEngine> engine(new r2i::onnxrt_openvino::Engine);
   std::shared_ptr<r2i::IModel> model(new r2i::onnxrt::Model);
 
   error = parameters.Configure(engine, model);
@@ -314,12 +301,36 @@ TEST (OnnxrtParameters, SetAndGetGraphOptLevel) {
   LONGS_EQUAL(in_value, out_value);
 }
 
-TEST (OnnxrtParameters, SetLogIdAtWrongEngineState) {
+TEST (OnnxrtOpenVinoParameters, SetAndGetHardwareId) {
   r2i::RuntimeError error;
-  r2i::onnxrt::Parameters parameters;
+  r2i::onnxrt_openvino::Parameters parameters;
+  std::string in_value;
+  std::string out_value;
+
+  std::shared_ptr<r2i::IEngine> engine(new r2i::onnxrt_openvino::Engine);
+  std::shared_ptr<r2i::IModel> model(new r2i::onnxrt::Model);
+
+  error = parameters.Configure(engine, model);
+
+  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
+
+  /* Value different from the default */
+  in_value = "test";
+  error = parameters.Set("hardware-id", in_value);
+
+  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
+
+  error = parameters.Get("hardware-id", out_value);
+
+  STRCMP_EQUAL(in_value.c_str(), out_value.c_str());
+}
+
+TEST (OnnxrtOpenVinoParameters, SetLogIdAtWrongEngineState) {
+  r2i::RuntimeError error;
+  r2i::onnxrt_openvino::Parameters parameters;
   std::string in_value;
 
-  std::shared_ptr<r2i::IEngine> engine(new r2i::onnxrt::Engine);
+  std::shared_ptr<r2i::IEngine> engine(new r2i::onnxrt_openvino::Engine);
   std::shared_ptr<r2i::IModel> model(new r2i::onnxrt::Model);
 
   error = engine->Start();
@@ -335,12 +346,12 @@ TEST (OnnxrtParameters, SetLogIdAtWrongEngineState) {
   LONGS_EQUAL (r2i::RuntimeError::Code::WRONG_ENGINE_STATE, error.GetCode ());
 }
 
-TEST (OnnxrtParameters, SetLoggingLevelAtWrongEngineState) {
+TEST (OnnxrtOpenVinoParameters, SetLoggingLevelAtWrongEngineState) {
   r2i::RuntimeError error;
-  r2i::onnxrt::Parameters parameters;
+  r2i::onnxrt_openvino::Parameters parameters;
   int in_value;
 
-  std::shared_ptr<r2i::IEngine> engine(new r2i::onnxrt::Engine);
+  std::shared_ptr<r2i::IEngine> engine(new r2i::onnxrt_openvino::Engine);
   std::shared_ptr<r2i::IModel> model(new r2i::onnxrt::Model);
 
   error = engine->Start();
@@ -356,7 +367,7 @@ TEST (OnnxrtParameters, SetLoggingLevelAtWrongEngineState) {
   LONGS_EQUAL (r2i::RuntimeError::Code::WRONG_ENGINE_STATE, error.GetCode ());
 }
 
-TEST (OnnxrtParameters, SetIntraNumThreadsAtWrongEngineState) {
+TEST (OnnxrtOpenVinoParameters, SetIntraNumThreadsAtWrongEngineState) {
   r2i::RuntimeError error;
   r2i::onnxrt::Parameters parameters;
   int in_value;
@@ -377,12 +388,12 @@ TEST (OnnxrtParameters, SetIntraNumThreadsAtWrongEngineState) {
   LONGS_EQUAL (r2i::RuntimeError::Code::WRONG_ENGINE_STATE, error.GetCode ());
 }
 
-TEST (OnnxrtParameters, SetGraphOptLevelAtWrongEngineState) {
+TEST (OnnxrtOpenVinoParameters, SetGraphOptLevelAtWrongEngineState) {
   r2i::RuntimeError error;
-  r2i::onnxrt::Parameters parameters;
+  r2i::onnxrt_openvino::Parameters parameters;
   int in_value;
 
-  std::shared_ptr<r2i::IEngine> engine(new r2i::onnxrt::Engine);
+  std::shared_ptr<r2i::IEngine> engine(new r2i::onnxrt_openvino::Engine);
   std::shared_ptr<r2i::IModel> model(new r2i::onnxrt::Model);
 
   error = engine->Start();
@@ -398,9 +409,30 @@ TEST (OnnxrtParameters, SetGraphOptLevelAtWrongEngineState) {
   LONGS_EQUAL (r2i::RuntimeError::Code::WRONG_ENGINE_STATE, error.GetCode ());
 }
 
-TEST (OnnxrtParameters, SetWrongType) {
+TEST (OnnxrtOpenVinoParameters, SetHardwareIdAtWrongEngineState) {
   r2i::RuntimeError error;
-  r2i::onnxrt::Parameters parameters;
+  r2i::onnxrt_openvino::Parameters parameters;
+  std::string in_value;
+
+  std::shared_ptr<r2i::IEngine> engine(new r2i::onnxrt_openvino::Engine);
+  std::shared_ptr<r2i::IModel> model(new r2i::onnxrt::Model);
+
+  error = engine->Start();
+
+  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
+
+  error = parameters.Configure(engine, model);
+  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
+
+  /* Value different from the default */
+  in_value = "test";
+  error = parameters.Set("hardware-id", in_value);
+  LONGS_EQUAL (r2i::RuntimeError::Code::WRONG_ENGINE_STATE, error.GetCode ());
+}
+
+TEST (OnnxrtOpenVinoParameters, SetWrongType) {
+  r2i::RuntimeError error;
+  r2i::onnxrt_openvino::Parameters parameters;
   int value = 0;
 
   error = parameters.Set("log-id", value);
@@ -409,9 +441,9 @@ TEST (OnnxrtParameters, SetWrongType) {
                error.GetCode ());
 }
 
-TEST (OnnxrtParameters, GetWrongType) {
+TEST (OnnxrtOpenVinoParameters, GetWrongType) {
   r2i::RuntimeError error;
-  r2i::onnxrt::Parameters parameters;
+  r2i::onnxrt_openvino::Parameters parameters;
   int value = 0;
 
   error = parameters.Get("log-id", value);
@@ -420,7 +452,7 @@ TEST (OnnxrtParameters, GetWrongType) {
                error.GetCode ());
 }
 
-TEST (OnnxrtParameters, GetList) {
+TEST (OnnxrtOpenVinoParameters, GetList) {
   r2i::RuntimeError error;
   r2i::onnxrt::Parameters parameters;
   std::vector<r2i::ParameterMeta> desc;

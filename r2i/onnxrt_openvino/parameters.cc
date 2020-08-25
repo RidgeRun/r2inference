@@ -14,7 +14,7 @@
 #include <string>
 
 namespace r2i {
-namespace onnxrt {
+namespace onnxrt_openvino {
 
 Parameters::Parameters () {
   ParamDesc logging_level_desc = {
@@ -43,6 +43,12 @@ Parameters::Parameters () {
   };
   parameter_map.emplace(std::make_pair(graph_optimization_level_meta.name,
                                        graph_optimization_level_desc));
+
+  ParamDesc hardware_id_desc = {
+    {hardware_id_meta},
+    std::make_shared<HardwareIdAccessor>(this)
+  };
+  parameter_map.emplace(std::make_pair(hardware_id_meta.name, hardware_id_desc));
 }
 
 RuntimeError Parameters::Configure (std::shared_ptr<r2i::IEngine> in_engine,
@@ -66,7 +72,7 @@ RuntimeError Parameters::Configure (std::shared_ptr<r2i::IEngine> in_engine,
     return error;
   }
 
-  auto model = std::dynamic_pointer_cast<Model, IModel>(in_model);
+  auto model = std::dynamic_pointer_cast<onnxrt::Model, IModel>(in_model);
   if (nullptr == model) {
     error.Set (RuntimeError::Code::INCOMPATIBLE_MODEL,
                "The provided engine is not an ONNXRT model");
@@ -83,13 +89,9 @@ std::shared_ptr<r2i::IEngine> Parameters::GetEngine () {
   return this->engine;
 }
 
-
-std::shared_ptr<r2i::IModel> Parameters::GetModel () {
-  return this->model;
-}
-
 Parameters::ParamDesc Parameters::Validate (const std::string &in_parameter,
-    int type, const std::string &stype,
+    int type,
+    const std::string &stype,
     RuntimeError &error) {
   ParamDesc undefined = {{.name = "", .description = ""}, nullptr};
 
@@ -212,5 +214,5 @@ RuntimeError Parameters::List (std::vector<ParameterMeta> &metas) {
   return RuntimeError();
 }
 
-}  // namespace onnxrt
+}  // namespace onnxrt_openvino
 }  // namespace r2i
