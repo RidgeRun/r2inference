@@ -10,7 +10,7 @@
 
 R2IVERSION=0.0
 
-CXXFLAGS:= -std=c++11 $(shell pkg-config --cflags r2inference-$(R2IVERSION)) -pthread $(shell pkg-config --cflags glib-2.0 gmodule-2.0)
+CXXFLAGS:= -std=c++11 $(shell pkg-config --cflags r2inference-$(R2IVERSION) glib-2.0 gmodule-2.0) -pthread
 LIBS:=$(shell pkg-config --libs r2inference-$(R2IVERSION)) -pthread
 
 OUT=list-backends
