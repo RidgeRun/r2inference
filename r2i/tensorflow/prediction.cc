@@ -15,7 +15,6 @@
 
 #include <cstring>
 #include <algorithm>
-#include <iostream>
 
 namespace r2i {
 namespace tensorflow {
@@ -94,7 +93,8 @@ RuntimeError Prediction::AddResults(float *data, unsigned int data_size) {
   float *internal_data = (float *)malloc(data_size);
   std::memcpy(internal_data, data, data_size);
 
-  this->results_data.push_back(std::shared_ptr<float []>(internal_data));
+  auto deleter = [](float * p) { free(p); };
+  this->results_data.push_back(std::shared_ptr<float []>(internal_data, deleter));
   this->results_sizes.push_back(data_size);
 
   return error;
