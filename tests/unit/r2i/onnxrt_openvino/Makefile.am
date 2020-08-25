@@ -13,8 +13,7 @@ AM_DEFAULT_SOURCE_EXT = .cc
 if ENABLE_TESTS
 if HAVE_ONNXRT_OPENVINO
 
-TESTS =                   \
-        parameters
+TESTS = parameters
 
 check_PROGRAMS=$(TESTS)
 
