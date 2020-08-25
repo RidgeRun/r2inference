@@ -29,7 +29,7 @@ std::shared_ptr<r2i::IModel> Loader::Load (const std::string & /*in_path*/,
 
 std::shared_ptr<IPreprocessing> Loader::LoadPreprocessing(
   const std::string &in_path, RuntimeError &error) {
-  PreprocessFactoryFunc factory;
+  PreprocessFactoryFunc factory = nullptr;
 
   GModule *module = LoadModule(in_path.c_str(), error);
   if (RuntimeError::EOK != error.GetCode()) {

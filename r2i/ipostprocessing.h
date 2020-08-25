@@ -28,7 +28,7 @@ class IPostprocessing {
 
  public:
   /**
-   * \brief Applys a custom postprocessing to the predicted data.
+   * \brief Applies custom postprocessing to the predicted data.
    * \param prediction returned from the model inference.
    * \return Error with a description message.
    */
@@ -46,12 +46,10 @@ class IPostprocessing {
 extern "C" {
 
   /**
-    * factory_make_postprocessing:
-    *
-    * Return a newly allocated algorithm to be used by IPostprocessing
-    *
-    * Returns: A newly allocated algorithm to be used by IPostprocessing
-    */
+   * \brief factory_make_postprocessing:
+   * Returns a newly allocated algorithm to be used by IPostprocessing.
+   * \return Pointer to IPostprocessing object.
+   */
   G_MODULE_EXPORT r2i::IPostprocessing *factory_make_postprocessing (void);
 }
 

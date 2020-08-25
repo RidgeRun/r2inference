@@ -13,8 +13,8 @@
 #define R2I_ILOADER_H
 
 #include <r2i/imodel.h>
-#include <r2i/ipreprocessing.h>
 #include <r2i/ipostprocessing.h>
+#include <r2i/ipreprocessing.h>
 #include <r2i/runtimeerror.h>
 
 #include <memory>
@@ -24,7 +24,6 @@
  * R2Inference Namespace
  */
 namespace r2i {
-
 /**
  *  Implements the interface to validate a IModel implementation
  *  for an IEngine implementation
