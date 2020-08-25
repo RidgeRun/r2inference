@@ -28,8 +28,8 @@ cpp_args = ['-DHAVE_CONFIG_H']
 cdata = configuration_data()
 
 # define common dependencies
-glib = dependency('glib-2.0')
-gmodule = dependency('gmodule-2.0')
+glib = dependency('glib-2.0', version:'>= 2.0.0', required: true)
+gmodule = dependency('gmodule-2.0', version:'>= 2.0.0', required: true)
 common_deps = [glib, gmodule]
 
 # Initialize preprocessor definitions
