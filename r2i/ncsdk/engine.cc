@@ -326,7 +326,7 @@ std::shared_ptr<r2i::IPrediction> Engine::Predict (std::shared_ptr<r2i::IFrame>
   }
 
   /* Apply preprocessing, if any */
-  error =  DoPreprocessing (*frame);
+  error =  Preprocess (*frame);
   if (error.IsError ()) {
     return nullptr;
   }
@@ -409,7 +409,7 @@ std::shared_ptr<r2i::IPrediction> Engine::Predict (std::shared_ptr<r2i::IFrame>
   }
 
   /* Apply postprocessing, if any */
-  error =  DoPostprocessing (*prediction);
+  error =  Postprocess (*prediction);
   if (error.IsError ()) {
     return nullptr;
   }

@@ -15,13 +15,15 @@ namespace r2i {
 
 RuntimeError Engine::SetModel (std::shared_ptr<r2i::IModel> in_model) {
   RuntimeError error;
-  error.Set(RuntimeError::NOT_IMPLEMENTED, "Engine::SetModel method not implemented");
+  error.Set(RuntimeError::NOT_IMPLEMENTED,
+            "Engine::SetModel method not implemented");
   return error;
 }
 
 RuntimeError Engine::Start () {
   RuntimeError error;
-  error.Set(RuntimeError::NOT_IMPLEMENTED, "Engine::Start method not implemented");
+  error.Set(RuntimeError::NOT_IMPLEMENTED,
+            "Engine::Start method not implemented");
   return error;
 }
 
@@ -32,12 +34,14 @@ RuntimeError Engine::Stop () {
 }
 
 std::shared_ptr<r2i::IPrediction> Engine::Predict (std::shared_ptr<r2i::IFrame>
-      in_frame, r2i::RuntimeError &error) {
-  error.Set(RuntimeError::NOT_IMPLEMENTED, "Engine::Predict method not implemented");
+    in_frame, r2i::RuntimeError &error) {
+  error.Set(RuntimeError::NOT_IMPLEMENTED,
+            "Engine::Predict method not implemented");
   return nullptr;
 }
 
-RuntimeError Engine::SetPreprocessing (std::shared_ptr<IPreprocessing> preprocessing) {
+RuntimeError Engine::SetPreprocessing (std::shared_ptr<IPreprocessing>
+                                       preprocessing) {
   RuntimeError error;
 
   if (nullptr == preprocessing) {
@@ -55,7 +59,8 @@ std::shared_ptr<IPreprocessing> Engine::GetPreprocessing () {
   return this->preprocessing;
 }
 
-RuntimeError Engine::SetPostprocessing (std::shared_ptr<IPostprocessing> postprocessing) {
+RuntimeError Engine::SetPostprocessing (std::shared_ptr<IPostprocessing>
+                                        postprocessing) {
   RuntimeError error;
 
   if (nullptr == postprocessing) {
@@ -73,7 +78,7 @@ std::shared_ptr<IPostprocessing> Engine::GetPostprocessing () {
   return this->postprocessing;
 }
 
-RuntimeError Engine::DoPreprocessing (IFrame &data) {
+RuntimeError Engine::Preprocess (IFrame &data) {
   RuntimeError error;
 
   /* No preprocessing module set, don't do preprocessing then */
@@ -86,7 +91,7 @@ RuntimeError Engine::DoPreprocessing (IFrame &data) {
   return error;
 }
 
-RuntimeError Engine::DoPostprocessing (IPrediction &prediction) {
+RuntimeError Engine::Postprocess (IPrediction &prediction) {
   RuntimeError error;
 
   /* No postprocessing module set, don't do postprocessing then */

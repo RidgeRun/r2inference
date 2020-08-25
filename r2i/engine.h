@@ -22,23 +22,26 @@ namespace r2i {
 class Engine : public IEngine {
  public:
 
-  virtual r2i::RuntimeError SetModel (std::shared_ptr<r2i::IModel> in_model) override;
+  virtual r2i::RuntimeError SetModel (std::shared_ptr<r2i::IModel> in_model)
+  override;
   virtual r2i::RuntimeError Start () override;
   virtual r2i::RuntimeError Stop () override;
   virtual std::shared_ptr<r2i::IPrediction> Predict (std::shared_ptr<r2i::IFrame>
       in_frame, r2i::RuntimeError &error) override;
-  virtual RuntimeError SetPreprocessing (std::shared_ptr<IPreprocessing> preprocessing) override;
+  virtual RuntimeError SetPreprocessing (std::shared_ptr<IPreprocessing>
+                                         preprocessing) override;
   virtual std::shared_ptr<IPreprocessing> GetPreprocessing () override;
-  virtual RuntimeError SetPostprocessing (std::shared_ptr<IPostprocessing> postprocessing) override;
+  virtual RuntimeError SetPostprocessing (std::shared_ptr<IPostprocessing>
+                                          postprocessing) override;
   virtual std::shared_ptr<IPostprocessing> GetPostprocessing () override;
 
  private:
   std::shared_ptr<IPreprocessing> preprocessing;
   std::shared_ptr<IPostprocessing> postprocessing;
 
-protected:
-  RuntimeError DoPreprocessing (IFrame &data);
-  RuntimeError DoPostprocessing (IPrediction &prediction);
+ protected:
+  RuntimeError Preprocess (IFrame &data);
+  RuntimeError Postprocess (IPrediction &prediction);
 
 };
 
