@@ -49,6 +49,11 @@ class Engine : public IEngine {
 
   std::shared_ptr<TF_Session> session;
   std::shared_ptr<Model> model;
+
+  float *GetTensorData(TF_Operation *operation, std::shared_ptr<TF_Tensor> tensor,
+                       RuntimeError &error);
+  int64_t GetRequiredBufferSize (std::shared_ptr<TF_Graph> graph,
+                                 TF_Operation *operation, int index, RuntimeError &error);
 };
 
 }
