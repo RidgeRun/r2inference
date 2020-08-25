@@ -56,9 +56,12 @@ int Frame::GetWidth () { return 224; }
 int Frame::GetHeight () { return 224; }
 
 Prediction::Prediction () {}
-double Prediction::At (unsigned int index,  r2i::RuntimeError &error) { return 0.0; }
-void *Prediction::GetResultData () { return nullptr; }
-unsigned int Prediction::GetResultSize () { return 0; }
+double Prediction::At (unsigned int output_index, unsigned int index,
+                       r2i::RuntimeError &error) { return 0.0; }
+void *Prediction::GetResultData (unsigned int output_index,
+                                 r2i::RuntimeError &error) { return nullptr; }
+unsigned int Prediction::GetResultSize (unsigned int output_index,
+                                        r2i::RuntimeError &error) { return 0; }
 }
 }
 

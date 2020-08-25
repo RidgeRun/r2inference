@@ -215,7 +215,7 @@ std::shared_ptr<r2i::IPrediction> Engine::Predict (std::shared_ptr<r2i::IFrame>
     return nullptr;
   }
 
-  prediction->SetTensorValues(tensor_data.data(), tensor_data.size());
+  prediction->AddResults(tensor_data.data(), tensor_data.size());
 
   return prediction;
 }

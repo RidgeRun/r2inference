@@ -43,14 +43,14 @@ TEST (TfLitePrediction, SetTensorSuccess) {
 
   tensordata = &matrix[0];
 
-  error = prediction.SetTensorValues(tensordata, INPUTS);
+  error = prediction.AddResults(tensordata, INPUTS);
   LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode());
 }
 
 TEST (TfLitePrediction, SetTensorNullValue) {
   r2i::RuntimeError error;
 
-  error = prediction.SetTensorValues(tensordata, INPUTS);
+  error = prediction.AddResults(tensordata, INPUTS);
   LONGS_EQUAL (r2i::RuntimeError::Code::NULL_PARAMETER, error.GetCode());
 }
 
@@ -59,7 +59,7 @@ TEST (TfLitePrediction, SetTensorZeroSize) {
 
   tensordata = &matrix[0];
 
-  error = prediction.SetTensorValues(tensordata, 0);
+  error = prediction.AddResults(tensordata, 0);
   LONGS_EQUAL (r2i::RuntimeError::Code::NULL_PARAMETER, error.GetCode());
 }
 
@@ -68,10 +68,10 @@ TEST (TfLitePrediction, Prediction) {
   tensordata = &matrix[0];
   double result = 0;
 
-  error = prediction.SetTensorValues(tensordata, INPUTS);
+  error = prediction.AddResults(tensordata, INPUTS);
   LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode());
 
-  result = prediction.At (0, error);
+  result = prediction.At (0, 0, error);
   LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode());
   DOUBLES_EQUAL (matrix[0], result, 0.05);
 }
@@ -79,8 +79,8 @@ TEST (TfLitePrediction, Prediction) {
 TEST (TfLitePrediction, PredictionNoTensorValues) {
   r2i::RuntimeError error;
 
-  prediction.At (0, error);
-  LONGS_EQUAL (r2i::RuntimeError::Code::INVALID_FRAMEWORK_PARAMETER,
+  prediction.At (0, 0, error);
+  LONGS_EQUAL (r2i::RuntimeError::Code::MEMORY_ERROR,
                error.GetCode());
 }
 
@@ -89,10 +89,10 @@ TEST (TfLitePrediction, PredictionNonExistentIndex) {
 
   tensordata = &matrix[0];
 
-  error = prediction.SetTensorValues(tensordata, INPUTS);
+  error = prediction.AddResults(tensordata, INPUTS);
   LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode());
 
-  prediction.At (5, error);
+  prediction.At (0, 5, error);
   LONGS_EQUAL (r2i::RuntimeError::Code::MEMORY_ERROR, error.GetCode());
 }
 

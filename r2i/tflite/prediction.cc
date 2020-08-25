@@ -17,63 +17,99 @@
 namespace r2i {
 namespace tflite {
 
-Prediction::Prediction ():
-  outputdata(nullptr), tensorsize(0) {
-}
-Prediction::~Prediction () {
-  if (nullptr != this->outputdata ) {
-    free(this->outputdata);
-  }
+Prediction::Prediction () {
 }
 
-RuntimeError Prediction::SetTensorValues(float *outputdata, int tensorsize) {
+Prediction::~Prediction () {
+  this->results_data.clear();
+  this->results_sizes.clear();
+}
+
+RuntimeError Prediction::AddResults (float *data, unsigned int size) {
   RuntimeError error;
 
-  if (nullptr == outputdata) {
+  if (nullptr == data) {
     error.Set (RuntimeError::Code::NULL_PARAMETER,
                "Invalid tensor values passed to prediction");
     return error;
   }
 
-  if (0 == tensorsize) {
+  if (0 == size) {
     error.Set (RuntimeError::Code::NULL_PARAMETER,
                "Invalid tensor size passed to prediction");
     return error;
   }
 
-  this->tensorsize = tensorsize;
+  float *internal_data = (float *)malloc(size * sizeof(float));
+  memcpy(internal_data, data, size * sizeof(float));
 
-  this->outputdata = (float *) malloc(this->tensorsize * sizeof(float));
+  auto deleter = [](float * p) { free(p); };
+  this->results_data.push_back(std::shared_ptr<float []>(internal_data, deleter));
 
-  memcpy(this->outputdata, outputdata, this->tensorsize * sizeof(float));
+  this->results_sizes.push_back(size);
 
   return error;
 }
 
-double Prediction::At (unsigned int index,  r2i::RuntimeError &error) {
+double Prediction::At (unsigned int output_index, unsigned int index,
+                       r2i::RuntimeError &error) {
   error.Clean ();
 
-  if (nullptr == this->outputdata or 0 == this->tensorsize) {
+  if (output_index >= this->results_data.size()) {
+    error.Set (RuntimeError::Code::MEMORY_ERROR, "Output index out of bounds");
+    return 0;
+  }
+
+  if (nullptr == this->results_data[output_index]
+      or 0 == this->results_sizes[output_index]) {
     error.Set (RuntimeError::Code::INVALID_FRAMEWORK_PARAMETER,
                "Prediction was not properly initialized");
     return 0;
   }
 
-  unsigned int n_results =  this->GetResultSize();
+  unsigned int n_results =  this->GetResultSize(output_index, error);
+  if (RuntimeError::Code::EOK != error.GetCode()) {
+    return 0;
+  }
   if (n_results < index ) {
     error.Set (RuntimeError::Code::MEMORY_ERROR,
                "Triying to access an non-existing index");
     return 0;
   }
-  return this->outputdata[index];
+
+  float *fdata = static_cast<float *>(this->GetResultData(output_index, error));
+  if (RuntimeError::Code::EOK != error.GetCode()) {
+    return 0;
+  }
+  if (nullptr == fdata) {
+    error.Set (RuntimeError::Code::INVALID_FRAMEWORK_PARAMETER,
+               "Prediction result not set yet");
+    return 0;
+  }
+
+  return fdata[index];
 }
 
-void *Prediction::GetResultData () {
-  return (void *)this->outputdata;
+void *Prediction::GetResultData (unsigned int output_index,
+                                 RuntimeError &error) {
+  if (output_index >= this->results_data.size()) {
+    error.Set(RuntimeError::Code::INVALID_FRAMEWORK_PARAMETER,
+              "Output index out of bounds");
+    return 0;
+  }
+
+  return this->results_data[output_index].get();
 }
 
-unsigned int Prediction::GetResultSize () {
-  return this->tensorsize;
+unsigned int Prediction::GetResultSize (unsigned int output_index,
+                                        RuntimeError &error) {
+  if (output_index >= this->results_sizes.size()) {
+    error.Set(RuntimeError::Code::INVALID_FRAMEWORK_PARAMETER,
+              "Output index out of bounds");
+    return 0;
+  }
+
+  return this->results_sizes[output_index];
 }
 }
 }

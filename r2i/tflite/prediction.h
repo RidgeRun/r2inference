@@ -24,14 +24,16 @@ class Prediction: public IPrediction {
  public:
   Prediction ();
   ~Prediction ();
-  double At (unsigned int index,  r2i::RuntimeError &error) override;
-  void *GetResultData () override;
-  unsigned int GetResultSize () override;
-  RuntimeError SetTensorValues(float *outputdata, int tensorsize);
+  double At (unsigned int output_index, unsigned int index,
+             r2i::RuntimeError &error) override;
+  void *GetResultData (unsigned int output_index, RuntimeError &error) override;
+  unsigned int GetResultSize (unsigned int output_index,
+                              RuntimeError &error) override;
+  RuntimeError AddResults (float *data, unsigned int size) override;
 
  private:
-  float *outputdata = NULL;
-  int tensorsize;
+  std::vector<std::shared_ptr<float []>> results_data;
+  std::vector<unsigned int> results_sizes;
 };
 
 }
