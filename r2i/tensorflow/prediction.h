@@ -33,7 +33,7 @@ class Prediction: public IPrediction {
                               RuntimeError &error) override;
 
  private:
-  std::vector<std::shared_ptr<float []>> results_data;
+  std::vector<std::shared_ptr<float>> results_data;
   std::vector<unsigned int> results_sizes;
 };
 

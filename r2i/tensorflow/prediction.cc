@@ -93,8 +93,7 @@ RuntimeError Prediction::AddResults(float *data, unsigned int data_size) {
   float *internal_data = (float *)malloc(data_size);
   std::memcpy(internal_data, data, data_size);
 
-  auto deleter = [](float * p) { free(p); };
-  this->results_data.push_back(std::shared_ptr<float []>(internal_data, deleter));
+  this->results_data.push_back(std::shared_ptr<float>(internal_data, free));
   this->results_sizes.push_back(data_size);
 
   return error;
