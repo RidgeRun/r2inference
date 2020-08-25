@@ -34,7 +34,8 @@ class Engine : public IEngine {
   r2i::RuntimeError Start () override;
   r2i::RuntimeError Stop () override;
   std::shared_ptr<r2i::IPrediction> Predict (std::shared_ptr<r2i::IFrame>
-      in_frame, r2i::RuntimeError &error) override;
+      in_frame,
+      r2i::RuntimeError &error) override;
   r2i::RuntimeError SetLoggingLevel (int logging_level);
   r2i::RuntimeError SetLogId (const std::string &log_id);
   r2i::RuntimeError SetIntraNumThreads (int intra_num_threads);
@@ -70,31 +71,33 @@ class Engine : public IEngine {
   size_t GetSessionOutputCount(std::shared_ptr<Ort::Session> session,
                                RuntimeError &error);
   std::vector<int64_t> GetSessionInputNodeDims(std::shared_ptr<Ort::Session>
-      session, size_t index, RuntimeError &error);
+      session,
+      size_t index,
+      RuntimeError &error);
   size_t GetSessionOutputSize(std::shared_ptr<Ort::Session> session,
                               size_t index, RuntimeError &error);
   const char *GetSessionInputName(std::shared_ptr<Ort::Session> session,
-                                  size_t index,
-                                  OrtAllocator *allocator, RuntimeError &error);
+                                  size_t index, OrtAllocator *allocator,
+                                  RuntimeError &error);
   const char *GetSessionOutputName(std::shared_ptr<Ort::Session> session,
-                                   size_t index,
-                                   OrtAllocator *allocator, RuntimeError &error);
-  float *SessionRun (std::shared_ptr<Ort::Session> session,
-                     std::shared_ptr<Frame> frame,
-                     size_t input_image_size,
-                     std::vector<int64_t> input_node_dims,
-                     std::vector<Ort::Value> &output_tensor,
-                     RuntimeError &error);
+                                   size_t index, OrtAllocator *allocator,
+                                   RuntimeError &error);
+  float *SessionRun(std::shared_ptr<Ort::Session> session,
+                    std::shared_ptr<Frame> frame,
+                    size_t input_image_size,
+                    std::vector<int64_t> input_node_dims,
+                    std::vector<Ort::Value> &output_tensor,
+                    RuntimeError &error);
   r2i::RuntimeError GetSessionInfo(std::shared_ptr<Ort::Session> session,
                                    size_t index);
-  r2i::RuntimeError ValidateInputTensorShape (int channels, int height, int width,
+  r2i::RuntimeError ValidateInputTensorShape(int channels, int height, int width,
       std::vector<int64_t> input_dims);
-  r2i::RuntimeError ScoreModel (std::shared_ptr<Ort::Session> session,
-                                std::shared_ptr<Frame> frame,
-                                size_t input_size,
-                                size_t output_size,
-                                std::vector<int64_t> input_node_dims,
-                                std::shared_ptr<Prediction> prediction);
+  r2i::RuntimeError ScoreModel(std::shared_ptr<Ort::Session> session,
+                               std::shared_ptr<Frame> frame,
+                               size_t input_size,
+                               size_t output_size,
+                               std::vector<int64_t> input_node_dims,
+                               std::shared_ptr<Prediction> prediction);
 
  protected:
   enum State {
@@ -104,7 +107,8 @@ class Engine : public IEngine {
   State state;
 
   virtual void AppendSessionOptionsExecutionProvider(Ort::SessionOptions
-      &session_options, r2i::RuntimeError &error);
+      &session_options,
+      r2i::RuntimeError &error);
 
 };
 

@@ -82,8 +82,9 @@ void Engine::CreateSessionOptions() {
     this->graph_opt_level);
 }
 
-void Engine::AppendSessionOptionsExecutionProvider(Ort::SessionOptions
-    &session_options, r2i::RuntimeError &error) {
+void Engine::AppendSessionOptionsExecutionProvider(
+  Ort::SessionOptions &session_options,
+  r2i::RuntimeError &error) {
 
   /* No implementation needed to use default CPU execution provider */
 
@@ -186,8 +187,9 @@ RuntimeError Engine::Stop () {
   return error;
 }
 
-std::shared_ptr<r2i::IPrediction> Engine::Predict (std::shared_ptr<r2i::IFrame>
-    in_frame, r2i::RuntimeError &error) {
+std::shared_ptr<r2i::IPrediction> Engine::Predict (
+  std::shared_ptr<r2i::IFrame> in_frame,
+  r2i::RuntimeError &error) {
   ImageFormat frame_format;
   int frame_width = 0;
   int frame_height = 0;
@@ -261,7 +263,9 @@ size_t Engine::GetSessionOutputCount(std::shared_ptr<Ort::Session> session,
 }
 
 std::vector<int64_t> Engine::GetSessionInputNodeDims(
-  std::shared_ptr<Ort::Session> session, size_t index, RuntimeError &error) {
+  std::shared_ptr<Ort::Session> session,
+  size_t index,
+  RuntimeError &error) {
   std::vector<int64_t> dims;
   if (nullptr == session) {
     error.Set (RuntimeError::Code:: NULL_PARAMETER,
@@ -305,9 +309,10 @@ const char *Engine::GetSessionInputName(std::shared_ptr<Ort::Session> session,
   return name;
 }
 
-const char *Engine::GetSessionOutputName(std::shared_ptr<Ort::Session> session,
-    size_t index, OrtAllocator *allocator,
-    RuntimeError &error) {
+const char *Engine::GetSessionOutputName(
+  std::shared_ptr<Ort::Session> session,
+  size_t index, OrtAllocator *allocator,
+  RuntimeError &error) {
   const char *name = "";
 
   if (nullptr == session) {
@@ -350,8 +355,10 @@ RuntimeError Engine::GetSessionInfo(std::shared_ptr<Ort::Session> session,
   return error;
 }
 
-RuntimeError Engine::ValidateInputTensorShape (int channels, int height,
-    int width, std::vector<int64_t> input_dims) {
+RuntimeError Engine::ValidateInputTensorShape (
+  int channels, int height,
+  int width,
+  std::vector<int64_t> input_dims) {
   RuntimeError error;
 
   /* We only support 1 batch */

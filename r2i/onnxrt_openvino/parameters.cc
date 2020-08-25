@@ -90,7 +90,9 @@ std::shared_ptr<r2i::IEngine> Parameters::GetEngine () {
 }
 
 Parameters::ParamDesc Parameters::Validate (const std::string &in_parameter,
-    int type, const std::string &stype, RuntimeError &error) {
+    int type,
+    const std::string &stype,
+    RuntimeError &error) {
   ParamDesc undefined = {{.name = "", .description = ""}, nullptr};
 
   error.Clean ();
