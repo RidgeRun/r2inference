@@ -22,6 +22,7 @@ libonnxrt_la_SOURCES =           \
     loader.cc                    \
     model.cc                     \
     parameters.cc                \
+    parameteraccessors.cc        \
     prediction.cc
 
 libonnxrt_la_CPPFLAGS =          \
@@ -54,6 +55,7 @@ onnxrtinclude_HEADERS =          \
     loader.h                     \
     model.h                      \
     parameters.h                 \
+    parameteraccessors.h         \
     prediction.h
 
 endif # HAVE_ONNXRT
