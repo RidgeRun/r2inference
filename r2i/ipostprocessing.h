@@ -32,7 +32,7 @@ class IPostprocessing {
    * \param prediction returned from the model inference.
    * \return Error with a description message.
    */
-  virtual RuntimeError apply(IPrediction &prediction) = 0;
+  virtual RuntimeError Apply(IPrediction &prediction) = 0;
 
   /**
    * \brief Default destructor
@@ -46,11 +46,11 @@ class IPostprocessing {
 extern "C" {
 
   /**
-   * \brief factory_make_postprocessing:
+   * \brief FactoryMakePostprocessing:
    * Returns a newly allocated algorithm to be used by IPostprocessing.
    * \return Pointer to IPostprocessing object.
    */
-  G_MODULE_EXPORT r2i::IPostprocessing *factory_make_postprocessing (void);
+  G_MODULE_EXPORT r2i::IPostprocessing *FactoryMakePostprocessing (void);
 }
 
 #endif // R2I_IPOSTPROCESSING_H

@@ -11,8 +11,8 @@
 
 #include "loader.h"
 
-#define MODULE_FACTORY_PREPROCESSING_SYMBOL "factory_make_preprocessing"
-#define MODULE_FACTORY_POSTPROCESSING_SYMBOL "factory_make_postprocessing"
+#define MODULE_FACTORY_PREPROCESSING_SYMBOL "FactoryMakePreprocessing"
+#define MODULE_FACTORY_POSTPROCESSING_SYMBOL "FactoryMakePostprocessing"
 
 typedef
 r2i::IPreprocessing *(*PreprocessFactoryFunc) (void);
@@ -29,6 +29,7 @@ std::shared_ptr<r2i::IModel> Loader::Load (const std::string & /*in_path*/,
 
 std::shared_ptr<IPreprocessing> Loader::LoadPreprocessing(
   const std::string &in_path, RuntimeError &error) {
+
   PreprocessFactoryFunc factory = nullptr;
 
   GModule *module = LoadModule(in_path.c_str(), error);
@@ -53,6 +54,7 @@ std::shared_ptr<IPreprocessing> Loader::LoadPreprocessing(
 
 std::shared_ptr<IPostprocessing> Loader::LoadPostprocessing(
   const std::string &in_path, RuntimeError &error) {
+
   PostprocessFactoryFunc factory;
 
   GModule *module = LoadModule(in_path.c_str(), error);
@@ -76,6 +78,7 @@ std::shared_ptr<IPostprocessing> Loader::LoadPostprocessing(
 }
 
 GModule *Loader::LoadModule(const gchar *in_path, RuntimeError &error) {
+
   GModule *module = nullptr;
 
   if (!in_path) {

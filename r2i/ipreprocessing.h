@@ -34,19 +34,19 @@ class IPreprocessing {
    * \param data Frame input data.
    * \return Error with a description message.
    */
-  virtual RuntimeError apply(IFrame &data) = 0;
+  virtual RuntimeError Apply(IFrame &data) = 0;
 
   /**
    * \brief Gets the available image formats that can be processed.
    * \return Vector with all the available formats.
    */
-  virtual std::vector<ImageFormat> getAvailableFormats() = 0;
+  virtual std::vector<ImageFormat> GetAvailableFormats() = 0;
 
   /**
    * \brief Gets the available dimensions for the input images
-   * \return Vector with a tuples (width, height) of the available dimensions.
+   * \return Vector with tuples (width, height) of the available dimensions.
    */
-  virtual std::vector<std::vector<int>> getAvailableDataSizes() = 0;
+  virtual std::vector<std::vector<int>> GetAvailableDataSizes() = 0;
 
   /**
    * \brief Default destructor
@@ -60,11 +60,11 @@ class IPreprocessing {
 extern "C" {
 
   /**
-   * \brief factory_make_preprocessing:
+   * \brief FactoryMakePreprocessing:
    * Returns a newly allocated algorithm to be used by IPreprocessing.
    * \return Pointer to IPreprocessing object.
    */
-  G_MODULE_EXPORT r2i::IPreprocessing *factory_make_preprocessing (void);
+  G_MODULE_EXPORT r2i::IPreprocessing *FactoryMakePreprocessing (void);
 }
 
 #endif // R2I_IPREPROCESSING_H
