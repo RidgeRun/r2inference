@@ -79,7 +79,7 @@ RuntimeError Engine::Stop () {
   return RuntimeError();
 }
 
-std::shared_ptr<r2i::IPrediction> Engine::Predict (std::shared_ptr<r2i::IFrame>
+std::shared_ptr<r2i::IPrediction> Engine::Process (std::shared_ptr<r2i::IFrame>
     in_frame, r2i::RuntimeError &error) {
   std::shared_ptr<nvinfer1::ICudaEngine> cuda_engine;
   ImageFormat in_format;
@@ -97,12 +97,6 @@ std::shared_ptr<r2i::IPrediction> Engine::Predict (std::shared_ptr<r2i::IFrame>
   if (!frame) {
     error.Set (RuntimeError::Code::NULL_PARAMETER,
                "Engine received null frame for prediction");
-    return nullptr;
-  }
-
-  /* Apply preprocessing, if any */
-  error =  Preprocess (*frame);
-  if (error.IsError ()) {
     return nullptr;
   }
 
@@ -152,12 +146,6 @@ std::shared_ptr<r2i::IPrediction> Engine::Predict (std::shared_ptr<r2i::IFrame>
   prediction->SetResultBuffer(output_buff,
                               output_size / frame->GetDataType().GetBytesPerPixel(),
                               frame->GetDataType());
-
-  /* Apply postprocessing, if any */
-  error =  Postprocess (*prediction);
-  if (error.IsError ()) {
-    return nullptr;
-  }
 
   return prediction;
 }

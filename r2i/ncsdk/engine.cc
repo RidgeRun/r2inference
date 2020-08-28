@@ -295,7 +295,7 @@ RuntimeError Engine::Stop () {
   return error;
 }
 
-std::shared_ptr<r2i::IPrediction> Engine::Predict (std::shared_ptr<r2i::IFrame>
+std::shared_ptr<r2i::IPrediction> Engine::Process (std::shared_ptr<r2i::IFrame>
     in_frame,
     r2i::RuntimeError &error) {
 
@@ -323,12 +323,6 @@ std::shared_ptr<r2i::IPrediction> Engine::Predict (std::shared_ptr<r2i::IFrame>
     error.Set (RuntimeError::Code::INCOMPATIBLE_MODEL,
                "The provided frame is not an NCSDK frame");
     goto engine_error;
-  }
-
-  /* Apply preprocessing, if any */
-  error =  Preprocess (*frame);
-  if (error.IsError ()) {
-    return nullptr;
   }
 
   engine_status = this->GetStatus();
@@ -406,12 +400,6 @@ std::shared_ptr<r2i::IPrediction> Engine::Predict (std::shared_ptr<r2i::IFrame>
   error = prediction->SetResult(presult, output_data_size);
   if (RuntimeError::Code::EOK != error.GetCode()) {
     goto exit;
-  }
-
-  /* Apply postprocessing, if any */
-  error =  Postprocess (*prediction);
-  if (error.IsError ()) {
-    return nullptr;
   }
 
   return prediction;

@@ -87,6 +87,7 @@ libr2inference_@RR_PACKAGE_VERSION@_la_LIBADD =     \
 
 r2iinclude_HEADERS =         \
         datatype.h           \
+        engine.h             \
         frameworkmeta.h      \
         frameworks.h         \
         iengine.h            \

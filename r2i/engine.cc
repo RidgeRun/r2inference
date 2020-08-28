@@ -35,9 +35,21 @@ RuntimeError Engine::Stop () {
 
 std::shared_ptr<r2i::IPrediction> Engine::Predict (std::shared_ptr<r2i::IFrame>
     in_frame, r2i::RuntimeError &error) {
-  error.Set(RuntimeError::NOT_IMPLEMENTED,
-            "Engine::Predict method not implemented");
-  return nullptr;
+  /* Apply preprocessing, if any */
+  error =  Preprocess (*in_frame);
+  if (error.IsError ()) {
+    return nullptr;
+  }
+  auto prediction = Process(in_frame, error);
+  if (error.IsError ()) {
+    return nullptr;
+  }
+  /* Apply postprocessing, if any */
+  error =  Postprocess (*prediction);
+  if (error.IsError ()) {
+    return nullptr;
+  }
+  return prediction;
 }
 
 RuntimeError Engine::SetPreprocessing (std::shared_ptr<IPreprocessing>
@@ -83,10 +95,12 @@ RuntimeError Engine::Preprocess (IFrame &data) {
 
   /* No preprocessing module set, don't do preprocessing then */
   if (nullptr == this->preprocessing) {
+    error.Set(RuntimeError::Code::EOK,
+              "Preprocessing module has not been set");
     return error;
   }
 
-  error = this->preprocessing->apply(data);
+  error = this->preprocessing->Apply(data);
 
   return error;
 }
@@ -96,12 +110,21 @@ RuntimeError Engine::Postprocess (IPrediction &prediction) {
 
   /* No postprocessing module set, don't do postprocessing then */
   if (nullptr == this->postprocessing) {
+    error.Set(RuntimeError::Code::EOK,
+              "Postprocessing module has not been set");
     return error;
   }
 
-  error = this->postprocessing->apply(prediction);
+  error = this->postprocessing->Apply(prediction);
 
   return error;
+}
+
+std::shared_ptr<r2i::IPrediction> Engine::Process (std::shared_ptr<r2i::IFrame>
+    in_frame, r2i::RuntimeError &error) {
+  error.Set(RuntimeError::NOT_IMPLEMENTED,
+            "Engine::Process method not implemented");
+  return nullptr;
 }
 
 }

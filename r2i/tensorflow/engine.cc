@@ -164,7 +164,7 @@ RuntimeError Engine::Stop () {
   return error;
 }
 
-std::shared_ptr<r2i::IPrediction> Engine::Predict (std::shared_ptr<r2i::IFrame>
+std::shared_ptr<r2i::IPrediction> Engine::Process (std::shared_ptr<r2i::IFrame>
     in_frame, r2i::RuntimeError &error) {
   ImageFormat in_format;
 
@@ -185,12 +185,6 @@ std::shared_ptr<r2i::IPrediction> Engine::Predict (std::shared_ptr<r2i::IFrame>
   if (nullptr == frame) {
     error.Set (RuntimeError::Code::INCOMPATIBLE_MODEL,
                "The provided frame is not an tensorflow frame");
-    return nullptr;
-  }
-
-  /* Apply preprocessing, if any */
-  error =  Preprocess (*frame);
-  if (error.IsError ()) {
     return nullptr;
   }
 
@@ -224,12 +218,6 @@ std::shared_ptr<r2i::IPrediction> Engine::Predict (std::shared_ptr<r2i::IFrame>
 
   std::shared_ptr<TF_Tensor> pout_tensor (out_tensor, TF_DeleteTensor);
   prediction->SetTensor (pgraph, out_operation, pout_tensor);
-
-  /* Apply postprocessing, if any */
-  error =  Postprocess (*prediction);
-  if (error.IsError ()) {
-    return nullptr;
-  }
 
   return prediction;
 }

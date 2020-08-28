@@ -42,7 +42,8 @@ class Engine : public IEngine {
  protected:
   RuntimeError Preprocess (IFrame &data);
   RuntimeError Postprocess (IPrediction &prediction);
-
+  virtual std::shared_ptr<r2i::IPrediction> Process (std::shared_ptr<r2i::IFrame>
+    in_frame, r2i::RuntimeError &error);
 };
 
 }

@@ -187,7 +187,7 @@ RuntimeError Engine::Stop () {
   return error;
 }
 
-std::shared_ptr<r2i::IPrediction> Engine::Predict (
+std::shared_ptr<r2i::IPrediction> Engine::Process (
   std::shared_ptr<r2i::IFrame> in_frame,
   r2i::RuntimeError &error) {
   ImageFormat frame_format;
@@ -213,12 +213,6 @@ std::shared_ptr<r2i::IPrediction> Engine::Predict (
     return nullptr;
   }
 
-  /* Apply preprocessing, if any */
-  error =  Preprocess (*frame);
-  if (error.IsError ()) {
-    return nullptr;
-  }
-
   frame_format = frame->GetFormat();
   frame_channels = frame_format.GetNumPlanes();
   frame_height = frame->GetHeight();
@@ -241,12 +235,6 @@ std::shared_ptr<r2i::IPrediction> Engine::Predict (
                            this->input_node_dims,
                            prediction);
 
-  if (error.IsError ()) {
-    return nullptr;
-  }
-
-  /* Apply postprocessing, if any */
-  error =  Postprocess (*prediction);
   if (error.IsError ()) {
     return nullptr;
   }

@@ -33,9 +33,6 @@ class Engine : public r2i::Engine {
 
   r2i::RuntimeError Stop () override;
 
-  std::shared_ptr<r2i::IPrediction> Predict (std::shared_ptr<r2i::IFrame>
-      in_frame, r2i::RuntimeError &error) override;
-
   ~Engine ();
 
  private:
@@ -49,6 +46,8 @@ class Engine : public r2i::Engine {
 
   std::shared_ptr<TF_Session> session;
   std::shared_ptr<Model> model;
+  virtual std::shared_ptr<r2i::IPrediction> Process (std::shared_ptr<r2i::IFrame>
+    in_frame, r2i::RuntimeError &error) override;
 };
 
 }

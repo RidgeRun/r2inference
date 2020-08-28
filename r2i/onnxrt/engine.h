@@ -33,9 +33,6 @@ class Engine : public r2i::Engine {
   r2i::RuntimeError SetModel (std::shared_ptr<r2i::IModel> in_model) override;
   r2i::RuntimeError Start () override;
   r2i::RuntimeError Stop () override;
-  std::shared_ptr<r2i::IPrediction> Predict (std::shared_ptr<r2i::IFrame>
-      in_frame,
-      r2i::RuntimeError &error) override;
   r2i::RuntimeError SetLoggingLevel (int logging_level);
   r2i::RuntimeError SetLogId (const std::string &log_id);
   r2i::RuntimeError SetIntraNumThreads (int intra_num_threads);
@@ -109,7 +106,8 @@ class Engine : public r2i::Engine {
   virtual void AppendSessionOptionsExecutionProvider(Ort::SessionOptions
       &session_options,
       r2i::RuntimeError &error);
-
+  virtual std::shared_ptr<r2i::IPrediction> Process (std::shared_ptr<r2i::IFrame>
+    in_frame, r2i::RuntimeError &error) override;
 };
 
 }  // namespace onnxrt

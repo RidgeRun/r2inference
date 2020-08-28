@@ -151,7 +151,7 @@ int64_t Engine::GetRequiredBufferSize (TfLiteIntArray *dims) {
   return size;
 }
 
-std::shared_ptr<r2i::IPrediction> Engine::Predict (std::shared_ptr<r2i::IFrame>
+std::shared_ptr<r2i::IPrediction> Engine::Process (std::shared_ptr<r2i::IFrame>
     in_frame, r2i::RuntimeError &error) {
   ImageFormat in_format;
 
@@ -167,12 +167,6 @@ std::shared_ptr<r2i::IPrediction> Engine::Predict (std::shared_ptr<r2i::IFrame>
   if (nullptr == frame) {
     error.Set (RuntimeError::Code::FRAMEWORK_ERROR,
                "The provided frame is not an tensorflow lite frame");
-    return nullptr;
-  }
-
-  /* Apply preprocessing, if any */
-  error =  Preprocess (*frame);
-  if (error.IsError ()) {
     return nullptr;
   }
 
@@ -222,12 +216,6 @@ std::shared_ptr<r2i::IPrediction> Engine::Predict (std::shared_ptr<r2i::IFrame>
   }
 
   prediction->SetTensorValues(tensor_data.data(), tensor_data.size());
-
-  /* Apply postprocessing, if any */
-  error =  Postprocess (*prediction);
-  if (error.IsError ()) {
-    return nullptr;
-  }
 
   return prediction;
 }

@@ -28,9 +28,6 @@ class Engine : public r2i::Engine {
 
   r2i::RuntimeError Stop () override;
 
-  std::shared_ptr<r2i::IPrediction> Predict (std::shared_ptr<r2i::IFrame>
-      in_frame, r2i::RuntimeError &error) override;
-
   ncDeviceHandle_t *GetDeviceHandler ();
   void SetDeviceHandler (ncDeviceHandle_t *handler);
 
@@ -56,8 +53,8 @@ class Engine : public r2i::Engine {
   Status GetStatus ();
   void SetStatus (Status new_status);
   Status status;
-
-
+  virtual std::shared_ptr<r2i::IPrediction> Process (std::shared_ptr<r2i::IFrame>
+    in_frame, r2i::RuntimeError &error) override;
 };
 
 }

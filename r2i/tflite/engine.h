@@ -34,8 +34,6 @@ class Engine : public r2i::Engine {
 
   r2i::RuntimeError Stop () override;
 
-  std::shared_ptr<r2i::IPrediction> Predict (std::shared_ptr<r2i::IFrame>
-      in_frame, r2i::RuntimeError &error) override;
   RuntimeError SetNumberOfThreads (int number_of_threads);
   const int GetNumberOfThreads ();
   RuntimeError SetAllowFP16 (int allow_fp16);
@@ -65,7 +63,8 @@ class Engine : public r2i::Engine {
   void GetOutputTensorData(::tflite::Interpreter *interpreter,
                            std::vector<float> &output_data,
                            r2i::RuntimeError &error);
-
+  virtual std::shared_ptr<r2i::IPrediction> Process (std::shared_ptr<r2i::IFrame>
+    in_frame, r2i::RuntimeError &error) override;
 };
 
 }

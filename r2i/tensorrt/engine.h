@@ -30,9 +30,6 @@ class Engine : public r2i::Engine {
 
   r2i::RuntimeError Stop () override;
 
-  std::shared_ptr<r2i::IPrediction> Predict (std::shared_ptr<r2i::IFrame>
-      in_frame, r2i::RuntimeError &error) override;
-
   r2i::RuntimeError SetBatchSize (const int batchsize);
 
   const int GetBatchSize ();
@@ -42,6 +39,8 @@ class Engine : public r2i::Engine {
  private:
   std::shared_ptr<Model> model;
   int batch_size;
+  virtual std::shared_ptr<r2i::IPrediction> Process (std::shared_ptr<r2i::IFrame>
+    in_frame, r2i::RuntimeError &error) override;
 };
 
 }
