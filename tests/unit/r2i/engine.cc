@@ -16,6 +16,7 @@
 #include <CppUTest/MemoryLeakDetectorMallocMacros.h>
 #include <CppUTest/TestHarness.h>
 
+static bool processing_fail = false;
 static bool preprocessing_fail = false;
 static bool postprocessing_fail = false;
 
@@ -54,6 +55,20 @@ class Postprocessing : public r2i::IPostprocessing {
     return error;
   }
 };
+}
+
+namespace r2i {
+std::shared_ptr<r2i::IPrediction> Engine::Process (std::shared_ptr<r2i::IFrame>
+    in_frame, r2i::RuntimeError &error) {
+  if (processing_fail) {
+    error.Set (r2i::RuntimeError::Code::FRAMEWORK_ERROR,
+               "Failed during inference process");
+    return nullptr;
+  }
+  error.Set(RuntimeError::EOK,
+            "Inference process success");
+  return nullptr;
+}
 }
 
 TEST_GROUP (Engine) {
@@ -104,6 +119,24 @@ TEST (Engine, SetandGetPostprocessing) {
     engine.GetPostprocessing();
 
   POINTERS_EQUAL(internal_postpropressing.get(), postprocessing.get());
+}
+
+TEST (Engine, EnginePredictSuccess) {
+  r2i::RuntimeError error;
+  std::shared_ptr<r2i::IPrediction> prediction;
+  processing_fail=false;
+
+  prediction = engine.Predict (frame, error);
+  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
+}
+
+TEST (Engine, EnginePredictFail) {
+  r2i::RuntimeError error;
+  std::shared_ptr<r2i::IPrediction> prediction;
+  processing_fail=true;
+
+  prediction = engine.Predict (frame, error);
+  LONGS_EQUAL (r2i::RuntimeError::Code::FRAMEWORK_ERROR, error.GetCode ());
 }
 
 TEST (Engine, EnginePredictPreprocessFail) {
