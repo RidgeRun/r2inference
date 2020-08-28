@@ -54,9 +54,6 @@ RuntimeError Engine::SetAllowFP16 (int name) {
   return RuntimeError();
 }
 const int Engine::GetAllowFP16 () { return this->allow_fp16; }
-
-std::shared_ptr<IPrediction> Engine::Predict (std::shared_ptr<IFrame> in_frame,
-    RuntimeError &error) { return nullptr; }
 Engine::~Engine () { }
 
 }

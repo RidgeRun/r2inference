@@ -71,8 +71,6 @@ Engine::Engine ()  { }
 RuntimeError Engine::SetModel (std::shared_ptr<IModel> in_model) { return RuntimeError(); }
 RuntimeError Engine::Start () { return RuntimeError(); }
 RuntimeError Engine::Stop () { return RuntimeError(); }
-std::shared_ptr<IPrediction> Engine::Predict (std::shared_ptr<IFrame> in_frame,
-    RuntimeError &error) { return nullptr; }
 Engine::~Engine () { }
 
 }
