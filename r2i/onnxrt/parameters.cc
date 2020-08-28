@@ -99,6 +99,8 @@ RuntimeError Parameters::Get (const std::string &in_parameter, int &value) {
 
 RuntimeError Parameters::Get (const std::string &in_parameter, double &value) {
   RuntimeError error;
+  error.Set(RuntimeError::NOT_IMPLEMENTED,
+            "Parameters::Get (double) method not implemented");
   return error;
 }
 
@@ -167,6 +169,8 @@ RuntimeError Parameters::Set (const std::string &in_parameter,
 RuntimeError Parameters::Set (const std::string &in_parameter,
                               double in_value) {
   RuntimeError error;
+  error.Set(RuntimeError::NOT_IMPLEMENTED,
+            "Parameters::Set (double) method not implemented");
   return error;
 }
 
