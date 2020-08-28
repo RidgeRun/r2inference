@@ -38,12 +38,16 @@ libncsdk_la_CFLAGS =                \
 libncsdk_la_CXXFLAGS =              \
         $(RR_CXXFLAGS)              \
         $(NCSDK_CFLAGS)             \
-        $(CODE_COVERAGE_CXXFLAGS)
+        $(CODE_COVERAGE_CXXFLAGS)   \
+        $(GLIB_CFLAGS)              \ 
+        $(GMODULE_CFLAGS)
 
 libncsdk_la_LIBADD =                \
         $(RR_LIBS)                  \
         $(NCSDK_LIBS)               \
-        $(CODE_COVERAGE_LIBS)
+        $(CODE_COVERAGE_LIBS)       \
+        $(GLIB_LIBS)                \ 
+        $(GMODULE_LIBS)
 
 ncsdkinclude_HEADERS =              \
         parameters.h                \

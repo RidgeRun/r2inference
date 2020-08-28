@@ -27,6 +27,11 @@ cpp_args = ['-DHAVE_CONFIG_H']
 # Create an empty configuration object to set config.h information
 cdata = configuration_data()
 
+# define common dependencies
+glib = dependency('glib-2.0', version:'>= 2.0.0', required: true)
+gmodule = dependency('gmodule-2.0', version:'>= 2.0.0', required: true)
+common_deps = [glib, gmodule]
+
 # Initialize preprocessor definitions
 cdata.set('HAVE_TENSORFLOW', false)
 cdata.set('HAVE_TFLITE', false)
@@ -40,7 +45,7 @@ cdata.set('HAVE_ONNXRT_OPENVINO', false)
 if get_option('enable-tensorflow')
   tensorflow = cpp.find_library('tensorflow', required: true)
   tensorflow_dep = declare_dependency(dependencies: tensorflow)
-  lib_tf_dep = [tensorflow_dep]
+  lib_tf_dep = [tensorflow_dep, common_deps]
   cdata.set('HAVE_TENSORFLOW', true)
 endif
 
@@ -49,7 +54,7 @@ if get_option('enable-tflite') or get_option('enable-edgetpu')
   tensorflow_lite = cpp.find_library('tensorflow-lite', required: true)
   tensorflow_lite_dep = declare_dependency(dependencies: tensorflow_lite)
   thread_dep = dependency('threads')
-  lib_tflite_dep = [tensorflow_lite_dep, thread_dep]
+  lib_tflite_dep = [tensorflow_lite_dep, thread_dep, common_deps]
   cdata.set('HAVE_TFLITE', true)
 endif
 
@@ -60,7 +65,7 @@ if get_option('enable-edgetpu')
     thread_dep = dependency('threads')
     dl_dep = cpp.find_library('dl', required : true)
     rt_dep = cpp.find_library('rt', required : true)
-    lib_edgetpu_dep = [edgetpu_dep, lib_tflite_dep, dl_dep, rt_dep]
+    lib_edgetpu_dep = [edgetpu_dep, lib_tflite_dep, dl_dep, rt_dep, common_deps]
     cdata.set('HAVE_EDGETPU', true)
 endif
 
@@ -89,7 +94,7 @@ if get_option('enable-tensorrt')
 
   tensorrt = cpp.find_library('nvinfer', required: true)
   tensorrt_dep = declare_dependency(dependencies: tensorrt)
-  lib_trt_dep = [tensorrt_dep, cuda_dep, cudart_dep]
+  lib_trt_dep = [tensorrt_dep, cuda_dep, cudart_dep, common_deps]
   cdata.set('HAVE_TENSORRT', true)
 endif
 
@@ -97,7 +102,7 @@ endif
 if get_option('enable-onnxrt') or get_option('enable-onnxrt-acl') or get_option('enable-onnxrt-openvino')
   onnxrt = cpp.find_library('onnxruntime', required: true)
   onnxrt_dep = declare_dependency(dependencies: onnxrt)
-  lib_onnxrt_dep = [onnxrt_dep]
+  lib_onnxrt_dep = [onnxrt_dep, common_deps]
   cdata.set('HAVE_ONNXRT', true)
 endif
 
@@ -109,7 +114,7 @@ if get_option('enable-onnxrt-acl')
   arm_compute_core_dep = declare_dependency(dependencies: arm_compute_core)
   arm_compute_graph = cpp.find_library('arm_compute_graph', required: true)
   arm_compute_graph_dep = declare_dependency(dependencies: arm_compute_graph)
-  lib_onnxrt_acl_dep = [arm_compute_dep, arm_compute_core_dep, arm_compute_graph_dep, lib_onnxrt_dep]
+  lib_onnxrt_acl_dep = [arm_compute_dep, arm_compute_core_dep, arm_compute_graph_dep, lib_onnxrt_dep, common_deps]
   lib_onnxrt_dep += [lib_onnxrt_acl_dep]
   cdata.set('HAVE_ONNXRT_ACL', true)
 endif

@@ -60,6 +60,7 @@ r2iincludedir = @R2IINCLUDEDIR@/r2i
 libr2inference_@RR_PACKAGE_VERSION@_la_SOURCES =    \
         datatype.cc                                 \
         iframeworkfactory.cc                        \
+        loader.cc                                   \
         runtimeerror.cc                             \
         imageformat.cc
 
@@ -73,11 +74,15 @@ libr2inference_@RR_PACKAGE_VERSION@_la_CFLAGS =     \
 
 libr2inference_@RR_PACKAGE_VERSION@_la_CXXFLAGS =   \
         $(RR_CXXFLAGS)                              \
-        $(CODE_COVERAGE_CXXFLAGS)
+        $(CODE_COVERAGE_CXXFLAGS)                   \
+        $(GLIB_CFLAGS)                              \ 
+        $(GMODULE_CFLAGS)
 
 libr2inference_@RR_PACKAGE_VERSION@_la_LIBADD =     \
         $(RR_LIBS)                                  \
-        $(CODE_COVERAGE_LIBS)
+        $(CODE_COVERAGE_LIBS)                       \
+        $(GLIB_LIBS)                                \ 
+        $(GMODULE_LIBS)
 
 r2iinclude_HEADERS =         \
         datatype.h           \
@@ -90,7 +95,10 @@ r2iinclude_HEADERS =         \
         imageformat.h        \
         imodel.h             \
         iparameters.h        \
+        ipostprocessing.h    \
         iprediction.h        \
+        ipreprocessing.h     \
+        loader.h             \
         parametermeta.h      \
         r2i.h                \
         runtimeerror.h

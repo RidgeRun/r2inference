@@ -41,6 +41,11 @@ class RuntimeError {
     WRONG_API_USAGE,
 
     /**
+     * Functionality has not been implemented
+     */
+    NOT_IMPLEMENTED,
+
+    /**
      * A mandatory parameter was passed in as null
      */
     NULL_PARAMETER,
@@ -69,6 +74,11 @@ class RuntimeError {
      * Allocation or memory management error
      */
     MEMORY_ERROR,
+
+    /**
+     * Error with a dynamic loading of a module
+     */
+    MODULE_ERROR,
 
     /**
      * The provided engine is incompatible with the current operation

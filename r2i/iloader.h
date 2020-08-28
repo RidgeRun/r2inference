@@ -13,6 +13,8 @@
 #define R2I_ILOADER_H
 
 #include <r2i/imodel.h>
+#include <r2i/ipostprocessing.h>
+#include <r2i/ipreprocessing.h>
 #include <r2i/runtimeerror.h>
 
 #include <memory>
@@ -37,6 +39,26 @@ class ILoader {
    */
   virtual std::shared_ptr<r2i::IModel> Load (const std::string &in_path,
       r2i::RuntimeError &error) = 0;
+
+  /**
+   * \brief Load preprocessing module.
+   * \param in_path A string of the absolute path to the preprocessing module to load.
+   * \param error [out] RuntimeError with a description of an error.
+   * \return A loaded IPreprocessing module.
+   */
+  virtual std::shared_ptr<IPreprocessing> LoadPreprocessing (
+    const std::string &in_path,
+    RuntimeError &error) = 0;
+
+  /**
+   * \brief Load postprocessing module.
+   * \param in_path A string of the absolute path to the postprocessing module to load.
+   * \param error [out] RuntimeError with a description of an error.
+   * \return A loaded IPostprocessing module.
+   */
+  virtual std::shared_ptr<IPostprocessing> LoadPostprocessing (
+    const std::string &in_path,
+    RuntimeError &error) = 0;
 
   /**
    * \brief Default destructor

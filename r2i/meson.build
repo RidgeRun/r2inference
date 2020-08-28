@@ -2,7 +2,7 @@ r2inference_internal_dep = []
 
 if cdata.get('HAVE_TENSORFLOW') == true
   subdir('tensorflow')
-  r2inference_internal_dep = [internal_tf_dep]
+  r2inference_internal_dep += [internal_tf_dep]
 endif
 
 if cdata.get('HAVE_TFLITE') == true
@@ -40,6 +40,7 @@ r2inference_sources = [
   'datatype.cc',
   'iframeworkfactory.cc',
   'imageformat.cc',
+  'loader.cc',
   'runtimeerror.cc',
 ]
 
@@ -54,7 +55,10 @@ r2inference_headers = [
   'imageformat.h',
   'imodel.h',
   'iparameters.h',
+  'ipostprocessing.h',
   'iprediction.h',
+  'ipreprocessing.h',
+  'loader.h',
   'parametermeta.h',
   'r2i.h',
   'runtimeerror.h',

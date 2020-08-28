@@ -13,7 +13,8 @@ AM_DEFAULT_SOURCE_EXT = .cc
 if ENABLE_TESTS
 
 TESTS =                         \
-        iframeworkfactory
+        iframeworkfactory       \
+        loader
 
 check_PROGRAMS=$(TESTS)
 
@@ -30,7 +31,9 @@ LOG_DRIVER=$(top_builddir)/common/rr-test-driver.py $(SINGLE_PROCESS)
 AM_CXXFLAGS =                      \
         $(RR_CXXFLAGS)             \
         $(TESTS_CFLAGS)            \
-        $(CODE_COVERAGE_CXXFLAGS)
+        $(CODE_COVERAGE_CXXFLAGS)  \
+        $(GLIB_CFLAGS)             \
+        $(GMODULE_CFLAGS)
 
 AM_CFLAGS =                        \
         $(RR_CFLAGS)               \
