@@ -14,30 +14,19 @@
 
 #include <memory>
 
-#include <r2i/iprediction.h>
 #include <r2i/datatype.h>
+#include <r2i/prediction.h>
 #include <r2i/runtimeerror.h>
 
 namespace r2i {
 namespace tensorrt {
 
-class Prediction: public IPrediction {
+class Prediction: public r2i::Prediction {
  public:
   Prediction ();
-
-  double At (unsigned int index,  r2i::RuntimeError &error) override;
-
-  void *GetResultData () override;
-
-  unsigned int GetResultSize () override;
-
-  RuntimeError SetResultBuffer (std::shared_ptr<void> results, size_t num,
-                                DataType data_type);
-
- private:
-  std::shared_ptr<void> result_buffer;
-  size_t num;
-  DataType data_type;
+  RuntimeError AddResult (float *data, unsigned int size) override;
+  RuntimeError InsertResult (unsigned int output_index, float *data,
+                             unsigned int size) override;
 };
 
 }

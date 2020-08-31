@@ -21,16 +21,17 @@ namespace r2i {
 class Prediction: public IPrediction {
  public:
   ~Prediction ();
-  double At (unsigned int output_index, unsigned int index,
-             r2i::RuntimeError &error) override;
-  void *GetResultData (unsigned int output_index, RuntimeError &error) override;
-  unsigned int GetResultSize (unsigned int output_index,
-                              RuntimeError &error) override;
-  RuntimeError AddResult (float *data, unsigned int size) override;
-  RuntimeError InsertResult (unsigned int output_index, float *data,
-                             unsigned int size) override;
+  virtual double At (unsigned int output_index, unsigned int index,
+                     r2i::RuntimeError &error) override;
+  virtual void *GetResultData (unsigned int output_index,
+                               RuntimeError &error) override;
+  virtual unsigned int GetResultSize (unsigned int output_index,
+                                      RuntimeError &error) override;
+  virtual RuntimeError AddResult (float *data, unsigned int size) override;
+  virtual RuntimeError InsertResult (unsigned int output_index, float *data,
+                                     unsigned int size) override;
 
- private:
+ protected:
   std::vector<std::shared_ptr<float>> results_data;
   std::vector<unsigned int> results_sizes;
 };

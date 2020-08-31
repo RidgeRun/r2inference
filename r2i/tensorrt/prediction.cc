@@ -21,96 +21,75 @@ Prediction::Prediction () {
 }
 
 
-RuntimeError Prediction::SetResultBuffer (std::shared_ptr<void> result_buffer,
-    size_t num, DataType data_type) {
-  cudaError_t cuda_error;
+RuntimeError Prediction::AddResult (float *data, unsigned int size) {
   RuntimeError error;
-  std::shared_ptr<void> buff;
+  cudaError_t cuda_error;
 
-  buff = std::shared_ptr<void>(malloc(num * data_type.GetBytesPerPixel()), free);
-  if (!buff) {
-    error.Set (RuntimeError::Code::MEMORY_ERROR,
-               "Unable to allocate memory for result");
-    return error;
-  }
-
-  if (nullptr == result_buffer) {
+  if (nullptr == data) {
     error.Set (RuntimeError::Code::NULL_PARAMETER,
-               "Invalid result buffer passed to prediction");
+               "Invalid tensor values passed to prediction");
     return error;
   }
 
-  cuda_error = cudaMemcpy(buff.get(),
-                          result_buffer.get(),
-                          num * data_type.GetBytesPerPixel(),
-                          cudaMemcpyDeviceToHost);
+  if (0 == size) {
+    error.Set (RuntimeError::Code::NULL_PARAMETER,
+               "Invalid tensor size passed to prediction");
+    return error;
+  }
+
+  float *internal_data = (float *)malloc(size * sizeof(float));
+  if (nullptr == internal_data) {
+    error.Set(RuntimeError::Code::MEMORY_ERROR,
+              "Error while allocating prediction result memory.");
+    return error;
+  }
+
+  cuda_error = cudaMemcpy(internal_data, data, size, cudaMemcpyDeviceToHost);
   if (cudaSuccess != cuda_error) {
     error.Set (RuntimeError::Code::MEMORY_ERROR,
                "Unable to read data from CUDA");
     return error;
   }
 
-  this->result_buffer = std::shared_ptr<void>(buff);
-  this->num = num;
-  this->data_type = data_type;
+  this->results_data.push_back(std::shared_ptr<float>(internal_data, free));
+  this->results_sizes.push_back(size);
 
   return error;
 }
 
-unsigned int Prediction::GetResultSize () {
-  return this->num * this->data_type.GetBytesPerPixel();
-}
+RuntimeError Prediction::InsertResult(unsigned int output_index, float *data,
+                                      unsigned int size) {
+  RuntimeError error;
+  cudaError_t cuda_error;
 
-void *Prediction::GetResultData () {
-  if (nullptr == this->result_buffer) {
-    return nullptr;
+  if (output_index >= this->results_data.size()) {
+    error.Set(RuntimeError::Code::INVALID_FRAMEWORK_PARAMETER,
+              "Output index out of bounds");
+    return error;
   }
-
-  return result_buffer.get();
-}
-
-template <class T>
-static double PointerToResult (void *buff, unsigned int index,
-                               RuntimeError &error) {
-  T *data = static_cast<T *>(buff);
 
   if (nullptr == data) {
-    error.Set (RuntimeError::Code::INVALID_FRAMEWORK_PARAMETER,
-               "Prediction result not set yet");
-    return 0;
+    error.Set (RuntimeError::Code::NULL_PARAMETER,
+               "Invalid tensor values passed to prediction");
+    return error;
   }
 
-  return data[index];
-}
-
-double Prediction::At (unsigned int index, RuntimeError &error) {
-  error.Clean ();
-  double result;
-
-  if (nullptr == this->result_buffer) {
-    error.Set (RuntimeError::Code::INVALID_FRAMEWORK_PARAMETER,
-               "Prediction was not properly initialized");
-    return 0;
+  if (0 == size) {
+    error.Set (RuntimeError::Code::NULL_PARAMETER,
+               "Invalid tensor size passed to prediction");
+    return error;
   }
 
-  unsigned int n_results =  this->num;
-  if ( n_results < index ) {
+  float *internal_data = this->results_data[output_index].get();
+
+  cuda_error = cudaMemcpy(internal_data, data, size, cudaMemcpyDeviceToHost);
+  if (cudaSuccess != cuda_error) {
     error.Set (RuntimeError::Code::MEMORY_ERROR,
-               "Trying to access an non-existing index");
-    return 0;
+               "Unable to read data from CUDA");
+    return error;
   }
 
-  switch ( this->data_type.GetId() ) {
-    case DataType::FLOAT :
-      result = PointerToResult<float>( this->GetResultData(), index, error);
-      break;
-    default :
-      result = 0;
-      error.Set (RuntimeError::Code::WRONG_API_USAGE,
-                 "Unsupported data type");
-  }
-
-  return result;
+  return error;
 }
 
 }

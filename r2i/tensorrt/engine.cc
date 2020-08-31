@@ -141,9 +141,15 @@ std::shared_ptr<r2i::IPrediction> Engine::Predict (std::shared_ptr<r2i::IFrame>
     return nullptr;
   }
 
-  prediction->SetResultBuffer(output_buff,
-                              output_size / in_frame->GetDataType().GetBytesPerPixel(),
-                              in_frame->GetDataType());
+  float *predicted_data = static_cast<float *>(output_buff.get());
+
+  if (nullptr == predicted_data) {
+    error.Set (RuntimeError::Code::INVALID_FRAMEWORK_PARAMETER,
+               "Prediction result not set yet");
+    return 0;
+  }
+
+  prediction->AddResult(predicted_data, output_size);
 
   return prediction;
 }
