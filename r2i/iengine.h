@@ -66,10 +66,11 @@ class IEngine {
 
   /**
    * \brief Set an instance of IPreprocessing into Engine.
-   * \param preprocessing Shared pointer on an IPreprocessing object.
+   * \param preprocessing Shared pointer of an IPreprocessing object.
    * \return RuntimeError with a description of an error.
    */
-  virtual RuntimeError SetPreprocessing (std::shared_ptr<IPreprocessing> preprocessing) = 0;
+  virtual RuntimeError SetPreprocessing (std::shared_ptr<IPreprocessing>
+                                         preprocessing) = 0;
 
   /**
    * \brief Get an instance of IPreprocessing from Engine.
@@ -79,10 +80,11 @@ class IEngine {
 
   /**
    * \brief Set an instance of IPostprocessing into Engine.
-   * \param postprocessing Shared pointer on an IPostprocessing object.
+   * \param postprocessing Shared pointer of an IPostprocessing object.
    * \return RuntimeError with a description of an error.
    */
-  virtual RuntimeError SetPostprocessing (std::shared_ptr<IPostprocessing> postprocessing) = 0;
+  virtual RuntimeError SetPostprocessing (std::shared_ptr<IPostprocessing>
+                                          postprocessing) = 0;
 
   /**
    * \brief Get an instance of IPostprocessing into Engine.
