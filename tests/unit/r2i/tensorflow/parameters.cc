@@ -9,9 +9,9 @@
  * back to RidgeRun without any encumbrance.
 */
 
+#include <r2i/prediction.h>
 #include <r2i/r2i.h>
 #include <r2i/tensorflow/parameters.h>
-#include <r2i/tensorflow/prediction.h>
 
 #include <CppUTest/CommandLineTestRunner.h>
 #include <CppUTest/TestHarness.h>
