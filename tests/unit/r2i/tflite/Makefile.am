@@ -16,7 +16,6 @@ if HAVE_TFLITE
 TESTS =                 \
         loader          \
         engine          \
-        prediction      \
         frame           \
         parameters
 
