@@ -17,6 +17,31 @@
 #include <CppUTest/CommandLineTestRunner.h>
 #include <CppUTest/TestHarness.h>
 
+namespace mock {
+class Model : public r2i::IModel {
+ public:
+  Model () {}
+  r2i::RuntimeError Start (const std::string &name) {
+    return r2i::RuntimeError();
+  }
+};
+
+class Engine : public r2i::IEngine {
+ public:
+  r2i::RuntimeError Start () {
+    return r2i::RuntimeError();
+  };
+  r2i::RuntimeError Stop () {
+    return r2i::RuntimeError();
+  };
+  r2i::RuntimeError SetModel (std::shared_ptr<r2i::IModel> in_model) {
+    return r2i::RuntimeError();
+  };
+  virtual std::shared_ptr<r2i::IPrediction> Predict (std::shared_ptr<r2i::IFrame>
+      in_frame, r2i::RuntimeError &error) { return nullptr; }
+};
+}
+
 namespace r2i {
 namespace onnxrt {
 
@@ -31,6 +56,32 @@ RuntimeError Engine::Start () {
 
 TEST_GROUP (OnnxrtParameters) {
 };
+
+TEST (OnnxrtParameters, ConfigureIncompatibleEngine) {
+  r2i::RuntimeError error;
+  r2i::onnxrt::Parameters parameters;
+
+  std::shared_ptr<r2i::IEngine> engine(new mock::Engine);
+  std::shared_ptr<r2i::IModel> model(new r2i::onnxrt::Model);
+
+  error = parameters.Configure(engine, model);
+
+  CHECK_TEXT (error.IsError(), error.GetDescription().c_str());
+  LONGS_EQUAL (r2i::RuntimeError::Code::INCOMPATIBLE_ENGINE, error.GetCode ());
+}
+
+TEST (OnnxrtParameters, ConfigureIncompatibleModel) {
+  r2i::RuntimeError error;
+  r2i::onnxrt::Parameters parameters;
+
+  std::shared_ptr<r2i::IEngine> engine(new r2i::onnxrt::Engine);
+  std::shared_ptr<r2i::IModel> model(new mock::Model);
+
+  error = parameters.Configure(engine, model);
+
+  CHECK_TEXT (error.IsError(), error.GetDescription().c_str());
+  LONGS_EQUAL (r2i::RuntimeError::Code::INCOMPATIBLE_MODEL, error.GetCode ());
+}
 
 TEST (OnnxrtParameters, ConfigureNullEngine) {
   r2i::RuntimeError error;
