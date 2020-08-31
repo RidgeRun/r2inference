@@ -6,7 +6,6 @@ tflite_sources = [
   'loader.cc',
   'model.cc',
   'parameters.cc',
-  'prediction.cc',
 ]
 
 tflite_headers = [
@@ -16,7 +15,6 @@ tflite_headers = [
   'loader.h',
   'model.h',
   'parameters.h',
-  'prediction.h',
 ]
 
 # Build library
