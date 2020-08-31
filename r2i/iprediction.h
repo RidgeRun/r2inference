@@ -38,12 +38,22 @@ class IPrediction {
                      r2i::RuntimeError &error) = 0;
 
   /**
-   * \brief Set predictions results
+   * \brief Set predictions result
    * \param data obtained from the model inference.
    * \param size of the input data.
    * \return Error code resulting from the set process.
    */
-  virtual r2i::RuntimeError AddResults (float *data, unsigned int size) = 0;
+  virtual r2i::RuntimeError AddResult (float *data, unsigned int size) = 0;
+
+  /**
+   * \brief Set a prediction result in some specific index.
+   * \param output_index Index of the result data.
+   * \param data predicted.
+   * \param size of the data array.
+   * \return Error code resulting from the insert process.
+   */
+  virtual r2i::RuntimeError InsertResult (unsigned int output_index, float *data,
+                                          unsigned int size) = 0;
 
   /**
    * \brief Gets the underlying vector to the result data. The pointer

@@ -61,6 +61,7 @@ libr2inference_@RR_PACKAGE_VERSION@_la_SOURCES =    \
         datatype.cc                                 \
         iframeworkfactory.cc                        \
         loader.cc                                   \
+        prediction.cc                               \
         runtimeerror.cc                             \
         imageformat.cc
 
@@ -100,6 +101,7 @@ r2iinclude_HEADERS =         \
         ipreprocessing.h     \
         loader.h             \
         parametermeta.h      \
+        prediction.h         \
         r2i.h                \
         runtimeerror.h
 
