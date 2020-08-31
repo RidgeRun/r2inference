@@ -6,7 +6,6 @@ tf_sources = [
   'loader.cc',
   'model.cc',
   'parameters.cc',
-  'prediction.cc',
 ]
 
 tf_headers = [
@@ -16,7 +15,6 @@ tf_headers = [
   'loader.h',
   'model.h',
   'parameters.h',
-  'prediction.h',
 ]
 
 # Build library

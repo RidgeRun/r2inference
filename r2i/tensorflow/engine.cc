@@ -11,8 +11,8 @@
 
 #include "r2i/tensorflow/engine.h"
 #include <tensorflow/c/c_api.h>
-#include "r2i/tensorflow/prediction.h"
 #include "r2i/tensorflow/frame.h"
+#include "r2i/prediction.h"
 
 namespace r2i {
 namespace tensorflow {
@@ -231,7 +231,7 @@ std::shared_ptr<r2i::IPrediction> Engine::Predict (std::shared_ptr<r2i::IFrame>
     return nullptr;
   }
 
-  prediction->AddResults(output_data, output_size);
+  prediction->AddResult(output_data, output_size);
 
   return prediction;
 }
