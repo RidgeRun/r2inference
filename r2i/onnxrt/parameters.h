@@ -42,13 +42,13 @@ class Parameters: public IParameters {
   RuntimeError Set (const std::string &in_parameter, double in_value) override;
   RuntimeError List (std::vector<ParameterMeta> &metas) override;
   /* To set/get Parameters of the internal Engine instance */
-  RuntimeError SetLogLevel (int &value);
+  RuntimeError SetLogLevel (int value);
   RuntimeError GetLogLevel (int &value);
-  RuntimeError SetIntraNumThreads (int &value);
+  RuntimeError SetIntraNumThreads (int value);
   RuntimeError GetIntraNumThreads (int &value);
-  RuntimeError SetGraphOptLevel (int &value);
+  RuntimeError SetGraphOptLevel (int value);
   RuntimeError GetGraphOptLevel (int &value);
-  RuntimeError SetLogId (std::string &value);
+  RuntimeError SetLogId (const std::string &value);
   RuntimeError GetLogId (std::string &value);
 
  protected:

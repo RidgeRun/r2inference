@@ -211,7 +211,7 @@ Parameters::ParamDesc Parameters::Validate (const std::string &in_parameter,
   return param;
 }
 
-RuntimeError Parameters::SetLogLevel (int &value) {
+RuntimeError Parameters::SetLogLevel (int value) {
   RuntimeError error;
   auto downcast_engine = std::dynamic_pointer_cast<Engine, IEngine>(this->engine);
   error = downcast_engine->SetLoggingLevel(value);
@@ -225,7 +225,7 @@ RuntimeError Parameters::GetLogLevel (int &value) {
   return error;
 }
 
-RuntimeError Parameters::SetIntraNumThreads (int &value) {
+RuntimeError Parameters::SetIntraNumThreads (int value) {
   RuntimeError error;
   auto downcast_engine = std::dynamic_pointer_cast<Engine, IEngine>(this->engine);
   error = downcast_engine->SetIntraNumThreads(value);
@@ -239,7 +239,7 @@ RuntimeError Parameters::GetIntraNumThreads (int &value) {
   return error;
 }
 
-RuntimeError Parameters::SetGraphOptLevel (int &value) {
+RuntimeError Parameters::SetGraphOptLevel (int value) {
   RuntimeError error;
   auto downcast_engine = std::dynamic_pointer_cast<Engine, IEngine>(this->engine);
   error = downcast_engine->SetGraphOptLevel(value);
@@ -253,7 +253,7 @@ RuntimeError Parameters::GetGraphOptLevel (int &value) {
   return error;
 }
 
-RuntimeError Parameters::SetLogId (std::string &value) {
+RuntimeError Parameters::SetLogId (const std::string &value) {
   RuntimeError error;
   auto downcast_engine = std::dynamic_pointer_cast<Engine, IEngine>(this->engine);
   error = downcast_engine->SetLogId(value);
