@@ -44,7 +44,7 @@ RuntimeError Prediction::AddResult (float *data, unsigned int size) {
     return error;
   }
 
-  cuda_error = cudaMemcpy(internal_data, data, size, cudaMemcpyDeviceToHost);
+  cuda_error = cudaMemcpy(internal_data, data, size * sizeof(float), cudaMemcpyDeviceToHost);
   if (cudaSuccess != cuda_error) {
     error.Set (RuntimeError::Code::MEMORY_ERROR,
                "Unable to read data from CUDA");
@@ -82,7 +82,7 @@ RuntimeError Prediction::InsertResult(unsigned int output_index, float *data,
 
   float *internal_data = this->results_data[output_index].get();
 
-  cuda_error = cudaMemcpy(internal_data, data, size, cudaMemcpyDeviceToHost);
+  cuda_error = cudaMemcpy(internal_data, data, size * sizeof(float), cudaMemcpyDeviceToHost);
   if (cudaSuccess != cuda_error) {
     error.Set (RuntimeError::Code::MEMORY_ERROR,
                "Unable to read data from CUDA");

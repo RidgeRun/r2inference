@@ -141,15 +141,22 @@ std::shared_ptr<r2i::IPrediction> Engine::Predict (std::shared_ptr<r2i::IFrame>
     return nullptr;
   }
 
-  float *predicted_data = static_cast<float *>(output_buff.get());
+  if (in_frame->GetDataType().GetId() == DataType::FLOAT) {
 
-  if (nullptr == predicted_data) {
-    error.Set (RuntimeError::Code::INVALID_FRAMEWORK_PARAMETER,
-               "Prediction result not set yet");
-    return 0;
+    float *predicted_data = static_cast<float *>(output_buff.get());
+
+    if (nullptr == predicted_data) {
+      error.Set (RuntimeError::Code::NULL_PARAMETER,
+               "Prediction result is null");
+      return nullptr;
+    }
+
+    prediction->AddResult(predicted_data, output_size);
+  } else {
+    error.Set (RuntimeError::Code::WRONG_API_USAGE,
+                 "Unsupported data type");
+    return nullptr;
   }
-
-  prediction->AddResult(predicted_data, output_size);
 
   return prediction;
 }

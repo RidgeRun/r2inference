@@ -58,7 +58,7 @@ TEST_GROUP (TensorRTPrediction) {
 };
 
 TEST (TensorRTPrediction, SetResultBufferSuccess) {
-  error = prediction.AddResult(matrix, INPUTS);
+  error = prediction.AddResult(matrix.get(), INPUTS);
   LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode());
 }
 
@@ -70,60 +70,63 @@ TEST (TensorRTPrediction, SetNullResultBuffer) {
 TEST (TensorRTPrediction, Prediction) {
   double result;
 
-  error = prediction.AddResult(matrix, INPUTS);
+  error = prediction.AddResult(matrix.get(), INPUTS);
   LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode());
 
-  result = prediction.At (0, error);
+  result = prediction.At (0, 0, error);
   LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode());
   DOUBLES_EQUAL (matrix[0], result, 0.05);
 }
 
 TEST (TensorRTPrediction, PredictionGetResultSize) {
-  error = prediction.AddResult(matrix, INPUTS);
+  error = prediction.AddResult(matrix.get(), INPUTS);
   LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode());
 
-  LONGS_EQUAL (INPUTS * sizeof(float), prediction.GetResultSize());
+  unsigned int result_size = prediction.GetResultSize(0, error);
+
+  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode());
+  LONGS_EQUAL (INPUTS, result_size);
 }
 
 TEST (TensorRTPrediction, PredictionNoTensor) {
-  prediction.At (0, error);
-  LONGS_EQUAL (r2i::RuntimeError::Code::INVALID_FRAMEWORK_PARAMETER,
+  prediction.At (0, 0, error);
+  LONGS_EQUAL (r2i::RuntimeError::Code::MEMORY_ERROR,
                error.GetCode());
 }
 
 TEST (TensorRTPrediction, PredictionNonExistentIndex) {
-  error = prediction.AddResult(matrix, INPUTS);
+  error = prediction.AddResult(matrix.get(), INPUTS);
   LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode());
 
-  prediction.At (5, error);
+  prediction.At (0, 5, error);
   LONGS_EQUAL (r2i::RuntimeError::Code::MEMORY_ERROR, error.GetCode());
 }
 
 TEST (TensorRTPrediction, PredictionCudaMemCpyError) {
   cudaMemCpyError = true;
-  error = prediction.AddResult(matrix, INPUTS);
+  error = prediction.AddResult(matrix.get(), INPUTS);
   LONGS_EQUAL (r2i::RuntimeError::Code::MEMORY_ERROR, error.GetCode());
 }
 
-TEST (Prediction, ReplaceExistingPrediction) {
+TEST (TensorRTPrediction, ReplaceExistingPrediction) {
   r2i::RuntimeError error;
   unsigned int output_index = 0;
 
-  error = prediction.AddResult(matrix, INPUTS);
+  error = prediction.AddResult(matrix.get(), INPUTS);
   LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode());
 
-  error = prediction.InsertResult(output_index, matrix, INPUTS);
+  error = prediction.InsertResult(output_index, matrix.get(), INPUTS);
   LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode());
 }
 
-TEST (Prediction, ReplaceExistingPredictionWithWrongIndex) {
+TEST (TensorRTPrediction, ReplaceExistingPredictionWithWrongIndex) {
   r2i::RuntimeError error;
   unsigned int output_index = 2;
 
-  error = prediction.AddResult(matrix, INPUTS);
+  error = prediction.AddResult(matrix.get(), INPUTS);
   LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode());
 
-  error = prediction.InsertResult(output_index, matrix, INPUTS);
+  error = prediction.InsertResult(output_index, matrix.get(), INPUTS);
   LONGS_EQUAL (r2i::RuntimeError::Code::INVALID_FRAMEWORK_PARAMETER,
                error.GetCode());
 }
