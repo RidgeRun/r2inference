@@ -25,6 +25,11 @@ RuntimeError HardwareIdAccessor::Set (IParameters *target) {
 
   r2i::onnxrt_openvino::Parameters *downcast_parameters =
     dynamic_cast<r2i::onnxrt_openvino::Parameters *>(target);
+  if (nullptr == downcast_parameters) {
+    error.Set (RuntimeError::Code::INCOMPATIBLE_PARAMETERS,
+               "The provided engine is not an ONNXRT OpenVINO parameters");
+    return error;
+  }
   error = downcast_parameters->SetHardwareId(this->value);
 
   return error;
@@ -41,6 +46,11 @@ RuntimeError HardwareIdAccessor::Get (IParameters *target) {
 
   r2i::onnxrt_openvino::Parameters *downcast_parameters =
     dynamic_cast<r2i::onnxrt_openvino::Parameters *>(target);
+  if (nullptr == downcast_parameters) {
+    error.Set (RuntimeError::Code::INCOMPATIBLE_PARAMETERS,
+               "The provided engine is not an ONNXRT OpenVINO parameters");
+    return error;
+  }
   error = downcast_parameters->GetHardwareId(this->value);
 
   return error;

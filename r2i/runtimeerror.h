@@ -61,6 +61,11 @@ class RuntimeError {
     INCOMPATIBLE_MODEL,
 
     /**
+     * The provided Parameters is incompatible with the current operation
+     */
+    INCOMPATIBLE_PARAMETERS,
+
+    /**
      * Framework-specific error triggered
      */
     FRAMEWORK_ERROR,

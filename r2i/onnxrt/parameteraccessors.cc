@@ -27,6 +27,11 @@ RuntimeError LoggingLevelAccessor::Set (IParameters *target) {
 
   r2i::onnxrt::Parameters *downcast_parameters =
     dynamic_cast<r2i::onnxrt::Parameters *>(target);
+  if (nullptr == downcast_parameters) {
+    error.Set (RuntimeError::Code::INCOMPATIBLE_PARAMETERS,
+               "The provided engine is not an ONNXRT parameters");
+    return error;
+  }
   error = downcast_parameters->SetLogLevel(this->value);
 
   return error;
@@ -43,6 +48,11 @@ RuntimeError LoggingLevelAccessor::Get (IParameters *target) {
 
   r2i::onnxrt::Parameters *downcast_parameters =
     dynamic_cast<r2i::onnxrt::Parameters *>(target);
+  if (nullptr == downcast_parameters) {
+    error.Set (RuntimeError::Code::INCOMPATIBLE_PARAMETERS,
+               "The provided engine is not an ONNXRT parameters");
+    return error;
+  }
   error = downcast_parameters->GetLogLevel(this->value);
 
   return error;
@@ -59,6 +69,11 @@ RuntimeError IntraNumThreadsAccessor::Set (IParameters *target) {
 
   r2i::onnxrt::Parameters *downcast_parameters =
     dynamic_cast<r2i::onnxrt::Parameters *>(target);
+  if (nullptr == downcast_parameters) {
+    error.Set (RuntimeError::Code::INCOMPATIBLE_PARAMETERS,
+               "The provided engine is not an ONNXRT parameters");
+    return error;
+  }
   error = downcast_parameters->SetIntraNumThreads(this->value);
 
   return error;
@@ -75,6 +90,11 @@ RuntimeError IntraNumThreadsAccessor::Get (IParameters *target) {
 
   r2i::onnxrt::Parameters *downcast_parameters =
     dynamic_cast<r2i::onnxrt::Parameters *>(target);
+  if (nullptr == downcast_parameters) {
+    error.Set (RuntimeError::Code::INCOMPATIBLE_PARAMETERS,
+               "The provided engine is not an ONNXRT parameters");
+    return error;
+  }
   error = downcast_parameters->GetIntraNumThreads(this->value);
 
   return error;
@@ -91,6 +111,11 @@ RuntimeError GraphOptLevelAccessor::Set (IParameters *target) {
 
   r2i::onnxrt::Parameters *downcast_parameters =
     dynamic_cast<r2i::onnxrt::Parameters *>(target);
+  if (nullptr == downcast_parameters) {
+    error.Set (RuntimeError::Code::INCOMPATIBLE_PARAMETERS,
+               "The provided engine is not an ONNXRT parameters");
+    return error;
+  }
   error = downcast_parameters->SetGraphOptLevel(this->value);
 
   return error;
@@ -107,6 +132,11 @@ RuntimeError GraphOptLevelAccessor::Get (IParameters *target) {
 
   r2i::onnxrt::Parameters *downcast_parameters =
     dynamic_cast<r2i::onnxrt::Parameters *>(target);
+  if (nullptr == downcast_parameters) {
+    error.Set (RuntimeError::Code::INCOMPATIBLE_PARAMETERS,
+               "The provided engine is not an ONNXRT parameters");
+    return error;
+  }
   error = downcast_parameters->GetGraphOptLevel(this->value);
 
   return error;
@@ -123,6 +153,11 @@ RuntimeError LogIdAccessor::Set (IParameters *target) {
 
   r2i::onnxrt::Parameters *downcast_parameters =
     dynamic_cast<r2i::onnxrt::Parameters *>(target);
+  if (nullptr == downcast_parameters) {
+    error.Set (RuntimeError::Code::INCOMPATIBLE_PARAMETERS,
+               "The provided engine is not an ONNXRT parameters");
+    return error;
+  }
   error = downcast_parameters->SetLogId(this->value);
 
   return error;
@@ -139,6 +174,11 @@ RuntimeError LogIdAccessor::Get (IParameters *target) {
 
   r2i::onnxrt::Parameters *downcast_parameters =
     dynamic_cast<r2i::onnxrt::Parameters *>(target);
+  if (nullptr == downcast_parameters) {
+    error.Set (RuntimeError::Code::INCOMPATIBLE_PARAMETERS,
+               "The provided engine is not an ONNXRT parameters");
+    return error;
+  }
   error = downcast_parameters->GetLogId(this->value);
 
   return error;
