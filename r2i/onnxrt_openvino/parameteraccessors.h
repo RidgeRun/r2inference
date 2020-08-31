@@ -20,8 +20,8 @@ namespace onnxrt_openvino {
 
 class HardwareIdAccessor : public r2i::onnxrt::StringAccessor {
  public:
-  RuntimeError Set (IParameters *target);
-  RuntimeError Get (IParameters *target);
+  RuntimeError Set (IParameters &target);
+  RuntimeError Get (IParameters &target);
 };
 
 } // namespace onnxrt

@@ -101,7 +101,7 @@ RuntimeError Parameters::Get (const std::string &in_parameter, int &value) {
   /* Valid parameter found */
   auto accessor = std::dynamic_pointer_cast<IntAccessor>(param.accessor);
 
-  error = accessor->Get (this);
+  error = accessor->Get (*this);
   if (error.IsError ()) {
     return error;
   }
@@ -133,7 +133,7 @@ RuntimeError Parameters::Get (const std::string &in_parameter,
   /* Valid parameter found */
   auto accessor = std::dynamic_pointer_cast<StringAccessor>(param.accessor);
 
-  error = accessor->Get (this);
+  error = accessor->Get (*this);
   if (error.IsError ()) {
     return error;
   }
@@ -156,7 +156,7 @@ RuntimeError Parameters::Set (const std::string &in_parameter, int in_value) {
   /* Valid parameter found */
   auto accessor = std::dynamic_pointer_cast<IntAccessor>(param.accessor);
   accessor->value = in_value;
-  error = accessor->Set (this);
+  error = accessor->Set (*this);
 
   return error;
 }
@@ -176,7 +176,7 @@ RuntimeError Parameters::Set (const std::string &in_parameter,
   auto accessor = std::dynamic_pointer_cast<StringAccessor>(param.accessor);
 
   accessor->value = in_value;
-  return accessor->Set (this);
+  return accessor->Set (*this);
   return error;
 }
 

@@ -21,8 +21,8 @@ namespace onnxrt {
 class Accessor {
  public:
   virtual ~Accessor() {}
-  virtual RuntimeError Set(IParameters *target) = 0;
-  virtual RuntimeError Get(IParameters *target) = 0;
+  virtual RuntimeError Set(IParameters &target) = 0;
+  virtual RuntimeError Get(IParameters &target) = 0;
 };
 
 class IntAccessor : public Accessor {
@@ -37,26 +37,26 @@ class StringAccessor : public Accessor {
 
 class LoggingLevelAccessor : public IntAccessor {
  public:
-  RuntimeError Set (IParameters *target);
-  RuntimeError Get (IParameters *target);
+  RuntimeError Set (IParameters &target);
+  RuntimeError Get (IParameters &target);
 };
 
 class IntraNumThreadsAccessor : public IntAccessor {
  public:
-  RuntimeError Set (IParameters *target);
-  RuntimeError Get (IParameters *target);
+  RuntimeError Set (IParameters &target);
+  RuntimeError Get (IParameters &target);
 };
 
 class GraphOptLevelAccessor : public IntAccessor {
  public:
-  RuntimeError Set (IParameters *target);
-  RuntimeError Get (IParameters *target);
+  RuntimeError Set (IParameters &target);
+  RuntimeError Get (IParameters &target);
 };
 
 class LogIdAccessor : public StringAccessor {
  public:
-  RuntimeError Set (IParameters *target);
-  RuntimeError Get (IParameters *target);
+  RuntimeError Set (IParameters &target);
+  RuntimeError Get (IParameters &target);
 };
 
 } // namespace onnxrt

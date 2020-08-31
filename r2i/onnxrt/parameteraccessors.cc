@@ -15,170 +15,130 @@
 namespace r2i {
 namespace onnxrt {
 
-RuntimeError LoggingLevelAccessor::Set (IParameters *target) {
+RuntimeError LoggingLevelAccessor::Set (IParameters &target) {
   RuntimeError error;
 
-  if (nullptr == target) {
-    error.Set (r2i::RuntimeError::Code::NULL_PARAMETER,
-               "Trying to access null IParameters pointer");
-    return error;
-  }
-
-  r2i::onnxrt::Parameters *downcast_parameters =
-    dynamic_cast<r2i::onnxrt::Parameters *>(target);
-  if (nullptr == downcast_parameters) {
+  try {
+    r2i::onnxrt::Parameters &downcast_parameters =
+      dynamic_cast<r2i::onnxrt::Parameters &>(target);
+    error = downcast_parameters.SetLogLevel(this->value);
+  } catch (const std::bad_cast &e) {
     error.Set (RuntimeError::Code::INCOMPATIBLE_PARAMETERS,
                "The provided engine is not an ONNXRT parameters");
     return error;
   }
-  error = downcast_parameters->SetLogLevel(this->value);
 
   return error;
 }
 
-RuntimeError LoggingLevelAccessor::Get (IParameters *target) {
+RuntimeError LoggingLevelAccessor::Get (IParameters &target) {
   RuntimeError error;
 
-  if (nullptr == target) {
-    error.Set (r2i::RuntimeError::Code::NULL_PARAMETER,
-               "Trying to access null IParameters pointer");
-    return error;
-  }
-
-  r2i::onnxrt::Parameters *downcast_parameters =
-    dynamic_cast<r2i::onnxrt::Parameters *>(target);
-  if (nullptr == downcast_parameters) {
+  try {
+    r2i::onnxrt::Parameters &downcast_parameters =
+      dynamic_cast<r2i::onnxrt::Parameters &>(target);
+    error = downcast_parameters.GetLogLevel(this->value);
+  } catch (const std::bad_cast &e) {
     error.Set (RuntimeError::Code::INCOMPATIBLE_PARAMETERS,
                "The provided engine is not an ONNXRT parameters");
     return error;
   }
-  error = downcast_parameters->GetLogLevel(this->value);
 
   return error;
 }
 
-RuntimeError IntraNumThreadsAccessor::Set (IParameters *target) {
+RuntimeError IntraNumThreadsAccessor::Set (IParameters &target) {
   RuntimeError error;
 
-  if (nullptr == target) {
-    error.Set (r2i::RuntimeError::Code::NULL_PARAMETER,
-               "Trying to access null IParameters pointer");
-    return error;
-  }
-
-  r2i::onnxrt::Parameters *downcast_parameters =
-    dynamic_cast<r2i::onnxrt::Parameters *>(target);
-  if (nullptr == downcast_parameters) {
+  try {
+    r2i::onnxrt::Parameters &downcast_parameters =
+      dynamic_cast<r2i::onnxrt::Parameters &>(target);
+    error = downcast_parameters.SetIntraNumThreads(this->value);
+  } catch (const std::bad_cast &e) {
     error.Set (RuntimeError::Code::INCOMPATIBLE_PARAMETERS,
                "The provided engine is not an ONNXRT parameters");
     return error;
   }
-  error = downcast_parameters->SetIntraNumThreads(this->value);
 
   return error;
 }
 
-RuntimeError IntraNumThreadsAccessor::Get (IParameters *target) {
+RuntimeError IntraNumThreadsAccessor::Get (IParameters &target) {
   RuntimeError error;
 
-  if (nullptr == target) {
-    error.Set (r2i::RuntimeError::Code::NULL_PARAMETER,
-               "Trying to access null IParameters pointer");
-    return error;
-  }
-
-  r2i::onnxrt::Parameters *downcast_parameters =
-    dynamic_cast<r2i::onnxrt::Parameters *>(target);
-  if (nullptr == downcast_parameters) {
+  try {
+    r2i::onnxrt::Parameters &downcast_parameters =
+      dynamic_cast<r2i::onnxrt::Parameters &>(target);
+    error = downcast_parameters.GetIntraNumThreads(this->value);
+  } catch (const std::bad_cast &e) {
     error.Set (RuntimeError::Code::INCOMPATIBLE_PARAMETERS,
                "The provided engine is not an ONNXRT parameters");
     return error;
   }
-  error = downcast_parameters->GetIntraNumThreads(this->value);
 
   return error;
 }
 
-RuntimeError GraphOptLevelAccessor::Set (IParameters *target) {
+RuntimeError GraphOptLevelAccessor::Set (IParameters &target) {
   RuntimeError error;
 
-  if (nullptr == target) {
-    error.Set (r2i::RuntimeError::Code::NULL_PARAMETER,
-               "Trying to access null IParameters pointer");
-    return error;
-  }
-
-  r2i::onnxrt::Parameters *downcast_parameters =
-    dynamic_cast<r2i::onnxrt::Parameters *>(target);
-  if (nullptr == downcast_parameters) {
+  try {
+    r2i::onnxrt::Parameters &downcast_parameters =
+      dynamic_cast<r2i::onnxrt::Parameters &>(target);
+    error = downcast_parameters.SetGraphOptLevel(this->value);
+  } catch (const std::bad_cast &e) {
     error.Set (RuntimeError::Code::INCOMPATIBLE_PARAMETERS,
                "The provided engine is not an ONNXRT parameters");
     return error;
   }
-  error = downcast_parameters->SetGraphOptLevel(this->value);
 
   return error;
 }
 
-RuntimeError GraphOptLevelAccessor::Get (IParameters *target) {
+RuntimeError GraphOptLevelAccessor::Get (IParameters &target) {
   RuntimeError error;
 
-  if (nullptr == target) {
-    error.Set (r2i::RuntimeError::Code::NULL_PARAMETER,
-               "Trying to access null IParameters pointer");
-    return error;
-  }
-
-  r2i::onnxrt::Parameters *downcast_parameters =
-    dynamic_cast<r2i::onnxrt::Parameters *>(target);
-  if (nullptr == downcast_parameters) {
+  try {
+    r2i::onnxrt::Parameters &downcast_parameters =
+      dynamic_cast<r2i::onnxrt::Parameters &>(target);
+    error = downcast_parameters.GetGraphOptLevel(this->value);
+  } catch (const std::bad_cast &e) {
     error.Set (RuntimeError::Code::INCOMPATIBLE_PARAMETERS,
                "The provided engine is not an ONNXRT parameters");
     return error;
   }
-  error = downcast_parameters->GetGraphOptLevel(this->value);
 
   return error;
 }
 
-RuntimeError LogIdAccessor::Set (IParameters *target) {
+RuntimeError LogIdAccessor::Set (IParameters &target) {
   RuntimeError error;
 
-  if (nullptr == target) {
-    error.Set (r2i::RuntimeError::Code::NULL_PARAMETER,
-               "Trying to access null IParameters pointer");
-    return error;
-  }
-
-  r2i::onnxrt::Parameters *downcast_parameters =
-    dynamic_cast<r2i::onnxrt::Parameters *>(target);
-  if (nullptr == downcast_parameters) {
+  try {
+    r2i::onnxrt::Parameters &downcast_parameters =
+      dynamic_cast<r2i::onnxrt::Parameters &>(target);
+    error = downcast_parameters.SetLogId(this->value);
+  } catch (const std::bad_cast &e) {
     error.Set (RuntimeError::Code::INCOMPATIBLE_PARAMETERS,
                "The provided engine is not an ONNXRT parameters");
     return error;
   }
-  error = downcast_parameters->SetLogId(this->value);
 
   return error;
 }
 
-RuntimeError LogIdAccessor::Get (IParameters *target) {
+RuntimeError LogIdAccessor::Get (IParameters &target) {
   RuntimeError error;
 
-  if (nullptr == target) {
-    error.Set (r2i::RuntimeError::Code::NULL_PARAMETER,
-               "Trying to access null IParameters pointer");
-    return error;
-  }
-
-  r2i::onnxrt::Parameters *downcast_parameters =
-    dynamic_cast<r2i::onnxrt::Parameters *>(target);
-  if (nullptr == downcast_parameters) {
+  try {
+    r2i::onnxrt::Parameters &downcast_parameters =
+      dynamic_cast<r2i::onnxrt::Parameters &>(target);
+    error = downcast_parameters.GetLogId(this->value);
+  } catch (const std::bad_cast &e) {
     error.Set (RuntimeError::Code::INCOMPATIBLE_PARAMETERS,
                "The provided engine is not an ONNXRT parameters");
     return error;
   }
-  error = downcast_parameters->GetLogId(this->value);
 
   return error;
 }

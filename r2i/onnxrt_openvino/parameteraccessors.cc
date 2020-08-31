@@ -14,44 +14,34 @@
 
 namespace r2i {
 namespace onnxrt_openvino {
-RuntimeError HardwareIdAccessor::Set (IParameters *target) {
+RuntimeError HardwareIdAccessor::Set (IParameters &target) {
   RuntimeError error;
 
-  if (nullptr == target) {
-    error.Set (r2i::RuntimeError::Code::NULL_PARAMETER,
-               "Trying to access null IParameters pointer");
-    return error;
-  }
-
-  r2i::onnxrt_openvino::Parameters *downcast_parameters =
-    dynamic_cast<r2i::onnxrt_openvino::Parameters *>(target);
-  if (nullptr == downcast_parameters) {
+  try {
+    r2i::onnxrt_openvino::Parameters &downcast_parameters =
+      dynamic_cast<r2i::onnxrt_openvino::Parameters &>(target);
+    error = downcast_parameters.SetHardwareId(this->value);
+  } catch (const std::bad_cast &e) {
     error.Set (RuntimeError::Code::INCOMPATIBLE_PARAMETERS,
                "The provided engine is not an ONNXRT OpenVINO parameters");
     return error;
   }
-  error = downcast_parameters->SetHardwareId(this->value);
 
   return error;
 }
 
-RuntimeError HardwareIdAccessor::Get (IParameters *target) {
+RuntimeError HardwareIdAccessor::Get (IParameters &target) {
   RuntimeError error;
 
-  if (nullptr == target) {
-    error.Set (r2i::RuntimeError::Code::NULL_PARAMETER,
-               "Trying to access null IParameters pointer");
-    return error;
-  }
-
-  r2i::onnxrt_openvino::Parameters *downcast_parameters =
-    dynamic_cast<r2i::onnxrt_openvino::Parameters *>(target);
-  if (nullptr == downcast_parameters) {
+  try {
+    r2i::onnxrt_openvino::Parameters &downcast_parameters =
+      dynamic_cast<r2i::onnxrt_openvino::Parameters &>(target);
+    error = downcast_parameters.GetHardwareId(this->value);
+  } catch (const std::bad_cast &e) {
     error.Set (RuntimeError::Code::INCOMPATIBLE_PARAMETERS,
                "The provided engine is not an ONNXRT OpenVINO parameters");
     return error;
   }
-  error = downcast_parameters->GetHardwareId(this->value);
 
   return error;
 }
