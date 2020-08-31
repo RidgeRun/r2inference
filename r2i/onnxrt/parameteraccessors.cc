@@ -14,7 +14,6 @@
 
 namespace r2i {
 namespace onnxrt {
-Accessor::Accessor () {}
 
 RuntimeError LoggingLevelAccessor::Set (IParameters *target) {
   RuntimeError error;
