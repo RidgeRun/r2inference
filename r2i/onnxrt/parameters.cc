@@ -59,8 +59,22 @@ RuntimeError Parameters::Configure (std::shared_ptr<r2i::IEngine> in_engine,
     return error;
   }
 
-  this->engine = in_engine;
-  this->model = in_model;
+  auto engine = std::dynamic_pointer_cast<Engine, IEngine>(in_engine);
+  if (nullptr == engine) {
+    error.Set (RuntimeError::Code::INCOMPATIBLE_ENGINE,
+               "The provided engine is not an ONNXRT engine");
+    return error;
+  }
+
+  auto model = std::dynamic_pointer_cast<Model, IModel>(in_model);
+  if (nullptr == model) {
+    error.Set (RuntimeError::Code::INCOMPATIBLE_MODEL,
+               "The provided engine is not an ONNXRT model");
+    return error;
+  }
+
+  this->engine = engine;
+  this->model = model;
 
   return error;
 }
@@ -213,57 +227,49 @@ Parameters::ParamDesc Parameters::Validate (const std::string &in_parameter,
 
 RuntimeError Parameters::SetLogLevel (int value) {
   RuntimeError error;
-  auto downcast_engine = std::dynamic_pointer_cast<Engine, IEngine>(this->engine);
-  error = downcast_engine->SetLoggingLevel(value);
+  error = this->engine->SetLoggingLevel(value);
   return error;
 }
 
 RuntimeError Parameters::GetLogLevel (int &value) {
   RuntimeError error;
-  auto downcast_engine = std::dynamic_pointer_cast<Engine, IEngine>(this->engine);
-  value = downcast_engine->GetLoggingLevel();
+  value = this->engine->GetLoggingLevel();
   return error;
 }
 
 RuntimeError Parameters::SetIntraNumThreads (int value) {
   RuntimeError error;
-  auto downcast_engine = std::dynamic_pointer_cast<Engine, IEngine>(this->engine);
-  error = downcast_engine->SetIntraNumThreads(value);
+  error = this->engine->SetIntraNumThreads(value);
   return error;
 }
 
 RuntimeError Parameters::GetIntraNumThreads (int &value) {
   RuntimeError error;
-  auto downcast_engine = std::dynamic_pointer_cast<Engine, IEngine>(this->engine);
-  value = downcast_engine->GetIntraNumThreads();
+  value = this->engine->GetIntraNumThreads();
   return error;
 }
 
 RuntimeError Parameters::SetGraphOptLevel (int value) {
   RuntimeError error;
-  auto downcast_engine = std::dynamic_pointer_cast<Engine, IEngine>(this->engine);
-  error = downcast_engine->SetGraphOptLevel(value);
+  error = this->engine->SetGraphOptLevel(value);
   return error;
 }
 
 RuntimeError Parameters::GetGraphOptLevel (int &value) {
   RuntimeError error;
-  auto downcast_engine = std::dynamic_pointer_cast<Engine, IEngine>(this->engine);
-  value = downcast_engine->GetGraphOptLevel();
+  value = this->engine->GetGraphOptLevel();
   return error;
 }
 
 RuntimeError Parameters::SetLogId (const std::string &value) {
   RuntimeError error;
-  auto downcast_engine = std::dynamic_pointer_cast<Engine, IEngine>(this->engine);
-  error = downcast_engine->SetLogId(value);
+  error = this->engine->SetLogId(value);
   return error;
 }
 
 RuntimeError Parameters::GetLogId (std::string &value) {
   RuntimeError error;
-  auto downcast_engine = std::dynamic_pointer_cast<Engine, IEngine>(this->engine);
-  value = downcast_engine->GetLogId();
+  value = this->engine->GetLogId();
   return error;
 }
 

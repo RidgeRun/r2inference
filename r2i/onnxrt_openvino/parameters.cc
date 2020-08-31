@@ -26,19 +26,50 @@ Parameters::Parameters () : r2i::onnxrt::Parameters() {
                                        hardware_id_desc));
 }
 
+RuntimeError Parameters::Configure (std::shared_ptr<r2i::IEngine> in_engine,
+                                    std::shared_ptr<r2i::IModel> in_model) {
+  RuntimeError error;
+
+  if (nullptr == in_engine) {
+    error.Set (RuntimeError::Code::NULL_PARAMETER, "Received null engine");
+    return error;
+  }
+
+  if (nullptr == in_model) {
+    error.Set (RuntimeError::Code::NULL_PARAMETER, "Received null model");
+    return error;
+  }
+
+  auto engine = std::dynamic_pointer_cast<r2i::onnxrt_openvino::Engine, IEngine>
+                (in_engine);
+  if (nullptr == engine) {
+    error.Set (RuntimeError::Code::INCOMPATIBLE_ENGINE,
+               "The provided engine is not an ONNXRT OpenVINO engine");
+    return error;
+  }
+
+  auto model = std::dynamic_pointer_cast<r2i::onnxrt::Model, IModel>(in_model);
+  if (nullptr == model) {
+    error.Set (RuntimeError::Code::INCOMPATIBLE_MODEL,
+               "The provided engine is not an ONNXRT model");
+    return error;
+  }
+
+  this->engine = engine;
+  this->model = model;
+
+  return error;
+}
+
 RuntimeError Parameters::SetHardwareId (std::string &value) {
   RuntimeError error;
-  auto downcast_engine =
-    std::dynamic_pointer_cast<r2i::onnxrt_openvino::Engine, IEngine>(this->engine);
-  error = downcast_engine->SetHardwareId(value);
+  error = this->engine->SetHardwareId(value);
   return error;
 }
 
 RuntimeError Parameters::GetHardwareId (std::string &value) {
   RuntimeError error;
-  auto downcast_engine =
-    std::dynamic_pointer_cast<r2i::onnxrt_openvino::Engine, IEngine>(this->engine);
-  value = downcast_engine->GetHardwareId();
+  value = this->engine->GetHardwareId();
   return error;
 }
 
