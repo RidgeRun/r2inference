@@ -65,7 +65,7 @@ class IEngine {
       r2i::RuntimeError &error) = 0;
 
   /**
-   * \brief Set an instance of IPreprocessing into Engine.
+   * \brief Set the IPreprocessing currently configured in the Engine
    * \param preprocessing Shared pointer of an IPreprocessing object.
    * \return RuntimeError with a description of an error.
    */
@@ -73,13 +73,13 @@ class IEngine {
                                          preprocessing) = 0;
 
   /**
-   * \brief Get an instance of IPreprocessing from Engine.
+   * \brief Get the IPreprocessing currently configured in the Engine.
    * \return An instance of the shared pointer if IPreprocessing stored in Engine.
    */
   virtual std::shared_ptr<IPreprocessing> GetPreprocessing () = 0;
 
   /**
-   * \brief Set an instance of IPostprocessing into Engine.
+   * \brief Set the IPostprocessing currently configured in the Engine.
    * \param postprocessing Shared pointer of an IPostprocessing object.
    * \return RuntimeError with a description of an error.
    */
@@ -87,7 +87,7 @@ class IEngine {
                                           postprocessing) = 0;
 
   /**
-   * \brief Get an instance of IPostprocessing into Engine.
+   * \brief Get the IPostprocessing currently configured in the Engine.
    * \return An instance of the shared pointer if IPostprocessing stored in Engine.
    */
   virtual std::shared_ptr<IPostprocessing> GetPostprocessing () = 0;
