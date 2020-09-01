@@ -12,10 +12,10 @@
 #include <mvnc.h>
 #include <unordered_map>
 
-#include "r2i/ncsdk/prediction.h"
 #include "r2i/ncsdk/engine.h"
 #include "r2i/ncsdk/frame.h"
 #include "r2i/ncsdk/statuscodes.h"
+#include "r2i/prediction.h"
 
 namespace r2i {
 namespace ncsdk {
@@ -397,7 +397,7 @@ std::shared_ptr<r2i::IPrediction> Engine::Predict (std::shared_ptr<r2i::IFrame>
 
   }
 
-  error = prediction->SetResult(presult, output_data_size);
+  error = prediction->AddResult(presult.get(), output_data_size);
   if (RuntimeError::Code::EOK != error.GetCode()) {
     goto exit;
   }

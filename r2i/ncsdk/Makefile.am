@@ -22,7 +22,6 @@ libncsdk_la_SOURCES =               \
         loader.cc                   \
         engine.cc                   \
         frame.cc                    \
-        prediction.cc               \
         statuscodes.cc              \
         frameworkfactory.cc
 
@@ -55,7 +54,6 @@ ncsdkinclude_HEADERS =              \
         model.h                     \
         loader.h                    \
         engine.h                    \
-        prediction.h                \
         frame.h                     \
         frameworkfactory.h
 
