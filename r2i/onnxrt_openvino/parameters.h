@@ -25,13 +25,10 @@ namespace onnxrt_openvino {
 class Parameters: public r2i::onnxrt::Parameters {
  public:
   Parameters ();
-  RuntimeError Configure (std::shared_ptr<IEngine> in_engine,
-                          std::shared_ptr<IModel> in_model) override;
   RuntimeError SetHardwareId (std::string &value);
   RuntimeError GetHardwareId (std::string &value);
 
  private:
-  std::shared_ptr <r2i::onnxrt_openvino::Engine> engine;
   ParameterMeta hardware_id_meta = {
     .name = "hardware-id",
     .description = "OpenVINO hardware device id",

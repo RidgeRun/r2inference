@@ -57,66 +57,41 @@ RuntimeError Engine::Start () {
 TEST_GROUP (OnnxrtOpenVinoParameters) {
 };
 
-TEST (OnnxrtOpenVinoParameters, ConfigureIncompatibleEngine) {
+TEST (OnnxrtOpenVinoParameters, SettHardwareIdWithIncompatibleEngine) {
   r2i::RuntimeError error;
   r2i::onnxrt_openvino::Parameters parameters;
+  std::string in_value;
 
-  std::shared_ptr<r2i::IEngine> engine(new mock::Engine);
-  std::shared_ptr<r2i::IModel> model(new r2i::onnxrt::Model);
-
-  error = parameters.Configure(engine, model);
-
-  CHECK_TEXT (error.IsError(), error.GetDescription().c_str());
-  LONGS_EQUAL (r2i::RuntimeError::Code::INCOMPATIBLE_ENGINE, error.GetCode ());
-}
-
-TEST (OnnxrtOpenVinoParameters, ConfigureIncompatibleModel) {
-  r2i::RuntimeError error;
-  r2i::onnxrt_openvino::Parameters parameters;
-
-  std::shared_ptr<r2i::IEngine> engine(new r2i::onnxrt_openvino::Engine);
-  std::shared_ptr<r2i::IModel> model(new mock::Model);
-
-  error = parameters.Configure(engine, model);
-
-  CHECK_TEXT (error.IsError(), error.GetDescription().c_str());
-  LONGS_EQUAL (r2i::RuntimeError::Code::INCOMPATIBLE_MODEL, error.GetCode ());
-}
-
-TEST (OnnxrtOpenVinoParameters, ConfigureNullEngine) {
-  r2i::RuntimeError error;
-  r2i::onnxrt_openvino::Parameters parameters;
-
-  std::shared_ptr<r2i::IModel> model(new r2i::onnxrt::Model);
-
-  error = parameters.Configure(nullptr, model);
-
-  CHECK_TEXT (error.IsError(), error.GetDescription().c_str());
-  LONGS_EQUAL (r2i::RuntimeError::Code::NULL_PARAMETER, error.GetCode ());
-}
-
-TEST (OnnxrtOpenVinoParameters, ConfigureNullModel) {
-  r2i::RuntimeError error;
-  r2i::onnxrt_openvino::Parameters parameters;
-
-  std::shared_ptr<r2i::IEngine> engine(new r2i::onnxrt_openvino::Engine);
-
-  error = parameters.Configure(engine, nullptr);
-
-  CHECK_TEXT (error.IsError(), error.GetDescription().c_str());
-  LONGS_EQUAL (r2i::RuntimeError::Code::NULL_PARAMETER, error.GetCode ());
-}
-
-TEST (OnnxrtOpenVinoParameters, ConfigureSuccess) {
-  r2i::RuntimeError error;
-  r2i::onnxrt_openvino::Parameters parameters;
-
-  std::shared_ptr<r2i::IEngine> engine(new r2i::onnxrt_openvino::Engine);
+  std::shared_ptr<r2i::IEngine> engine(new r2i::onnxrt::Engine);
   std::shared_ptr<r2i::IModel> model(new r2i::onnxrt::Model);
 
   error = parameters.Configure(engine, model);
 
   LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
+
+  /* Value different from the default */
+  in_value = "test";
+  error = parameters.Set("hardware-id", in_value);
+
+  LONGS_EQUAL (r2i::RuntimeError::Code::INCOMPATIBLE_ENGINE, error.GetCode ());
+}
+
+TEST (OnnxrtOpenVinoParameters, GettHardwareIdWithIncompatibleEngine) {
+  r2i::RuntimeError error;
+  r2i::onnxrt_openvino::Parameters parameters;
+  std::string out_value;
+
+  std::shared_ptr<r2i::IEngine> engine(new r2i::onnxrt::Engine);
+  std::shared_ptr<r2i::IModel> model(new r2i::onnxrt::Model);
+
+  error = parameters.Configure(engine, model);
+
+  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
+
+  /* Value different from the default */
+  error = parameters.Get("hardware-id", out_value);
+
+  LONGS_EQUAL (r2i::RuntimeError::Code::INCOMPATIBLE_ENGINE, error.GetCode ());
 }
 
 TEST (OnnxrtOpenVinoParameters, SetHardwareIdAtWrongEngineState) {

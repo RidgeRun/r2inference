@@ -51,10 +51,8 @@ class Parameters: public IParameters {
   RuntimeError SetLogId (const std::string &value);
   RuntimeError GetLogId (std::string &value);
 
- private:
-  std::shared_ptr <Engine> engine;
-
  protected:
+  std::shared_ptr <Engine> engine;
   std::shared_ptr <IModel> model;
   std::shared_ptr<r2i::onnxrt::Accessor> accessor;
 
