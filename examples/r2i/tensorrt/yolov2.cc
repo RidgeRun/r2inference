@@ -68,13 +68,17 @@ box_to_pixels (BBox *normalized_box, int row, int col, int box) {
 
 static void
 parse_boxes(std::shared_ptr<r2i::IPrediction> prediction) {
+  r2i::RuntimeError error;
   float *network_output;
   int i, j, b, c;
 
   if (!prediction)
     return;
 
-  network_output = static_cast<float *>(prediction->GetResultData());
+  network_output = static_cast<float *>(prediction->GetResultData(0, error));
+  if (error.IsError()) {
+    return;
+  }
 
   for (i = 0; i < GRID_H; i++) {
     for (j = 0; j < GRID_W; j++) {

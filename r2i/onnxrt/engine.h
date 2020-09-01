@@ -21,7 +21,7 @@
 
 #include <r2i/onnxrt/frame.h>
 #include <r2i/onnxrt/model.h>
-#include <r2i/onnxrt/prediction.h>
+#include <r2i/prediction.h>
 
 namespace r2i {
 namespace onnxrt {

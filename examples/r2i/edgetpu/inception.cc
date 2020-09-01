@@ -26,13 +26,13 @@
 
 void PrintTopPrediction (std::shared_ptr<r2i::IPrediction> prediction) {
   r2i::RuntimeError error;
-  int num_labels = prediction->GetResultSize();
+  int num_labels = prediction->GetResultSize(0, error);
 
   std::vector<double> results;
   results.resize(num_labels);
 
   for (int i = 0; i < num_labels; ++i) {
-    results[i] = prediction->At(i, error);
+    results[i] = prediction->At(0, i, error);
   }
 
   auto it = std::max_element(results.begin(), results.end());
