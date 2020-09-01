@@ -51,7 +51,6 @@ RuntimeError Engine::Start () {
   this->state = State::STARTED;
   return error;
 }
-
 }
 }
 
