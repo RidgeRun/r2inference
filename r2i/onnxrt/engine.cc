@@ -20,7 +20,7 @@
 
 #include "r2i/onnxrt/frame.h"
 #include "r2i/onnxrt/model.h"
-#include "r2i/onnxrt/prediction.h"
+#include "r2i/prediction.h"
 
 namespace r2i {
 namespace onnxrt {
@@ -442,7 +442,7 @@ RuntimeError Engine::ScoreModel (std::shared_ptr<Ort::Session> session,
     return error;
   }
 
-  error = prediction->SetTensorValues(result, output_size);
+  error = prediction->AddResult(result, output_size);
   if (error.IsError ()) {
     return error;
   }

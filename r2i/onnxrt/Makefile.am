@@ -21,8 +21,7 @@ libonnxrt_la_SOURCES =           \
     frameworkfactory.cc          \
     loader.cc                    \
     model.cc                     \
-    parameters.cc                \
-    prediction.cc
+    parameters.cc                
 
 libonnxrt_la_CPPFLAGS =          \
     $(RR_CPPFLAGS)               \
@@ -53,7 +52,6 @@ onnxrtinclude_HEADERS =          \
     frameworkfactory.h           \
     loader.h                     \
     model.h                      \
-    parameters.h                 \
-    prediction.h
+    parameters.h                 
 
 endif # HAVE_ONNXRT

@@ -19,8 +19,7 @@ TESTS =                   \
         frameworkfactory  \
         loader            \
         model             \
-        parameters        \
-        prediction
+        parameters        
 
 check_PROGRAMS=$(TESTS)
 

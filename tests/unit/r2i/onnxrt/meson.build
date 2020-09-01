@@ -7,7 +7,6 @@ lib_onnxrt_tests = [
   ['loader.cc'],
   ['model.cc'],
   ['parameters.cc'],
-  ['prediction.cc'],
 ]
 
 # Build and run tests
