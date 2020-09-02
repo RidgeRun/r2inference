@@ -10,6 +10,9 @@
  * back to RidgeRun without any encumbrance.
  */
 
+#include <memory>
+#include <vector>
+
 #include <r2i/ipreprocessing.h>
 #include <r2i/onnxrt/frame.h>
 
