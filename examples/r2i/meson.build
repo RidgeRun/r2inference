@@ -40,3 +40,25 @@ endif
 if cdata.get('HAVE_TENSORRT') == true
   subdir('tensorrt')
 endif
+
+preprocessing_sources = [
+    'mean_std_preprocessing'
+]
+
+foreach pre_module : preprocessing_sources
+  library(pre_module, '@0@.cc'.format(pre_module),
+    include_directories: [configinc, common_inc_dir],
+    dependencies : [r2inference_lib_dep],
+    install: false)
+endforeach
+
+postprocessing_sources = [
+    'top_sort_postprocessing'
+]
+
+foreach post_module : postprocessing_sources
+  library(post_module, '@0@.cc'.format(post_module),
+    include_directories: [configinc, common_inc_dir],
+    dependencies : [r2inference_lib_dep],
+    install: false)
+endforeach
