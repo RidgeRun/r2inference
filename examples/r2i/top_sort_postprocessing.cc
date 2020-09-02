@@ -11,7 +11,8 @@
  */
 
 #include <algorithm>
-#include <iostream>
+#include <memory>
+#include <vector>
 
 #include <r2i/ipostprocessing.h>
 
