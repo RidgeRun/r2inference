@@ -26,6 +26,10 @@
 #define REQ_WIDTH_224 224
 #define REQ_HEIGTH_224 224
 
+/* Constants for preprocessing */
+#define MEAN 128.0
+#define STD_DEV 128.0
+
 class Example: public r2i::IPreprocessing {
  public:
   r2i::RuntimeError Apply(std::shared_ptr<r2i::IFrame> in_frame,
@@ -91,9 +95,9 @@ class Example: public r2i::IPreprocessing {
 
     for (int i = 0; i < scaled_size; i += channels) {
       /* RGB = (RGB - Mean)*StdDev */
-      adjusted[i + 0] = (static_cast<float>(scaled[i + 0]) - 128.0) / 128.0;
-      adjusted[i + 1] = (static_cast<float>(scaled[i + 1]) - 128.0) / 128.0;
-      adjusted[i + 2] = (static_cast<float>(scaled[i + 2]) - 128.0) / 128.0;
+      adjusted[i + 0] = (static_cast<float>(scaled[i + 0]) - MEAN) / STD_DEV;
+      adjusted[i + 1] = (static_cast<float>(scaled[i + 1]) - MEAN) / STD_DEV;
+      adjusted[i + 2] = (static_cast<float>(scaled[i + 2]) - MEAN) / STD_DEV;
     }
 
     return adjusted_ptr;
