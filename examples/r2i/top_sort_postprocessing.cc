@@ -22,11 +22,17 @@ class Example: public r2i::IPostprocessing {
   std::shared_ptr<r2i::IPrediction> Apply(std::shared_ptr<r2i::IPrediction>
                                           prediction,
                                           r2i::RuntimeError &error) override {
-    std::shared_ptr<r2i::IPrediction> sorted_prediction;
+    std::shared_ptr<r2i::IPrediction> out_prediction;
 
-    sorted_prediction = SortPrediction(prediction, error);
+    if (!prediction) {
+      error.Set (r2i::RuntimeError::Code::NULL_PARAMETER,
+                 "Null IPrediction parameter");
+      return nullptr;
+    }
 
-    return sorted_prediction;
+    out_prediction = SortPrediction(prediction, error);
+
+    return out_prediction;
   }
 
  private:

@@ -32,6 +32,13 @@
 
 class Example: public r2i::IPreprocessing {
  public:
+  Example () {
+    /* Set supported dimensiones */
+    this->dimensions.push_back(std::tuple<int, int>(REQ_WIDTH_224, REQ_HEIGTH_224));
+    /* Set supported formats */
+    this->formats.push_back(r2i::ImageFormat(r2i::ImageFormat::Id::RGB));
+  }
+
   r2i::RuntimeError Apply(std::shared_ptr<r2i::IFrame> in_frame,
                           std::shared_ptr<r2i::IFrame> out_frame, int required_width, int required_height,
                           r2i::ImageFormat::Id required_format) override {
@@ -39,9 +46,19 @@ class Example: public r2i::IPreprocessing {
     int width;
     int height;
 
+    if (!in_frame or !out_frame) {
+      error.Set (r2i::RuntimeError::Code::NULL_PARAMETER, "Null IFrame parameters");
+      return error;
+    }
+
     this->required_width = required_width;
     this->required_height = required_height;
     this->required_format = required_format;
+
+    error = Validate();
+    if (error.IsError ()) {
+      return error;
+    }
 
     width = in_frame->GetWidth();
     height = in_frame->GetHeight();
@@ -51,7 +68,7 @@ class Example: public r2i::IPreprocessing {
                                             this->required_height);
     error = out_frame->Configure (processed_data.get(), this->required_width,
                                   this->required_height,
-                                  r2i::ImageFormat::Id::RGB);
+                                  this->required_format.GetId());
     if (error.IsError ()) {
       return error;
     }
@@ -59,12 +76,10 @@ class Example: public r2i::IPreprocessing {
   }
 
   std::vector<r2i::ImageFormat> GetAvailableFormats() override {
-    this->formats.push_back(r2i::ImageFormat(r2i::ImageFormat::Id::RGB));
     return this->formats;
   }
 
   std::vector<std::tuple<int, int>> GetAvailableDataSizes() override {
-    this->dimensions.push_back(std::tuple<int, int>(REQ_WIDTH_224, REQ_HEIGTH_224));
     return this->dimensions;
   }
 
@@ -75,6 +90,46 @@ class Example: public r2i::IPreprocessing {
   std::shared_ptr<unsigned char> scaled_ptr;
   std::vector<std::tuple<int, int>> dimensions;
   std::vector<r2i::ImageFormat> formats;
+
+  r2i::RuntimeError Validate () {
+    r2i::RuntimeError error;
+    r2i::ImageFormat format;
+    bool match_dimensions = false, match_format = false;
+    int width, height;
+
+    /* Verify if the required dimensions are supported */
+    for (unsigned int i = 0; i < this->dimensions.size(); i++) {
+      width = std::get<0>(this->dimensions.at(i));
+      height = std::get<1>(this->dimensions.at(i));
+      if (width == this->required_width and height == this->required_height) {
+        match_dimensions = true;
+        break;
+      }
+    }
+
+    if (!match_dimensions) {
+      error.Set (r2i::RuntimeError::Code::MODULE_ERROR,
+                 "Required output dimensions are not supported in the preprocessing module");
+      return error;
+    }
+
+    /* Verify if the required format is supported */
+    for (unsigned int i = 0; i < this->formats.size(); i++) {
+      format = this->formats.at(i);
+      if (format.GetId() == this->required_format.GetId()) {
+        match_format = true;
+        break;
+      }
+    }
+
+    if (!match_format) {
+      error.Set (r2i::RuntimeError::Code::MODULE_ERROR,
+                 "Required output image format is not supported in the preprocessing module");
+      return error;
+    }
+
+    return error;
+  }
 
   std::shared_ptr<float> PreProcessImage (const unsigned char *input,
                                           int width, int height, int required_width, int required_height) {
