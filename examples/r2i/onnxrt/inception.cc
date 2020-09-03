@@ -22,18 +22,6 @@
 #define STB_IMAGE_RESIZE_IMPLEMENTATION
 #include "stb_image_resize.h"
 
-void PrintTopPrediction (std::shared_ptr<r2i::IPrediction> prediction) {
-  r2i::RuntimeError error;
-  int index = 0;
-  double max = -1;
-
-  float *prediction_data = reinterpret_cast<float *>(prediction->GetResultData());
-  max = prediction_data[0];
-
-  std::cout << "Highest probability is label "
-            << index << " (" << max << ")" << std::endl;
-}
-
 void PrintUsage() {
   std::cerr << "Required arguments: "
             << "-i [JPG input_image] "
@@ -212,8 +200,8 @@ int main (int argc, char *argv[]) {
     exit(EXIT_FAILURE);
   }
 
+  /* Sort and print top prediction */
   postprocessing->Apply(prediction, error);
-  PrintTopPrediction (prediction);
 
   std::cout << "Stopping engine" << std::endl;
   error = engine->Stop ();

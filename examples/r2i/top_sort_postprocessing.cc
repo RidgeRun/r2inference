@@ -11,6 +11,7 @@
  */
 
 #include <algorithm>
+#include <iostream>
 #include <memory>
 #include <vector>
 
@@ -23,26 +24,53 @@ class Example: public r2i::IPostprocessing {
                                           r2i::RuntimeError &error) override {
     std::shared_ptr<r2i::IPrediction> sorted_prediction;
 
-    error = SortPrediction(prediction);
-
-    sorted_prediction = prediction;
+    sorted_prediction = SortPrediction(prediction, error);
 
     return sorted_prediction;
   }
 
  private:
-  r2i::RuntimeError SortPrediction (std::shared_ptr<r2i::IPrediction>
-                                    prediction) {
-    r2i::RuntimeError error;
-    std::vector<double> sorted_prediction;
+  /* Sort tuples in descending order based on the first element of the tuple */
+  static bool SortDesc(const std::tuple<double, int> &a,
+                       const std::tuple<double, int> &b) {
+    return (std::get<0>(a) > std::get<0>(b));
+  }
 
-    float *prediction_data = reinterpret_cast<float *>(prediction->GetResultData());
-    /* Number of elements in the array */
-    unsigned int prediction_data_size = prediction->GetResultSize() / sizeof(float);
-    /* Sort in descending fashion, top prediction at the beginning */
-    std::sort(prediction_data, prediction_data + prediction_data_size,
-              std::greater<float>());
-    return error;
+  std::shared_ptr<r2i::IPrediction> SortPrediction (
+    std::shared_ptr<r2i::IPrediction>
+    prediction, r2i::RuntimeError &error) {
+    int max_index;
+    double max;
+
+    try {
+      /* Array of prediction values */
+      float *prediction_data = reinterpret_cast<float *>(prediction->GetResultData());
+      /* Number of elements in the array */
+      unsigned int prediction_data_size = prediction->GetResultSize() / sizeof(float);
+      /* Sort indexes in descending fashion, top prediction pair at the beginning */
+      std::vector<std::pair<double, int> > index_value;
+      /* Store (value, index) pairs in a vector */
+      for (unsigned int i = 0; i < prediction_data_size; ++i) {
+        index_value.push_back(std::pair<double, int>(prediction_data[i], i));
+      }
+
+      /* Sort indexes in descending order based on the prediction values */
+      std::stable_sort(index_value.begin(), index_value.end(), SortDesc);
+
+      std::pair<double, int> top_pair = index_value.at(0);
+      max_index = top_pair.second;
+      max = top_pair.first;
+
+      std::cout << "Highest probability is label "
+                << max_index << " (" << max << ")" << std::endl;
+
+    } catch (const std::exception &e) {
+      error.Set (r2i::RuntimeError::Code::MODULE_ERROR,
+                 e.what());
+      return nullptr;
+    }
+
+    return prediction;
   }
 };
 
