@@ -9,10 +9,10 @@
  * back to RidgeRun without any encumbrance.
 */
 
+#include <r2i/prediction.h>
 #include <r2i/r2i.h>
 #include <r2i/tflite/engine.h>
 #include <r2i/tflite/frame.h>
-#include <r2i/tflite/prediction.h>
 
 #include <CppUTest/CommandLineTestRunner.h>
 #include <CppUTest/MemoryLeakDetectorNewMacros.h>
@@ -55,12 +55,21 @@ void *Frame::GetData () {
 int Frame::GetWidth () { return 224; }
 int Frame::GetHeight () { return 224; }
 
-Prediction::Prediction () {}
-double Prediction::At (unsigned int index,  r2i::RuntimeError &error) { return 0.0; }
-void *Prediction::GetResultData () { return nullptr; }
-unsigned int Prediction::GetResultSize () { return 0; }
 }
 }
+
+namespace r2i {
+
+//Prediction::Prediction () {}
+double Prediction::At (unsigned int output_index, unsigned int index,
+                       r2i::RuntimeError &error) { return 0.0; }
+void *Prediction::GetResultData (unsigned int output_index,
+                                 r2i::RuntimeError &error) { return nullptr; }
+unsigned int Prediction::GetResultSize (unsigned int output_index,
+                                        r2i::RuntimeError &error) { return 0; }
+
+}
+
 
 TEST_GROUP (TfLiteEngine) {
   r2i::tflite::Engine engine;

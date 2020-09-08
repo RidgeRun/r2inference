@@ -5,7 +5,6 @@ lib_tflite_tests = [
   ['frame.cc'],
   ['loader.cc'],
   ['parameters.cc'],
-  ['prediction.cc'],
 ]
 
 # Build and run tests
