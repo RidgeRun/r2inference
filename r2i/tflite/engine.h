@@ -17,8 +17,8 @@
 #include <memory>
 #include <vector>
 
+#include <r2i/prediction.h>
 #include <r2i/tflite/model.h>
-#include <r2i/tflite/prediction.h>
 #include <tensorflow/lite/kernels/register.h>
 
 namespace r2i {

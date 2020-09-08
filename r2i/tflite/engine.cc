@@ -14,8 +14,8 @@
 #include <tensorflow/lite/model.h>
 #include <tensorflow/lite/string_util.h>
 
+#include "r2i/prediction.h"
 #include "r2i/tflite/frame.h"
-#include "r2i/tflite/prediction.h"
 
 namespace r2i {
 namespace tflite {
@@ -215,7 +215,7 @@ std::shared_ptr<r2i::IPrediction> Engine::Predict (std::shared_ptr<r2i::IFrame>
     return nullptr;
   }
 
-  prediction->SetTensorValues(tensor_data.data(), tensor_data.size());
+  prediction->AddResult(tensor_data.data(), tensor_data.size());
 
   return prediction;
 }
