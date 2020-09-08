@@ -14,7 +14,8 @@ if ENABLE_TESTS
 
 TESTS =                         \
         iframeworkfactory       \
-        loader
+        loader                  \
+        prediction
 
 check_PROGRAMS=$(TESTS)
 
