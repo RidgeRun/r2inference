@@ -9,29 +9,33 @@
  * back to RidgeRun without any encumbrance.
 */
 
-#ifndef R2I_PREDICTION_CLASSIFICATION_H
-#define R2I_PREDICTION_CLASSIFICATION_H
+#ifndef R2I_PREDICTION_DETECTION_H
+#define R2I_PREDICTION_DETECTION_H
 
 #include <r2i/predictiondecorator.h>
 
 namespace r2i {
 
-class PredictionClassification: public PredictionDecorator {
+struct BBox {
+  double x;
+  double y;
+  double width;
+  double height;
+};
+
+
+class PredictionDetection: public PredictionDecorator {
  public:
-  PredictionClassification();
-  PredictionClassification(std::shared_ptr<IPrediction> base);
-  ~PredictionClassification();
-  RuntimeError SetScores(float *scores, unsigned int size);
-  RuntimeError SetLabels(int *labels, unsigned int size);
-  float *GetScores();
-  int *GetLabels();
+  PredictionDetection();
+  PredictionDetection(std::shared_ptr<IPrediction> base);
+  ~PredictionDetection();
+  RuntimeError SetBoundingBoxes(BBox *bounding_boxes, unsigned int size);
+  BBox *GetBoundingBoxes();
 
  private:
-  std::vector<float> scores;
-  std::vector<int> labels;
+  std::vector<BBox> bounding_boxes;
 };
 
 }
-
 
 #endif // R2I_PREDICTION_CLASSIFICATION_H

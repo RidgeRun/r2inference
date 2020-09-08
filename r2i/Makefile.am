@@ -100,7 +100,6 @@ r2iinclude_HEADERS =         \
         ipreprocessing.h     \
         loader.h             \
         parametermeta.h      \
-        prediction.h         \
         predictiondecorator.h\
         r2i.h                \
         runtimeerror.h
