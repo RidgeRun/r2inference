@@ -41,6 +41,11 @@ r2inference_sources = [
   'iframeworkfactory.cc',
   'imageformat.cc',
   'loader.cc',
+<<<<<<< HEAD
+=======
+  'prediction.cc',
+  'predictiondecorator.cc',
+>>>>>>> Add prediction decorator class
   'runtimeerror.cc',
 ]
 
@@ -60,6 +65,11 @@ r2inference_headers = [
   'ipreprocessing.h',
   'loader.h',
   'parametermeta.h',
+<<<<<<< HEAD
+=======
+  'prediction.h',
+  'predictiondecorator.h',
+>>>>>>> Add prediction decorator class
   'r2i.h',
   'runtimeerror.h',
 ]
