@@ -25,10 +25,10 @@ void PrintTopPrediction (std::shared_ptr<r2i::IPrediction> prediction) {
   r2i::RuntimeError error;
   int index = 0;
   double max = -1;
-  int num_labels = prediction->GetResultSize();
+  int num_labels = prediction->GetResultSize(0, error);
 
   for (int i = 0; i < num_labels; ++i) {
-    double current = prediction->At(i, error);
+    double current = prediction->At(0, i, error);
     if (current > max) {
       max = current;
       index = i;
