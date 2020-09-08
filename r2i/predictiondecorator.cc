@@ -13,6 +13,10 @@
 
 namespace r2i {
 
+PredictionDecorator::PredictionDecorator() {
+  this->base_prediction = nullptr;
+}
+
 PredictionDecorator::PredictionDecorator(std::shared_ptr<IPrediction> base) {
   this->base_prediction = base;
 }

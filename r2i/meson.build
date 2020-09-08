@@ -44,6 +44,7 @@ r2inference_sources = [
 <<<<<<< HEAD
 =======
   'prediction.cc',
+  'predictionclassification.cc',
   'predictiondecorator.cc',
 >>>>>>> Add prediction decorator class
   'runtimeerror.cc',
@@ -68,6 +69,7 @@ r2inference_headers = [
 <<<<<<< HEAD
 =======
   'prediction.h',
+  'predictionclassification.h',
   'predictiondecorator.h',
 >>>>>>> Add prediction decorator class
   'r2i.h',
