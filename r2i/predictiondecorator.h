@@ -20,6 +20,7 @@ namespace r2i {
 
 class PredictionDecorator: public Prediction {
  public:
+  PredictionDecorator();
   PredictionDecorator(std::shared_ptr<IPrediction> base);
   ~PredictionDecorator();
 
@@ -33,7 +34,7 @@ class PredictionDecorator: public Prediction {
                              unsigned int size) override;
   unsigned int GetOutputCount() override;
 
- private:
+ protected:
   std::shared_ptr<IPrediction> base_prediction = nullptr;
 };
 
