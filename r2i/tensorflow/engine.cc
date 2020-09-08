@@ -11,8 +11,8 @@
 
 #include "r2i/tensorflow/engine.h"
 #include <tensorflow/c/c_api.h>
-#include "r2i/tensorflow/prediction.h"
 #include "r2i/tensorflow/frame.h"
+#include "r2i/prediction.h"
 
 namespace r2i {
 namespace tensorflow {
@@ -217,13 +217,99 @@ std::shared_ptr<r2i::IPrediction> Engine::Predict (std::shared_ptr<r2i::IFrame>
   }
 
   std::shared_ptr<TF_Tensor> pout_tensor (out_tensor, TF_DeleteTensor);
-  prediction->SetTensor (pgraph, out_operation, pout_tensor);
+
+  //TODO: here should implement an interation logic to add all the possible outputs
+  float *output_data = this->GetTensorData(out_operation, pout_tensor, error);
+  if (RuntimeError::EOK != error.GetCode()) {
+    return nullptr;
+  }
+
+  //NOTE: the third argument corresponds to the output index. This should be parameterized.
+  int64_t output_size = this->GetRequiredBufferSize(pgraph, out_operation, 0,
+                        error);
+  if (RuntimeError::EOK != error.GetCode()) {
+    return nullptr;
+  }
+
+  prediction->AddResult(output_data, output_size);
 
   return prediction;
 }
 
 Engine::~Engine () {
   this->Stop();
+}
+
+float *Engine::GetTensorData(TF_Operation *operation,
+                             std::shared_ptr<TF_Tensor> tensor, RuntimeError &error) {
+
+  if (nullptr == tensor) {
+    error.Set (RuntimeError::Code::NULL_PARAMETER,
+               "Invalid tensor");
+    return nullptr;
+  }
+
+  TF_Output output = { .oper = operation, .index = 0 };
+  TF_DataType type = TF_OperationOutputType(output);
+
+  if (TF_FLOAT != type) {
+    error.Set (RuntimeError::Code::INCOMPATIBLE_MODEL,
+               "The output of this model is not floating point");
+    return nullptr;
+  }
+
+  return static_cast<float *>(TF_TensorData(tensor.get()));
+}
+
+int64_t Engine::GetRequiredBufferSize (std::shared_ptr<TF_Graph> pgraph,
+                                       TF_Operation *operation, int index, RuntimeError &error) {
+  if (nullptr == pgraph) {
+    error.Set (RuntimeError::Code::NULL_PARAMETER,
+               "Invalid graph passed to prediction");
+    return 0;
+  }
+
+  if (nullptr == operation) {
+    error.Set (RuntimeError::Code::NULL_PARAMETER,
+               "Invalid operation passed to prediction");
+    return 0;
+  }
+
+  std::shared_ptr<TF_Status> pstatus (TF_NewStatus(), TF_DeleteStatus);
+  TF_Status *status = pstatus.get ();
+  TF_Graph *graph = pgraph.get ();
+  TF_Output output = { .oper = operation, .index = index };
+
+  int num_dims = TF_GraphGetTensorNumDims(graph, output, status);
+  if (TF_GetCode(status) != TF_OK) {
+    error.Set (RuntimeError::Code::FRAMEWORK_ERROR, TF_Message (status));
+    return 0;
+  }
+
+  int64_t dims[num_dims];
+  TF_GraphGetTensorShape(graph, output, dims, num_dims, status);
+  if (TF_GetCode(status) != TF_OK) {
+    error.Set (RuntimeError::Code::FRAMEWORK_ERROR, TF_Message (status));
+    return 0;
+  }
+
+  /* R2Inference uses a batch size of 1 but some tensors have this value set to
+   * generic (-1) or greater than 1.
+   * Batch size set to 1 for general compatibility support. */
+  dims[0] = 1;
+
+  TF_DataType type = TF_OperationOutputType(output);
+  size_t type_size = TF_DataTypeSize(type);
+  size_t data_size = 1;
+
+  /* For each dimension, multiply the amount of entries */
+  for (int dim = 0; dim < num_dims; ++dim) {
+    data_size *= dims[dim];
+  }
+
+  int64_t result_size = data_size * type_size;
+
+  return result_size;
 }
 
 } //namespace tensorflow
