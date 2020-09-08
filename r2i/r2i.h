@@ -25,6 +25,11 @@
 #include <r2i/ipreprocessing.h>
 #include <r2i/loader.h>
 #include <r2i/parametermeta.h>
+<<<<<<< HEAD
+=======
+#include <r2i/prediction.h>
+#include <r2i/predictiondecorator.h>
+>>>>>>> Add prediction decorator class
 #include <r2i/r2i.h>
 #include <r2i/runtimeerror.h>
 
