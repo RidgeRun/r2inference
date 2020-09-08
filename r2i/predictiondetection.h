@@ -12,7 +12,7 @@
 #ifndef R2I_PREDICTION_DETECTION_H
 #define R2I_PREDICTION_DETECTION_H
 
-#include <r2i/predictiondecorator.h>
+#include <r2i/predictionclassification.h>
 
 namespace r2i {
 
@@ -24,7 +24,7 @@ struct BBox {
 };
 
 
-class PredictionDetection: public PredictionDecorator {
+class PredictionDetection: public PredictionClassification {
  public:
   PredictionDetection();
   PredictionDetection(std::shared_ptr<IPrediction> base);
