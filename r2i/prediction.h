@@ -30,6 +30,7 @@ class Prediction: public IPrediction {
   virtual RuntimeError AddResult (float *data, unsigned int size) override;
   virtual RuntimeError InsertResult (unsigned int output_index, float *data,
                                      unsigned int size) override;
+  virtual unsigned int GetOutputCount() override;
 
  protected:
   std::vector<std::shared_ptr<float>> results_data;

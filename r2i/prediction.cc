@@ -152,4 +152,8 @@ RuntimeError Prediction::InsertResult(unsigned int output_index, float *data,
   return error;
 }
 
+unsigned int Prediction::GetOutputCount() {
+  return this->results_data.size();
+}
+
 }

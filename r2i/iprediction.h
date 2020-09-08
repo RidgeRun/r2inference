@@ -81,6 +81,12 @@ class IPrediction {
                                       RuntimeError &error) = 0;
 
   /**
+   * \brief Gets the number of output predictions stored.
+   * \return Integer value with the number of output predictions.
+   */
+  virtual unsigned int GetOutputCount() = 0;
+
+  /**
    * \brief Default destructor
    */
   virtual ~IPrediction () {};
