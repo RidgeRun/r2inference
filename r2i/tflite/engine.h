@@ -63,7 +63,7 @@ class Engine : public IEngine {
   void PreprocessInputData(const float *input_data, const int size,
                            ::tflite::Interpreter *interpreter, r2i::RuntimeError &error);
   void GetOutputTensorData(::tflite::Interpreter *interpreter,
-                           std::vector<float> &output_data,
+                           std::shared_ptr<Prediction> prediction,
                            r2i::RuntimeError &error);
 
 };

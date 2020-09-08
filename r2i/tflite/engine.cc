@@ -209,13 +209,10 @@ std::shared_ptr<r2i::IPrediction> Engine::Predict (std::shared_ptr<r2i::IFrame>
     return nullptr;
   }
 
-  std::vector<float> tensor_data;
-  this->GetOutputTensorData(this->interpreter.get(), tensor_data, error);
+  this->GetOutputTensorData(this->interpreter.get(), prediction, error);
   if (r2i::RuntimeError::EOK != error.GetCode()) {
     return nullptr;
   }
-
-  prediction->AddResult(tensor_data.data(), tensor_data.size());
 
   return prediction;
 }
@@ -289,33 +286,41 @@ void Engine::PreprocessInputData(const float *input_data, const int size,
 }
 
 void Engine::GetOutputTensorData(::tflite::Interpreter *interpreter,
-                                 std::vector<float> &output_data,
+                                 std::shared_ptr<Prediction> prediction,
                                  r2i::RuntimeError &error) {
 
   const auto &output_indices = interpreter->outputs();
-  const auto *out_tensor = interpreter->tensor(output_indices[0]);
 
-  if (nullptr == out_tensor) {
-    error.Set (RuntimeError::Code::FRAMEWORK_ERROR,
-               "Output tensor is null");
-    return;
-  }
+  for (size_t index = 0; index < output_indices.size(); index++) {
+    const auto *out_tensor = interpreter->tensor(output_indices[index]);
+    int num_values = 0;
 
-  if (kTfLiteUInt8 == out_tensor->type) {
-    const int num_values = out_tensor->bytes;
-    output_data.resize(num_values);
-    const uint8_t *output = interpreter->typed_output_tensor<uint8_t>(0);
-    ConvertArrayToFloatingPoint<float, uint8_t>(output, output_data, num_values,
-        out_tensor->params.scale, out_tensor->params.zero_point);
-  } else if (kTfLiteFloat32 == out_tensor->type) {
-    const int num_values = out_tensor->bytes / sizeof(float);
-    output_data.resize(num_values);
-    const float *output = interpreter->typed_output_tensor<float>(0);
-    memcpy(&output_data[0], output, num_values * sizeof(float));
-  } else {
-    error.Set (RuntimeError::Code::WRONG_API_USAGE,
-               "Output tensor has unsupported output type");
-    return;
+    if (nullptr == out_tensor) {
+      error.Set (RuntimeError::Code::FRAMEWORK_ERROR,
+                 "Output tensor is null");
+      return;
+    }
+
+    if (kTfLiteUInt8 == out_tensor->type) {
+      std::vector<float> output_data;
+      const uint8_t *output = interpreter->typed_output_tensor<uint8_t>(index);
+      num_values = out_tensor->bytes;
+
+      output_data.resize(num_values);
+      ConvertArrayToFloatingPoint<float, uint8_t>(output, output_data, num_values,
+          out_tensor->params.scale, out_tensor->params.zero_point);
+
+      prediction->AddResult(output_data.data(), output_data.size());
+    } else if (kTfLiteFloat32 == out_tensor->type) {
+      num_values = out_tensor->bytes / sizeof(float);
+      float *output = interpreter->typed_output_tensor<float>(index);
+
+      prediction->AddResult(output, num_values);
+    } else {
+      error.Set (RuntimeError::Code::WRONG_API_USAGE,
+                 "Output tensor has unsupported output type");
+      return;
+    }
   }
 }
 
