@@ -9,10 +9,10 @@
  * back to RidgeRun without any encumbrance.
 */
 
+#include <r2i/prediction.h>
 #include <r2i/r2i.h>
 #include <r2i/tensorflow/engine.h>
 #include <r2i/tensorflow/frame.h>
-#include <r2i/tensorflow/prediction.h>
 
 #include <CppUTest/CommandLineTestRunner.h>
 #include <CppUTest/MemoryLeakDetectorNewMacros.h>
@@ -62,13 +62,23 @@ ImageFormat Frame::GetFormat () { return ImageFormat::Id::UNKNOWN_FORMAT; }
 std::shared_ptr<TF_Tensor> Frame::GetTensor (std::shared_ptr<TF_Graph> graph,
     TF_Operation *operation, RuntimeError &error) { return nullptr; }
 
-Prediction::Prediction () {}
-double Prediction::At (unsigned int index,  r2i::RuntimeError &error) { return 0.0; }
-void *Prediction::GetResultData () { return nullptr; }
-unsigned int Prediction::GetResultSize () { return 0; }
-RuntimeError Prediction::SetTensor (std::shared_ptr<TF_Graph> graph,
-                                    TF_Operation *operation, std::shared_ptr<TF_Tensor> tensor) { return RuntimeError(); }
+float *Engine::GetTensorData(TF_Operation *operation,
+                             std::shared_ptr<TF_Tensor> tensor, RuntimeError &error) { return nullptr; }
+int64_t Engine::GetRequiredBufferSize (std::shared_ptr<TF_Graph> pgraph,
+                                       TF_Operation *operation, int index, RuntimeError &error) { return 0; }
 }
+}
+
+namespace r2i {
+
+double Prediction::At (unsigned int output_index, unsigned int index,
+                       r2i::RuntimeError &error) { return 0.0; }
+void *Prediction::GetResultData (unsigned int output_index,
+                                 RuntimeError &error) { return nullptr; }
+unsigned int Prediction::GetResultSize (unsigned int output_index,
+                                        RuntimeError &error) { return 0; }
+RuntimeError Prediction::AddResult (float *data, unsigned int size) { return RuntimeError(); }
+
 }
 
 TEST_GROUP (TensorflowEngine) {
