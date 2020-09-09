@@ -30,9 +30,9 @@
 #define MEAN 128.0
 #define STD_DEV 128.0
 
-class Example: public r2i::IPreprocessing {
+class MeanStdPreprocessing: public r2i::IPreprocessing {
  public:
-  Example () {
+  MeanStdPreprocessing () {
     /* Set supported dimensiones */
     this->dimensions.push_back(std::tuple<int, int>(REQ_WIDTH_224, REQ_HEIGTH_224));
     /* Set supported formats */
@@ -161,5 +161,5 @@ class Example: public r2i::IPreprocessing {
 
 r2i::IPreprocessing *
 FactoryMakePreprocessing () {
-  return new Example ();
+  return new MeanStdPreprocessing ();
 }

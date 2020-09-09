@@ -17,7 +17,7 @@
 
 #include <r2i/ipostprocessing.h>
 
-class Example: public r2i::IPostprocessing {
+class TopSortPostprocessing: public r2i::IPostprocessing {
  public:
   std::shared_ptr<r2i::IPrediction> Apply(std::shared_ptr<r2i::IPrediction>
                                           prediction,
@@ -82,5 +82,5 @@ class Example: public r2i::IPostprocessing {
 
 r2i::IPostprocessing *
 FactoryMakePostprocessing () {
-  return new Example ();
+  return new TopSortPostprocessing ();
 }
