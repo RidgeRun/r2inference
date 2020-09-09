@@ -45,6 +45,7 @@ class MeanStdPreprocessing: public r2i::IPreprocessing {
     r2i::RuntimeError error;
     int width = 0;
     int height = 0;
+    const unsigned char *data;
 
     if (!in_frame or !out_frame) {
       error.Set (r2i::RuntimeError::Code::NULL_PARAMETER, "Null IFrame parameters");
@@ -58,10 +59,11 @@ class MeanStdPreprocessing: public r2i::IPreprocessing {
 
     width = in_frame->GetWidth();
     height = in_frame->GetHeight();
+    data = static_cast<const unsigned char *>(in_frame->GetData());
 
-    std::shared_ptr<float> processed_data = PreProcessImage(
-        static_cast<const unsigned char *>(in_frame->GetData()), width, height,
-        required_width, required_height);
+
+    std::shared_ptr<float> processed_data = PreProcessImage(data,
+                                            width, height, required_width, required_height);
     error = out_frame->Configure (processed_data.get(), required_width,
                                   required_height,
                                   required_format_id);
