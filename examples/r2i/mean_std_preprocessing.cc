@@ -149,7 +149,7 @@ class MeanStdPreprocessing: public r2i::IPreprocessing {
                        required_height, 0, channels);
 
     for (int i = 0; i < scaled_size; i += channels) {
-      /* RGB = (RGB - Mean)*StdDev */
+      /* RGB = (RGB - Mean)/StdDev */
       adjusted[i + 0] = (static_cast<float>(scaled[i + 0]) - MEAN) / STD_DEV;
       adjusted[i + 1] = (static_cast<float>(scaled[i + 1]) - MEAN) / STD_DEV;
       adjusted[i + 2] = (static_cast<float>(scaled[i + 2]) - MEAN) / STD_DEV;
