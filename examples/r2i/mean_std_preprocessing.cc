@@ -41,7 +41,7 @@ class MeanStdPreprocessing: public r2i::IPreprocessing {
 
   r2i::RuntimeError Apply(std::shared_ptr<r2i::IFrame> in_frame,
                           std::shared_ptr<r2i::IFrame> out_frame, int required_width, int required_height,
-                          r2i::ImageFormat::Id required_format) override {
+                          r2i::ImageFormat::Id required_format_id) override {
     r2i::RuntimeError error;
     int width = 0;
     int height = 0;
@@ -51,11 +51,7 @@ class MeanStdPreprocessing: public r2i::IPreprocessing {
       return error;
     }
 
-    this->required_width = required_width;
-    this->required_height = required_height;
-    this->required_format = required_format;
-
-    error = Validate();
+    error = Validate(required_width, required_height, required_format_id);
     if (error.IsError ()) {
       return error;
     }
@@ -63,12 +59,12 @@ class MeanStdPreprocessing: public r2i::IPreprocessing {
     width = in_frame->GetWidth();
     height = in_frame->GetHeight();
 
-    std::shared_ptr<float> processed_data = PreProcessImage((
-        const unsigned char *)in_frame->GetData(), width, height, this->required_width,
-                                            this->required_height);
-    error = out_frame->Configure (processed_data.get(), this->required_width,
-                                  this->required_height,
-                                  this->required_format.GetId());
+    std::shared_ptr<float> processed_data = PreProcessImage(
+        static_cast<const unsigned char *>(in_frame->GetData()), width, height,
+        required_width, required_height);
+    error = out_frame->Configure (processed_data.get(), required_width,
+                                  required_height,
+                                  required_format_id);
     if (error.IsError ()) {
       return error;
     }
@@ -84,14 +80,14 @@ class MeanStdPreprocessing: public r2i::IPreprocessing {
   }
 
  private:
-  int required_width, required_height;
-  r2i::ImageFormat required_format;
   std::shared_ptr<float> adjusted_ptr;
   std::shared_ptr<unsigned char> scaled_ptr;
   std::vector<std::tuple<int, int>> dimensions;
   std::vector<r2i::ImageFormat> formats;
 
-  r2i::RuntimeError Validate () {
+  r2i::RuntimeError Validate (int required_width, int required_height,
+                              r2i::ImageFormat::Id required_format_id) {
+
     r2i::RuntimeError error;
     r2i::ImageFormat format;
     bool match_dimensions = false;
@@ -103,7 +99,7 @@ class MeanStdPreprocessing: public r2i::IPreprocessing {
     for (unsigned int i = 0; i < this->dimensions.size(); i++) {
       width = std::get<0>(this->dimensions.at(i));
       height = std::get<1>(this->dimensions.at(i));
-      if (width == this->required_width and height == this->required_height) {
+      if (width == required_width and height == required_height) {
         match_dimensions = true;
         break;
       }
@@ -118,7 +114,7 @@ class MeanStdPreprocessing: public r2i::IPreprocessing {
     /* Verify if the required format is supported */
     for (unsigned int i = 0; i < this->formats.size(); i++) {
       format = this->formats.at(i);
-      if (format.GetId() == this->required_format.GetId()) {
+      if (format.GetId() == required_format_id) {
         match_format = true;
         break;
       }
