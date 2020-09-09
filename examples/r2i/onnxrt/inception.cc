@@ -35,8 +35,8 @@ void PrintUsage() {
             << std::endl;
 }
 
-std::shared_ptr<r2i::IFrame> LoadImage(const std::string &path, int reqwidth,
-                                       int reqheight,
+std::shared_ptr<r2i::IFrame> LoadImage(const std::string &path, int req_width,
+                                       int req_height,
                                        std::shared_ptr<r2i::IPreprocessing> preprocessing,
                                        std::shared_ptr<r2i::IFrame> in_frame,
                                        std::shared_ptr<r2i::IFrame> out_frame,
@@ -67,7 +67,7 @@ std::shared_ptr<r2i::IFrame> LoadImage(const std::string &path, int reqwidth,
   error = in_frame->Configure (img, width, height,
                                r2i::ImageFormat::Id::RGB);
 
-  error = preprocessing->Apply(in_frame, out_frame, reqwidth, reqheight,
+  error = preprocessing->Apply(in_frame, out_frame, req_width, req_height,
                                r2i::ImageFormat::Id::RGB);
 
   free (img);
