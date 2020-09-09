@@ -43,8 +43,8 @@ class MeanStdPreprocessing: public r2i::IPreprocessing {
                           std::shared_ptr<r2i::IFrame> out_frame, int required_width, int required_height,
                           r2i::ImageFormat::Id required_format) override {
     r2i::RuntimeError error;
-    int width;
-    int height;
+    int width = 0;
+    int height = 0;
 
     if (!in_frame or !out_frame) {
       error.Set (r2i::RuntimeError::Code::NULL_PARAMETER, "Null IFrame parameters");
@@ -94,8 +94,10 @@ class MeanStdPreprocessing: public r2i::IPreprocessing {
   r2i::RuntimeError Validate () {
     r2i::RuntimeError error;
     r2i::ImageFormat format;
-    bool match_dimensions = false, match_format = false;
-    int width, height;
+    bool match_dimensions = false;
+    bool match_format = false;
+    int width = 0;
+    int height = 0;
 
     /* Verify if the required dimensions are supported */
     for (unsigned int i = 0; i < this->dimensions.size(); i++) {
