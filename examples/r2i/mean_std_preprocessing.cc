@@ -62,8 +62,8 @@ class MeanStdPreprocessing: public r2i::IPreprocessing {
     data = static_cast<const unsigned char *>(in_frame->GetData());
 
 
-    std::shared_ptr<float> processed_data = PreProcessImage(data,
-                                            width, height, required_width, required_height);
+    this->processed_data = PreProcessImage(data, width, height, required_width,
+                                           required_height);
     error = out_frame->Configure (processed_data.get(), required_width,
                                   required_height,
                                   required_format_id);
@@ -82,8 +82,7 @@ class MeanStdPreprocessing: public r2i::IPreprocessing {
   }
 
  private:
-  std::shared_ptr<float> adjusted_ptr;
-  std::shared_ptr<unsigned char> scaled_ptr;
+  std::shared_ptr<float> processed_data;
   std::vector<std::tuple<int, int>> dimensions;
   std::vector<r2i::ImageFormat> formats;
 
@@ -136,14 +135,18 @@ class MeanStdPreprocessing: public r2i::IPreprocessing {
 
     const int channels = 3;
     const int scaled_size = channels * required_width * required_height;
-    this->scaled_ptr = std::shared_ptr<unsigned char>(new unsigned
-                       char[scaled_size],
-                       std::default_delete<const unsigned char[]>());
-    this->adjusted_ptr = std::shared_ptr<float>(new float[scaled_size],
-                         std::default_delete<float[]>());
+    std::shared_ptr<unsigned char> scaled_ptr;
+    std::shared_ptr<float> adjusted_ptr;
+    float *adjusted;
+    unsigned char *scaled;
 
-    float *adjusted = adjusted_ptr.get();
-    unsigned char *scaled = scaled_ptr.get();
+    scaled_ptr = std::shared_ptr<unsigned char>(new unsigned char[scaled_size],
+                 std::default_delete<const unsigned char[]>());
+    adjusted_ptr = std::shared_ptr<float>(new float[scaled_size],
+                                          std::default_delete<float[]>());
+
+    adjusted = adjusted_ptr.get();
+    scaled = scaled_ptr.get();
 
     stbir_resize_uint8(input, width, height, 0, scaled, required_width,
                        required_height, 0, channels);
