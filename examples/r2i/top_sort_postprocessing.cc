@@ -63,6 +63,7 @@ class TopSortPostprocessing: public r2i::IPostprocessing {
       /* Sort indexes in descending order based on the prediction values */
       std::stable_sort(index_value.begin(), index_value.end(), SortDesc);
 
+      /* After sorting, print highest scoring label */
       std::pair<double, int> top_pair = index_value.at(0);
       max_index = top_pair.second;
       max = top_pair.first;
