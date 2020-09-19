@@ -13,6 +13,7 @@
 #define R2I_TENSORFLOW_MODEL_H
 
 #include <memory>
+#include <vector>
 #include <tensorflow/c/c_api.h>
 
 #include <r2i/imodel.h>
@@ -30,11 +31,20 @@ class Model : public IModel {
   std::shared_ptr<TF_Graph> GetGraph ();
   std::shared_ptr<TF_Buffer> GetBuffer ();
   TF_Operation *GetInputOperation ();
+
+  //[[deprecated("Use GetOutputOperation() instead.")]]
   TF_Operation *GetOutputOperation ();
+  std::vector<TF_Operation *> GetOutputOperations ();
   RuntimeError SetInputLayerName (const std::string &name);
+
+  //[[deprecated("Use SetOutputLayersNames() instead.")]]
   RuntimeError SetOutputLayerName (const std::string &name);
+  RuntimeError SetOutputLayersNames (std::vector< std::string > names);
   const std::string GetInputLayerName ();
+
+  //[[deprecated("Use GetOutputLayesrNames() instead.")]]
   const std::string GetOutputLayerName ();
+  std::vector< std::string > GetOutputLayesrNames ();
 
   RuntimeError Load (std::shared_ptr<TF_Buffer> buffer);
 
@@ -42,9 +52,9 @@ class Model : public IModel {
   std::shared_ptr<TF_Graph> graph;
   std::shared_ptr<TF_Buffer> buffer;
   TF_Operation *in_operation;
-  TF_Operation *out_operation;
+  std::vector<TF_Operation *> out_operations;
   std::string input_layer_name;
-  std::string output_layer_name;
+  std::vector<std::string> output_layers_names;
 };
 
 }

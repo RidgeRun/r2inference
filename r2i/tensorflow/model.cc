@@ -11,16 +11,18 @@
 
 #include "r2i/tensorflow/model.h"
 
+#include <iostream>
+
 namespace r2i {
 namespace tensorflow {
 
 Model::Model () {
   this->graph = nullptr;
   this->buffer = nullptr;
-  this->out_operation = nullptr;
   this->in_operation = nullptr;
+  this->out_operations.clear();
   this->input_layer_name.clear ();
-  this->output_layer_name.clear ();
+  this->output_layers_names.clear();
 }
 
 RuntimeError Model::Start (const std::string &name) {
@@ -32,9 +34,9 @@ RuntimeError Model::Start (const std::string &name) {
     return error;
   }
 
-  if (this->output_layer_name.empty()) {
+  if (this->output_layers_names.size() == 0) {
     error.Set (RuntimeError::Code::NULL_PARAMETER,
-               "Output layer name has not been set");
+               "Output layers names has not been set");
     return error;
   }
 
@@ -48,17 +50,27 @@ RuntimeError Model::Start (const std::string &name) {
     return error;
   }
 
-  TF_Operation *out_operation = nullptr;
-  out_operation = TF_GraphOperationByName(graph,
-                                          this->output_layer_name.c_str ());
-  if (nullptr == out_operation) {
-    error.Set (RuntimeError::Code::INVALID_FRAMEWORK_PARAMETER,
-               "No valid output node provided");
-    return error;
+  for (size_t index = 0; index < this->output_layers_names.size(); index++) {
+    std::string out_layer_name = this->output_layers_names[index];
+
+    if (out_layer_name.empty()) {
+      error.Set (RuntimeError::Code::NULL_PARAMETER, "Invalid output layer name");
+      return error;
+    }
+
+    TF_Operation *out_operation = nullptr;
+    out_operation = TF_GraphOperationByName(graph, out_layer_name.c_str ());
+
+    if (nullptr == out_operation) {
+      error.Set (RuntimeError::Code::INVALID_FRAMEWORK_PARAMETER,
+                 "No valid output node provided");
+      return error;
+    }
+
+    this->out_operations.push_back(out_operation);
   }
 
   this->in_operation = in_operation;
-  this->out_operation = out_operation;
 
   return error;
 }
@@ -75,8 +87,21 @@ TF_Operation *Model::GetInputOperation () {
   return this->in_operation;
 }
 
+/*
+ * NOTE: This method should be removed once the multiple output
+ * support is integrated with the GStreamer plugins. The logic of
+ * this method is emulating the previous one to allow backward
+ * compatibility.
+ */
 TF_Operation *Model::GetOutputOperation () {
-  return this->out_operation;
+  if (this->out_operations.size() > 0) {
+    return this->out_operations[0];
+  }
+  return nullptr;
+}
+
+std::vector<TF_Operation *> Model::GetOutputOperations () {
+  return this->out_operations;
 }
 
 RuntimeError Model::SetInputLayerName (const std::string &name) {
@@ -85,9 +110,20 @@ RuntimeError Model::SetInputLayerName (const std::string &name) {
   return RuntimeError ();
 }
 
+/*
+ * NOTE: This method should be removed once the multiple output
+ * support is integrated with the GStreamer plugins. The logic of
+ * this method is emulating the previous one to allow backward
+ * compatibility.
+ */
 RuntimeError Model::SetOutputLayerName (const std::string &name) {
-  this->output_layer_name = name;
+  this->output_layers_names.clear();
+  this->output_layers_names.push_back(name);
+  return RuntimeError ();
+}
 
+RuntimeError Model::SetOutputLayersNames (std::vector< std::string > names) {
+  this->output_layers_names = names;
   return RuntimeError ();
 }
 
@@ -95,8 +131,23 @@ const std::string Model::GetInputLayerName () {
   return this->input_layer_name;
 }
 
+/*
+ * NOTE: This method should be removed once the multiple output
+ * support is integrated with the GStreamer plugins. The logic of
+ * this method is emulating the previous one to allow backward
+ * compatibility.
+ */
 const std::string Model::GetOutputLayerName () {
-  return this->output_layer_name;
+  std::string output_name;
+
+  if (this->output_layers_names.size() > 0) {
+    output_name = this->output_layers_names[0];
+  }
+  return output_name;
+}
+
+std::vector< std::string > Model::GetOutputLayesrNames () {
+  return this->output_layers_names;
 }
 
 RuntimeError Model::Load (std::shared_ptr<TF_Buffer> pbuffer) {

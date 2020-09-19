@@ -61,11 +61,18 @@ RuntimeError Model::SetInputLayerName (const std::string &name) {
   return RuntimeError();
 }
 RuntimeError Model::SetOutputLayerName (const std::string &name) {
-  this->output_layer_name = name;
+  this->output_layers_names.clear();
+  this->output_layers_names.push_back(name);
   return RuntimeError();
 }
 const std::string Model::GetInputLayerName () { return this->input_layer_name; }
-const std::string Model::GetOutputLayerName () { return this->output_layer_name; }
+const std::string Model::GetOutputLayerName () {
+  std::string output_name;
+  if (this->output_layers_names.size() > 0) {
+    output_name = this->output_layers_names[0];
+  }
+  return output_name;
+}
 
 Engine::Engine ()  { }
 RuntimeError Engine::SetModel (std::shared_ptr<IModel> in_model) { return RuntimeError(); }
