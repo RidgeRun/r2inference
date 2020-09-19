@@ -15,6 +15,7 @@
 #include <memory>
 #include <string>
 #include <unordered_map>
+#include <vector>
 
 #include <r2i/iparameters.h>
 #include <r2i/runtimeerror.h>
@@ -42,12 +43,18 @@ class Parameters : public IParameters {
   RuntimeError Get (const std::string &in_parameter,
                     std::string &value) override;
 
+  RuntimeError Get (const std::string &in_parameter,
+                    std::vector< std::string > &value);
+
   RuntimeError Set (const std::string &in_parameter,
                     const std::string &in_value) override;
 
   RuntimeError Set (const std::string &in_parameter, int in_value) override;
 
   RuntimeError Set (const std::string &in_parameter, double in_value) override;
+
+  RuntimeError Set (const std::string &in_parameter,
+                    std::vector< std::string > value);
 
   RuntimeError List (std::vector<ParameterMeta> &metas) override;
 
@@ -83,6 +90,12 @@ class Parameters : public IParameters {
    public:
     DoubleAccessor (Parameters *target) : Accessor(target) {}
     double value;
+  };
+
+  class VectorAccessor : public Accessor {
+   public:
+    VectorAccessor (Parameters *target) : Accessor(target) {}
+    std::vector< std::string > value;
   };
 
   class VersionAccessor : public StringAccessor {
@@ -133,6 +146,19 @@ class Parameters : public IParameters {
 
     RuntimeError Get () {
       this->value = target->model->GetOutputLayerName();
+      return RuntimeError ();
+    }
+  };
+
+  class OutputLayersAccessor : public VectorAccessor {
+   public:
+    OutputLayersAccessor (Parameters *target) : VectorAccessor(target) {}
+    RuntimeError Set () {
+      return target->model->SetOutputLayersNames(this->value);
+    }
+
+    RuntimeError Get () {
+      this->value = target->model->GetOutputLayesrNames();
       return RuntimeError ();
     }
   };
