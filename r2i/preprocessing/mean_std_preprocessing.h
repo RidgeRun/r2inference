@@ -18,23 +18,22 @@ namespace r2i {
 
 class MeanStdPreprocessing: public r2i::IPreprocessing {
  public:
-   MeanStdPreprocessing ();
-   r2i::RuntimeError Apply(std::shared_ptr<r2i::IFrame> in_frame,
+  MeanStdPreprocessing ();
+  r2i::RuntimeError Apply(std::shared_ptr<r2i::IFrame> in_frame,
                           std::shared_ptr<r2i::IFrame> out_frame, int required_width, int required_height,
                           r2i::ImageFormat::Id required_format_id) override;
-   std::vector<r2i::ImageFormat> GetAvailableFormats() override;
-   std::vector<std::tuple<int, int>> GetAvailableDataSizes() override;
+  std::vector<r2i::ImageFormat> GetAvailableFormats() override;
+  std::vector<std::tuple<int, int>> GetAvailableDataSizes() override;
 
  private:
-   std::shared_ptr<float> processed_data;
-   std::vector<std::tuple<int, int>> dimensions;
-   std::vector<r2i::ImageFormat> formats;
+  std::shared_ptr<float> processed_data;
+  std::vector<std::tuple<int, int>> dimensions;
+  std::vector<r2i::ImageFormat> formats;
 
-   r2i::RuntimeError Validate (int required_width, int required_height,
-                             r2i::ImageFormat::Id required_format_id);
-   std::shared_ptr<float> PreProcessImage (const unsigned char *input,
-                                           int width, int height, int required_width, int required_height);
-   r2i::IPreprocessing *FactoryMakePreprocessing ();
+  r2i::RuntimeError Validate (int required_width, int required_height,
+                              r2i::ImageFormat::Id required_format_id);
+  std::shared_ptr<float> PreProcessImage (const unsigned char *input,
+                                          int width, int height, int required_width, int required_height);
 };
 
 }  // namespace r2i

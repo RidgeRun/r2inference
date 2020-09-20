@@ -38,9 +38,10 @@ MeanStdPreprocessing::MeanStdPreprocessing () {
   this->formats.push_back(r2i::ImageFormat(r2i::ImageFormat::Id::RGB));
 }
 
-r2i::RuntimeError MeanStdPreprocessing::Apply(std::shared_ptr<r2i::IFrame> in_frame,
-                        std::shared_ptr<r2i::IFrame> out_frame, int required_width, int required_height,
-                        r2i::ImageFormat::Id required_format_id) {
+r2i::RuntimeError MeanStdPreprocessing::Apply(std::shared_ptr<r2i::IFrame>
+    in_frame,
+    std::shared_ptr<r2i::IFrame> out_frame, int required_width, int required_height,
+    r2i::ImageFormat::Id required_format_id) {
   r2i::RuntimeError error;
   int width = 0;
   int height = 0;
@@ -76,12 +77,14 @@ std::vector<r2i::ImageFormat> MeanStdPreprocessing::GetAvailableFormats() {
   return this->formats;
 }
 
-std::vector<std::tuple<int, int>> MeanStdPreprocessing::GetAvailableDataSizes() {
+std::vector<std::tuple<int, int>>
+MeanStdPreprocessing::GetAvailableDataSizes() {
   return this->dimensions;
 }
 
-r2i::RuntimeError MeanStdPreprocessing::Validate (int required_width, int required_height,
-                            r2i::ImageFormat::Id required_format_id) {
+r2i::RuntimeError MeanStdPreprocessing::Validate (int required_width,
+    int required_height,
+    r2i::ImageFormat::Id required_format_id) {
 
   r2i::RuntimeError error;
   r2i::ImageFormat format;
@@ -124,8 +127,9 @@ r2i::RuntimeError MeanStdPreprocessing::Validate (int required_width, int requir
   return error;
 }
 
-std::shared_ptr<float> MeanStdPreprocessing::PreProcessImage (const unsigned char *input,
-                                        int width, int height, int required_width, int required_height) {
+std::shared_ptr<float> MeanStdPreprocessing::PreProcessImage (
+  const unsigned char *input,
+  int width, int height, int required_width, int required_height) {
 
   const int channels = 3;
   const int scaled_size = channels * required_width * required_height;
@@ -155,10 +159,9 @@ std::shared_ptr<float> MeanStdPreprocessing::PreProcessImage (const unsigned cha
   return adjusted_ptr;
 }
 
-r2i::IPreprocessing *MeanStdPreprocessing::FactoryMakePreprocessing () {
-  return new MeanStdPreprocessing ();
-}
-
 }  // namespace r2i
 
-
+r2i::IPreprocessing *
+FactoryMakePreprocessing () {
+  return new r2i::MeanStdPreprocessing ();
+}
