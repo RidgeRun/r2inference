@@ -65,7 +65,7 @@ std::shared_ptr<TF_Tensor> Frame::GetTensor (std::shared_ptr<TF_Graph> graph,
 float *Engine::GetTensorData(TF_Operation *operation,
                              std::shared_ptr<TF_Tensor> tensor, RuntimeError &error) { return nullptr; }
 int64_t Engine::GetRequiredBufferSize (std::shared_ptr<TF_Graph> pgraph,
-                                       TF_Operation *operation, int index, RuntimeError &error) { return 0; }
+                                       TF_Operation *operation, RuntimeError &error) { return 0; }
 }
 }
 

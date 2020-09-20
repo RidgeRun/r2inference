@@ -21,6 +21,14 @@
 namespace r2i {
 namespace tensorflow {
 
+struct TensorInfo {
+  int num_dims = 0;
+  int64_t *dims;
+  TF_DataType type;
+  size_t type_size = 0;
+  size_t data_size = 0;
+};
+
 class Engine : public IEngine {
  public:
   Engine ();
@@ -53,7 +61,11 @@ class Engine : public IEngine {
   float *GetTensorData(TF_Operation *operation, std::shared_ptr<TF_Tensor> tensor,
                        RuntimeError &error);
   int64_t GetRequiredBufferSize (std::shared_ptr<TF_Graph> graph,
-                                 TF_Operation *operation, int index, RuntimeError &error);
+                                 TF_Operation *operation, RuntimeError &error);
+  TF_Tensor *AllocateTensor(std::shared_ptr<TF_Graph> pgraph,
+                            TF_Operation *operation, RuntimeError &error);
+  TensorInfo InspectTensor(std::shared_ptr<TF_Graph> graph,
+                           TF_Operation *operation, RuntimeError &error);
 };
 
 }

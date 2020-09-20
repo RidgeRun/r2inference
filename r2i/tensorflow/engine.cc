@@ -178,8 +178,9 @@ std::shared_ptr<r2i::IPrediction> Engine::Predict (std::shared_ptr<r2i::IFrame>
 
   /* These pointers are validated during load */
   auto pgraph = this->model->GetGraph ();
-  auto out_operation = this->model->GetOutputOperation ();
   auto in_operation = this->model->GetInputOperation ();
+  std::vector< TF_Operation * > out_operations =
+    this->model->GetOutputOperations();
 
   auto frame = std::dynamic_pointer_cast<Frame, IFrame> (in_frame);
   if (nullptr == frame) {
@@ -200,38 +201,52 @@ std::shared_ptr<r2i::IPrediction> Engine::Predict (std::shared_ptr<r2i::IFrame>
   auto *in_tensor = pin_tensor.get ();
   auto *status = pstatus.get ();
 
-  TF_Output run_outputs = {.oper = out_operation, .index = 0};
+  std::vector<TF_Output> run_outputs;
+  std::vector<TF_Tensor *> out_tensors;
+  for (size_t index = 0; index < out_operations.size(); index++) {
+    TF_Output run_output = {.oper = out_operations[index], .index = 0};
+    TF_Tensor *out_tensor = this->AllocateTensor(pgraph, out_operations[index],
+                            error);
+    if (error.IsError()) {
+      return nullptr;
+    }
+
+    run_outputs.push_back(run_output);
+    out_tensors.push_back(out_tensor);
+  }
+
   TF_Output run_inputs = {.oper = in_operation, .index = 0};
-  TF_Tensor *out_tensor = nullptr;
 
   TF_SessionRun(session,
-                NULL,                         /* RunOptions */
-                &run_inputs, &in_tensor, 1,   /* Input tensors */
-                &run_outputs, &out_tensor, 1, /* Output tensors */
-                NULL, 0,                      /* Target operations */
-                NULL,                         /* RunMetadata */
+                NULL,                                                 /* RunOptions */
+                &run_inputs, &in_tensor, 1,                           /* Input tensors */
+                &run_outputs[0], &out_tensors[0], out_tensors.size(), /* Output tensors */
+                NULL, 0,                                              /* Target operations */
+                NULL,                                                 /* RunMetadata */
                 status);
   if (TF_GetCode(status) != TF_OK) {
     error.Set (RuntimeError::Code::FRAMEWORK_ERROR, TF_Message (status));
     return nullptr;
   }
 
-  std::shared_ptr<TF_Tensor> pout_tensor (out_tensor, TF_DeleteTensor);
+  // Iterate over the multiple outputs
+  for (size_t index = 0; index < out_tensors.size(); index++) {
+    std::shared_ptr<TF_Tensor> pout_tensor (out_tensors[index], TF_DeleteTensor);
 
-  //TODO: here should implement an interation logic to add all the possible outputs
-  float *output_data = this->GetTensorData(out_operation, pout_tensor, error);
-  if (RuntimeError::EOK != error.GetCode()) {
-    return nullptr;
+    float *output_data = this->GetTensorData(out_operations[index], pout_tensor,
+                         error);
+    if (RuntimeError::EOK != error.GetCode()) {
+      return nullptr;
+    }
+
+    int64_t output_size = this->GetRequiredBufferSize(pgraph, out_operations[index],
+                          error);
+    if (RuntimeError::EOK != error.GetCode()) {
+      return nullptr;
+    }
+
+    prediction->AddResult(output_data, output_size);
   }
-
-  //NOTE: the third argument corresponds to the output index. This should be parameterized.
-  int64_t output_size = this->GetRequiredBufferSize(pgraph, out_operation, 0,
-                        error);
-  if (RuntimeError::EOK != error.GetCode()) {
-    return nullptr;
-  }
-
-  prediction->AddResult(output_data, output_size);
 
   return prediction;
 }
@@ -262,41 +277,70 @@ float *Engine::GetTensorData(TF_Operation *operation,
 }
 
 int64_t Engine::GetRequiredBufferSize (std::shared_ptr<TF_Graph> pgraph,
-                                       TF_Operation *operation, int index, RuntimeError &error) {
+                                       TF_Operation *operation, RuntimeError &error) {
+  int64_t result_size = 0;
+  TensorInfo info = this->InspectTensor(pgraph, operation, error);
+  if (error.IsError()) {
+    return result_size;
+  }
+
+  result_size = info.data_size * info.type_size;
+  return result_size;
+}
+
+TF_Tensor *Engine::AllocateTensor(std::shared_ptr<TF_Graph> pgraph,
+                                  TF_Operation *operation, RuntimeError &error) {
+  TensorInfo info = this->InspectTensor(pgraph, operation, error);
+  if (error.IsError()) {
+    return nullptr;
+  }
+
+  int64_t result_size = info.data_size * info.type_size;
+  return TF_AllocateTensor(info.type, info.dims, info.num_dims, result_size);
+}
+
+TensorInfo Engine::InspectTensor(std::shared_ptr<TF_Graph> pgraph,
+                                 TF_Operation *operation, RuntimeError &error) {
+  TensorInfo info;
+
   if (nullptr == pgraph) {
     error.Set (RuntimeError::Code::NULL_PARAMETER,
-               "Invalid graph passed to prediction");
-    return 0;
+               "Invalid graph passed");
+    return info;
   }
 
   if (nullptr == operation) {
     error.Set (RuntimeError::Code::NULL_PARAMETER,
-               "Invalid operation passed to prediction");
-    return 0;
+               "Invalid operation passed");
+    return info;
   }
 
   std::shared_ptr<TF_Status> pstatus (TF_NewStatus(), TF_DeleteStatus);
   TF_Status *status = pstatus.get ();
   TF_Graph *graph = pgraph.get ();
-  TF_Output output = { .oper = operation, .index = index };
+  TF_Output output = { .oper = operation, .index = 0 };
 
   int num_dims = TF_GraphGetTensorNumDims(graph, output, status);
   if (TF_GetCode(status) != TF_OK) {
     error.Set (RuntimeError::Code::FRAMEWORK_ERROR, TF_Message (status));
-    return 0;
+    return info;
   }
+
+  info.num_dims = num_dims;
 
   int64_t dims[num_dims];
   TF_GraphGetTensorShape(graph, output, dims, num_dims, status);
   if (TF_GetCode(status) != TF_OK) {
     error.Set (RuntimeError::Code::FRAMEWORK_ERROR, TF_Message (status));
-    return 0;
+    return info;
   }
 
   /* R2Inference uses a batch size of 1 but some tensors have this value set to
    * generic (-1) or greater than 1.
    * Batch size set to 1 for general compatibility support. */
   dims[0] = 1;
+
+  info.dims = dims;
 
   TF_DataType type = TF_OperationOutputType(output);
   size_t type_size = TF_DataTypeSize(type);
@@ -307,9 +351,11 @@ int64_t Engine::GetRequiredBufferSize (std::shared_ptr<TF_Graph> pgraph,
     data_size *= dims[dim];
   }
 
-  int64_t result_size = data_size * type_size;
+  info.type = type;
+  info.type_size = type_size;
+  info.data_size = data_size;
 
-  return result_size;
+  return info;
 }
 
 } //namespace tensorflow
