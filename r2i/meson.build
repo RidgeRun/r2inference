@@ -1,4 +1,6 @@
 r2inference_internal_dep = []
+internal_preprocessing_dep = []
+internal_postprocessing_dep = []
 
 if cdata.get('HAVE_TENSORFLOW') == true
   subdir('tensorflow')
@@ -101,3 +103,11 @@ pkgconfig.generate(libraries : r2inference_lib,
 
 # Define the library as an internal dependency to the current build
 r2inference_lib_dep = declare_dependency(link_with: r2inference_lib, dependencies: r2inference_internal_dep)
+
+#Preprocessing modules
+subdir('preprocessing')
+r2inference_internal_dep += [internal_preprocessing_dep]
+
+#Postprocessing modules
+subdir('postprocessing')
+r2inference_internal_dep += [internal_postprocessing_dep]
