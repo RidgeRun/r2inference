@@ -148,3 +148,7 @@ if HAVE_TFLITE
 libr2inference_@RR_PACKAGE_VERSION@_la_LIBADD +=    \
         $(top_builddir)/r2i/tflite/libtflite.la
 endif
+
+SUBDIRS += preprocessing
+
+SUBDIRS += postprocessing
