@@ -41,3 +41,6 @@ endif
 
 #Preprocessing modules tests
 subdir('preprocessing')
+
+#Postprocessing modules tests
+subdir('postprocessing')
