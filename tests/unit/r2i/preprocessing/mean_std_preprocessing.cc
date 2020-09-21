@@ -9,7 +9,7 @@
  * back to RidgeRun without any encumbrance.
 */
 
-#include <r2i/preprocessing/mean_std_preprocessing.h>
+#include "r2i/preprocessing/mean_std_preprocessing.h"
 
 #include <memory>
 
@@ -27,7 +27,7 @@
 #define CHANNELS  3
 
 r2i::ImageFormat image_format_rgb (r2i::ImageFormat::Id::RGB);
-std::vector<float> dummy_frame_data(CHANNELS * FRAME_WIDTH * FRAME_HEIGHT);
+std::vector<float> dummy_frame_data(CHANNELS *FRAME_WIDTH *FRAME_HEIGHT);
 
 namespace mock {
 class Frame : public r2i::IFrame {
@@ -36,21 +36,21 @@ class Frame : public r2i::IFrame {
   r2i::RuntimeError Configure (void *in_data, int width,
                                int height, r2i::ImageFormat::Id format) {
 
-    for (unsigned int i; i < dummy_frame_data.size()-1; i++) {
-	  dummy_frame_data.at(i) = i;
-	}
-   
+    for (unsigned int i = 0; i < dummy_frame_data.size() - 1; i++) {
+      dummy_frame_data.at(i) = i;
+    }
+
     return r2i::RuntimeError();
   }
 
   void *GetData () {
     return dummy_frame_data.data();
   }
-  
+
   int GetWidth () {
     return FRAME_WIDTH;
   }
-  
+
   int GetHeight () {
     return FRAME_HEIGHT;
   }
@@ -73,13 +73,15 @@ class Frame : public r2i::IFrame {
 
 TEST_GROUP(MeanStd) {
   r2i::RuntimeError error;
-  std::shared_ptr<r2i::IPreprocessing> preprocessing = std::make_shared<r2i::MeanStdPreprocessing>();
+  std::shared_ptr<r2i::IPreprocessing> preprocessing =
+    std::make_shared<r2i::MeanStdPreprocessing>();
   std::shared_ptr<mock::Frame> in_frame = std::make_shared<mock::Frame>();
   std::shared_ptr<mock::Frame> out_frame = std::make_shared<mock::Frame>();
 
   void setup() {
     error.Clean();
-    error = in_frame->Configure(dummy_frame_data.data(), FRAME_WIDTH, FRAME_HEIGHT, image_format_rgb.GetId());
+    error = in_frame->Configure(dummy_frame_data.data(), FRAME_WIDTH, FRAME_HEIGHT,
+                                image_format_rgb.GetId());
   }
 };
 
@@ -90,19 +92,22 @@ TEST(MeanStd, ApplySuccess) {
 }
 
 TEST(MeanStd, UnsupportedHeight) {
-  error = preprocessing->Apply(in_frame, out_frame, FRAME_WIDTH, UNSUPPORTED_FRAME_HEIGHT,
+  error = preprocessing->Apply(in_frame, out_frame, FRAME_WIDTH,
+                               UNSUPPORTED_FRAME_HEIGHT,
                                r2i::ImageFormat::Id::RGB);
   LONGS_EQUAL(r2i::RuntimeError::Code::MODULE_ERROR, error.GetCode());
 }
 
 TEST(MeanStd, UnsupportedWidth) {
-  error = preprocessing->Apply(in_frame, out_frame, FRAME_WIDTH, UNSUPPORTED_FRAME_WIDTH,
+  error = preprocessing->Apply(in_frame, out_frame, FRAME_WIDTH,
+                               UNSUPPORTED_FRAME_WIDTH,
                                r2i::ImageFormat::Id::RGB);
   LONGS_EQUAL(r2i::RuntimeError::Code::MODULE_ERROR, error.GetCode());
 }
 
 TEST(MeanStd, UnsupportedFormatId) {
-  error = preprocessing->Apply(in_frame, out_frame, FRAME_WIDTH, UNSUPPORTED_FRAME_WIDTH,
+  error = preprocessing->Apply(in_frame, out_frame, FRAME_WIDTH,
+                               UNSUPPORTED_FRAME_WIDTH,
                                r2i::ImageFormat::Id::BGR);
   LONGS_EQUAL(r2i::RuntimeError::Code::MODULE_ERROR, error.GetCode());
 }

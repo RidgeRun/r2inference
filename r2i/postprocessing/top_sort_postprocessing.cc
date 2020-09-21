@@ -15,73 +15,74 @@
 #include <memory>
 #include <vector>
 
-#include <r2i/ipostprocessing.h>
+#include <r2i/postprocessing/top_sort_postprocessing.h>
 
-class TopSortPostprocessing: public r2i::IPostprocessing {
- public:
-  std::shared_ptr<r2i::IPrediction> Apply(std::shared_ptr<r2i::IPrediction>
-                                          prediction,
-                                          r2i::RuntimeError &error) override {
-    std::shared_ptr<r2i::IPrediction> out_prediction;
+namespace r2i {
 
-    if (!prediction) {
-      error.Set (r2i::RuntimeError::Code::NULL_PARAMETER,
-                 "Null IPrediction parameter");
-      return nullptr;
+/* Sort tuples in descending order based on the first element of the tuple */
+static bool SortDesc(const std::tuple<double, int> &a,
+                     const std::tuple<double, int> &b) {
+  return (std::get<0>(a) > std::get<0>(b));
+}
+
+std::shared_ptr<r2i::IPrediction> TopSortPostprocessing::Apply(
+  std::shared_ptr<r2i::IPrediction>
+  prediction,
+  r2i::RuntimeError &error) {
+  std::shared_ptr<r2i::IPrediction> out_prediction;
+
+  if (!prediction) {
+    error.Set (r2i::RuntimeError::Code::NULL_PARAMETER,
+               "Null IPrediction parameter");
+    return nullptr;
+  }
+
+  out_prediction = SortPrediction(prediction, error);
+
+  return out_prediction;
+}
+
+std::shared_ptr<r2i::IPrediction> TopSortPostprocessing::SortPrediction (
+  std::shared_ptr<r2i::IPrediction>
+  prediction, r2i::RuntimeError &error) {
+  int max_index;
+  double max;
+
+  try {
+    /* Array of prediction values */
+    float *prediction_data = reinterpret_cast<float *>(prediction->GetResultData());
+    /* Number of elements in the array */
+    unsigned int prediction_data_size = prediction->GetResultSize() / sizeof(float);
+    /* Sort indexes in descending fashion, top prediction pair at the beginning */
+    std::vector<std::pair<double, int> > index_value;
+    /* Store (value, index) pairs in a vector */
+    for (unsigned int i = 0; i < prediction_data_size; ++i) {
+      index_value.push_back(std::pair<double, int>(prediction_data[i], i));
     }
 
-    out_prediction = SortPrediction(prediction, error);
+    /* Sort indexes in descending order based on the prediction values */
+    std::stable_sort(index_value.begin(), index_value.end(), SortDesc);
 
-    return out_prediction;
+    /* After sorting, print highest scoring label */
+    std::pair<double, int> top_pair = index_value.at(0);
+    max_index = top_pair.second;
+    max = top_pair.first;
+
+    std::cout << "Highest probability is label "
+              << max_index << " (" << max << ")" << std::endl;
+
+  } catch (const std::exception &e) {
+    error.Set (r2i::RuntimeError::Code::MODULE_ERROR,
+               e.what());
+    return nullptr;
   }
 
- private:
-  /* Sort tuples in descending order based on the first element of the tuple */
-  static bool SortDesc(const std::tuple<double, int> &a,
-                       const std::tuple<double, int> &b) {
-    return (std::get<0>(a) > std::get<0>(b));
-  }
+  return prediction;
+}
 
-  std::shared_ptr<r2i::IPrediction> SortPrediction (
-    std::shared_ptr<r2i::IPrediction>
-    prediction, r2i::RuntimeError &error) {
-    int max_index;
-    double max;
-
-    try {
-      /* Array of prediction values */
-      float *prediction_data = reinterpret_cast<float *>(prediction->GetResultData());
-      /* Number of elements in the array */
-      unsigned int prediction_data_size = prediction->GetResultSize() / sizeof(float);
-      /* Sort indexes in descending fashion, top prediction pair at the beginning */
-      std::vector<std::pair<double, int> > index_value;
-      /* Store (value, index) pairs in a vector */
-      for (unsigned int i = 0; i < prediction_data_size; ++i) {
-        index_value.push_back(std::pair<double, int>(prediction_data[i], i));
-      }
-
-      /* Sort indexes in descending order based on the prediction values */
-      std::stable_sort(index_value.begin(), index_value.end(), SortDesc);
-
-      /* After sorting, print highest scoring label */
-      std::pair<double, int> top_pair = index_value.at(0);
-      max_index = top_pair.second;
-      max = top_pair.first;
-
-      std::cout << "Highest probability is label "
-                << max_index << " (" << max << ")" << std::endl;
-
-    } catch (const std::exception &e) {
-      error.Set (r2i::RuntimeError::Code::MODULE_ERROR,
-                 e.what());
-      return nullptr;
-    }
-
-    return prediction;
-  }
-};
+}  // namespace r2i
 
 r2i::IPostprocessing *
 FactoryMakePostprocessing () {
-  return new TopSortPostprocessing ();
+  return new r2i::TopSortPostprocessing ();
 }

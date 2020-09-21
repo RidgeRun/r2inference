@@ -1,14 +1,14 @@
-lib_preprocessing_tests = [
-  ['mean_std_preprocessing.cc'],
+lib_postprocessing_tests = [
+  ['top_sort_postprocessing.cc'],
 ]
 
 # Build and run tests
-foreach t : lib_preprocessing_tests
+foreach t : lib_postprocessing_tests
   fname = t[0]
   test_name = fname.split('.')[0].underscorify()
 
   exe = executable(test_name, fname,
-      include_directories : [configinc, preprocessing_inc_dir],
+      include_directories : [configinc, postprocessing_inc_dir],
       dependencies : [r2inference_lib_dep, r2inference_internal_dep, tests_dep],
   )
 
