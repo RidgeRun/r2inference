@@ -5,6 +5,7 @@ lib_tensorflow_tests = [
   ['loader.cc'],
   ['model.cc'],
   ['parameters.cc'],
+  ['prediction.cc'],
 ]
 
 # Build and run tests

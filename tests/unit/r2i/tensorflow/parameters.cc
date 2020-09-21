@@ -9,9 +9,9 @@
  * back to RidgeRun without any encumbrance.
 */
 
-#include <r2i/prediction.h>
 #include <r2i/r2i.h>
 #include <r2i/tensorflow/parameters.h>
+#include <r2i/tensorflow/prediction.h>
 
 #include <CppUTest/CommandLineTestRunner.h>
 #include <CppUTest/TestHarness.h>
@@ -38,6 +38,8 @@ class Engine : public r2i::IEngine {
   };
   virtual std::shared_ptr<r2i::IPrediction> Predict (std::shared_ptr<r2i::IFrame>
       in_frame, r2i::RuntimeError &error) { return nullptr; }
+  virtual r2i::RuntimeError Predict (std::shared_ptr<r2i::IFrame> in_frame,
+                                     std::vector< std::shared_ptr<r2i::IPrediction> > &predictions) { return r2i::RuntimeError(); }
 };
 }
 

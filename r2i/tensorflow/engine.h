@@ -44,6 +44,9 @@ class Engine : public IEngine {
   std::shared_ptr<r2i::IPrediction> Predict (std::shared_ptr<r2i::IFrame>
       in_frame, r2i::RuntimeError &error) override;
 
+  RuntimeError Predict (std::shared_ptr<r2i::IFrame> in_frame,
+                        std::vector< std::shared_ptr<r2i::IPrediction> > &predictions) override;
+
   ~Engine ();
 
  private:
@@ -58,10 +61,6 @@ class Engine : public IEngine {
   std::shared_ptr<TF_Session> session;
   std::shared_ptr<Model> model;
 
-  float *GetTensorData(TF_Operation *operation, std::shared_ptr<TF_Tensor> tensor,
-                       RuntimeError &error);
-  int64_t GetRequiredBufferSize (std::shared_ptr<TF_Graph> graph,
-                                 TF_Operation *operation, RuntimeError &error);
   TF_Tensor *AllocateTensor(std::shared_ptr<TF_Graph> pgraph,
                             TF_Operation *operation, RuntimeError &error);
   TensorInfo InspectTensor(std::shared_ptr<TF_Graph> graph,

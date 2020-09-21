@@ -17,7 +17,7 @@
 #include <memory>
 #include <vector>
 
-#include <r2i/prediction.h>
+#include <r2i/iprediction.h>
 #include <r2i/tflite/model.h>
 #include <tensorflow/lite/kernels/register.h>
 
@@ -36,6 +36,10 @@ class Engine : public IEngine {
 
   std::shared_ptr<r2i::IPrediction> Predict (std::shared_ptr<r2i::IFrame>
       in_frame, r2i::RuntimeError &error) override;
+
+  RuntimeError Predict (std::shared_ptr<r2i::IFrame> in_frame,
+                        std::vector< std::shared_ptr<r2i::IPrediction> > &predictions) override;
+
   RuntimeError SetNumberOfThreads (int number_of_threads);
   const int GetNumberOfThreads ();
   RuntimeError SetAllowFP16 (int allow_fp16);
@@ -60,11 +64,12 @@ class Engine : public IEngine {
   virtual void SetInterpreterContext(::tflite::Interpreter *interpreter);
 
  private:
+  RuntimeError PredictAuxiliar(std::shared_ptr<r2i::IFrame> in_frame);
   void PreprocessInputData(const float *input_data, const int size,
                            ::tflite::Interpreter *interpreter, r2i::RuntimeError &error);
   void GetOutputTensorData(::tflite::Interpreter *interpreter,
-                           std::shared_ptr<Prediction> prediction,
-                           r2i::RuntimeError &error);
+                           std::vector<float> &output_data,
+                           int index, r2i::RuntimeError &error);
 
 };
 

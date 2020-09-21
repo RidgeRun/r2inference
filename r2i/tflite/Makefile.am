@@ -20,6 +20,7 @@ libtflite_la_SOURCES =           \
     frame.cc                     \
     loader.cc                    \
     model.cc                     \
+    prediction.cc                \
     frameworkfactory.cc          \
     parameters.cc
 
@@ -50,6 +51,7 @@ tensorflowliteinclude_HEADERS =      \
     model.h                          \
     loader.h                         \
     engine.h                         \
+    prediction.h                     \
     frame.h                          \
     frameworkfactory.h               \
     parameters.h

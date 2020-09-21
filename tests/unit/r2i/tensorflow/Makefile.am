@@ -17,6 +17,7 @@ TESTS =                 \
         model           \
         loader          \
         engine          \
+        prediction      \
         frame           \
         parameters      \
         frameworkfactory

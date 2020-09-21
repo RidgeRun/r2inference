@@ -19,6 +19,7 @@
 
 #include <memory>
 #include <string>
+#include <vector>
 
 /**
  * R2Inference Namespace
@@ -61,6 +62,17 @@ class IEngine {
   virtual std::shared_ptr<r2i::IPrediction> Predict (std::shared_ptr<r2i::IFrame>
       in_frame,
       r2i::RuntimeError &error) = 0;
+
+  /**
+   * \brief Performs a prediction on a IEngine framework, based on a
+   *  assigned IModel.
+   *  \param in_frame Input data to perform the inference.
+   *  \param predictions [in/out] obteined from evaluating and IFrame
+   *   on the assigned IModel.
+   *  \return RuntimeError with a description of an error.
+   */
+  virtual RuntimeError Predict (std::shared_ptr<r2i::IFrame> in_frame,
+                                std::vector< std::shared_ptr<r2i::IPrediction> > &predictions) = 0;
 
   /**
    * \brief Default destructor
