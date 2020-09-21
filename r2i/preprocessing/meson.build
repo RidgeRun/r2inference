@@ -1,6 +1,6 @@
 #Build preprocessing modules
 preprocessing_sources = [
-    'mean_std_preprocessing'
+    'normalize'
 ]
 
 foreach pre_module : preprocessing_sources

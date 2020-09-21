@@ -9,7 +9,7 @@
  * back to RidgeRun without any encumbrance.
 */
 
-#include "r2i/preprocessing/mean_std_preprocessing.h"
+#include "r2i/preprocessing/normalize.h"
 
 #include <memory>
 
@@ -71,10 +71,10 @@ class Frame : public r2i::IFrame {
 };
 }
 
-TEST_GROUP(MeanStd) {
+TEST_GROUP(Normalize) {
   r2i::RuntimeError error;
   std::shared_ptr<r2i::IPreprocessing> preprocessing =
-    std::make_shared<r2i::MeanStdPreprocessing>();
+    std::make_shared<r2i::Normalize>();
   std::shared_ptr<mock::Frame> in_frame = std::make_shared<mock::Frame>();
   std::shared_ptr<mock::Frame> out_frame = std::make_shared<mock::Frame>();
 
@@ -85,27 +85,27 @@ TEST_GROUP(MeanStd) {
   }
 };
 
-TEST(MeanStd, ApplySuccess) {
+TEST(Normalize, ApplySuccess) {
   error = preprocessing->Apply(in_frame, out_frame, FRAME_WIDTH, FRAME_HEIGHT,
                                r2i::ImageFormat::Id::RGB);
   LONGS_EQUAL(r2i::RuntimeError::Code::EOK, error.GetCode());
 }
 
-TEST(MeanStd, UnsupportedHeight) {
+TEST(Normalize, UnsupportedHeight) {
   error = preprocessing->Apply(in_frame, out_frame, FRAME_WIDTH,
                                UNSUPPORTED_FRAME_HEIGHT,
                                r2i::ImageFormat::Id::RGB);
   LONGS_EQUAL(r2i::RuntimeError::Code::MODULE_ERROR, error.GetCode());
 }
 
-TEST(MeanStd, UnsupportedWidth) {
+TEST(Normalize, UnsupportedWidth) {
   error = preprocessing->Apply(in_frame, out_frame, FRAME_WIDTH,
                                UNSUPPORTED_FRAME_WIDTH,
                                r2i::ImageFormat::Id::RGB);
   LONGS_EQUAL(r2i::RuntimeError::Code::MODULE_ERROR, error.GetCode());
 }
 
-TEST(MeanStd, UnsupportedFormatId) {
+TEST(Normalize, UnsupportedFormatId) {
   error = preprocessing->Apply(in_frame, out_frame, FRAME_WIDTH,
                                UNSUPPORTED_FRAME_WIDTH,
                                r2i::ImageFormat::Id::BGR);

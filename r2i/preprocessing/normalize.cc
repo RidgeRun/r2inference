@@ -13,7 +13,7 @@
 #include <memory>
 #include <vector>
 
-#include <r2i/preprocessing/mean_std_preprocessing.h>
+#include <r2i/preprocessing/normalize.h>
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
@@ -22,29 +22,35 @@
 #include "stb_image_resize.h"
 
 /* Model specific required dimensions */
-#define REQ_WIDTH_224 224
-#define REQ_HEIGTH_224 224
-#define REQ_WIDTH_299 299
-#define REQ_HEIGTH_299 299
+#define REQ_WIDTH_224 224 /* InceptionV1, InceptionV2, Mobilenet */
+#define REQ_HEIGTH_224 224 /* InceptionV1, InceptionV2, Mobilenet */
+#define REQ_WIDTH_299 299 /* InceptionV3, InceptionV4 */
+#define REQ_HEIGTH_299 299 /* InceptionV3, InceptionV4 */
+#define REQ_WIDTH_416 416 /* TinyyoloV2, TinyyoloV3 */
+#define REQ_HEIGTH_416 416 /* TinyyoloV2, TinyyoloV3 */
 
 /* Constants for preprocessing */
-#define MEAN 128.0
-#define STD_DEV 128.0
+#define MEAN_128 128.0 /* Inception, Mobilenet */
+#define STD_DEV_128 128.0 /* Inception, Mobilenet */
+#define MEAN_0 0 /* TinyyoloV2, TinyyoloV3 */
+#define STD_DEV_255 255 /* TinyyoloV2 */
+#define STD_DEV_1 1 /* TinyyoloV3 */
 
 namespace r2i {
 
-MeanStdPreprocessing::MeanStdPreprocessing () {
+Normalize::Normalize () {
   /* Set supported dimensiones */
   this->dimensions.push_back(std::tuple<int, int>(REQ_WIDTH_224, REQ_HEIGTH_224));
   this->dimensions.push_back(std::tuple<int, int>(REQ_WIDTH_299, REQ_HEIGTH_299));
+  this->dimensions.push_back(std::tuple<int, int>(REQ_WIDTH_416, REQ_HEIGTH_416));
   /* Set supported formats */
   this->formats.push_back(r2i::ImageFormat(r2i::ImageFormat::Id::RGB));
 }
 
-r2i::RuntimeError MeanStdPreprocessing::Apply(std::shared_ptr<r2i::IFrame>
-    in_frame,
-    std::shared_ptr<r2i::IFrame> out_frame, int required_width, int required_height,
-    r2i::ImageFormat::Id required_format_id) {
+r2i::RuntimeError Normalize::Apply(std::shared_ptr<r2i::IFrame>
+                                   in_frame,
+                                   std::shared_ptr<r2i::IFrame> out_frame, int required_width, int required_height,
+                                   r2i::ImageFormat::Id required_format_id) {
   r2i::RuntimeError error;
   int width = 0;
   int height = 0;
@@ -76,18 +82,18 @@ r2i::RuntimeError MeanStdPreprocessing::Apply(std::shared_ptr<r2i::IFrame>
   return error;
 }
 
-std::vector<r2i::ImageFormat> MeanStdPreprocessing::GetAvailableFormats() {
+std::vector<r2i::ImageFormat> Normalize::GetAvailableFormats() {
   return this->formats;
 }
 
 std::vector<std::tuple<int, int>>
-MeanStdPreprocessing::GetAvailableDataSizes() {
+Normalize::GetAvailableDataSizes() {
   return this->dimensions;
 }
 
-r2i::RuntimeError MeanStdPreprocessing::Validate (int required_width,
-    int required_height,
-    r2i::ImageFormat::Id required_format_id) {
+r2i::RuntimeError Normalize::Validate (int required_width,
+                                       int required_height,
+                                       r2i::ImageFormat::Id required_format_id) {
 
   r2i::RuntimeError error;
   r2i::ImageFormat format;
@@ -130,7 +136,7 @@ r2i::RuntimeError MeanStdPreprocessing::Validate (int required_width,
   return error;
 }
 
-std::shared_ptr<float> MeanStdPreprocessing::PreProcessImage (
+std::shared_ptr<float> Normalize::PreProcessImage (
   const unsigned char *input,
   int width, int height, int required_width, int required_height) {
 
@@ -154,9 +160,9 @@ std::shared_ptr<float> MeanStdPreprocessing::PreProcessImage (
 
   for (int i = 0; i < scaled_size; i += channels) {
     /* RGB = (RGB - Mean)/StdDev */
-    adjusted[i + 0] = (static_cast<float>(scaled[i + 0]) - MEAN) / STD_DEV;
-    adjusted[i + 1] = (static_cast<float>(scaled[i + 1]) - MEAN) / STD_DEV;
-    adjusted[i + 2] = (static_cast<float>(scaled[i + 2]) - MEAN) / STD_DEV;
+    adjusted[i + 0] = (static_cast<float>(scaled[i + 0]) - MEAN_128) / STD_DEV_128;
+    adjusted[i + 1] = (static_cast<float>(scaled[i + 1]) - MEAN_128) / STD_DEV_128;
+    adjusted[i + 2] = (static_cast<float>(scaled[i + 2]) - MEAN_128) / STD_DEV_128;
   }
 
   return adjusted_ptr;
@@ -166,5 +172,5 @@ std::shared_ptr<float> MeanStdPreprocessing::PreProcessImage (
 
 r2i::IPreprocessing *
 FactoryMakePreprocessing () {
-  return new r2i::MeanStdPreprocessing ();
+  return new r2i::Normalize ();
 }
