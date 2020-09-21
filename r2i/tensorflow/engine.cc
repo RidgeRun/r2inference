@@ -296,7 +296,8 @@ TF_Tensor *Engine::AllocateTensor(std::shared_ptr<TF_Graph> pgraph,
   }
 
   int64_t result_size = info.data_size * info.type_size;
-  return TF_AllocateTensor(info.type, info.dims, info.num_dims, result_size);
+  return TF_AllocateTensor(info.type, info.dims.data(), info.num_dims,
+                           result_size);
 }
 
 TensorInfo Engine::InspectTensor(std::shared_ptr<TF_Graph> pgraph,
@@ -340,8 +341,6 @@ TensorInfo Engine::InspectTensor(std::shared_ptr<TF_Graph> pgraph,
    * Batch size set to 1 for general compatibility support. */
   dims[0] = 1;
 
-  info.dims = dims;
-
   TF_DataType type = TF_OperationOutputType(output);
   size_t type_size = TF_DataTypeSize(type);
   size_t data_size = 1;
@@ -349,6 +348,7 @@ TensorInfo Engine::InspectTensor(std::shared_ptr<TF_Graph> pgraph,
   /* For each dimension, multiply the amount of entries */
   for (int dim = 0; dim < num_dims; ++dim) {
     data_size *= dims[dim];
+    info.dims.push_back(dims[dim]);
   }
 
   info.type = type;
