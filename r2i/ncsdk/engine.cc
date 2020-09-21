@@ -412,6 +412,14 @@ engine_error:
 
 }
 
+RuntimeError Engine::Predict (std::shared_ptr<r2i::IFrame> in_frame,
+                              std::vector< std::shared_ptr<r2i::IPrediction> > &predictions) {
+  RuntimeError error;
+  error.Set(RuntimeError::Code::NOT_IMPLEMENTED,
+            "Predict function for multiple outputs not implemented in NCSDK backend.");
+  return error;
+}
+
 Engine::~Engine () {
   this->Stop();
 }
