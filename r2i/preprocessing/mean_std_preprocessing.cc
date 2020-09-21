@@ -24,6 +24,8 @@
 /* Model specific required dimensions */
 #define REQ_WIDTH_224 224
 #define REQ_HEIGTH_224 224
+#define REQ_WIDTH_299 299
+#define REQ_HEIGTH_299 299
 
 /* Constants for preprocessing */
 #define MEAN 128.0
@@ -34,6 +36,7 @@ namespace r2i {
 MeanStdPreprocessing::MeanStdPreprocessing () {
   /* Set supported dimensiones */
   this->dimensions.push_back(std::tuple<int, int>(REQ_WIDTH_224, REQ_HEIGTH_224));
+  this->dimensions.push_back(std::tuple<int, int>(REQ_WIDTH_299, REQ_HEIGTH_299));
   /* Set supported formats */
   this->formats.push_back(r2i::ImageFormat(r2i::ImageFormat::Id::RGB));
 }
