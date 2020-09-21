@@ -123,6 +123,8 @@ r2i/ncsdk/Makefile
 r2i/onnxrt/Makefile
 r2i/onnxrt_acl/Makefile
 r2i/onnxrt_openvino/Makefile
+r2i/postprocessing/Makefile
+r2i/preprocessing/Makefile
 r2i/tensorflow/Makefile
 r2i/tensorrt/Makefile
 r2i/tflite/Makefile
@@ -134,6 +136,8 @@ tests/unit/r2i/Makefile
 tests/unit/r2i/ncsdk/Makefile
 tests/unit/r2i/onnxrt/Makefile
 tests/unit/r2i/onnxrt_openvino/Makefile
+tests/unit/r2i/postprocessing/Makefile
+tests/unit/r2i/preprocessing/Makefile
 tests/unit/r2i/tensorflow/Makefile
 tests/unit/r2i/tensorrt/Makefile
 tests/unit/r2i/tflite/Makefile
