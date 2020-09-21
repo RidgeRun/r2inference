@@ -24,7 +24,15 @@ mean_std_preprocessing_la_CFLAGS =            \
 
 mean_std_preprocessing_la_CXXFLAGS =          \
     $(RR_CXXFLAGS)                            \
-    $(CODE_COVERAGE_CXXFLAGS)
+    $(CODE_COVERAGE_CXXFLAGS)                 \
+    $(GLIB_CFLAGS)                            \
+    $(GMODULE_CFLAGS)
+
+mean_std_preprocessing_la_LIBADD =            \
+    $(RR_LIBS)                                \
+    $(CODE_COVERAGE_LIBS)                     \
+    $(GLIB_LIBS)                              \
+    $(GMODULE_LIBS)
 
 #Indicate libtool this is a module (dlopened library)
 mean_std_preprocessing_la_LDFLAGS =           \
