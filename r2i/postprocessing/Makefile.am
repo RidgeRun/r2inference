@@ -10,22 +10,30 @@
 
 lib_LTLIBRARIES = top_sort_postprocessing.la
 
-top_sort_postprocessing_la_SOURCES =           \
+top_sort_postprocessing_la_SOURCES =          \
     top_sort_postprocessing.cc
 
-top_sort_postprocessing_la_CPPFLAGS =          \
+top_sort_postprocessing_la_CPPFLAGS =         \
     $(RR_CPPFLAGS)                            \
     $(CODE_COVERAGE_CPPFLAGS)                 \
     -I../../examples/r2i/common
 
-top_sort_postprocessing_la_CFLAGS =            \
+top_sort_postprocessing_la_CFLAGS =           \
     $(RR_CFLAGS)                              \
     $(CODE_COVERAGE_CFLAGS)
 
-top_sort_postprocessing_la_CXXFLAGS =          \
+top_sort_postprocessing_la_CXXFLAGS =         \
     $(RR_CXXFLAGS)                            \
-    $(CODE_COVERAGE_CXXFLAGS)
+    $(CODE_COVERAGE_CXXFLAGS)                 \
+    $(GLIB_CFLAGS)                            \
+    $(GMODULE_CFLAGS)
+
+top_sort_postprocessing_la_LIBADD =           \
+    $(RR_LIBS)                                \
+    $(CODE_COVERAGE_LIBS)                     \
+    $(GLIB_LIBS)                              \
+    $(GMODULE_LIBS)
 
 #Indicate libtool this is a module (dlopened library)
-top_sort_postprocessing_la_LDFLAGS =           \
+top_sort_postprocessing_la_LDFLAGS =          \
     -module -avoid-version -shared
