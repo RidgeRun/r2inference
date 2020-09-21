@@ -8,32 +8,32 @@
 # a software license from RidgeRun.  All source code changes must be provided
 # back to RidgeRun without any encumbrance.
 
-lib_LTLIBRARIES = mean_std_preprocessing.la
+lib_LTLIBRARIES = normalize.la
 
-mean_std_preprocessing_la_SOURCES =           \
-    mean_std_preprocessing.cc
+normalize_la_SOURCES =                        \
+    normalize.cc
 
-mean_std_preprocessing_la_CPPFLAGS =          \
+normalize_la_CPPFLAGS =                       \
     $(RR_CPPFLAGS)                            \
     $(CODE_COVERAGE_CPPFLAGS)                 \
     -I../../examples/r2i/common
 
-mean_std_preprocessing_la_CFLAGS =            \
+normalize_la_CFLAGS =                         \
     $(RR_CFLAGS)                              \
     $(CODE_COVERAGE_CFLAGS)
 
-mean_std_preprocessing_la_CXXFLAGS =          \
+normalize_la_CXXFLAGS =                       \
     $(RR_CXXFLAGS)                            \
     $(CODE_COVERAGE_CXXFLAGS)                 \
     $(GLIB_CFLAGS)                            \
     $(GMODULE_CFLAGS)
 
-mean_std_preprocessing_la_LIBADD =            \
+normalize_la_LIBADD =                         \
     $(RR_LIBS)                                \
     $(CODE_COVERAGE_LIBS)                     \
     $(GLIB_LIBS)                              \
     $(GMODULE_LIBS)
 
 #Indicate libtool this is a module (dlopened library)
-mean_std_preprocessing_la_LDFLAGS =           \
+normalize_la_LDFLAGS =           \
     -module -avoid-version -shared

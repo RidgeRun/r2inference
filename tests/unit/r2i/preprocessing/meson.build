@@ -1,5 +1,5 @@
 lib_preprocessing_tests = [
-  ['mean_std_preprocessing.cc'],
+  ['normalize.cc'],
 ]
 
 # Build and run tests

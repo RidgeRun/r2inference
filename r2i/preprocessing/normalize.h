@@ -9,16 +9,16 @@
  * back to RidgeRun without any encumbrance.
 */
 
-#ifndef R2I_MEAN_STD_PREPROCESSING_H
-#define R2I_MEAN_STD_PREPROCESSING_H
+#ifndef R2I_NORMALIZE_PREPROCESSING_H
+#define R2I_NORMALIZE_PREPROCESSING_H
 
 #include <r2i/ipreprocessing.h>
 
 namespace r2i {
 
-class MeanStdPreprocessing: public r2i::IPreprocessing {
+class Normalize: public r2i::IPreprocessing {
  public:
-  MeanStdPreprocessing ();
+  Normalize ();
   r2i::RuntimeError Apply(std::shared_ptr<r2i::IFrame> in_frame,
                           std::shared_ptr<r2i::IFrame> out_frame, int required_width, int required_height,
                           r2i::ImageFormat::Id required_format_id) override;
@@ -38,4 +38,4 @@ class MeanStdPreprocessing: public r2i::IPreprocessing {
 
 }  // namespace r2i
 
-#endif  // R2I_MEAN_STD_PREPROCESSING_H
+#endif  // R2I_NORMALIZE_PREPROCESSING_H

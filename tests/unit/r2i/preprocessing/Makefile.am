@@ -13,7 +13,7 @@ AM_DEFAULT_SOURCE_EXT = .cc
 if ENABLE_TESTS
 
 TESTS =                   \
-        mean_std_preprocessing
+        normalize
 
 check_PROGRAMS=$(TESTS)
 
@@ -48,6 +48,6 @@ AM_LDFLAGS =                        \
         $(TESTS_LIBS)               \
         $(CODE_COVERAGE_LIBS)       \
         $(top_builddir)/r2i/libr2inference-@RR_PACKAGE_VERSION@.la \
-        $(top_builddir)/r2i/preprocessing/mean_std_preprocessing.la
+        $(top_builddir)/r2i/preprocessing/normalize.la
 
 CLEANFILES = cpputest_*.xml
