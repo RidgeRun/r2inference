@@ -30,7 +30,9 @@ NormalizeTinyyoloV2::NormalizeTinyyoloV2 () : r2i::Normalize() {
   this->dimensions.push_back(std::tuple<int, int>(REQ_WIDTH_416, REQ_HEIGTH_416));
 }
 
-r2i::RuntimeError NormalizeTinyyoloV2::SetNormalizationParameters () {
+r2i::RuntimeError NormalizeTinyyoloV2::SetNormalizationParameters (
+  std::shared_ptr<unsigned char> frame_data, int width, int height,
+  int channels) {
   this->mean_red = MEAN;
   this->mean_green = MEAN;
   this->mean_blue = MEAN;

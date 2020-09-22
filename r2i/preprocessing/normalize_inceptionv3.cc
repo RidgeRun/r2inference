@@ -30,7 +30,9 @@ NormalizeInceptionV3::NormalizeInceptionV3 () : r2i::Normalize() {
   this->dimensions.push_back(std::tuple<int, int>(REQ_WIDTH_299, REQ_HEIGTH_299));
 }
 
-r2i::RuntimeError NormalizeInceptionV3::SetNormalizationParameters () {
+r2i::RuntimeError NormalizeInceptionV3::SetNormalizationParameters (
+  std::shared_ptr<unsigned char> frame_data, int width, int height,
+  int channels) {
   this->mean_red = MEAN_128;
   this->mean_green = MEAN_128;
   this->mean_blue = MEAN_128;

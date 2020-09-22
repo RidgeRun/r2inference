@@ -32,7 +32,9 @@ NormalizeResnet50V1::NormalizeResnet50V1 () : r2i::Normalize() {
   this->dimensions.push_back(std::tuple<int, int>(REQ_WIDTH_224, REQ_HEIGTH_224));
 }
 
-r2i::RuntimeError NormalizeResnet50V1::SetNormalizationParameters () {
+r2i::RuntimeError NormalizeResnet50V1::SetNormalizationParameters (
+  std::shared_ptr<unsigned char> frame_data, int width, int height,
+  int channels) {
   this->mean_red = MEAN_RED;
   this->mean_green = MEAN_GREEN;
   this->mean_blue = MEAN_BLUE;
