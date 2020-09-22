@@ -25,8 +25,8 @@
 #define FRAME_SIZE CHANNELS * FRAME_WIDTH * FRAME_HEIGHT
 #define MEAN 0
 #define STD_DEV 1
-#define UNSUPPORTED_FRAME_WIDTH -1
-#define UNSUPPORTED_FRAME_HEIGHT -1
+#define UNSUPPORTED_FRAME_WIDTH 1
+#define UNSUPPORTED_FRAME_HEIGHT 1
 #define CHANNELS  3
 
 static const float reference_matrix[FRAME_SIZE] = {
@@ -129,6 +129,7 @@ TEST_GROUP(Normalize) {
 };
 
 TEST(Normalize, ApplySuccess) {
+  /* Fill frames with dummy data */
   unsigned char value = 0;
   dummy_frame_data = std::shared_ptr<unsigned char>(new unsigned char[FRAME_SIZE],
                      std::default_delete<const unsigned char[]>());
@@ -143,8 +144,14 @@ TEST(Normalize, ApplySuccess) {
   error = in_frame->Configure(in_data, FRAME_WIDTH, FRAME_HEIGHT,
                               r2i::ImageFormat::Id::RGB);
 
-  error = preprocessing->Apply(in_frame, out_frame, FRAME_WIDTH, FRAME_HEIGHT,
-                               r2i::ImageFormat::Id::RGB);
+  std::shared_ptr<float> out_data = std::shared_ptr<float>
+                                    (new float[FRAME_WIDTH * FRAME_HEIGHT * CHANNELS],
+                                     std::default_delete<float[]>());
+  error = out_frame->Configure (out_data.get(), FRAME_WIDTH,
+                                FRAME_HEIGHT,
+                                r2i::ImageFormat::Id::RGB);
+
+  error = preprocessing->Apply(in_frame, out_frame);
   LONGS_EQUAL(r2i::RuntimeError::Code::EOK, error.GetCode());
 
   /* Check output values are the expected ones */
@@ -154,31 +161,100 @@ TEST(Normalize, ApplySuccess) {
 
 }
 
-TEST(Normalize, UnsupportedHeight) {
-  error = preprocessing->Apply(in_frame, out_frame, FRAME_WIDTH,
-                               UNSUPPORTED_FRAME_HEIGHT,
-                               r2i::ImageFormat::Id::RGB);
+TEST(Normalize, UnsupportedWidth) {
+  /* Fill frames with dummy data */
+  unsigned char value = 0;
+  dummy_frame_data = std::shared_ptr<unsigned char>(new unsigned char[FRAME_SIZE],
+                     std::default_delete<const unsigned char[]>());
+
+  unsigned char *in_data = dummy_frame_data.get();
+
+  for (unsigned int i = 0; i < FRAME_SIZE; i++) {
+    in_data[i] = value;
+    value++;
+  }
+
+  error = in_frame->Configure(in_data, FRAME_WIDTH, FRAME_HEIGHT,
+                              r2i::ImageFormat::Id::RGB);
+
+  std::shared_ptr<float> out_data = std::shared_ptr<float>
+                                    (new float[UNSUPPORTED_FRAME_WIDTH * FRAME_HEIGHT * CHANNELS],
+                                     std::default_delete<float[]>());
+  error = out_frame->Configure (out_data.get(), UNSUPPORTED_FRAME_WIDTH,
+                                FRAME_HEIGHT,
+                                r2i::ImageFormat::Id::RGB);
+
+  error = preprocessing->Apply(in_frame, out_frame);
   LONGS_EQUAL(r2i::RuntimeError::Code::MODULE_ERROR, error.GetCode());
 }
 
-TEST(Normalize, UnsupportedWidth) {
-  error = preprocessing->Apply(in_frame, out_frame, FRAME_WIDTH,
-                               UNSUPPORTED_FRAME_WIDTH,
-                               r2i::ImageFormat::Id::RGB);
+TEST(Normalize, UnsupportedHeight) {
+  /* Fill frames with dummy data */
+  unsigned char value = 0;
+  dummy_frame_data = std::shared_ptr<unsigned char>(new unsigned char[FRAME_SIZE],
+                     std::default_delete<const unsigned char[]>());
+
+  unsigned char *in_data = dummy_frame_data.get();
+
+  for (unsigned int i = 0; i < FRAME_SIZE; i++) {
+    in_data[i] = value;
+    value++;
+  }
+
+  error = in_frame->Configure(in_data, FRAME_WIDTH, FRAME_HEIGHT,
+                              r2i::ImageFormat::Id::RGB);
+
+  std::shared_ptr<float> out_data = std::shared_ptr<float>
+                                    (new float[FRAME_WIDTH * UNSUPPORTED_FRAME_HEIGHT * CHANNELS],
+                                     std::default_delete<float[]>());
+  error = out_frame->Configure (out_data.get(), FRAME_WIDTH,
+                                UNSUPPORTED_FRAME_HEIGHT,
+                                r2i::ImageFormat::Id::RGB);
+
+  error = preprocessing->Apply(in_frame, out_frame);
   LONGS_EQUAL(r2i::RuntimeError::Code::MODULE_ERROR, error.GetCode());
 }
 
 TEST(Normalize, UnsupportedFormatId) {
-  error = preprocessing->Apply(in_frame, out_frame, FRAME_WIDTH,
-                               UNSUPPORTED_FRAME_WIDTH,
-                               r2i::ImageFormat::Id::BGR);
+  /* Fill frames with dummy data */
+  unsigned char value = 0;
+  dummy_frame_data = std::shared_ptr<unsigned char>(new unsigned char[FRAME_SIZE],
+                     std::default_delete<const unsigned char[]>());
+
+  unsigned char *in_data = dummy_frame_data.get();
+
+  for (unsigned int i = 0; i < FRAME_SIZE; i++) {
+    in_data[i] = value;
+    value++;
+  }
+
+  error = in_frame->Configure(in_data, FRAME_WIDTH, FRAME_HEIGHT,
+                              r2i::ImageFormat::Id::RGB);
+
+  std::shared_ptr<float> out_data = std::shared_ptr<float>
+                                    (new float[FRAME_WIDTH * FRAME_HEIGHT * CHANNELS],
+                                     std::default_delete<float[]>());
+  error = out_frame->Configure (out_data.get(), FRAME_WIDTH,
+                                FRAME_HEIGHT,
+                                r2i::ImageFormat::Id::BGR);
+  error = preprocessing->Apply(in_frame, out_frame);
   LONGS_EQUAL(r2i::RuntimeError::Code::MODULE_ERROR, error.GetCode());
 }
 
+TEST(Normalize, NullInputFrame) {
+  in_frame = nullptr;
+  error = preprocessing->Apply(in_frame, out_frame);
+  LONGS_EQUAL(r2i::RuntimeError::Code::NULL_PARAMETER, error.GetCode());
+}
+
+TEST(Normalize, NullOutputFrame) {
+  out_frame = nullptr;
+  error = preprocessing->Apply(in_frame, out_frame);
+  LONGS_EQUAL(r2i::RuntimeError::Code::NULL_PARAMETER, error.GetCode());
+}
+
 TEST(Normalize, NullFrameData) {
-  error = preprocessing->Apply(in_frame, out_frame, FRAME_WIDTH,
-                               FRAME_HEIGHT,
-                               r2i::ImageFormat::Id::RGB);
+  error = preprocessing->Apply(in_frame, out_frame);
   LONGS_EQUAL(r2i::RuntimeError::Code::NULL_PARAMETER, error.GetCode());
 }
 

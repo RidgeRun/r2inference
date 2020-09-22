@@ -36,7 +36,7 @@ ImageFormat::Id ImageFormat::GetId () {
   return this->id;
 }
 
-std::pair<const std::string, int> search (ImageFormat::Id id) {
+std::pair<const std::string, int> Search (ImageFormat::Id id) {
   auto search = format_descriptors.find (id);
   if (format_descriptors.end () == search) {
     search = format_descriptors.find (ImageFormat::Id::UNKNOWN_FORMAT);
@@ -45,12 +45,12 @@ std::pair<const std::string, int> search (ImageFormat::Id id) {
 }
 
 const std::string ImageFormat::GetDescription () {
-  std::pair<const std::string, int> descriptor = search(this->id);
+  std::pair<const std::string, int> descriptor = Search(this->id);
   return descriptor.first;
 }
 
 int ImageFormat::GetNumPlanes () {
-  std::pair<const std::string, int> descriptor = search(this->id);
+  std::pair<const std::string, int> descriptor = Search(this->id);
   return descriptor.second;
 }
 }

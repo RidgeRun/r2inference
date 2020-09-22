@@ -67,8 +67,7 @@ std::shared_ptr<r2i::IFrame> LoadImage(const std::string &path, int req_width,
   error = in_frame->Configure (img, width, height,
                                r2i::ImageFormat::Id::RGB);
 
-  error = preprocessing->Apply(in_frame, out_frame, req_width, req_height,
-                               r2i::ImageFormat::Id::RGB);
+  error = preprocessing->Apply(in_frame, out_frame);
 
   free (img);
 
@@ -179,6 +178,12 @@ int main (int argc, char *argv[]) {
   std::cout << "Loading image: " << image_path << std::endl;
   std::shared_ptr<r2i::IFrame> in_frame = factory->MakeFrame (error);
   std::shared_ptr<r2i::IFrame> out_frame = factory->MakeFrame (error);
+  std::shared_ptr<float> out_data = std::shared_ptr<float>
+                                    (new float[size * size * 3],
+                                     std::default_delete<float[]>());
+  error = out_frame->Configure (out_data.get(), size,
+                                size,
+                                r2i::ImageFormat::Id::RGB);
   out_frame = LoadImage (image_path, size, size, preprocessing, in_frame,
                          out_frame, error);
   if (error.IsError ()) {

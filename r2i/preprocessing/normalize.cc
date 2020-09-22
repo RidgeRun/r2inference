@@ -28,39 +28,54 @@ Normalize::Normalize () {
   this->formats.push_back(r2i::ImageFormat(r2i::ImageFormat::Id::RGB));
 }
 
-r2i::RuntimeError Normalize::Apply(std::shared_ptr<r2i::IFrame>
-                                   in_frame,
-                                   std::shared_ptr<r2i::IFrame> out_frame, int required_width, int required_height,
-                                   r2i::ImageFormat::Id required_format_id) {
+r2i::RuntimeError Normalize::Apply(std::shared_ptr<r2i::IFrame> in_frame,
+                                   std::shared_ptr<r2i::IFrame> out_frame) {
   r2i::RuntimeError error;
   int width = 0;
   int height = 0;
-  const unsigned char *data;
+  int channels = 0;
+  int required_width = 0;
+  int required_height = 0;
+  int required_channels = 0;
+  r2i::ImageFormat format;
+  r2i::ImageFormat required_format;
+  r2i::ImageFormat::Id required_format_id;
+  unsigned char *in_data;
 
   if (!in_frame or !out_frame) {
     error.Set (r2i::RuntimeError::Code::NULL_PARAMETER, "Null IFrame parameters");
     return error;
   }
 
+  width = in_frame->GetWidth();
+  height = in_frame->GetHeight();
+  format = in_frame->GetFormat();
+  channels = format.GetNumPlanes();
+  in_data = static_cast<unsigned char *>(in_frame->GetData());
+
+  if (!in_data) {
+    error.Set (r2i::RuntimeError::Code::NULL_PARAMETER, "Null input frame data");
+    return error;
+  }
+
+  required_width = out_frame->GetWidth();
+  required_height = out_frame->GetHeight();
+  required_format = out_frame->GetFormat();
+  required_format_id = required_format.GetId();
+  required_channels = required_format.GetNumPlanes();
+
   error = Validate(required_width, required_height, required_format_id);
   if (error.IsError ()) {
     return error;
   }
 
-  width = in_frame->GetWidth();
-  height = in_frame->GetHeight();
-  data = static_cast<const unsigned char *>(in_frame->GetData());
-
-  if (!data) {
-    error.Set (r2i::RuntimeError::Code::NULL_PARAMETER, "Null frame data");
-    return error;
-  }
-
-  this->processed_data = PreProcessImage(data, width, height, required_width,
-                                         required_height);
+  processed_data = PreProcessImage(in_data, width, height, channels,
+                                   required_width,
+                                   required_height, required_channels);
   error = out_frame->Configure (processed_data.get(), required_width,
                                 required_height,
                                 required_format_id);
+
   if (error.IsError ()) {
     return error;
   }
@@ -127,12 +142,12 @@ r2i::RuntimeError Normalize::SetNormalizationParameters (
   return r2i::RuntimeError();
 }
 
-std::shared_ptr<float> Normalize::PreProcessImage (
-  const unsigned char *input,
-  int width, int height, int required_width, int required_height) {
+std::shared_ptr<float> Normalize::PreProcessImage (unsigned char *in_data,
+    int width, int height, int channels, int required_width, int required_height,
+    int required_channels) {
 
-  const int channels = 3;
-  const int scaled_size = channels * required_width * required_height;
+  r2i::RuntimeError error;
+  const int scaled_size = required_channels * required_width * required_height;
   std::shared_ptr<unsigned char> scaled_ptr;
   std::shared_ptr<float> adjusted_ptr;
   float *adjusted;
@@ -146,8 +161,8 @@ std::shared_ptr<float> Normalize::PreProcessImage (
   adjusted = adjusted_ptr.get();
   scaled = scaled_ptr.get();
 
-  stbir_resize_uint8(input, width, height, 0, scaled, required_width,
-                     required_height, 0, channels);
+  stbir_resize_uint8(in_data, width, height, 0, scaled, required_width,
+                     required_height, 0, required_channels);
 
   /* To set model specific preprocessing paramaters */
   SetNormalizationParameters(scaled_ptr, required_width, required_height,
@@ -155,7 +170,7 @@ std::shared_ptr<float> Normalize::PreProcessImage (
 
   for (int i = 0; i < scaled_size; i += channels) {
     /* RGB = (RGB - Mean)/StdDev */
-    adjusted[i + 0] = (static_cast<float>(scaled[i + 0]) - this->mean_red)   /
+    adjusted[i + 0] = (static_cast<float>(scaled[i + 0]) - this->mean_red) /
                       this->std_dev_red;
     adjusted[i + 1] = (static_cast<float>(scaled[i + 1]) - this->mean_green) /
                       this->std_dev_green;

@@ -20,8 +20,7 @@ class Normalize: public r2i::IPreprocessing {
  public:
   Normalize ();
   r2i::RuntimeError Apply(std::shared_ptr<r2i::IFrame> in_frame,
-                          std::shared_ptr<r2i::IFrame> out_frame, int required_width, int required_height,
-                          r2i::ImageFormat::Id required_format_id) override;
+                          std::shared_ptr<r2i::IFrame> out_frame) override;
   std::vector<r2i::ImageFormat> GetAvailableFormats() override;
   std::vector<std::tuple<int, int>> GetAvailableDataSizes() override;
 
@@ -39,8 +38,11 @@ class Normalize: public r2i::IPreprocessing {
 
   r2i::RuntimeError Validate (int required_width, int required_height,
                               r2i::ImageFormat::Id required_format_id);
-  std::shared_ptr<float> PreProcessImage (const unsigned char *input,
-                                          int width, int height, int required_width, int required_height);
+  std::shared_ptr<float> PreProcessImage (unsigned char *in_data, int width,
+                                          int height, int channels,
+                                          int required_width,
+                                          int required_height,
+                                          int required_channels);
   virtual r2i::RuntimeError SetNormalizationParameters (
     std::shared_ptr<unsigned char> frame_data, int width, int height, int channels);
 };
