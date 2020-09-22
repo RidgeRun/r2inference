@@ -12,10 +12,12 @@
 #ifndef R2I_IPOSTPROCESSING_H
 #define R2I_IPOSTPROCESSING_H
 
+#include <r2i/inferenceoutput.h>
 #include <r2i/iprediction.h>
 #include <r2i/runtimeerror.h>
 
 #include <gmodule.h>
+#include <vector>
 
 /**
  * R2Inference Namespace
@@ -29,10 +31,12 @@ class IPostprocessing {
  public:
   /**
    * \brief Applies custom postprocessing to the predicted data.
-   * \param prediction returned from the model inference.
+   * \param predictions returned from the model inference.
+   * \param outputs [in/out] to be displayed in the video stream.
    * \return Error with a description message.
    */
-  virtual RuntimeError Apply(IPrediction &prediction) = 0;
+  virtual RuntimeError Apply(std::vector< IPrediction > &prediction,
+                             std::vector< InferenceOutput > &outputs) = 0;
 
   /**
    * \brief Default destructor
