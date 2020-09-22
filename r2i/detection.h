@@ -35,9 +35,9 @@ struct DetectionBin {
 
 class Detection: public InferenceOutput {
  public:
-  Detection(InferenceOutputType output_type);
+  Detection();
   ~Detection();
-  void SetDetections(std::vector< DetectionBin > detections);
+  RuntimeError SetDetections(std::vector< DetectionBin > detections);
   std::vector< DetectionBin > GetDetections();
 
  private:

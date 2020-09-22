@@ -13,8 +13,8 @@
 
 namespace r2i {
 
-Classification::Classification(InferenceOutputType output_type) {
-  this->type = output_type;
+Classification::Classification() {
+  this->type = InferenceOutputType::CLASSIFICATION;
 }
 
 Classification::~Classification() {

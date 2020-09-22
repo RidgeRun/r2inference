@@ -13,16 +13,17 @@
 
 namespace r2i {
 
-Detection::Detection(InferenceOutputType output_type) {
-  this->type = output_type;
+Detection::Detection() {
+  this->type = InferenceOutputType::OBJECT_DETECTION;
 }
 
 Detection::~Detection() {
   this->detections.clear();
 }
 
-void Detection::SetDetections(std::vector< DetectionBin > detections) {
+RuntimeError Detection::SetDetections(std::vector< DetectionBin > detections) {
   this->detections = detections;
+  return RuntimeError();
 }
 
 std::vector< DetectionBin > Detection::GetDetections() {

@@ -13,6 +13,8 @@ AM_DEFAULT_SOURCE_EXT = .cc
 if ENABLE_TESTS
 
 TESTS =                         \
+        classification          \
+        detection               \
         iframeworkfactory       \
         loader
 
