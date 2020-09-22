@@ -25,7 +25,10 @@ class Normalize: public r2i::IPreprocessing {
   std::vector<r2i::ImageFormat> GetAvailableFormats() override;
   std::vector<std::tuple<int, int>> GetAvailableDataSizes() override;
 
- private:
+ protected:
+  double mean = 0;
+  double std_dev = 1;
+
   std::shared_ptr<float> processed_data;
   std::vector<std::tuple<int, int>> dimensions;
   std::vector<r2i::ImageFormat> formats;
@@ -34,6 +37,7 @@ class Normalize: public r2i::IPreprocessing {
                               r2i::ImageFormat::Id required_format_id);
   std::shared_ptr<float> PreProcessImage (const unsigned char *input,
                                           int width, int height, int required_width, int required_height);
+  virtual r2i::RuntimeError SetNormalizationParameters ();
 };
 
 }  // namespace r2i
