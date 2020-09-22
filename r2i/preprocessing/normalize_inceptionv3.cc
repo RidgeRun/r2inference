@@ -26,13 +26,17 @@
 namespace r2i {
 
 NormalizeInceptionV3::NormalizeInceptionV3 () : r2i::Normalize() {
-  /* Set supported dimensiones for InceptionV3 and InceptionV4 architectures */
+  /* Set supported dimensions for InceptionV3 and InceptionV4 architectures */
   this->dimensions.push_back(std::tuple<int, int>(REQ_WIDTH_299, REQ_HEIGTH_299));
 }
 
 r2i::RuntimeError NormalizeInceptionV3::SetNormalizationParameters () {
-  this->mean = MEAN_128;
-  this->std_dev = STD_DEV_128;
+  this->mean_red = MEAN_128;
+  this->mean_green = MEAN_128;
+  this->mean_blue = MEAN_128;
+  this->std_dev_red = STD_DEV_128;
+  this->std_dev_green = STD_DEV_128;
+  this->std_dev_blue = STD_DEV_128;
   return r2i::RuntimeError();
 }
 

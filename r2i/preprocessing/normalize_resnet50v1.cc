@@ -13,30 +13,32 @@
 #include <memory>
 #include <vector>
 
-#include <r2i/preprocessing/normalize_inceptionv1.h>
+#include <r2i/preprocessing/normalize_resnet50v1.h>
 
-/* Architecture specific required dimensions InceptionV1 and InceptionV2 */
+/* Architecture specific required dimensions Resnet50V1 */
 #define REQ_WIDTH_224 224
 #define REQ_HEIGTH_224 224
 
 /* Constants for preprocessing */
-#define MEAN_128 128.0
-#define STD_DEV_128 128.0
+#define MEAN_RED 123.68
+#define MEAN_GREEN 116.78
+#define MEAN_BLUE 103.94
+#define STD_DEV 1
 
 namespace r2i {
 
-NormalizeInceptionV1::NormalizeInceptionV1 () : r2i::Normalize() {
-  /* Set supported dimensions for InceptionV1 and InceptionV2 architectures */
+NormalizeResnet50V1::NormalizeResnet50V1 () : r2i::Normalize() {
+  /* Set supported dimensions for Resnet50V1 architecture */
   this->dimensions.push_back(std::tuple<int, int>(REQ_WIDTH_224, REQ_HEIGTH_224));
 }
 
-r2i::RuntimeError NormalizeInceptionV1::SetNormalizationParameters () {
-  this->mean_red = MEAN_128;
-  this->mean_green = MEAN_128;
-  this->mean_blue = MEAN_128;
-  this->std_dev_red = STD_DEV_128;
-  this->std_dev_green = STD_DEV_128;
-  this->std_dev_blue = STD_DEV_128;
+r2i::RuntimeError NormalizeResnet50V1::SetNormalizationParameters () {
+  this->mean_red = MEAN_RED;
+  this->mean_green = MEAN_GREEN;
+  this->mean_blue = MEAN_BLUE;
+  this->std_dev_red = STD_DEV;
+  this->std_dev_green = STD_DEV;
+  this->std_dev_blue = STD_DEV;
   return r2i::RuntimeError();
 }
 
@@ -44,5 +46,5 @@ r2i::RuntimeError NormalizeInceptionV1::SetNormalizationParameters () {
 
 r2i::IPreprocessing *
 FactoryMakePreprocessing () {
-  return new r2i::NormalizeInceptionV1 ();
+  return new r2i::NormalizeResnet50V1 ();
 }

@@ -26,8 +26,12 @@ class Normalize: public r2i::IPreprocessing {
   std::vector<std::tuple<int, int>> GetAvailableDataSizes() override;
 
  protected:
-  double mean = 0;
-  double std_dev = 1;
+  double mean_red = 0;
+  double mean_green = 0;
+  double mean_blue = 0;
+  double std_dev_red = 1;
+  double std_dev_green = 1;
+  double std_dev_blue = 1;
 
   std::shared_ptr<float> processed_data;
   std::vector<std::tuple<int, int>> dimensions;

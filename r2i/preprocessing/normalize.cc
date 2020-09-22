@@ -147,16 +147,17 @@ std::shared_ptr<float> Normalize::PreProcessImage (
   stbir_resize_uint8(input, width, height, 0, scaled, required_width,
                      required_height, 0, channels);
 
+  /* To set model specific preprocessing paramaters */
   SetNormalizationParameters();
 
   for (int i = 0; i < scaled_size; i += channels) {
     /* RGB = (RGB - Mean)/StdDev */
-    adjusted[i + 0] = (static_cast<float>(scaled[i + 0]) - this->mean) /
-                      this->std_dev;
-    adjusted[i + 1] = (static_cast<float>(scaled[i + 1]) - this->mean) /
-                      this->std_dev;
-    adjusted[i + 2] = (static_cast<float>(scaled[i + 2]) - this->mean) /
-                      this->std_dev;
+    adjusted[i + 0] = (static_cast<float>(scaled[i + 0]) - this->mean_red)   /
+                      this->std_dev_red;
+    adjusted[i + 1] = (static_cast<float>(scaled[i + 1]) - this->mean_green) /
+                      this->std_dev_green;
+    adjusted[i + 2] = (static_cast<float>(scaled[i + 2]) - this->mean_blue) /
+                      this->std_dev_blue;
   }
 
   return adjusted_ptr;

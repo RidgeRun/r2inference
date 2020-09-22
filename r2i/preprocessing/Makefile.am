@@ -10,7 +10,8 @@
 
 lib_LTLIBRARIES =                             \
     libnormalize_inceptionv1.la               \
-    libnormalize_inceptionv3.la
+    libnormalize_inceptionv3.la               \
+    libnormalize_resnet50v1.la
 
 libnormalize_inceptionv1_la_SOURCES =         \
     normalize_inceptionv1.cc                  \
@@ -18,6 +19,10 @@ libnormalize_inceptionv1_la_SOURCES =         \
 
 libnormalize_inceptionv3_la_SOURCES =         \
     normalize_inceptionv3.cc                  \
+    normalize.cc
+
+libnormalize_resnet50v1_la_SOURCES =          \
+    normalize_resnet50v1.cc                   \
     normalize.cc
 
 AM_CPPFLAGS =                                 \
