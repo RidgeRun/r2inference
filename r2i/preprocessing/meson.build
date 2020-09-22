@@ -5,6 +5,7 @@ preprocessing_sources = [
     'normalize_resnet50v1',
     'normalize_tinyyolov2',
     'normalize_tinyyolov3',
+    'normalize_facenetv1',
 ]
 
 normalize_lib = static_library('normalize',

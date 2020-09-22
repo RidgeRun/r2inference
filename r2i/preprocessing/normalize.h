@@ -41,7 +41,8 @@ class Normalize: public r2i::IPreprocessing {
                               r2i::ImageFormat::Id required_format_id);
   std::shared_ptr<float> PreProcessImage (const unsigned char *input,
                                           int width, int height, int required_width, int required_height);
-  virtual r2i::RuntimeError SetNormalizationParameters ();
+  virtual r2i::RuntimeError SetNormalizationParameters (
+    std::shared_ptr<unsigned char> frame_data, int width, int height, int channels);
 };
 
 }  // namespace r2i

@@ -121,7 +121,9 @@ r2i::RuntimeError Normalize::Validate (int required_width,
   return error;
 }
 
-r2i::RuntimeError Normalize::SetNormalizationParameters () {
+r2i::RuntimeError Normalize::SetNormalizationParameters (
+  std::shared_ptr<unsigned char> frame_data, int width, int height,
+  int channels) {
   return r2i::RuntimeError();
 }
 
@@ -148,7 +150,8 @@ std::shared_ptr<float> Normalize::PreProcessImage (
                      required_height, 0, channels);
 
   /* To set model specific preprocessing paramaters */
-  SetNormalizationParameters();
+  SetNormalizationParameters(scaled_ptr, required_width, required_height,
+                             channels);
 
   for (int i = 0; i < scaled_size; i += channels) {
     /* RGB = (RGB - Mean)/StdDev */

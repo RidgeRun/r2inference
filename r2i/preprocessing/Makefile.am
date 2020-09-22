@@ -13,7 +13,8 @@ lib_LTLIBRARIES =                             \
     libnormalize_inceptionv3.la               \
     libnormalize_resnet50v1.la                \
     libnormalize_tinyyolov2.la                \
-    libnormalize_tinyyolov3.la
+    libnormalize_tinyyolov3.la                \
+    libnormalize_facenetv1.la
 
 libnormalize_inceptionv1_la_SOURCES =         \
     normalize_inceptionv1.cc                  \
@@ -33,6 +34,10 @@ libnormalize_tinyyolov2_la_SOURCES =          \
 
 libnormalize_tinyyolov3_la_SOURCES =          \
     normalize_tinyyolov3.cc                   \
+    normalize.cc
+
+libnormalize_facenetv1_la_SOURCES =           \
+    normalize_facenetv1.cc                    \
     normalize.cc
 
 AM_CPPFLAGS =                                 \

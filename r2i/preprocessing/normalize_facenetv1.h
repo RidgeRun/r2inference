@@ -9,16 +9,16 @@
  * back to RidgeRun without any encumbrance.
 */
 
-#ifndef R2I_NORMALIZE_RESNET50V1_PREPROCESSING_H
-#define R2I_NORMALIZE_RESNET50V1_PREPROCESSING_H
+#ifndef R2I_NORMALIZE_FACENETV1_PREPROCESSING_H
+#define R2I_NORMALIZE_FACENETV1_PREPROCESSING_H
 
 #include <r2i/preprocessing/normalize.h>
 
 namespace r2i {
 
-class NormalizeResnet50V1: public r2i::Normalize {
+class NormalizeFaceNetV1: public r2i::Normalize {
  public:
-  NormalizeResnet50V1 ();
+  NormalizeFaceNetV1 ();
  private:
   r2i::RuntimeError SetNormalizationParameters (std::shared_ptr<unsigned char>
       frame_data, int width, int height, int channels) override;
@@ -26,4 +26,4 @@ class NormalizeResnet50V1: public r2i::Normalize {
 
 }  // namespace r2i
 
-#endif  // R2I_NORMALIZE_RESNET50V1_PREPROCESSING_H
+#endif  // R2I_NORMALIZE_FACENETV1_PREPROCESSING_H
