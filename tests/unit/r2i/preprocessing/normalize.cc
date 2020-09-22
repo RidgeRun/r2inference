@@ -22,13 +22,14 @@
 
 #define FRAME_WIDTH 2
 #define FRAME_HEIGHT 2
+#define FRAME_SIZE CHANNELS * FRAME_WIDTH * FRAME_HEIGHT
 #define MEAN 0
 #define STD_DEV 1
 #define UNSUPPORTED_FRAME_WIDTH -1
 #define UNSUPPORTED_FRAME_HEIGHT -1
 #define CHANNELS  3
 
-static const float reference_matrix[CHANNELS * FRAME_WIDTH * FRAME_HEIGHT] = {
+static const float reference_matrix[FRAME_SIZE] = {
   1.0, 2.0, 3.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 10.0
 };
 
@@ -129,12 +130,12 @@ TEST_GROUP(Normalize) {
 
 TEST(Normalize, ApplySuccess) {
   unsigned char value = 0;
-  dummy_frame_data = std::shared_ptr<unsigned char>(new unsigned char[12],
+  dummy_frame_data = std::shared_ptr<unsigned char>(new unsigned char[FRAME_SIZE],
                      std::default_delete<const unsigned char[]>());
 
   unsigned char *in_data = dummy_frame_data.get();
 
-  for (unsigned int i = 0; i < 12; i++) {
+  for (unsigned int i = 0; i < FRAME_SIZE; i++) {
     in_data[i] = value;
     value++;
   }
@@ -147,7 +148,7 @@ TEST(Normalize, ApplySuccess) {
   LONGS_EQUAL(r2i::RuntimeError::Code::EOK, error.GetCode());
 
   /* Check output values are the expected ones */
-  for (unsigned int i = 0; i < 12; i++) {
+  for (unsigned int i = 0; i < FRAME_SIZE; i++) {
     LONGS_EQUAL(static_cast<float *>(out_frame->GetData())[i], reference_matrix[i]);
   }
 
