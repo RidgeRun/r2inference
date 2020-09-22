@@ -12,6 +12,7 @@
 #include <r2i/r2i.h>
 #include <r2i/tensorflow/engine.h>
 #include <r2i/tensorflow/frame.h>
+#include <r2i/tensorflow/model.h>
 #include <r2i/tensorflow/prediction.h>
 
 #include <CppUTest/CommandLineTestRunner.h>
@@ -205,6 +206,32 @@ TEST (TensorflowEngine, PredictEngine) {
   prediction = engine.Predict (frame, error);
   LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
 
+}
+
+TEST (TensorflowEngine, MultiplePredictsEngine) {
+  r2i::RuntimeError error;
+  std::string output_1 = "output-value-1";
+  std::string output_2 = "output-value-2";
+  std::string output_3 = "output-value-3";
+  std::vector< std::string > output_layers;
+  std::vector<std::shared_ptr<r2i::IPrediction>> predictions;
+
+  output_layers.push_back(output_1);
+  output_layers.push_back(output_2);
+  output_layers.push_back(output_3);
+
+  auto tf_model = static_cast<r2i::tensorflow::Model *>(model.get());
+  error = tf_model->SetOutputLayersNames(output_layers);
+  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
+
+  error = engine.SetModel (model);
+  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
+
+  error = engine.Start ();
+  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
+
+  error = engine.Predict (frame, predictions);
+  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
 }
 
 int main (int ac, char **av) {

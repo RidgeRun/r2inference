@@ -230,6 +230,38 @@ TEST (TensorflowParameters, SetAndGetOutputLayerName) {
   STRCMP_EQUAL(in_value.c_str(), out_value.c_str());
 }
 
+TEST (TensorflowParameters, SetAndGetOutputLayersNames) {
+  r2i::RuntimeError error;
+  r2i::tensorflow::Parameters parameters;
+  std::vector< std::string > in_value;
+  std::string output_1 = "output-value-1";
+  std::string output_2 = "output-value-2";
+  std::string output_3 = "output-value-3";
+  std::vector< std::string > out_value;
+
+  in_value.push_back(output_1);
+  in_value.push_back(output_2);
+  in_value.push_back(output_3);
+
+  std::shared_ptr<r2i::IEngine> engine(new r2i::tensorflow::Engine);
+  std::shared_ptr<r2i::IModel> model(new r2i::tensorflow::Model);
+
+  error = parameters.Configure(engine, model);
+
+  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
+
+  error = parameters.Set("output-layers", in_value);
+
+  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
+
+  error = parameters.Get("output-layers", out_value);
+
+  LONGS_EQUAL (in_value.size(), out_value.size());
+  STRCMP_EQUAL(out_value[0].c_str(), output_1.c_str());
+  STRCMP_EQUAL(out_value[1].c_str(), output_2.c_str());
+  STRCMP_EQUAL(out_value[2].c_str(), output_3.c_str());
+}
+
 TEST (TensorflowParameters, GetVersion) {
   r2i::RuntimeError error;
   r2i::tensorflow::Parameters parameters;
