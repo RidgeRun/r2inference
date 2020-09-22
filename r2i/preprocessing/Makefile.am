@@ -25,17 +25,17 @@ AM_CPPFLAGS =                                 \
     $(CODE_COVERAGE_CPPFLAGS)                 \
     -I../../examples/r2i/common
 
-AM_CPPFLAGS_CFLAGS =                          \
+AM_CFLAGS =                                   \
     $(RR_CFLAGS)                              \
     $(CODE_COVERAGE_CFLAGS)
 
-AM_CPPFLAGS_CXXFLAGS =                        \
+AM_CXXFLAGS =                                 \
     $(RR_CXXFLAGS)                            \
     $(CODE_COVERAGE_CXXFLAGS)                 \
     $(GLIB_CFLAGS)                            \
     $(GMODULE_CFLAGS)
 
-AM_CPPFLAGS_LIBADD =                          \
+AM_LIBADD =                                   \
     $(RR_LIBS)                                \
     $(CODE_COVERAGE_LIBS)                     \
     $(GLIB_LIBS)                              \
