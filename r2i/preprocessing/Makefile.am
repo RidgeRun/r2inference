@@ -8,32 +8,39 @@
 # a software license from RidgeRun.  All source code changes must be provided
 # back to RidgeRun without any encumbrance.
 
-lib_LTLIBRARIES = normalize.la
+lib_LTLIBRARIES =                             \
+    libnormalize_inceptionv1.la               \
+    libnormalize_inceptionv3.la
 
-normalize_la_SOURCES =                        \
+libnormalize_inceptionv1_la_SOURCES =         \
+    normalize_inceptionv1.cc                  \
     normalize.cc
 
-normalize_la_CPPFLAGS =                       \
+libnormalize_inceptionv3_la_SOURCES =         \
+    normalize_inceptionv3.cc                  \
+    normalize.cc
+
+AM_CPPFLAGS =                                 \
     $(RR_CPPFLAGS)                            \
     $(CODE_COVERAGE_CPPFLAGS)                 \
     -I../../examples/r2i/common
 
-normalize_la_CFLAGS =                         \
+AM_CPPFLAGS_CFLAGS =                          \
     $(RR_CFLAGS)                              \
     $(CODE_COVERAGE_CFLAGS)
 
-normalize_la_CXXFLAGS =                       \
+AM_CPPFLAGS_CXXFLAGS =                        \
     $(RR_CXXFLAGS)                            \
     $(CODE_COVERAGE_CXXFLAGS)                 \
     $(GLIB_CFLAGS)                            \
     $(GMODULE_CFLAGS)
 
-normalize_la_LIBADD =                         \
+AM_CPPFLAGS_LIBADD =                          \
     $(RR_LIBS)                                \
     $(CODE_COVERAGE_LIBS)                     \
     $(GLIB_LIBS)                              \
     $(GMODULE_LIBS)
 
 #Indicate libtool this is a module (dlopened library)
-normalize_la_LDFLAGS =           \
+AM_CPPFLAGS_LDFLAGS =                         \
     -module -avoid-version -shared

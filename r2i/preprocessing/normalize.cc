@@ -21,28 +21,9 @@
 #define STB_IMAGE_RESIZE_IMPLEMENTATION
 #include "stb_image_resize.h"
 
-/* Model specific required dimensions */
-#define REQ_WIDTH_224 224 /* InceptionV1, InceptionV2, Mobilenet */
-#define REQ_HEIGTH_224 224 /* InceptionV1, InceptionV2, Mobilenet */
-#define REQ_WIDTH_299 299 /* InceptionV3, InceptionV4 */
-#define REQ_HEIGTH_299 299 /* InceptionV3, InceptionV4 */
-#define REQ_WIDTH_416 416 /* TinyyoloV2, TinyyoloV3 */
-#define REQ_HEIGTH_416 416 /* TinyyoloV2, TinyyoloV3 */
-
-/* Constants for preprocessing */
-#define MEAN_128 128.0 /* Inception, Mobilenet */
-#define STD_DEV_128 128.0 /* Inception, Mobilenet */
-#define MEAN_0 0 /* TinyyoloV2, TinyyoloV3 */
-#define STD_DEV_255 255 /* TinyyoloV2 */
-#define STD_DEV_1 1 /* TinyyoloV3 */
-
 namespace r2i {
 
 Normalize::Normalize () {
-  /* Set supported dimensiones */
-  this->dimensions.push_back(std::tuple<int, int>(REQ_WIDTH_224, REQ_HEIGTH_224));
-  this->dimensions.push_back(std::tuple<int, int>(REQ_WIDTH_299, REQ_HEIGTH_299));
-  this->dimensions.push_back(std::tuple<int, int>(REQ_WIDTH_416, REQ_HEIGTH_416));
   /* Set supported formats */
   this->formats.push_back(r2i::ImageFormat(r2i::ImageFormat::Id::RGB));
 }
@@ -70,6 +51,10 @@ r2i::RuntimeError Normalize::Apply(std::shared_ptr<r2i::IFrame>
   height = in_frame->GetHeight();
   data = static_cast<const unsigned char *>(in_frame->GetData());
 
+  if (!data) {
+    error.Set (r2i::RuntimeError::Code::NULL_PARAMETER, "Null frame data");
+    return error;
+  }
 
   this->processed_data = PreProcessImage(data, width, height, required_width,
                                          required_height);
@@ -136,6 +121,10 @@ r2i::RuntimeError Normalize::Validate (int required_width,
   return error;
 }
 
+r2i::RuntimeError Normalize::SetNormalizationParameters () {
+  return r2i::RuntimeError();
+}
+
 std::shared_ptr<float> Normalize::PreProcessImage (
   const unsigned char *input,
   int width, int height, int required_width, int required_height) {
@@ -158,19 +147,19 @@ std::shared_ptr<float> Normalize::PreProcessImage (
   stbir_resize_uint8(input, width, height, 0, scaled, required_width,
                      required_height, 0, channels);
 
+  SetNormalizationParameters();
+
   for (int i = 0; i < scaled_size; i += channels) {
     /* RGB = (RGB - Mean)/StdDev */
-    adjusted[i + 0] = (static_cast<float>(scaled[i + 0]) - MEAN_128) / STD_DEV_128;
-    adjusted[i + 1] = (static_cast<float>(scaled[i + 1]) - MEAN_128) / STD_DEV_128;
-    adjusted[i + 2] = (static_cast<float>(scaled[i + 2]) - MEAN_128) / STD_DEV_128;
+    adjusted[i + 0] = (static_cast<float>(scaled[i + 0]) - this->mean) /
+                      this->std_dev;
+    adjusted[i + 1] = (static_cast<float>(scaled[i + 1]) - this->mean) /
+                      this->std_dev;
+    adjusted[i + 2] = (static_cast<float>(scaled[i + 2]) - this->mean) /
+                      this->std_dev;
   }
 
   return adjusted_ptr;
 }
 
 }  // namespace r2i
-
-r2i::IPreprocessing *
-FactoryMakePreprocessing () {
-  return new r2i::Normalize ();
-}

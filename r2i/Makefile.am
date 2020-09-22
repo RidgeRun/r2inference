@@ -149,6 +149,7 @@ libr2inference_@RR_PACKAGE_VERSION@_la_LIBADD +=    \
         $(top_builddir)/r2i/tflite/libtflite.la
 endif
 
+#Build pre/post processing modules
 SUBDIRS += preprocessing
 
 SUBDIRS += postprocessing
