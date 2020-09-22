@@ -31,7 +31,7 @@ typedef std::tuple<int, double> ClassificationBin;
 
 class Classification : public InferenceOutput {
  public:
-  Classification(InferenceOutputType output_type);
+  Classification();
   ~Classification();
   RuntimeError SetLabels(std::vector< ClassificationBin > labels);
   std::vector< ClassificationBin> GetLabels();
