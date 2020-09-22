@@ -36,9 +36,7 @@ class IPreprocessing {
    * \return Error with a description message.
    */
   virtual RuntimeError Apply(std::shared_ptr<r2i::IFrame> in_frame,
-                             std::shared_ptr<r2i::IFrame> out_frame,
-                             int required_width, int required_height,
-                             r2i::ImageFormat::Id required_format) = 0;
+                             std::shared_ptr<r2i::IFrame> out_frame) = 0;
 
   /**
    * \brief Gets the available image formats that can be processed.
