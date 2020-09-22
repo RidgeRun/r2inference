@@ -102,8 +102,12 @@ class NormalizeMock : public r2i::Normalize {
 
  private:
   r2i::RuntimeError SetNormalizationParameters () {
-    this->mean = MEAN;
-    this->std_dev = STD_DEV;
+    this->mean_red = MEAN;
+    this->mean_green = MEAN;
+    this->mean_blue = MEAN;
+    this->std_dev_red = STD_DEV;
+    this->std_dev_green = STD_DEV;
+    this->std_dev_blue = STD_DEV;
     return r2i::RuntimeError();
   }
 

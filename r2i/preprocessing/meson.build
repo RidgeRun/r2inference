@@ -1,7 +1,8 @@
 #Build preprocessing modules
 preprocessing_sources = [
     'normalize_inceptionv1',
-    'normalize_inceptionv3'
+    'normalize_inceptionv3',
+    'normalize_resnet50v1',
 ]
 
 normalize_lib = static_library('normalize',
