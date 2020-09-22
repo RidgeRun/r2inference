@@ -37,7 +37,9 @@ endif
 
 # Define source code
 r2inference_sources = [
+  'classification.cc',
   'datatype.cc',
+  'detection.cc',
   'iframeworkfactory.cc',
   'imageformat.cc',
   'loader.cc',
@@ -45,7 +47,9 @@ r2inference_sources = [
 ]
 
 r2inference_headers = [
+  'classification.h',
   'datatype.h',
+  'detection.h',
   'frameworkmeta.h',
   'frameworks.h',
   'iengine.h',
@@ -54,6 +58,7 @@ r2inference_headers = [
   'iloader.h',
   'imageformat.h',
   'imodel.h',
+  'inferenceoutput.h',
   'iparameters.h',
   'ipostprocessing.h',
   'iprediction.h',

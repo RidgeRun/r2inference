@@ -58,7 +58,9 @@ lib_LTLIBRARIES = libr2inference-@RR_PACKAGE_VERSION@.la
 r2iincludedir = @R2IINCLUDEDIR@/r2i
 
 libr2inference_@RR_PACKAGE_VERSION@_la_SOURCES =    \
+        classification.cc                           \
         datatype.cc                                 \
+        detection.cc                                \
         iframeworkfactory.cc                        \
         loader.cc                                   \
         runtimeerror.cc                             \
@@ -85,7 +87,9 @@ libr2inference_@RR_PACKAGE_VERSION@_la_LIBADD =     \
         $(GMODULE_LIBS)
 
 r2iinclude_HEADERS =         \
+        classification.h     \
         datatype.h           \
+        detection.h          \
         frameworkmeta.h      \
         frameworks.h         \
         iengine.h            \
@@ -94,6 +98,7 @@ r2iinclude_HEADERS =         \
         iloader.h            \
         imageformat.h        \
         imodel.h             \
+        inferenceoutput.h    \
         iparameters.h        \
         ipostprocessing.h    \
         iprediction.h        \
