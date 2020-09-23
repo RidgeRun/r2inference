@@ -32,17 +32,17 @@ class Normalize: public r2i::IPreprocessing {
   double std_dev_green = 1;
   double std_dev_blue = 1;
 
-  std::shared_ptr<float> processed_data;
   std::vector<std::tuple<int, int>> dimensions;
   std::vector<r2i::ImageFormat> formats;
 
   r2i::RuntimeError Validate (int required_width, int required_height,
                               r2i::ImageFormat::Id required_format_id);
-  std::shared_ptr<float> PreProcessImage (unsigned char *in_data, int width,
-                                          int height, int channels,
-                                          int required_width,
-                                          int required_height,
-                                          int required_channels);
+  void PreProcessImage (unsigned char *in_data, float *out_data, int width,
+                        int height, int channels,
+                        int required_width,
+                        int required_height,
+                        int required_channels,
+                        r2i::RuntimeError error);
   virtual r2i::RuntimeError SetNormalizationParameters (
     std::shared_ptr<unsigned char> frame_data, int width, int height, int channels);
 };
