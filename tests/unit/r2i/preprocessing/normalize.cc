@@ -310,7 +310,25 @@ TEST(Normalize, NullOutputFrame) {
   LONGS_EQUAL(r2i::RuntimeError::Code::NULL_PARAMETER, error.GetCode());
 }
 
-TEST(Normalize, NullFrameData) {
+TEST(Normalize, NullInputFrameData) {
+  std::shared_ptr<float> out_data = std::shared_ptr<float>
+                                    (new float[FRAME_WIDTH * FRAME_HEIGHT * CHANNELS],
+                                     std::default_delete<float[]>());
+  error = out_frame->Configure (out_data.get(), FRAME_WIDTH,
+                                FRAME_HEIGHT,
+                                r2i::ImageFormat::Id::BGR);
+
+  error = preprocessing->Apply(in_frame, out_frame);
+  LONGS_EQUAL(r2i::RuntimeError::Code::NULL_PARAMETER, error.GetCode());
+}
+
+TEST(Normalize, NullOutputFrameData) {
+  dummy_frame_data = std::shared_ptr<unsigned char>(new unsigned char[FRAME_SIZE],
+                     std::default_delete<const unsigned char[]>());
+  unsigned char *in_data = dummy_frame_data.get();
+  error = in_frame->Configure(in_data, FRAME_WIDTH, FRAME_HEIGHT,
+                              r2i::ImageFormat::Id::RGB);
+
   error = preprocessing->Apply(in_frame, out_frame);
   LONGS_EQUAL(r2i::RuntimeError::Code::NULL_PARAMETER, error.GetCode());
 }
@@ -366,25 +384,42 @@ TEST_GROUP(NormalizeModels) {
     error = in_frame->Configure(in_data, FRAME_WIDTH, FRAME_HEIGHT,
                                 r2i::ImageFormat::Id::RGB);
 
-    std::shared_ptr<float> out_data = std::shared_ptr<float>
-                                      (new float[FRAME_WIDTH * FRAME_HEIGHT * CHANNELS],
-                                       std::default_delete<float[]>());
-    error = out_frame_facenetv1->Configure (out_data.get(), FRAME_WIDTH,
+    std::shared_ptr<float> out_data_facenetv1 = std::shared_ptr<float>
+        (new float[FRAME_WIDTH * FRAME_HEIGHT * CHANNELS],
+         std::default_delete<float[]>());
+    std::shared_ptr<float> out_data_inceptionv1 = std::shared_ptr<float>
+        (new float[FRAME_WIDTH * FRAME_HEIGHT * CHANNELS],
+         std::default_delete<float[]>());
+    std::shared_ptr<float> out_data_inceptionv3 = std::shared_ptr<float>
+        (new float[FRAME_WIDTH * FRAME_HEIGHT * CHANNELS],
+         std::default_delete<float[]>());
+    std::shared_ptr<float> out_data_resnet50v1 = std::shared_ptr<float>
+        (new float[FRAME_WIDTH * FRAME_HEIGHT * CHANNELS],
+         std::default_delete<float[]>());
+    std::shared_ptr<float> out_data_tinyyolov2 = std::shared_ptr<float>
+        (new float[FRAME_WIDTH * FRAME_HEIGHT * CHANNELS],
+         std::default_delete<float[]>());
+    std::shared_ptr<float> out_data_tinyyolov3 = std::shared_ptr<float>
+        (new float[FRAME_WIDTH * FRAME_HEIGHT * CHANNELS],
+         std::default_delete<float[]>());
+    error = out_frame_facenetv1->Configure (out_data_facenetv1.get(), FRAME_WIDTH,
                                             FRAME_HEIGHT,
                                             r2i::ImageFormat::Id::RGB);
-    error = out_frame_inceptionv1->Configure (out_data.get(), FRAME_WIDTH,
+    error = out_frame_inceptionv1->Configure (out_data_inceptionv1.get(),
+            FRAME_WIDTH,
             FRAME_HEIGHT,
             r2i::ImageFormat::Id::RGB);
-    error = out_frame_inceptionv3->Configure (out_data.get(), FRAME_WIDTH,
+    error = out_frame_inceptionv3->Configure (out_data_inceptionv3.get(),
+            FRAME_WIDTH,
             FRAME_HEIGHT,
             r2i::ImageFormat::Id::RGB);
-    error = out_frame_resnet50v1->Configure (out_data.get(), FRAME_WIDTH,
+    error = out_frame_resnet50v1->Configure (out_data_resnet50v1.get(), FRAME_WIDTH,
             FRAME_HEIGHT,
             r2i::ImageFormat::Id::RGB);
-    error = out_frame_tinyyolov2->Configure (out_data.get(), FRAME_WIDTH,
+    error = out_frame_tinyyolov2->Configure (out_data_tinyyolov2.get(), FRAME_WIDTH,
             FRAME_HEIGHT,
             r2i::ImageFormat::Id::RGB);
-    error = out_frame_tinyyolov3->Configure (out_data.get(), FRAME_WIDTH,
+    error = out_frame_tinyyolov3->Configure (out_data_tinyyolov3.get(), FRAME_WIDTH,
             FRAME_HEIGHT,
             r2i::ImageFormat::Id::RGB);
 

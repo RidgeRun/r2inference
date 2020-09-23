@@ -41,9 +41,16 @@ r2i::RuntimeError Normalize::Apply(std::shared_ptr<r2i::IFrame> in_frame,
   r2i::ImageFormat required_format;
   r2i::ImageFormat::Id required_format_id;
   unsigned char *in_data;
+  float *out_data;
 
   if (!in_frame or !out_frame) {
     error.Set (r2i::RuntimeError::Code::NULL_PARAMETER, "Null IFrame parameters");
+    return error;
+  }
+
+  in_data = static_cast<unsigned char *>(in_frame->GetData());
+  if (!in_data) {
+    error.Set (r2i::RuntimeError::Code::NULL_PARAMETER, "Null input frame data");
     return error;
   }
 
@@ -51,10 +58,10 @@ r2i::RuntimeError Normalize::Apply(std::shared_ptr<r2i::IFrame> in_frame,
   height = in_frame->GetHeight();
   format = in_frame->GetFormat();
   channels = format.GetNumPlanes();
-  in_data = static_cast<unsigned char *>(in_frame->GetData());
 
-  if (!in_data) {
-    error.Set (r2i::RuntimeError::Code::NULL_PARAMETER, "Null input frame data");
+  out_data = static_cast<float *>(out_frame->GetData());
+  if (!out_data) {
+    error.Set (r2i::RuntimeError::Code::NULL_PARAMETER, "Null output frame data");
     return error;
   }
 
@@ -69,12 +76,8 @@ r2i::RuntimeError Normalize::Apply(std::shared_ptr<r2i::IFrame> in_frame,
     return error;
   }
 
-  processed_data = PreProcessImage(in_data, width, height, channels,
-                                   required_width,
-                                   required_height, required_channels);
-  error = out_frame->Configure (processed_data.get(), required_width,
-                                required_height,
-                                required_format_id);
+  PreProcessImage(in_data, out_data, width, height, channels, required_width,
+                  required_height, required_channels, error);
 
   if (error.IsError ()) {
     return error;
@@ -142,23 +145,18 @@ r2i::RuntimeError Normalize::SetNormalizationParameters (
   return r2i::RuntimeError();
 }
 
-std::shared_ptr<float> Normalize::PreProcessImage (unsigned char *in_data,
-    int width, int height, int channels, int required_width, int required_height,
-    int required_channels) {
+void Normalize::PreProcessImage (unsigned char *in_data, float *out_data,
+                                 int width, int height, int channels, int required_width,
+                                 int required_height, int required_channels,
+                                 r2i::RuntimeError error) {
 
-  r2i::RuntimeError error;
   const int scaled_size = required_channels * required_width * required_height;
   std::shared_ptr<unsigned char> scaled_ptr;
-  std::shared_ptr<float> adjusted_ptr;
-  float *adjusted;
   unsigned char *scaled;
 
   scaled_ptr = std::shared_ptr<unsigned char>(new unsigned char[scaled_size],
                std::default_delete<const unsigned char[]>());
-  adjusted_ptr = std::shared_ptr<float>(new float[scaled_size],
-                                        std::default_delete<float[]>());
 
-  adjusted = adjusted_ptr.get();
   scaled = scaled_ptr.get();
 
   stbir_resize_uint8(in_data, width, height, 0, scaled, required_width,
@@ -170,15 +168,13 @@ std::shared_ptr<float> Normalize::PreProcessImage (unsigned char *in_data,
 
   for (int i = 0; i < scaled_size; i += channels) {
     /* RGB = (RGB - Mean)/StdDev */
-    adjusted[i + 0] = (static_cast<float>(scaled[i + 0]) - this->mean_red) /
+    out_data[i + 0] = (static_cast<float>(scaled[i + 0]) - this->mean_red) /
                       this->std_dev_red;
-    adjusted[i + 1] = (static_cast<float>(scaled[i + 1]) - this->mean_green) /
+    out_data[i + 1] = (static_cast<float>(scaled[i + 1]) - this->mean_green) /
                       this->std_dev_green;
-    adjusted[i + 2] = (static_cast<float>(scaled[i + 2]) - this->mean_blue) /
+    out_data[i + 2] = (static_cast<float>(scaled[i + 2]) - this->mean_blue) /
                       this->std_dev_blue;
   }
-
-  return adjusted_ptr;
 }
 
 }  // namespace r2i
