@@ -27,15 +27,15 @@
  */
 namespace r2i {
 
-typedef std::tuple<int, double> ClassificationBin;
+typedef std::tuple<int, double> ClassificationInstance;
 
 class Classification : public InferenceOutput {
  public:
   Classification();
   ~Classification();
-  RuntimeError SetLabels(std::vector< ClassificationBin > labels);
-  std::vector< ClassificationBin> GetLabels();
-  ClassificationBin GetRank1();
+  RuntimeError SetLabels(std::vector< ClassificationInstance > labels);
+  std::vector< ClassificationInstance> GetLabels();
+  ClassificationInstance GetRank1();
 
  private:
   /**

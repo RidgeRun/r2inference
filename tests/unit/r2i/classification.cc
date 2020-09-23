@@ -26,8 +26,8 @@ TEST_GROUP (ClassificationOutput) {
 };
 
 TEST (ClassificationOutput, SetAndGetLabels) {
-  std::vector< r2i::ClassificationBin > in_value;
-  std::vector< r2i::ClassificationBin > out_value;
+  std::vector< r2i::ClassificationInstance > in_value;
+  std::vector< r2i::ClassificationInstance > out_value;
 
   in_value.push_back( std::make_tuple(0, 0.5) );
   in_value.push_back( std::make_tuple(1, 0.5) );
@@ -48,8 +48,8 @@ TEST (ClassificationOutput, SetAndGetLabels) {
 }
 
 TEST (ClassificationOutput, GetRank1) {
-  std::vector< r2i::ClassificationBin > in_value;
-  r2i::ClassificationBin out_value;
+  std::vector< r2i::ClassificationInstance > in_value;
+  r2i::ClassificationInstance out_value;
 
   in_value.push_back( std::make_tuple(0, 0.25) );
   in_value.push_back( std::make_tuple(1, 0.5) );

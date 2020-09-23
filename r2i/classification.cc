@@ -21,18 +21,18 @@ Classification::~Classification() {
   this->labels.clear();
 }
 
-RuntimeError Classification::SetLabels(std::vector< ClassificationBin >
+RuntimeError Classification::SetLabels(std::vector< ClassificationInstance >
                                        labels) {
   this->labels = labels;
   return RuntimeError();
 }
 
-std::vector< ClassificationBin > Classification::GetLabels() {
+std::vector< ClassificationInstance > Classification::GetLabels() {
   return this->labels;
 }
 
-ClassificationBin Classification::GetRank1() {
-  ClassificationBin max_scored_class;
+ClassificationInstance Classification::GetRank1() {
+  ClassificationInstance max_scored_class;
 
   max_scored_class = std::make_tuple(0, 0.0);
 
