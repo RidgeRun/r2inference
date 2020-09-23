@@ -32,7 +32,8 @@ class IPreprocessing {
  public:
   /**
    * \brief Apply a custom preprocessin to the input data.
-   * \param data Frame input data.
+   * \param in_frame input Frame with data to be preprocessed.
+   * \param out_frame output Frame with processed data.
    * \return Error with a description message.
    */
   virtual RuntimeError Apply(std::shared_ptr<r2i::IFrame> in_frame,
