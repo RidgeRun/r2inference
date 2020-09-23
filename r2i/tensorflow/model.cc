@@ -11,8 +11,6 @@
 
 #include "r2i/tensorflow/model.h"
 
-#include <iostream>
-
 namespace r2i {
 namespace tensorflow {
 
