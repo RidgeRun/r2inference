@@ -48,7 +48,11 @@ AM_LDFLAGS =                        \
         $(TESTS_LIBS)               \
         $(CODE_COVERAGE_LIBS)       \
         $(top_builddir)/r2i/libr2inference-@RR_PACKAGE_VERSION@.la     \
+        $(top_builddir)/r2i/preprocessing/libnormalize_facenetv1.la    \
         $(top_builddir)/r2i/preprocessing/libnormalize_inceptionv1.la  \
-        $(top_builddir)/r2i/preprocessing/libnormalize_inceptionv3.la
+        $(top_builddir)/r2i/preprocessing/libnormalize_inceptionv3.la  \
+        $(top_builddir)/r2i/preprocessing/libnormalize_resnet50v1.la   \
+        $(top_builddir)/r2i/preprocessing/libnormalize_tinyyolov2.la   \
+        $(top_builddir)/r2i/preprocessing/libnormalize_tinyyolov3.la
 
 CLEANFILES = cpputest_*.xml

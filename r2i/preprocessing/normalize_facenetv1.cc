@@ -55,9 +55,9 @@ r2i::RuntimeError NormalizeFaceNetV1::SetNormalizationParameters (
 
   /* Calculate std_dev */
   for (int i = 0; i < size; i += channels) {
-    red += data[i + 0] - mean;
-    green += data[i + 1] - mean;
-    blue += data[i + 2] - mean;
+    red = data[i + 0] - mean;
+    green = data[i + 1] - mean;
+    blue = data[i + 2] - mean;
     normalized += std::pow(red, 2);
     normalized += std::pow(green, 2);
     normalized += std::pow(blue, 2);
