@@ -26,11 +26,11 @@ TEST_GROUP (DetectionOutput) {
 };
 
 TEST (DetectionOutput, SetAndGetDetections) {
-  std::vector< r2i::DetectionBin > in_value;
-  std::vector< r2i::DetectionBin > out_value;
-  r2i::DetectionBin detection1;
+  std::vector< r2i::DetectionInstance > in_value;
+  std::vector< r2i::DetectionInstance > out_value;
+  r2i::DetectionInstance detection1;
   r2i::Classification class1;
-  std::vector< r2i::ClassificationBin > labels1;
+  std::vector< r2i::ClassificationInstance > labels1;
 
   r2i::BBox box1 = {.x = 0, .y = 0, .width = 100, .height = 100};
 

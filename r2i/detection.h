@@ -28,7 +28,7 @@ struct BBox {
   double height;
 };
 
-struct DetectionBin {
+struct DetectionInstance {
   BBox box;
   Classification labels;
 };
@@ -37,11 +37,11 @@ class Detection: public InferenceOutput {
  public:
   Detection();
   ~Detection();
-  RuntimeError SetDetections(std::vector< DetectionBin > detections);
-  std::vector< DetectionBin > GetDetections();
+  RuntimeError SetDetections(std::vector< DetectionInstance > detections);
+  std::vector< DetectionInstance > GetDetections();
 
  private:
-  std::vector< DetectionBin > detections;
+  std::vector< DetectionInstance > detections;
 };
 
 }
