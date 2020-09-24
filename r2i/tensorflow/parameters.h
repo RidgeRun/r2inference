@@ -140,13 +140,21 @@ class Parameters : public IParameters {
   class OutputLayerAccessor : public StringAccessor {
    public:
     OutputLayerAccessor (Parameters *target) : StringAccessor(target) {}
+    const std::string name = "output-layers";
+
     RuntimeError Set () {
-      return target->model->SetOutputLayerName(this->value);
+      return target->Set (name, {this->value});
     }
 
     RuntimeError Get () {
-      this->value = target->model->GetOutputLayerName();
-      return RuntimeError ();
+      std::vector <std::string> layers;
+
+      RuntimeError error = target->Get (name, layers);
+      if (!error.IsError()) {
+	this->value = layers.at(0);
+      }
+
+      return error;
     }
   };
 
@@ -158,7 +166,7 @@ class Parameters : public IParameters {
     }
 
     RuntimeError Get () {
-      this->value = target->model->GetOutputLayesrNames();
+      this->value = target->model->GetOutputLayersNames();
       return RuntimeError ();
     }
   };

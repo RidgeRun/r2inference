@@ -166,60 +166,11 @@ RuntimeError Engine::Stop () {
 
 std::shared_ptr<r2i::IPrediction> Engine::Predict (std::shared_ptr<r2i::IFrame>
     in_frame, r2i::RuntimeError &error) {
-  ImageFormat in_format;
+  std::vector< std::shared_ptr<r2i::IPrediction> > predictions;
 
-  error.Clean ();
+  error = this->Predict (in_frame, predictions);
 
-  if (State::STARTED != this->state) {
-    error.Set (RuntimeError::Code::WRONG_ENGINE_STATE,
-               "Engine not started");
-    return nullptr;
-  }
-
-  /* These pointers are validated during load */
-  auto pgraph = this->model->GetGraph ();
-  auto out_operation = this->model->GetOutputOperation ();
-  auto in_operation = this->model->GetInputOperation ();
-
-  auto frame = std::dynamic_pointer_cast<Frame, IFrame> (in_frame);
-  if (nullptr == frame) {
-    error.Set (RuntimeError::Code::INCOMPATIBLE_MODEL,
-               "The provided frame is not an tensorflow frame");
-    return nullptr;
-  }
-
-  auto pin_tensor = frame->GetTensor (pgraph, in_operation, error);
-  if (error.IsError ()) {
-    return nullptr;
-  }
-
-  auto prediction = std::make_shared<Prediction>();
-  std::shared_ptr<TF_Status> pstatus(TF_NewStatus(), TF_DeleteStatus);
-
-  auto *session = this->session.get ();
-  auto *in_tensor = pin_tensor.get ();
-  auto *status = pstatus.get ();
-
-  TF_Output run_outputs = {.oper = out_operation, .index = 0};
-  TF_Output run_inputs = {.oper = in_operation, .index = 0};
-  TF_Tensor *out_tensor = nullptr;
-
-  TF_SessionRun(session,
-                NULL,                         /* RunOptions */
-                &run_inputs, &in_tensor, 1,   /* Input tensors */
-                &run_outputs, &out_tensor, 1, /* Output tensors */
-                NULL, 0,                      /* Target operations */
-                NULL,                         /* RunMetadata */
-                status);
-  if (TF_GetCode(status) != TF_OK) {
-    error.Set (RuntimeError::Code::FRAMEWORK_ERROR, TF_Message (status));
-    return nullptr;
-  }
-
-  std::shared_ptr<TF_Tensor> pout_tensor (out_tensor, TF_DeleteTensor);
-  prediction->SetTensor (pout_tensor);
-
-  return prediction;
+  return predictions.at(0);
 }
 
 RuntimeError Engine::Predict (std::shared_ptr<r2i::IFrame> in_frame,

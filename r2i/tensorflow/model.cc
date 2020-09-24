@@ -85,19 +85,6 @@ TF_Operation *Model::GetInputOperation () {
   return this->in_operation;
 }
 
-/*
- * NOTE: This method should be removed once the multiple output
- * support is integrated with the GStreamer plugins. The logic of
- * this method is emulating the previous one to allow backward
- * compatibility.
- */
-TF_Operation *Model::GetOutputOperation () {
-  if (this->out_operations.size() > 0) {
-    return this->out_operations[0];
-  }
-  return nullptr;
-}
-
 std::vector<TF_Operation *> Model::GetOutputOperations () {
   return this->out_operations;
 }
@@ -105,18 +92,6 @@ std::vector<TF_Operation *> Model::GetOutputOperations () {
 RuntimeError Model::SetInputLayerName (const std::string &name) {
   this->input_layer_name = name;
 
-  return RuntimeError ();
-}
-
-/*
- * NOTE: This method should be removed once the multiple output
- * support is integrated with the GStreamer plugins. The logic of
- * this method is emulating the previous one to allow backward
- * compatibility.
- */
-RuntimeError Model::SetOutputLayerName (const std::string &name) {
-  this->output_layers_names.clear();
-  this->output_layers_names.push_back(name);
   return RuntimeError ();
 }
 
@@ -129,22 +104,7 @@ const std::string Model::GetInputLayerName () {
   return this->input_layer_name;
 }
 
-/*
- * NOTE: This method should be removed once the multiple output
- * support is integrated with the GStreamer plugins. The logic of
- * this method is emulating the previous one to allow backward
- * compatibility.
- */
-const std::string Model::GetOutputLayerName () {
-  std::string output_name;
-
-  if (this->output_layers_names.size() > 0) {
-    output_name = this->output_layers_names[0];
-  }
-  return output_name;
-}
-
-std::vector< std::string > Model::GetOutputLayesrNames () {
+std::vector< std::string > Model::GetOutputLayersNames () {
   return this->output_layers_names;
 }
 

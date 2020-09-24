@@ -30,21 +30,15 @@ class Model : public IModel {
 
   std::shared_ptr<TF_Graph> GetGraph ();
   std::shared_ptr<TF_Buffer> GetBuffer ();
+
   TF_Operation *GetInputOperation ();
-
-  //[[deprecated("Use GetOutputOperation() instead.")]]
-  TF_Operation *GetOutputOperation ();
   std::vector<TF_Operation *> GetOutputOperations ();
-  RuntimeError SetInputLayerName (const std::string &name);
 
-  //[[deprecated("Use SetOutputLayersNames() instead.")]]
-  RuntimeError SetOutputLayerName (const std::string &name);
-  RuntimeError SetOutputLayersNames (std::vector< std::string > names);
+  RuntimeError SetInputLayerName (const std::string &name);
   const std::string GetInputLayerName ();
 
-  //[[deprecated("Use GetOutputLayesrNames() instead.")]]
-  const std::string GetOutputLayerName ();
-  std::vector< std::string > GetOutputLayesrNames ();
+  RuntimeError SetOutputLayersNames (std::vector< std::string > names);
+  std::vector< std::string > GetOutputLayersNames ();
 
   RuntimeError Load (std::shared_ptr<TF_Buffer> buffer);
 

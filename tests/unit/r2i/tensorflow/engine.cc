@@ -47,11 +47,8 @@ r2i::RuntimeError Model::Load (std::shared_ptr<TF_Buffer> pbuffer) {
 std::shared_ptr<TF_Graph> Model::GetGraph () {return this->graph;}
 std::shared_ptr<TF_Buffer> Model::GetBuffer () {return this->buffer;}
 TF_Operation *Model::GetInputOperation () { return nullptr; }
-TF_Operation *Model::GetOutputOperation () { return nullptr; }
 RuntimeError Model::SetInputLayerName (const std::string &name) { return RuntimeError(); }
-RuntimeError Model::SetOutputLayerName (const std::string &name) { return RuntimeError(); }
 const std::string Model::GetInputLayerName () { return "inputLayer"; }
-const std::string Model::GetOutputLayerName () { return "outputLayer"; }
 
 Frame::Frame () {}
 RuntimeError Frame::Configure (void *in_data, int width, int height,
@@ -83,7 +80,7 @@ TEST_GROUP (TensorflowEngine) {
     auto tf_model = std::dynamic_pointer_cast<r2i::tensorflow::Model, r2i::IModel>
                     (model);
     tf_model->SetInputLayerName("InputLayer");
-    tf_model->SetOutputLayerName("OutputLayer");
+    tf_model->SetOutputLayersNames({"OutputLayer"});
 
     inc_model = std::make_shared<MockModel> ();
     frame = std::make_shared<r2i::tensorflow::Frame> ();
