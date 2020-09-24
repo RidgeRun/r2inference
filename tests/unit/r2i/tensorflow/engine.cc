@@ -46,7 +46,6 @@ r2i::RuntimeError Model::Load (std::shared_ptr<TF_Buffer> pbuffer) {
 }
 std::shared_ptr<TF_Graph> Model::GetGraph () {return this->graph;}
 std::shared_ptr<TF_Buffer> Model::GetBuffer () {return this->buffer;}
-TF_Operation *Model::GetInputOperation () { return nullptr; }
 RuntimeError Model::SetInputLayerName (const std::string &name) { return RuntimeError(); }
 const std::string Model::GetInputLayerName () { return "inputLayer"; }
 

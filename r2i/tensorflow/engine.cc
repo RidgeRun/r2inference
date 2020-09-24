@@ -183,10 +183,6 @@ RuntimeError Engine::Predict (std::shared_ptr<r2i::IFrame> in_frame,
     return error;
   }
 
-  /* These pointers are validated during load */
-  auto pgraph = this->model->GetGraph ();
-  auto in_operation = this->model->GetInputOperation ();
-
   auto frame = std::dynamic_pointer_cast<Frame, IFrame> (in_frame);
   if (nullptr == frame) {
     error.Set (RuntimeError::Code::INCOMPATIBLE_MODEL,
@@ -194,31 +190,33 @@ RuntimeError Engine::Predict (std::shared_ptr<r2i::IFrame> in_frame,
     return error;
   }
 
-  auto pin_tensor = frame->GetTensor (pgraph, in_operation, error);
-  if (error.IsError ()) {
-    return error;
-  }
-
-  std::shared_ptr<TF_Status> pstatus(TF_NewStatus(), TF_DeleteStatus);
-
-  auto *session = this->session.get ();
-  auto *in_tensor = pin_tensor.get ();
-  auto *status = pstatus.get ();
+  /* These pointers are validated during load */
+  auto graph = this->model->GetGraph ();
 
   std::vector<TF_Output> run_outputs = this->model->GetRunOutputs();
   std::vector<TF_Tensor *> out_tensors (run_outputs.size());
 
-  TF_Output run_inputs = {.oper = in_operation, .index = 0};
+  std::vector<TF_Output> run_inputs = this->model->GetRunInputs();
+  std::vector<TF_Tensor *> in_tensors;
 
-  TF_SessionRun(session,
+  TF_Operation *in_operation = run_inputs.at(0).oper;
+  auto in_tensor = frame->GetTensor (graph, in_operation, error);
+  if (error.IsError ()) {
+    return error;
+  }
+  in_tensors.push_back (in_tensor.get());
+
+  std::shared_ptr<TF_Status> status(TF_NewStatus(), TF_DeleteStatus);
+
+  TF_SessionRun(session.get(),
                 NULL,                                                       /* RunOptions */
-                &run_inputs, &in_tensor, 1,                                 /* Input tensors */
+                run_inputs.data(), in_tensors.data(), in_tensors.size(),    /* Input tensors */
                 run_outputs.data(), out_tensors.data(), out_tensors.size(), /* Output tensors */
                 NULL, 0,                                                    /* Target operations */
                 NULL,                                                       /* RunMetadata */
-                status);
-  if (TF_GetCode(status) != TF_OK) {
-    error.Set (RuntimeError::Code::FRAMEWORK_ERROR, TF_Message (status));
+                status.get());
+  if (TF_GetCode(status.get()) != TF_OK) {
+    error.Set (RuntimeError::Code::FRAMEWORK_ERROR, TF_Message (status.get()));
     return error;
   }
 

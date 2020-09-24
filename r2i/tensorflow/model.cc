@@ -17,10 +17,35 @@ namespace tensorflow {
 Model::Model () {
   this->graph = nullptr;
   this->buffer = nullptr;
-  this->in_operation = nullptr;
+  this->run_inputs.clear();
   this->run_outputs.clear();
   this->input_layer_name.clear ();
   this->output_layers_names.clear();
+}
+
+static RuntimeError FillRuns (std::shared_ptr<TF_Graph> graph,
+			      const std::vector<std::string> &names,
+			      std::vector<TF_Output> &runs) {
+  RuntimeError error;
+
+  for (auto &name: names) {
+
+    if (name.empty()) {
+      error.Set (RuntimeError::Code::NULL_PARAMETER, "Invalid layer name " + name);
+      return error;
+    }
+
+    TF_Operation *operation = TF_GraphOperationByName(graph.get(), name.c_str ());
+    if (nullptr == operation) {
+      error.Set (RuntimeError::Code::INVALID_FRAMEWORK_PARAMETER,
+                 "No valid node for layer " + name);
+      return error;
+    }
+
+    runs.push_back({.oper = operation, .index = 0});
+  }
+
+  return error;
 }
 
 RuntimeError Model::Start (const std::string &name) {
@@ -38,34 +63,15 @@ RuntimeError Model::Start (const std::string &name) {
     return error;
   }
 
-  TF_Graph *graph = this->graph.get();
-
-  TF_Operation *in_operation = nullptr;
-  in_operation = TF_GraphOperationByName(graph, this->input_layer_name.c_str ());
-  if (nullptr == in_operation) {
-    error.Set (RuntimeError::Code::INVALID_FRAMEWORK_PARAMETER,
-               "No valid input node provided");
+  error = FillRuns (this->graph, this->output_layers_names, this->run_outputs);
+  if (error.IsError()) {
     return error;
   }
 
-  for (auto &name: this->output_layers_names) {
-
-    if (name.empty()) {
-      error.Set (RuntimeError::Code::NULL_PARAMETER, "Invalid output layer name");
-      return error;
-    }
-
-    TF_Operation *out_operation = TF_GraphOperationByName(graph, name.c_str ());
-    if (nullptr == out_operation) {
-      error.Set (RuntimeError::Code::INVALID_FRAMEWORK_PARAMETER,
-                 "No valid output node " + name);
-      return error;
-    }
-
-    this->run_outputs.push_back({.oper = out_operation, .index = 0});
+  error = FillRuns (this->graph, {this->input_layer_name}, this->run_inputs);
+  if (error.IsError()) {
+    return error;
   }
-
-  this->in_operation = in_operation;
 
   return error;
 }
@@ -78,8 +84,8 @@ std::shared_ptr<TF_Buffer> Model::GetBuffer () {
   return this->buffer;
 }
 
-TF_Operation *Model::GetInputOperation () {
-  return this->in_operation;
+std::vector<TF_Output> Model::GetRunInputs () {
+  return this->run_inputs;
 }
 
 std::vector<TF_Output> Model::GetRunOutputs () {

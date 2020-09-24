@@ -56,7 +56,6 @@ RuntimeError Model::Load (std::shared_ptr<TF_Buffer> pbuffer) {
 
 std::shared_ptr<TF_Graph> Model::GetGraph () {return this->graph;}
 std::shared_ptr<TF_Buffer> Model::GetBuffer () {return this->buffer;}
-TF_Operation *Model::GetInputOperation () { return nullptr; }
 RuntimeError Model::SetInputLayerName (const std::string &name) {
   this->input_layer_name = name;
   return RuntimeError();
