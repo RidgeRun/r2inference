@@ -156,6 +156,40 @@ RuntimeError Frame::CreateTensor (TF_DataType type, int64_t dims[],
   return error;
 }
 
+void Frame::HandleGenericDimensions (int64_t dims[], int64_t num_dims) {
+  const int64_t expected_dims = 4;
+  /* TensorFlow assigns a generic (-1) value on dimensions that accept any
+   * value. This is almost always true for the batch (first dimension), but
+   * convolutional neural networks may also accept any width, height or even
+   * amount of channels.
+   */
+
+  /* The idea above is only true if we have 4 dimensions, aka: BxWxHxC */
+  if (expected_dims != num_dims) {
+    return;
+  }
+
+  /* Is batch size generic? */
+  if (-1 == dims[0]) {
+    dims[0] = 1;
+  }
+
+  /* Is width generic? */
+  if (-1 == dims[1]) {
+    dims[1] = this->frame_width;;
+  }
+
+  /* Is height generic? */
+  if (-1 == dims[2]) {
+    dims[2] = this->frame_height;;
+  }
+
+  /* Is channels generic? */
+  if (-1 == dims[3]) {
+    dims[3] = this->frame_format.GetNumPlanes();
+  }
+}
+
 RuntimeError Frame::GetTensorShape (std::shared_ptr<TF_Graph> pgraph,
                                     TF_Operation *operation, TF_DataType &type, int64_t **dims,
                                     int64_t &num_dims, int64_t &size) {
@@ -192,10 +226,7 @@ RuntimeError Frame::GetTensorShape (std::shared_ptr<TF_Graph> pgraph,
     return error;
   }
 
-  /* R2Inference uses a batch size of 1 but some tensors have this value set to
-   * generic (-1) or greater than 1.
-   * Batch size set to 1 for general compatibility support. */
-  (*dims)[0] = 1;
+  HandleGenericDimensions(*dims, num_dims);
 
   type = TF_OperationOutputType(output);
   size = TF_DataTypeSize(type);

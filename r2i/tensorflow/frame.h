@@ -53,6 +53,7 @@ class Frame : public IFrame {
   RuntimeError CreateTensor (TF_DataType type, int64_t dims[], int64_t num_dims,
                              int64_t size);
   RuntimeError Validate (int64_t dims[], int64_t num_dims);
+  void HandleGenericDimensions (int64_t dims[], int64_t num_dims);
 };
 
 }
