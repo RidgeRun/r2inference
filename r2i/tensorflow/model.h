@@ -32,7 +32,7 @@ class Model : public IModel {
   std::shared_ptr<TF_Buffer> GetBuffer ();
 
   TF_Operation *GetInputOperation ();
-  std::vector<TF_Operation *> GetOutputOperations ();
+  std::vector<TF_Output> GetRunOutputs ();
 
   RuntimeError SetInputLayerName (const std::string &name);
   const std::string GetInputLayerName ();
@@ -46,7 +46,7 @@ class Model : public IModel {
   std::shared_ptr<TF_Graph> graph;
   std::shared_ptr<TF_Buffer> buffer;
   TF_Operation *in_operation;
-  std::vector<TF_Operation *> out_operations;
+  std::vector<TF_Output> run_outputs;
   std::string input_layer_name;
   std::vector<std::string> output_layers_names;
 };

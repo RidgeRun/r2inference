@@ -18,7 +18,7 @@ Model::Model () {
   this->graph = nullptr;
   this->buffer = nullptr;
   this->in_operation = nullptr;
-  this->out_operations.clear();
+  this->run_outputs.clear();
   this->input_layer_name.clear ();
   this->output_layers_names.clear();
 }
@@ -48,24 +48,21 @@ RuntimeError Model::Start (const std::string &name) {
     return error;
   }
 
-  for (size_t index = 0; index < this->output_layers_names.size(); index++) {
-    std::string out_layer_name = this->output_layers_names[index];
+  for (auto &name: this->output_layers_names) {
 
-    if (out_layer_name.empty()) {
+    if (name.empty()) {
       error.Set (RuntimeError::Code::NULL_PARAMETER, "Invalid output layer name");
       return error;
     }
 
-    TF_Operation *out_operation = nullptr;
-    out_operation = TF_GraphOperationByName(graph, out_layer_name.c_str ());
-
+    TF_Operation *out_operation = TF_GraphOperationByName(graph, name.c_str ());
     if (nullptr == out_operation) {
       error.Set (RuntimeError::Code::INVALID_FRAMEWORK_PARAMETER,
-                 "No valid output node provided");
+                 "No valid output node " + name);
       return error;
     }
 
-    this->out_operations.push_back(out_operation);
+    this->run_outputs.push_back({.oper = out_operation, .index = 0});
   }
 
   this->in_operation = in_operation;
@@ -85,8 +82,8 @@ TF_Operation *Model::GetInputOperation () {
   return this->in_operation;
 }
 
-std::vector<TF_Operation *> Model::GetOutputOperations () {
-  return this->out_operations;
+std::vector<TF_Output> Model::GetRunOutputs () {
+  return this->run_outputs;
 }
 
 RuntimeError Model::SetInputLayerName (const std::string &name) {

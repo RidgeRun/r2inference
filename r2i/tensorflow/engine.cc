@@ -186,8 +186,6 @@ RuntimeError Engine::Predict (std::shared_ptr<r2i::IFrame> in_frame,
   /* These pointers are validated during load */
   auto pgraph = this->model->GetGraph ();
   auto in_operation = this->model->GetInputOperation ();
-  std::vector< TF_Operation * > out_operations =
-    this->model->GetOutputOperations();
 
   auto frame = std::dynamic_pointer_cast<Frame, IFrame> (in_frame);
   if (nullptr == frame) {
@@ -207,22 +205,17 @@ RuntimeError Engine::Predict (std::shared_ptr<r2i::IFrame> in_frame,
   auto *in_tensor = pin_tensor.get ();
   auto *status = pstatus.get ();
 
-  std::vector<TF_Output> run_outputs;
-  for (size_t index = 0; index < out_operations.size(); index++) {
-    TF_Output run_output = {.oper = out_operations[index], .index = 0};
-
-    run_outputs.push_back(run_output);
-  }
+  std::vector<TF_Output> run_outputs = this->model->GetRunOutputs();
   std::vector<TF_Tensor *> out_tensors (run_outputs.size());
 
   TF_Output run_inputs = {.oper = in_operation, .index = 0};
 
   TF_SessionRun(session,
-                NULL,                                                 /* RunOptions */
-                &run_inputs, &in_tensor, 1,                           /* Input tensors */
-                &run_outputs[0], &out_tensors[0], out_tensors.size(), /* Output tensors */
-                NULL, 0,                                              /* Target operations */
-                NULL,                                                 /* RunMetadata */
+                NULL,                                                       /* RunOptions */
+                &run_inputs, &in_tensor, 1,                                 /* Input tensors */
+                run_outputs.data(), out_tensors.data(), out_tensors.size(), /* Output tensors */
+                NULL, 0,                                                    /* Target operations */
+                NULL,                                                       /* RunMetadata */
                 status);
   if (TF_GetCode(status) != TF_OK) {
     error.Set (RuntimeError::Code::FRAMEWORK_ERROR, TF_Message (status));
