@@ -31,7 +31,7 @@ NormalizeInceptionV1::NormalizeInceptionV1 () : r2i::Normalize() {
 }
 
 r2i::RuntimeError NormalizeInceptionV1::SetNormalizationParameters (
-  std::shared_ptr<unsigned char> frame_data, int width, int height,
+  unsigned char *frame_data, int width, int height,
   int channels) {
   this->mean_red = MEAN_128;
   this->mean_green = MEAN_128;

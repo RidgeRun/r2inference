@@ -20,7 +20,7 @@ class NormalizeTinyyoloV2: public r2i::Normalize {
  public:
   NormalizeTinyyoloV2 ();
  private:
-  r2i::RuntimeError SetNormalizationParameters (std::shared_ptr<unsigned char>
+  r2i::RuntimeError SetNormalizationParameters (unsigned char *
       frame_data, int width, int height, int channels) override;
 };
 

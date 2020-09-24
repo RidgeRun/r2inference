@@ -28,7 +28,7 @@ NormalizeFaceNetV1::NormalizeFaceNetV1 () : r2i::Normalize() {
 }
 
 r2i::RuntimeError NormalizeFaceNetV1::SetNormalizationParameters (
-  std::shared_ptr<unsigned char> frame_data, int width, int height,
+  unsigned char *frame_data, int width, int height,
   int channels) {
   double mean = 0;
   double std_dev = 1;
@@ -42,7 +42,7 @@ r2i::RuntimeError NormalizeFaceNetV1::SetNormalizationParameters (
   unsigned char *data;
   r2i::RuntimeError error;
 
-  data = frame_data.get();
+  data = frame_data;
   size = width * height * channels;
 
   /* Calculate mean */

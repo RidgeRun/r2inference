@@ -33,7 +33,7 @@ NormalizeResnet50V1::NormalizeResnet50V1 () : r2i::Normalize() {
 }
 
 r2i::RuntimeError NormalizeResnet50V1::SetNormalizationParameters (
-  std::shared_ptr<unsigned char> frame_data, int width, int height,
+  unsigned char *frame_data, int width, int height,
   int channels) {
   this->mean_red = MEAN_RED;
   this->mean_green = MEAN_GREEN;

@@ -35,25 +35,31 @@ void PrintUsage() {
             << std::endl;
 }
 
-std::shared_ptr<r2i::IFrame> LoadImage(const std::string &path, int req_width,
-                                       int req_height,
-                                       std::shared_ptr<r2i::IPreprocessing> preprocessing,
-                                       std::shared_ptr<r2i::IFrame> in_frame,
-                                       std::shared_ptr<r2i::IFrame> out_frame,
-                                       r2i::RuntimeError &error) {
+r2i::RuntimeError LoadImage(const std::string &path, int req_width,
+                            int req_height,
+                            std::shared_ptr<r2i::IPreprocessing> preprocessing,
+                            std::shared_ptr<r2i::IFrame> in_frame,
+                            std::shared_ptr<r2i::IFrame> out_frame) {
   int channels = 3;
   int width, height, cp;
+  int required_width;
+  int required_height;
+  int required_channels;
+  unsigned char *scaled;
+  r2i::ImageFormat output_image_format;
+  r2i::RuntimeError error;
+  std::shared_ptr<unsigned char> scaled_ptr;
 
   if (!in_frame) {
     error.Set (r2i::RuntimeError::Code::FILE_ERROR,
                "Null IFrame object");
-    return nullptr;
+    return error;
   }
 
   if (!preprocessing) {
     error.Set (r2i::RuntimeError::Code::FILE_ERROR,
                "Null Preprocessing object");
-    return nullptr;
+    return error;
   }
 
   unsigned char *img = stbi_load(path.c_str(), &width, &height, &cp, channels);
@@ -61,17 +67,29 @@ std::shared_ptr<r2i::IFrame> LoadImage(const std::string &path, int req_width,
     error.Set (r2i::RuntimeError::Code::FILE_ERROR,
                "Error while loading the image file");
     std::cerr << "The picture " << path << " could not be loaded";
-    return nullptr;
+    return error;
   }
 
-  error = in_frame->Configure (img, width, height,
-                               r2i::ImageFormat::Id::RGB);
+  required_width = out_frame->GetWidth();
+  required_height = out_frame->GetHeight();
+  required_channels = out_frame->GetFormat().GetNumPlanes();
+
+  scaled_ptr = std::shared_ptr<unsigned char>(new unsigned char[required_width
+               * required_height * required_channels],
+               std::default_delete<const unsigned char[]>());
+  scaled = scaled_ptr.get();
+
+  stbir_resize_uint8(img, width, height, 0, scaled, required_width,
+                     required_height, 0, required_channels);
+
+  error = in_frame->Configure (scaled, required_width, required_height,
+                               out_frame->GetFormat().GetId());
 
   error = preprocessing->Apply(in_frame, out_frame);
 
   free (img);
 
-  return out_frame;
+  return error;
 }
 
 bool ParseArgs (int &argc, char *argv[], std::string &image_path,
@@ -184,8 +202,8 @@ int main (int argc, char *argv[]) {
   error = out_frame->Configure (out_data.get(), size,
                                 size,
                                 r2i::ImageFormat::Id::RGB);
-  out_frame = LoadImage (image_path, size, size, preprocessing, in_frame,
-                         out_frame, error);
+  error = LoadImage (image_path, size, size, preprocessing, in_frame,
+                     out_frame);
   if (error.IsError ()) {
     std::cerr << error.GetDescription() << std::endl;
     exit(EXIT_FAILURE);
