@@ -44,7 +44,7 @@ class Normalize: public r2i::IPreprocessing {
                         int required_channels,
                         r2i::RuntimeError error);
   virtual r2i::RuntimeError SetNormalizationParameters (
-    std::shared_ptr<unsigned char> frame_data, int width, int height, int channels);
+    unsigned char *frame_data, int width, int height, int channels);
 };
 
 }  // namespace r2i

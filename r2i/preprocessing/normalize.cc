@@ -15,12 +15,6 @@
 
 #include <r2i/preprocessing/normalize.h>
 
-#define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"
-
-#define STB_IMAGE_RESIZE_IMPLEMENTATION
-#include "stb_image_resize.h"
-
 namespace r2i {
 
 Normalize::Normalize () {
@@ -140,7 +134,7 @@ r2i::RuntimeError Normalize::Validate (int required_width,
 }
 
 r2i::RuntimeError Normalize::SetNormalizationParameters (
-  std::shared_ptr<unsigned char> frame_data, int width, int height,
+  unsigned char *frame_data, int width, int height,
   int channels) {
   return r2i::RuntimeError();
 }
@@ -151,28 +145,18 @@ void Normalize::PreProcessImage (unsigned char *in_data, float *out_data,
                                  r2i::RuntimeError error) {
 
   const int scaled_size = required_channels * required_width * required_height;
-  std::shared_ptr<unsigned char> scaled_ptr;
-  unsigned char *scaled;
-
-  scaled_ptr = std::shared_ptr<unsigned char>(new unsigned char[scaled_size],
-               std::default_delete<const unsigned char[]>());
-
-  scaled = scaled_ptr.get();
-
-  stbir_resize_uint8(in_data, width, height, 0, scaled, required_width,
-                     required_height, 0, required_channels);
 
   /* To set model specific preprocessing paramaters */
-  SetNormalizationParameters(scaled_ptr, required_width, required_height,
+  SetNormalizationParameters(in_data, required_width, required_height,
                              channels);
 
   for (int i = 0; i < scaled_size; i += channels) {
     /* RGB = (RGB - Mean)/StdDev */
-    out_data[i + 0] = (static_cast<float>(scaled[i + 0]) - this->mean_red) /
+    out_data[i + 0] = (static_cast<float>(in_data[i + 0]) - this->mean_red) /
                       this->std_dev_red;
-    out_data[i + 1] = (static_cast<float>(scaled[i + 1]) - this->mean_green) /
+    out_data[i + 1] = (static_cast<float>(in_data[i + 1]) - this->mean_green) /
                       this->std_dev_green;
-    out_data[i + 2] = (static_cast<float>(scaled[i + 2]) - this->mean_blue) /
+    out_data[i + 2] = (static_cast<float>(in_data[i + 2]) - this->mean_blue) /
                       this->std_dev_blue;
   }
 }

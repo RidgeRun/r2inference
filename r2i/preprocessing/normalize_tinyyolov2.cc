@@ -31,7 +31,7 @@ NormalizeTinyyoloV2::NormalizeTinyyoloV2 () : r2i::Normalize() {
 }
 
 r2i::RuntimeError NormalizeTinyyoloV2::SetNormalizationParameters (
-  std::shared_ptr<unsigned char> frame_data, int width, int height,
+  unsigned char *frame_data, int width, int height,
   int channels) {
   this->mean_red = MEAN;
   this->mean_green = MEAN;

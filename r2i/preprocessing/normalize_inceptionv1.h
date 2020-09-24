@@ -20,7 +20,7 @@ class NormalizeInceptionV1: public r2i::Normalize {
  public:
   NormalizeInceptionV1 ();
  private:
-  r2i::RuntimeError SetNormalizationParameters (std::shared_ptr<unsigned char>
+  r2i::RuntimeError SetNormalizationParameters (unsigned char *
       frame_data, int width, int height, int channels) override;
 };
 
