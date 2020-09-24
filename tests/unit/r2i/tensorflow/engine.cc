@@ -67,8 +67,7 @@ Prediction::Prediction () {}
 double Prediction::At (unsigned int index,  r2i::RuntimeError &error) { return 0.0; }
 void *Prediction::GetResultData () { return nullptr; }
 unsigned int Prediction::GetResultSize () { return 0; }
-RuntimeError Prediction::SetTensor (std::shared_ptr<TF_Graph> graph,
-                                    TF_Operation *operation, std::shared_ptr<TF_Tensor> tensor) { return RuntimeError(); }
+RuntimeError Prediction::SetTensor (std::shared_ptr<TF_Tensor> tensor) { return RuntimeError(); }
 }
 }
 

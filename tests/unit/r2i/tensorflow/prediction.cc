@@ -76,28 +76,14 @@ TEST_GROUP (TensorflowPrediction) {
 TEST (TensorflowPrediction, SetTensorSuccess) {
   r2i::RuntimeError error;
 
-  error = prediction.SetTensor(pgraph, poperation, pout_tensor);
+  error = prediction.SetTensor(pout_tensor);
   LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode());
-}
-
-TEST (TensorflowPrediction, SetTensorNullGraph) {
-  r2i::RuntimeError error;
-
-  error = prediction.SetTensor(nullptr, poperation, pout_tensor);
-  LONGS_EQUAL (r2i::RuntimeError::Code::NULL_PARAMETER, error.GetCode());
-}
-
-TEST (TensorflowPrediction, SetTensorNullOperation) {
-  r2i::RuntimeError error;
-
-  error = prediction.SetTensor(pgraph, nullptr, pout_tensor);
-  LONGS_EQUAL (r2i::RuntimeError::Code::NULL_PARAMETER, error.GetCode());
 }
 
 TEST (TensorflowPrediction, SetTensorNullTensor) {
   r2i::RuntimeError error;
 
-  error = prediction.SetTensor(pgraph, poperation, nullptr);
+  error = prediction.SetTensor(nullptr);
   LONGS_EQUAL (r2i::RuntimeError::Code::NULL_PARAMETER, error.GetCode());
 }
 
@@ -105,7 +91,7 @@ TEST (TensorflowPrediction, SetTensorIncompatibleModel) {
   r2i::RuntimeError error;
   model_sucess = false;
 
-  error = prediction.SetTensor(pgraph, poperation, pout_tensor);
+  error = prediction.SetTensor(pout_tensor);
   LONGS_EQUAL (r2i::RuntimeError::Code::INCOMPATIBLE_MODEL, error.GetCode());
 
   model_sucess = true;
@@ -115,7 +101,7 @@ TEST (TensorflowPrediction, Prediction) {
   r2i::RuntimeError error;
   double result = 0;
 
-  error = prediction.SetTensor(pgraph, poperation, pout_tensor);
+  error = prediction.SetTensor(pout_tensor);
   LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode());
 
   result = prediction.At (0, error);
@@ -137,7 +123,7 @@ TEST (TensorflowPrediction, PredictionNoData) {
   pout_tensor = std::shared_ptr<TF_Tensor> (TF_NewTensor(TF_FLOAT, raw_input_dims,
                 1, nullptr, INPUTS * sizeof(float), DummyDeallocator, NULL), TF_DeleteTensor);
 
-  error = prediction.SetTensor(pgraph, poperation, pout_tensor);
+  error = prediction.SetTensor(pout_tensor);
   LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode());
 
   prediction.At (0, error);
@@ -148,7 +134,7 @@ TEST (TensorflowPrediction, PredictionNoData) {
 TEST (TensorflowPrediction, PredictionNonExistentIndex) {
   r2i::RuntimeError error;
 
-  error = prediction.SetTensor(pgraph, poperation, pout_tensor);
+  error = prediction.SetTensor(pout_tensor);
   LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode());
 
   prediction.At (5, error);

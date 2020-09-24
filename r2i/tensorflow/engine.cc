@@ -217,7 +217,7 @@ std::shared_ptr<r2i::IPrediction> Engine::Predict (std::shared_ptr<r2i::IFrame>
   }
 
   std::shared_ptr<TF_Tensor> pout_tensor (out_tensor, TF_DeleteTensor);
-  prediction->SetTensor (pgraph, out_operation, pout_tensor);
+  prediction->SetTensor (pout_tensor);
 
   return prediction;
 }
@@ -279,11 +279,11 @@ RuntimeError Engine::Predict (std::shared_ptr<r2i::IFrame> in_frame,
   }
 
   // Iterate over the multiple outputs
-  for (size_t index = 0; index < out_tensors.size(); index++) {
-    std::shared_ptr<TF_Tensor> pout_tensor (out_tensors[index], TF_DeleteTensor);
+  for (auto &tensor: out_tensors) {
+    std::shared_ptr<TF_Tensor> pout_tensor (tensor, TF_DeleteTensor);
     auto prediction = std::make_shared<Prediction>();
 
-    prediction->SetTensor(pgraph, out_operations[index], pout_tensor);
+    prediction->SetTensor(pout_tensor);
     predictions.push_back(prediction);
   }
 
