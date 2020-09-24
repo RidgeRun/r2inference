@@ -257,18 +257,12 @@ RuntimeError Engine::Predict (std::shared_ptr<r2i::IFrame> in_frame,
   auto *status = pstatus.get ();
 
   std::vector<TF_Output> run_outputs;
-  std::vector<TF_Tensor *> out_tensors;
   for (size_t index = 0; index < out_operations.size(); index++) {
     TF_Output run_output = {.oper = out_operations[index], .index = 0};
-    TF_Tensor *out_tensor = this->AllocateTensor(pgraph, out_operations[index],
-                            error);
-    if (error.IsError()) {
-      return error;
-    }
 
     run_outputs.push_back(run_output);
-    out_tensors.push_back(out_tensor);
   }
+  std::vector<TF_Tensor *> out_tensors (run_outputs.size());
 
   TF_Output run_inputs = {.oper = in_operation, .index = 0};
 
@@ -298,76 +292,6 @@ RuntimeError Engine::Predict (std::shared_ptr<r2i::IFrame> in_frame,
 
 Engine::~Engine () {
   this->Stop();
-}
-
-TF_Tensor *Engine::AllocateTensor(std::shared_ptr<TF_Graph> pgraph,
-                                  TF_Operation *operation, RuntimeError &error) {
-  TensorInfo info = this->InspectTensor(pgraph, operation, error);
-  if (error.IsError()) {
-    return nullptr;
-  }
-
-  int64_t result_size = info.data_size * info.type_size;
-  return TF_AllocateTensor(info.type, info.dims.data(), info.num_dims,
-                           result_size);
-}
-
-TensorInfo Engine::InspectTensor(std::shared_ptr<TF_Graph> pgraph,
-                                 TF_Operation *operation, RuntimeError &error) {
-  TensorInfo info;
-
-  if (nullptr == pgraph) {
-    error.Set (RuntimeError::Code::NULL_PARAMETER,
-               "Invalid graph passed");
-    return info;
-  }
-
-  if (nullptr == operation) {
-    error.Set (RuntimeError::Code::NULL_PARAMETER,
-               "Invalid operation passed");
-    return info;
-  }
-
-  std::shared_ptr<TF_Status> pstatus (TF_NewStatus(), TF_DeleteStatus);
-  TF_Status *status = pstatus.get ();
-  TF_Graph *graph = pgraph.get ();
-  TF_Output output = { .oper = operation, .index = 0 };
-
-  int num_dims = TF_GraphGetTensorNumDims(graph, output, status);
-  if (TF_GetCode(status) != TF_OK) {
-    error.Set (RuntimeError::Code::FRAMEWORK_ERROR, TF_Message (status));
-    return info;
-  }
-
-  info.num_dims = num_dims;
-
-  int64_t dims[num_dims];
-  TF_GraphGetTensorShape(graph, output, dims, num_dims, status);
-  if (TF_GetCode(status) != TF_OK) {
-    error.Set (RuntimeError::Code::FRAMEWORK_ERROR, TF_Message (status));
-    return info;
-  }
-
-  /* R2Inference uses a batch size of 1 but some tensors have this value set to
-   * generic (-1) or greater than 1.
-   * Batch size set to 1 for general compatibility support. */
-  dims[0] = 1;
-
-  TF_DataType type = TF_OperationOutputType(output);
-  size_t type_size = TF_DataTypeSize(type);
-  size_t data_size = 1;
-
-  /* For each dimension, multiply the amount of entries */
-  for (int dim = 0; dim < num_dims; ++dim) {
-    data_size *= dims[dim];
-    info.dims.push_back(dims[dim]);
-  }
-
-  info.type = type;
-  info.type_size = type_size;
-  info.data_size = data_size;
-
-  return info;
 }
 
 } //namespace tensorflow

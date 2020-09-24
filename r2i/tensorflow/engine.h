@@ -60,11 +60,6 @@ class Engine : public IEngine {
 
   std::shared_ptr<TF_Session> session;
   std::shared_ptr<Model> model;
-
-  TF_Tensor *AllocateTensor(std::shared_ptr<TF_Graph> pgraph,
-                            TF_Operation *operation, RuntimeError &error);
-  TensorInfo InspectTensor(std::shared_ptr<TF_Graph> graph,
-                           TF_Operation *operation, RuntimeError &error);
 };
 
 }
