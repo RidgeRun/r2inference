@@ -52,13 +52,13 @@ r2i::RuntimeError LoadImage(const std::string &path, int req_width,
   std::shared_ptr<unsigned char> scaled_ptr;
 
   if (!in_frame) {
-    error.Set (r2i::RuntimeError::Code::FILE_ERROR,
+    error.Set (r2i::RuntimeError::Code::NULL_PARAMETER,
                "Null IFrame object");
     return error;
   }
 
   if (!preprocessing) {
-    error.Set (r2i::RuntimeError::Code::FILE_ERROR,
+    error.Set (r2i::RuntimeError::Code::NULL_PARAMETER,
                "Null Preprocessing object");
     return error;
   }
@@ -66,7 +66,7 @@ r2i::RuntimeError LoadImage(const std::string &path, int req_width,
   unsigned char *img = stbi_load(path.c_str(), &width, &height, &channels_in_file,
                                  channels);
   if (!img) {
-    error.Set (r2i::RuntimeError::Code::FILE_ERROR,
+    error.Set (r2i::RuntimeError::Code::NULL_PARAMETER,
                "Error while loading the image file");
     std::cerr << "The picture " << path << " could not be loaded";
     return error;
