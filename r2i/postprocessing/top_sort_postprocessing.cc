@@ -20,64 +20,82 @@
 namespace r2i {
 
 /* Sort tuples in descending order based on the first element of the tuple */
-static bool SortDesc(const std::tuple<double, int> &a,
-                     const std::tuple<double, int> &b) {
-  return (std::get<0>(a) > std::get<0>(b));
+static bool SortDesc(const std::tuple<int, double> &a,
+                     const std::tuple<int, double> &b) {
+  return (std::get<1>(a) > std::get<1>(b));
 }
 
-std::shared_ptr<r2i::IPrediction> TopSortPostprocessing::Apply(
-  std::shared_ptr<r2i::IPrediction>
-  prediction,
-  r2i::RuntimeError &error) {
-  std::shared_ptr<r2i::IPrediction> out_prediction;
+RuntimeError TopSortPostprocessing::Apply(
+  std::vector< std::shared_ptr<r2i::IPrediction> > &predictions,
+  std::vector< std::shared_ptr<InferenceOutput> > &outputs) {
+  float *prediction_data;
+  unsigned int prediction_data_size;
+  unsigned int num_predictions;
+  RuntimeError error;
+  std::shared_ptr<r2i::Classification> classification;
+  std::vector< r2i::ClassificationInstance > labels;
 
-  if (!prediction) {
-    error.Set (r2i::RuntimeError::Code::NULL_PARAMETER,
-               "Null IPrediction parameter");
-    return nullptr;
-  }
+  /* Number of predictions */
+  num_predictions = predictions.size();
 
-  out_prediction = SortPrediction(prediction, error);
-
-  return out_prediction;
-}
-
-std::shared_ptr<r2i::IPrediction> TopSortPostprocessing::SortPrediction (
-  std::shared_ptr<r2i::IPrediction>
-  prediction, r2i::RuntimeError &error) {
-  int max_index;
-  double max;
-
-  try {
+  /* Do top sort on all predictions */
+  for (unsigned int i = 0; i < num_predictions; ++i) {
     /* Array of prediction values */
-    float *prediction_data = reinterpret_cast<float *>(prediction->GetResultData());
+    prediction_data = static_cast<float *>(predictions.at(i)->GetResultData());
     /* Number of elements in the array */
-    unsigned int prediction_data_size = prediction->GetResultSize() / sizeof(float);
-    /* Sort indexes in descending fashion, top prediction pair at the beginning */
-    std::vector<std::pair<double, int> > index_value;
-    /* Store (value, index) pairs in a vector */
-    for (unsigned int i = 0; i < prediction_data_size; ++i) {
-      index_value.push_back(std::pair<double, int>(prediction_data[i], i));
+    prediction_data_size = predictions.at(i)->GetResultSize() / sizeof(float);
+
+    for (unsigned int j = 0; j < prediction_data_size; ++j) {
+      /* Fill vector with (index, value) pairs */
+      labels.push_back(std::make_tuple(j, prediction_data[j]));
     }
 
+    classification = std::make_shared<r2i::Classification>();
+    if (!classification) {
+      error.Set (RuntimeError::Code::MODULE_ERROR,
+                 "Failed to create Classification instance");
+      return error;
+    }
+
+    error = classification->SetLabels(labels);
+    if (error.IsError ()) {
+      return error;
+    }
+
+    error = SortPrediction(classification);
+    if (error.IsError ()) {
+      return error;
+    }
+
+    outputs.push_back(classification);
+  }
+
+  return error;
+}
+
+RuntimeError TopSortPostprocessing::SortPrediction (
+  std::shared_ptr<r2i::Classification> classification) {
+  RuntimeError error;
+  std::vector< r2i::ClassificationInstance > labels;
+
+  try {
+    labels = classification->GetLabels();
+
     /* Sort indexes in descending order based on the prediction values */
-    std::stable_sort(index_value.begin(), index_value.end(), SortDesc);
+    std::stable_sort(labels.begin(), labels.end(), SortDesc);
 
-    /* After sorting, print highest scoring label */
-    std::pair<double, int> top_pair = index_value.at(0);
-    max_index = top_pair.second;
-    max = top_pair.first;
-
-    std::cout << "Highest probability is label "
-              << max_index << " (" << max << ")" << std::endl;
+    error = classification->SetLabels(labels);
+    if (error.IsError ()) {
+      return error;
+    }
 
   } catch (const std::exception &e) {
     error.Set (r2i::RuntimeError::Code::MODULE_ERROR,
                e.what());
-    return nullptr;
+    return error;
   }
 
-  return prediction;
+  return error;
 }
 
 }  // namespace r2i

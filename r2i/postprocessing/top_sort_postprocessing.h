@@ -12,21 +12,20 @@
 #ifndef R2I_TOP_SORT_POSTPROCESSING_H
 #define R2I_TOP_SORT_POSTPROCESSING_H
 
+#include <r2i/classification.h>
 #include <r2i/ipostprocessing.h>
 
 namespace r2i {
 
 class TopSortPostprocessing: public r2i::IPostprocessing {
  public:
-  std::shared_ptr<r2i::IPrediction> Apply(
-    std::shared_ptr<r2i::IPrediction>
-    prediction,
-    r2i::RuntimeError &error) override;
+  RuntimeError Apply(std::vector< std::shared_ptr<r2i::IPrediction> >
+                     &predictions,
+                     std::vector< std::shared_ptr<InferenceOutput> >  &outputs) override;
 
  private:
-  std::shared_ptr<r2i::IPrediction> SortPrediction (
-    std::shared_ptr<r2i::IPrediction>
-    prediction, r2i::RuntimeError &error);
+  RuntimeError SortPrediction (std::shared_ptr<r2i::Classification>
+                               classification);
 };
 
 }  // namespace r2i

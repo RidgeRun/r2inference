@@ -34,6 +34,7 @@ class InferenceOutput {
   InferenceOutputType GetType() {
     return this->type;
   }
+
  protected:
   InferenceOutputType type;
 };
