@@ -176,12 +176,12 @@ void Frame::HandleGenericDimensions (int64_t dims[], int64_t num_dims) {
 
   /* Is width generic? */
   if (-1 == dims[1]) {
-    dims[1] = this->frame_width;;
+    dims[1] = this->frame_width;
   }
 
   /* Is height generic? */
   if (-1 == dims[2]) {
-    dims[2] = this->frame_height;;
+    dims[2] = this->frame_height;
   }
 
   /* Is channels generic? */

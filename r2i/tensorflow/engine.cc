@@ -170,7 +170,11 @@ std::shared_ptr<r2i::IPrediction> Engine::Predict (std::shared_ptr<r2i::IFrame>
 
   error = this->Predict (in_frame, predictions);
 
-  return predictions.at(0);
+  if (predictions.size() > 0) {
+    return predictions.at(0);
+  } else {
+    return nullptr;
+  }
 }
 
 RuntimeError Engine::Predict (std::shared_ptr<r2i::IFrame> in_frame,
@@ -199,6 +203,12 @@ RuntimeError Engine::Predict (std::shared_ptr<r2i::IFrame> in_frame,
   std::vector<TF_Output> run_inputs = this->model->GetRunInputs();
   std::vector<TF_Tensor *> in_tensors;
 
+  if (0 == run_inputs.size()) {
+    error.Set(RuntimeError::Code::INVALID_FRAMEWORK_PARAMETER,
+              "No input layers provided");
+    return error;
+  }
+
   TF_Operation *in_operation = run_inputs.at(0).oper;
   auto in_tensor = frame->GetTensor (graph, in_operation, error);
   if (error.IsError ()) {
@@ -221,7 +231,7 @@ RuntimeError Engine::Predict (std::shared_ptr<r2i::IFrame> in_frame,
   }
 
   // Iterate over the multiple outputs
-  for (auto &tensor: out_tensors) {
+  for (auto &tensor : out_tensors) {
     std::shared_ptr<TF_Tensor> pout_tensor (tensor, TF_DeleteTensor);
     auto prediction = std::make_shared<Prediction>();
 

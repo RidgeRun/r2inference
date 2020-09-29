@@ -24,6 +24,9 @@
 
 #define FRAME_WIDTH  2
 #define FRAME_HEIGHT  2
+#define WRONG_FRAME_WIDTH 3
+#define WRONG_FRAME_HEIGHT 3
+#define WRONG_FRAME_CHANNELS 4
 
 bool multiple_batches = false;
 bool invalid_width = false;
@@ -45,19 +48,19 @@ void TF_GraphGetTensorShape(TF_Graph *graph, TF_Output output, int64_t *dims,
   }
 
   if (invalid_width) {
-    dims[1] = -1;
+    dims[1] = WRONG_FRAME_WIDTH;
   } else {
     dims[1] = FRAME_WIDTH;
   }
 
   if (invalid_height) {
-    dims[2] = -1;
+    dims[2] = WRONG_FRAME_HEIGHT;
   } else {
     dims[2] = FRAME_HEIGHT;
   }
 
   if (invalid_channels) {
-    dims[3] = -1;
+    dims[3] = WRONG_FRAME_CHANNELS;
   } else {
     dims[3] = 3;
   }
@@ -228,9 +231,10 @@ TEST (TensorflowFrame, FrameGetTensorMultipleBatches) {
   error = frame.Configure(data, width, height, format.GetId());
   LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode());
 
-  /* R2I will set the tensor size to 1 to allow frame by frame processing */
+  /* R2I only support a batch of 1 image(s) in our frames */
   tensor = frame.GetTensor(pgraph, operation, error);
-  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode());
+  LONGS_EQUAL (r2i::RuntimeError::Code::INVALID_FRAMEWORK_PARAMETER,
+               error.GetCode());
 
   multiple_batches = false;
 }

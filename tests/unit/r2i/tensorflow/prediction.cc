@@ -87,16 +87,6 @@ TEST (TensorflowPrediction, SetTensorNullTensor) {
   LONGS_EQUAL (r2i::RuntimeError::Code::NULL_PARAMETER, error.GetCode());
 }
 
-TEST (TensorflowPrediction, SetTensorIncompatibleModel) {
-  r2i::RuntimeError error;
-  model_sucess = false;
-
-  error = prediction.SetTensor(pout_tensor);
-  LONGS_EQUAL (r2i::RuntimeError::Code::INCOMPATIBLE_MODEL, error.GetCode());
-
-  model_sucess = true;
-}
-
 TEST (TensorflowPrediction, Prediction) {
   r2i::RuntimeError error;
   double result = 0;

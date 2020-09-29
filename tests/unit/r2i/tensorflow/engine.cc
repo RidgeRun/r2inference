@@ -48,6 +48,13 @@ std::shared_ptr<TF_Graph> Model::GetGraph () {return this->graph;}
 std::shared_ptr<TF_Buffer> Model::GetBuffer () {return this->buffer;}
 RuntimeError Model::SetInputLayerName (const std::string &name) { return RuntimeError(); }
 const std::string Model::GetInputLayerName () { return "inputLayer"; }
+std::vector<TF_Output> Model::GetRunInputs () {
+  TF_Output input = {.oper = nullptr, .index = 0};
+
+  std::vector<TF_Output> inputs;
+  inputs.push_back(input);
+  return inputs;
+}
 
 Frame::Frame () {}
 RuntimeError Frame::Configure (void *in_data, int width, int height,
