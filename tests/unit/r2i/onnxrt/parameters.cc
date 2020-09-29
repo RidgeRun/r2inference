@@ -39,8 +39,8 @@ class Engine : public r2i::IEngine {
   };
   virtual std::shared_ptr<r2i::IPrediction> Predict (std::shared_ptr<r2i::IFrame>
       in_frame, r2i::RuntimeError &error) { return nullptr; }
-  virtual RuntimeError Predict (std::shared_ptr<r2i::IFrame> in_frame,
-                                std::vector< std::shared_ptr<r2i::IPrediction> > &predictions) { return r2i::RuntimeError(); }
+  virtual r2i::RuntimeError Predict (std::shared_ptr<r2i::IFrame> in_frame,
+                                     std::vector< std::shared_ptr<r2i::IPrediction> > &predictions) { return r2i::RuntimeError(); }
 };
 }
 

@@ -9,6 +9,7 @@
  * back to RidgeRun without any encumbrance.
 */
 
+#include <r2i/classification.h>
 #include <r2i/r2i.h>
 
 #include <getopt.h>
@@ -124,13 +125,17 @@ bool ParseArgs (int &argc, char *argv[], std::string &image_path,
 }
 
 int main (int argc, char *argv[]) {
+  double max = 0;
+  int Index = 0;
+  int size = 0;
+  int max_index = 0;
   r2i::RuntimeError error;
   std::string model_path;
   std::string image_path;
   std::string preprocess_module;
   std::string postprocess_module;
-  int Index = 0;
-  int size = 0;
+  std::vector<std::shared_ptr<r2i::InferenceOutput>> outputs;
+  std::vector<std::shared_ptr<r2i::IPrediction>> predictions;
 
   if (false == ParseArgs (argc, argv, image_path, model_path, Index,
                           size, preprocess_module, postprocess_module)) {
@@ -217,14 +222,37 @@ int main (int argc, char *argv[]) {
   }
 
   std::cout << "Predicting..." << std::endl;
+  /* Inception models just give one output */
   auto prediction = engine->Predict (out_frame, error);
+  predictions.push_back(prediction);
   if (error.IsError ()) {
     std::cerr << "Engine prediction error: " << error << std::endl;
     exit(EXIT_FAILURE);
   }
 
+  std::cout << "Postprocessing..." << std::endl;
   /* Sort and print top prediction */
-  postprocessing->Apply(prediction, error);
+  error = postprocessing->Apply(predictions, outputs);
+  if (error.IsError ()) {
+    std::cerr << "Postprocessing error: " << error << std::endl;
+    exit(EXIT_FAILURE);
+  }
+  /* Top score is at the beginning */
+  auto output =
+    std::dynamic_pointer_cast<r2i::Classification, r2i::InferenceOutput>
+    (outputs.at(0));
+  if (!output) {
+    error.Set (r2i::RuntimeError::Code::FRAMEWORK_ERROR,
+               "The provided output is not a Classification type");
+    std::cerr << "Postprocessing error: " << error << std::endl;
+    exit(EXIT_FAILURE);
+  }
+
+  std::tuple<int, double> label = output->GetLabels().at(0);
+  max_index = std::get<0>(label);
+  max = std::get<1>(label);
+  std::cout << "Highest probability is label "
+            << max_index << " (" << max << ")" << std::endl;
 
   std::cout << "Stopping engine" << std::endl;
   error = engine->Stop ();
