@@ -1,5 +1,11 @@
 lib_preprocessing_tests = [
   ['normalize.cc'],
+  ['normalize_facenetv1.cc'],
+  ['normalize_inceptionv1.cc'],
+  ['normalize_inceptionv3.cc'],
+  ['normalize_resnet50v1.cc'],
+  ['normalize_tinyyolov2.cc'],
+  ['normalize_tinyyolov3.cc'],
 ]
 
 # Build and run tests

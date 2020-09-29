@@ -13,7 +13,13 @@ AM_DEFAULT_SOURCE_EXT = .cc
 if ENABLE_TESTS
 
 TESTS =                             \
-        normalize
+        normalize                   \
+        normalize_facenetv1         \
+        normalize_inceptionv1       \
+        normalize_inceptionv3       \
+        normalize_resnet50v1        \
+        normalize_tinyyolov2        \
+        normalize_tinyyolov3
 
 check_PROGRAMS=$(TESTS)
 
