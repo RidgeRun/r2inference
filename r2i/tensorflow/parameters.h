@@ -143,7 +143,10 @@ class Parameters : public IParameters {
     const std::string name = "output-layers";
 
     RuntimeError Set () {
-      return target->Set (name, {this->value});
+      std::vector <std::string> layers;
+      layers.push_back(this->value);
+
+      return target->Set (name, layers);
     }
 
     RuntimeError Get () {
@@ -151,7 +154,7 @@ class Parameters : public IParameters {
 
       RuntimeError error = target->Get (name, layers);
       if (!error.IsError()) {
-	this->value = layers.at(0);
+        this->value = layers.at(0);
       }
 
       return error;
