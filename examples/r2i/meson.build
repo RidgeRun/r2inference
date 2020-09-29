@@ -1,3 +1,6 @@
+# Define common path for headers in examples directory
+common_inc_dir = include_directories('common')
+
 # Compile examples
 app_examples = [
   'list_parameters',

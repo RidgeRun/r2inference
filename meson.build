@@ -18,9 +18,6 @@ else
 endif
 version_is_dev = version_minor % 2 == 1 and version_micro < 90
 
-# Define common path for headers in examples directory
-common_inc_dir = include_directories('examples/r2i/common')
-
 # Get an object returns describing a compiler
 cpp = meson.get_compiler('cpp')
 
