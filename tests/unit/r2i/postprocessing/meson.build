@@ -8,7 +8,7 @@ foreach t : lib_postprocessing_tests
   test_name = fname.split('.')[0].underscorify()
 
   exe = executable(test_name, fname,
-      include_directories : [configinc, postprocessing_inc_dir],
+      include_directories : [configinc],
       dependencies : [r2inference_lib_dep, r2inference_internal_dep, tests_dep],
   )
 
