@@ -10,10 +10,10 @@
  * back to RidgeRun without any encumbrance.
  */
 
+#include "r2i/preprocessing/normalize.h"
+
 #include <memory>
 #include <vector>
-
-#include <r2i/preprocessing/normalize.h>
 
 namespace r2i {
 

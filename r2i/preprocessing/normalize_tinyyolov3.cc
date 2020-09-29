@@ -10,9 +10,9 @@
  * back to RidgeRun without any encumbrance.
  */
 
-#include <vector>
+#include "r2i/preprocessing/normalize_tinyyolov3.h"
 
-#include <r2i/preprocessing/normalize_tinyyolov3.h>
+#include <vector>
 
 /* Architecture specific required dimensions TinyyoloV3 */
 #define REQ_WIDTH_416 416

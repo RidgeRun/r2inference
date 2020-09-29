@@ -10,9 +10,9 @@
  * back to RidgeRun without any encumbrance.
  */
 
-#include <vector>
+#include "r2i/preprocessing/normalize_inceptionv3.h"
 
-#include <r2i/preprocessing/normalize_inceptionv3.h>
+#include <vector>
 
 /* Architecture specific required dimensions InceptionV3 and InceptionV4 */
 #define REQ_WIDTH_299 299
