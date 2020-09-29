@@ -11,7 +11,6 @@
  */
 
 #include <cmath>
-#include <memory>
 #include <vector>
 
 #include <r2i/preprocessing/normalize_facenetv1.h>
