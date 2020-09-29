@@ -10,10 +10,10 @@
  * back to RidgeRun without any encumbrance.
  */
 
+#include "r2i/preprocessing/normalize_facenetv1.h"
+
 #include <cmath>
 #include <vector>
-
-#include <r2i/preprocessing/normalize_facenetv1.h>
 
 /* Architecture specific required dimensions FaceNetV1 */
 #define REQ_WIDTH_160 160

@@ -10,9 +10,9 @@
  * back to RidgeRun without any encumbrance.
  */
 
-#include <vector>
+#include "r2i/preprocessing/normalize_resnet50v1.h"
 
-#include <r2i/preprocessing/normalize_resnet50v1.h>
+#include <vector>
 
 /* Architecture specific required dimensions Resnet50V1 */
 #define REQ_WIDTH_224 224
