@@ -10,7 +10,6 @@
  * back to RidgeRun without any encumbrance.
  */
 
-#include <memory>
 #include <vector>
 
 #include <r2i/preprocessing/normalize_resnet50v1.h>
