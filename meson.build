@@ -21,12 +21,6 @@ version_is_dev = version_minor % 2 == 1 and version_micro < 90
 # Define common path for headers in examples directory
 common_inc_dir = include_directories('examples/r2i/common')
 
-#Preprocessing headers
-preprocessing_inc_dir = include_directories('r2i/preprocessing')
-
-#Postprocessing headers
-postprocessing_inc_dir = include_directories('r2i/postprocessing')
-
 # Get an object returns describing a compiler
 cpp = meson.get_compiler('cpp')
 
