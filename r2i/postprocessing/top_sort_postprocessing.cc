@@ -11,11 +11,10 @@
  */
 
 #include <algorithm>
-#include <iostream>
 #include <memory>
 #include <vector>
 
-#include <r2i/postprocessing/top_sort_postprocessing.h>
+#include "r2i/postprocessing/top_sort_postprocessing.h"
 
 namespace r2i {
 
