@@ -42,7 +42,7 @@ r2i::RuntimeError LoadImage(const std::string &path, int req_width,
                             std::shared_ptr<r2i::IFrame> in_frame,
                             std::shared_ptr<r2i::IFrame> out_frame) {
   int channels = 3;
-  int width, height, cp;
+  int width, height, channels_in_file;
   int required_width;
   int required_height;
   int required_channels;
@@ -63,7 +63,8 @@ r2i::RuntimeError LoadImage(const std::string &path, int req_width,
     return error;
   }
 
-  unsigned char *img = stbi_load(path.c_str(), &width, &height, &cp, channels);
+  unsigned char *img = stbi_load(path.c_str(), &width, &height, &channels_in_file,
+                                 channels);
   if (!img) {
     error.Set (r2i::RuntimeError::Code::FILE_ERROR,
                "Error while loading the image file");
