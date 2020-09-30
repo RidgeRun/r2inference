@@ -38,10 +38,15 @@ r2i::RuntimeError NormalizeFaceNetV1::SetNormalizationParameters (
   double green = 0;
   double blue = 0;
   int size = 0;
-  unsigned char *data;
+  unsigned char *data = nullptr;
   r2i::RuntimeError error;
 
   data = frame_data;
+  if (!data) {
+    error.Set (r2i::RuntimeError::Code::NULL_PARAMETER, "NULL input frame data");
+    return error;
+  }
+
   size = width * height * channels;
 
   /* Calculate mean */
