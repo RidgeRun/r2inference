@@ -22,16 +22,17 @@
 #define FRAME_WIDTH 2
 #define FRAME_HEIGHT 2
 #define FRAME_SIZE CHANNELS * FRAME_WIDTH * FRAME_HEIGHT
-#define MEAN 0
-#define STD_DEV 1
+#define MEAN 5.5
+#define STD_DEV 3.45205253
 #define UNSUPPORTED_FRAME_WIDTH 1
 #define UNSUPPORTED_FRAME_HEIGHT 1
 #define CHANNELS  3
 #define TOLERANCE 0.000001
 
 static const float reference_matrix[FRAME_SIZE] = {
-  0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 11.0
-};
+  -1.593255, -1.303572, -1.013890, -0.724207, -0.434524, -0.144841,
+    0.144841, 0.434524, 0.724207, 1.013890, 1.303572, 1.593255
+  };
 
 namespace mock {
 class Frame : public r2i::IFrame {
@@ -100,8 +101,8 @@ class NormalizeMock : public r2i::Normalize {
     this->dimensions.push_back(std::tuple<int, int>(FRAME_WIDTH, FRAME_HEIGHT));
   }
 
- private:
-  r2i::RuntimeError SetNormalizationParameters () {
+  r2i::RuntimeError SetNormalizationParameters (unsigned char *
+      frame_data, int width, int height, int channels) override {
     this->mean_red = MEAN;
     this->mean_green = MEAN;
     this->mean_blue = MEAN;
