@@ -70,8 +70,9 @@ r2i::RuntimeError Normalize::Apply(std::shared_ptr<r2i::IFrame> in_frame,
     return error;
   }
 
-  PreProcessImage(in_data, out_data, width, height, channels, required_width,
-                  required_height, required_channels, error);
+  error = PreProcessImage(in_data, out_data, width, height, channels,
+                          required_width,
+                          required_height, required_channels);
   if (error.IsError ()) {
     return error;
   }
@@ -137,16 +138,34 @@ r2i::RuntimeError Normalize::SetNormalizationParameters (
   return r2i::RuntimeError();
 }
 
-void Normalize::PreProcessImage (unsigned char *in_data, float *out_data,
-                                 int width, int height, int channels, int required_width,
-                                 int required_height, int required_channels,
-                                 r2i::RuntimeError error) {
-
+r2i::RuntimeError Normalize::PreProcessImage (unsigned char *in_data,
+    float *out_data,
+    int width, int height, int channels, int required_width,
+    int required_height, int required_channels) {
+  r2i::RuntimeError error;
   const int scaled_size = required_channels * required_width * required_height;
 
   /* To set model specific preprocessing paramaters */
   SetNormalizationParameters(in_data, required_width, required_height,
                              channels);
+
+  if (!this->std_dev_red) {
+    error.Set (r2i::RuntimeError::Code::NULL_PARAMETER,
+               "Red channel standard deviation is zero, can not use this value in division");
+    return error;
+  }
+
+  if (!this->std_dev_green) {
+    error.Set (r2i::RuntimeError::Code::NULL_PARAMETER,
+               "Green channel standard deviation is zero, can not use this value in division");
+    return error;
+  }
+
+  if (!this->std_dev_blue) {
+    error.Set (r2i::RuntimeError::Code::NULL_PARAMETER,
+               "Blue channel standard deviation is zero, can not use this value in division");
+    return error;
+  }
 
   for (int i = 0; i < scaled_size; i += channels) {
     /* RGB = (RGB - Mean)/StdDev */
@@ -157,6 +176,8 @@ void Normalize::PreProcessImage (unsigned char *in_data, float *out_data,
     out_data[i + 2] = (static_cast<float>(in_data[i + 2]) - this->mean_blue) /
                       this->std_dev_blue;
   }
+
+  return error;
 }
 
 }  // namespace r2i
