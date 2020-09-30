@@ -30,6 +30,9 @@ class MockEngine : public r2i::IEngine {
       r2i::RuntimeError &error) override {
     return nullptr;
   }
+
+  RuntimeError Predict (std::shared_ptr<r2i::IFrame> in_frame,
+                        std::vector< std::shared_ptr<r2i::IPrediction> > &predictions) override { return r2i::RuntimeError(); }
 };
 
 class MockModel : public r2i::IModel {
