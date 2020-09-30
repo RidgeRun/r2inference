@@ -48,6 +48,11 @@ r2i::RuntimeError NormalizeFaceNetV1::SetNormalizationParameters (
   }
 
   size = width * height * channels;
+  if (!size) {
+    error.Set (r2i::RuntimeError::Code::NULL_PARAMETER,
+               "Can not process a frame with size 0");
+    return error;
+  }
 
   /* Calculate mean */
   for (int i = 0; i < size; i += channels) {
@@ -55,7 +60,7 @@ r2i::RuntimeError NormalizeFaceNetV1::SetNormalizationParameters (
     sum += data[i + 1];
     sum += data[i + 2];
   }
-  mean = sum / (float) (size);
+  mean = sum / size;
 
   /* Calculate std_dev */
   for (int i = 0; i < size; i += channels) {
@@ -67,7 +72,7 @@ r2i::RuntimeError NormalizeFaceNetV1::SetNormalizationParameters (
     normalized += std::pow(blue, 2);
   }
 
-  variance = normalized / (float) (size);
+  variance = normalized / size;
   std_dev = std::sqrt (variance);
 
   this->mean_red = mean;
