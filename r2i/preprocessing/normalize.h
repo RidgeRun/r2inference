@@ -37,12 +37,12 @@ class Normalize: public r2i::IPreprocessing {
 
   r2i::RuntimeError Validate (int required_width, int required_height,
                               r2i::ImageFormat::Id required_format_id);
-  void PreProcessImage (unsigned char *in_data, float *out_data, int width,
-                        int height, int channels,
-                        int required_width,
-                        int required_height,
-                        int required_channels,
-                        r2i::RuntimeError error);
+  r2i::RuntimeError PreProcessImage (unsigned char *in_data, float *out_data,
+                                     int width,
+                                     int height, int channels,
+                                     int required_width,
+                                     int required_height,
+                                     int required_channels);
   virtual r2i::RuntimeError SetNormalizationParameters (
     unsigned char *frame_data, int width, int height, int channels);
 };
