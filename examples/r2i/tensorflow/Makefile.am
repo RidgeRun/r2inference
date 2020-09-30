@@ -13,8 +13,11 @@ AM_DEFAULT_SOURCE_EXT = .cc
 if ENABLE_EXAMPLES
 
 noinst_PROGRAMS =                  \
-        inception                  \
-        ssd-mobilenet
+        inception
+
+if HAVE_OPENCV
+noinst_PROGRAMS += ssd-mobilenet
+endif
 
 AM_CXXFLAGS =                      \
         $(RR_CXXFLAGS)             \
