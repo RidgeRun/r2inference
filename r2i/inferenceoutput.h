@@ -9,7 +9,7 @@
  * back to RidgeRun without any encumbrance.
 */
 
-#ifndef R2I_INFERENCE_OUTOUT_H
+#ifndef R2I_INFERENCE_OUTPUT_H
 #define R2I_INFERENCE_OUTPUT_H
 
 /**

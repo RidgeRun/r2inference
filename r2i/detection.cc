@@ -31,4 +31,4 @@ std::vector< DetectionInstance > Detection::GetDetections() {
   return this->detections;
 }
 
-} // namespace r2
+} // namespace r2i
