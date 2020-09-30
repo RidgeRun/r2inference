@@ -1,12 +1,20 @@
 # Compile examples
 app_examples = [
   'inception',
-  'ssd-mobilenet',
 ]
+
+example_dependencies = [
+  r2inference_lib_dep
+]
+
+if opencv_dep.found()
+  app_examples += ['ssd-mobilenet']
+  example_dependencies += [opencv_dep]
+endif
 
 foreach app : app_examples
   executable(app, '@0@.cc'.format(app),
     include_directories: [configinc, common_inc_dir],
-    dependencies : [r2inference_lib_dep, opencv_dep],
+    dependencies : example_dependencies,
     install: false)
 endforeach
