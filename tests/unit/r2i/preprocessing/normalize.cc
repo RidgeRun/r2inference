@@ -121,25 +121,27 @@ TEST_GROUP(Normalize) {
   std::shared_ptr<unsigned char> dummy_frame_data;
   std::shared_ptr<mock::Frame> in_frame = std::make_shared<mock::Frame>();
   std::shared_ptr<mock::Frame> out_frame = std::make_shared<mock::Frame>();
+  unsigned char *in_data;
+  unsigned char value;
 
   void setup() {
     error.Clean();
+    /* Fill frames with dummy data */
+    value = 0;
+    dummy_frame_data = std::shared_ptr<unsigned char>(new unsigned char[FRAME_SIZE],
+                       std::default_delete<const unsigned char[]>());
+
+    in_data = dummy_frame_data.get();
+
+    for (unsigned int i = 0; i < FRAME_SIZE; i++) {
+      in_data[i] = value;
+      value++;
+    }
+
   }
 };
 
 TEST(Normalize, ApplySuccess) {
-  /* Fill frames with dummy data */
-  unsigned char value = 0;
-  dummy_frame_data = std::shared_ptr<unsigned char>(new unsigned char[FRAME_SIZE],
-                     std::default_delete<const unsigned char[]>());
-
-  unsigned char *in_data = dummy_frame_data.get();
-
-  for (unsigned int i = 0; i < FRAME_SIZE; i++) {
-    in_data[i] = value;
-    value++;
-  }
-
   error = in_frame->Configure(in_data, FRAME_WIDTH, FRAME_HEIGHT,
                               r2i::ImageFormat::Id::RGB);
 
@@ -162,18 +164,6 @@ TEST(Normalize, ApplySuccess) {
 }
 
 TEST(Normalize, UnsupportedWidth) {
-  /* Fill frames with dummy data */
-  unsigned char value = 0;
-  dummy_frame_data = std::shared_ptr<unsigned char>(new unsigned char[FRAME_SIZE],
-                     std::default_delete<const unsigned char[]>());
-
-  unsigned char *in_data = dummy_frame_data.get();
-
-  for (unsigned int i = 0; i < FRAME_SIZE; i++) {
-    in_data[i] = value;
-    value++;
-  }
-
   error = in_frame->Configure(in_data, FRAME_WIDTH, FRAME_HEIGHT,
                               r2i::ImageFormat::Id::RGB);
 
@@ -189,18 +179,6 @@ TEST(Normalize, UnsupportedWidth) {
 }
 
 TEST(Normalize, UnsupportedHeight) {
-  /* Fill frames with dummy data */
-  unsigned char value = 0;
-  dummy_frame_data = std::shared_ptr<unsigned char>(new unsigned char[FRAME_SIZE],
-                     std::default_delete<const unsigned char[]>());
-
-  unsigned char *in_data = dummy_frame_data.get();
-
-  for (unsigned int i = 0; i < FRAME_SIZE; i++) {
-    in_data[i] = value;
-    value++;
-  }
-
   error = in_frame->Configure(in_data, FRAME_WIDTH, FRAME_HEIGHT,
                               r2i::ImageFormat::Id::RGB);
 
@@ -216,18 +194,6 @@ TEST(Normalize, UnsupportedHeight) {
 }
 
 TEST(Normalize, UnsupportedFormatId) {
-  /* Fill frames with dummy data */
-  unsigned char value = 0;
-  dummy_frame_data = std::shared_ptr<unsigned char>(new unsigned char[FRAME_SIZE],
-                     std::default_delete<const unsigned char[]>());
-
-  unsigned char *in_data = dummy_frame_data.get();
-
-  for (unsigned int i = 0; i < FRAME_SIZE; i++) {
-    in_data[i] = value;
-    value++;
-  }
-
   error = in_frame->Configure(in_data, FRAME_WIDTH, FRAME_HEIGHT,
                               r2i::ImageFormat::Id::RGB);
 
