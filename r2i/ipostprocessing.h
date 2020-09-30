@@ -17,6 +17,7 @@
 #include <r2i/runtimeerror.h>
 
 #include <gmodule.h>
+#include <memory>
 #include <vector>
 
 /**
@@ -35,8 +36,9 @@ class IPostprocessing {
    * \param outputs [in/out] to be displayed in the video stream.
    * \return Error with a description message.
    */
-  virtual RuntimeError Apply(std::vector< IPrediction > &prediction,
-                             std::vector< InferenceOutput > &outputs) = 0;
+  virtual RuntimeError Apply(std::vector< std::shared_ptr<r2i::IPrediction> >
+                             &prediction,
+                             std::vector< std::shared_ptr<InferenceOutput> > &outputs) = 0;
 
   /**
    * \brief Default destructor
