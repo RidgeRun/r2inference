@@ -34,17 +34,17 @@ r2i::RuntimeError Normalize::Apply(std::shared_ptr<r2i::IFrame> in_frame,
   r2i::ImageFormat format;
   r2i::ImageFormat required_format;
   r2i::ImageFormat::Id required_format_id;
-  unsigned char *in_data;
-  float *out_data;
+  unsigned char *in_data = nullptr;
+  float *out_data = nullptr;
 
   if (!in_frame or !out_frame) {
-    error.Set (r2i::RuntimeError::Code::NULL_PARAMETER, "Null IFrame parameters");
+    error.Set (r2i::RuntimeError::Code::NULL_PARAMETER, "NULL IFrame parameters");
     return error;
   }
 
   in_data = static_cast<unsigned char *>(in_frame->GetData());
   if (!in_data) {
-    error.Set (r2i::RuntimeError::Code::NULL_PARAMETER, "Null input frame data");
+    error.Set (r2i::RuntimeError::Code::NULL_PARAMETER, "NULL input frame data");
     return error;
   }
 
@@ -55,7 +55,7 @@ r2i::RuntimeError Normalize::Apply(std::shared_ptr<r2i::IFrame> in_frame,
 
   out_data = static_cast<float *>(out_frame->GetData());
   if (!out_data) {
-    error.Set (r2i::RuntimeError::Code::NULL_PARAMETER, "Null output frame data");
+    error.Set (r2i::RuntimeError::Code::NULL_PARAMETER, "NULL output frame data");
     return error;
   }
 
@@ -72,7 +72,6 @@ r2i::RuntimeError Normalize::Apply(std::shared_ptr<r2i::IFrame> in_frame,
 
   PreProcessImage(in_data, out_data, width, height, channels, required_width,
                   required_height, required_channels, error);
-
   if (error.IsError ()) {
     return error;
   }
@@ -100,9 +99,9 @@ r2i::RuntimeError Normalize::Validate (int required_width,
   int height = 0;
 
   /* Verify if the required dimensions are supported */
-  for (unsigned int i = 0; i < this->dimensions.size(); i++) {
-    width = std::get<0>(this->dimensions.at(i));
-    height = std::get<1>(this->dimensions.at(i));
+  for (auto &dimension : this->dimensions) {
+    width = std::get<0>(dimension);
+    height = std::get<1>(dimension);
     if (width == required_width and height == required_height) {
       match_dimensions = true;
       break;
@@ -116,8 +115,7 @@ r2i::RuntimeError Normalize::Validate (int required_width,
   }
 
   /* Verify if the required format is supported */
-  for (unsigned int i = 0; i < this->formats.size(); i++) {
-    format = this->formats.at(i);
+  for (auto &format : this->formats) {
     if (format.GetId() == required_format_id) {
       match_format = true;
       break;
