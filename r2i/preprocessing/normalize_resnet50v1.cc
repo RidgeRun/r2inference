@@ -22,7 +22,7 @@
 #define MEAN_RED 123.68
 #define MEAN_GREEN 116.78
 #define MEAN_BLUE 103.94
-#define STD_DEV 1
+#define STD_DEV 1.0
 
 namespace r2i {
 

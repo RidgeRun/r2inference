@@ -19,8 +19,8 @@
 #define REQ_HEIGTH_416 416
 
 /* Constants for preprocessing */
-#define MEAN 0
-#define STD_DEV 1
+#define MEAN 0.0
+#define STD_DEV 1.0
 
 namespace r2i {
 
