@@ -8,6 +8,9 @@
 # a software license from RidgeRun.  All source code changes must be provided
 # back to RidgeRun without any encumbrance.
 
+noinst_LTLIBRARIES =                          \
+    libnormalize.la
+
 lib_LTLIBRARIES =                             \
     libnormalize_inceptionv1.la               \
     libnormalize_inceptionv3.la               \
@@ -16,29 +19,26 @@ lib_LTLIBRARIES =                             \
     libnormalize_tinyyolov3.la                \
     libnormalize_facenetv1.la
 
-libnormalize_inceptionv1_la_SOURCES =         \
-    normalize_inceptionv1.cc                  \
+libnormalize_la_SOURCES =                     \
     normalize.cc
+
+libnormalize_inceptionv1_la_SOURCES =         \
+    normalize_inceptionv1.cc
 
 libnormalize_inceptionv3_la_SOURCES =         \
-    normalize_inceptionv3.cc                  \
-    normalize.cc
+    normalize_inceptionv3.cc
 
 libnormalize_resnet50v1_la_SOURCES =          \
-    normalize_resnet50v1.cc                   \
-    normalize.cc
+    normalize_resnet50v1.cc
 
 libnormalize_tinyyolov2_la_SOURCES =          \
-    normalize_tinyyolov2.cc                   \
-    normalize.cc
+    normalize_tinyyolov2.cc
 
 libnormalize_tinyyolov3_la_SOURCES =          \
-    normalize_tinyyolov3.cc                   \
-    normalize.cc
+    normalize_tinyyolov3.cc
 
 libnormalize_facenetv1_la_SOURCES =           \
-    normalize_facenetv1.cc                    \
-    normalize.cc
+    normalize_facenetv1.cc
 
 AM_CPPFLAGS =                                 \
     $(RR_CPPFLAGS)                            \
@@ -59,7 +59,8 @@ AM_LIBADD =                                   \
     $(RR_LIBS)                                \
     $(CODE_COVERAGE_LIBS)                     \
     $(GLIB_LIBS)                              \
-    $(GMODULE_LIBS)
+    $(GMODULE_LIBS)                           \
+    $(top_builddir)/r2i/preprocessing/libnormalize.la
 
 #Indicate libtool this is a module (dlopened library)
 AM_CPPFLAGS_LDFLAGS =                         \
