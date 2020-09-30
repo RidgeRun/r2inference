@@ -17,6 +17,11 @@
 #include <r2i/r2i.h>
 #include <r2i/tensorflow/parameters.h>
 
+#include <opencv2/core.hpp>
+#include <opencv2/imgcodecs.hpp>
+#include <opencv2/imgproc.hpp>
+#include <opencv2/highgui.hpp>
+
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
@@ -24,9 +29,18 @@
 #include "stb_image_resize.h"
 
 void PrintTopPrediction (std::vector<std::shared_ptr<r2i::IPrediction>>
-                         predictions) {
+                         predictions, const std::string &path) {
   r2i::RuntimeError error;
   uint num_detections = predictions[0]->At(0, error);
+
+  const int channels = 3;
+  int width, height, cp;
+  unsigned char *img = stbi_load(path.c_str(), &width, &height, &cp, channels);
+  if (!img) {
+    std::cerr << "The picture " << path << " could not be loaded";
+    return;
+  }
+  cv::Mat img_mat(height, width, CV_8UC3, img);
 
   std::cout << "Num of detections: " << num_detections << std::endl;
 
@@ -36,13 +50,24 @@ void PrintTopPrediction (std::vector<std::shared_ptr<r2i::IPrediction>>
               error) << " (" << predictions[3]->At(index, error) << ")" << std::endl;
 
     size_t bbox_index = index * 4;
-    std::cout << "BBox: {x:" << predictions[1]->At(bbox_index,
-              error) << ", y:" << predictions[1]->At(bbox_index + 1,
-                  error) << ", width:" << predictions[1]->At(bbox_index + 2,
-                      error) << ", height:" << predictions[1]->At(bbox_index + 3,
-                          error) << "}" << std::endl;
+    double b_x =  predictions[1]->At(bbox_index, error);
+    double b_y = predictions[1]->At(bbox_index + 1, error);
+    double b_width = predictions[1]->At(bbox_index + 2, error);
+    double b_height = predictions[1]->At(bbox_index + 3, error);
+
+    std::cout << "BBox: {x:" << b_x << ", y:" << b_y << ", width:" << b_width <<
+              ", height:" << b_height << "}" << std::endl;
     std::cout << "==============================" << std::endl;
+
+    cv::Point p1(b_x * width, b_y * height);
+    cv::Point p2(b_x * width + width, b_y * height + height);
+    cv::rectangle(img_mat, p1, p2, cv::Scalar(0, 0, 255), 5);
   }
+
+  cv::imshow("Prediction", img_mat);
+  cv::waitKey(0);
+
+  free(img);
 }
 
 void PrintUsage() {
@@ -198,7 +223,7 @@ int main (int argc, char *argv[]) {
     exit(EXIT_FAILURE);
   }
 
-  PrintTopPrediction(predictions);
+  PrintTopPrediction(predictions, image_path);
 
   std::cout << "Stopping engine" << std::endl;
   error = engine->Stop ();
