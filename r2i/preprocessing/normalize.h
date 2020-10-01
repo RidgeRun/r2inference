@@ -35,8 +35,10 @@ class Normalize: public r2i::IPreprocessing {
   std::vector<std::tuple<int, int>> dimensions;
   std::vector<r2i::ImageFormat> formats;
 
-  r2i::RuntimeError Validate (int required_width, int required_height,
-                              r2i::ImageFormat::Id required_format_id);
+  r2i::RuntimeError Validate (int input_width, int input_height,
+                              r2i::ImageFormat::Id input_format_id,
+                              int output_width, int output_height,
+                              r2i::ImageFormat::Id output_format_id);
   r2i::RuntimeError PreProcessImage (unsigned char *in_data, float *out_data,
                                      int width,
                                      int height, int channels,
