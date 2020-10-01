@@ -42,12 +42,15 @@ r2i::RuntimeError LoadImage(const std::string &path, int req_width,
                             std::shared_ptr<r2i::IFrame> in_frame,
                             std::shared_ptr<r2i::IFrame> out_frame) {
   int channels = 3;
-  int width, height, channels_in_file;
-  int required_width;
-  int required_height;
-  int required_channels;
-  unsigned char *scaled;
+  int width = 0;
+  int height = 0;
+  int channels_in_file = 0;
+  int required_width = 0;
+  int required_height = 0;
+  int required_channels = 0;
+  unsigned char *scaled = nullptr;
   r2i::ImageFormat output_image_format;
+  r2i::ImageFormat::Id input_image_format_id;
   r2i::RuntimeError error;
   std::shared_ptr<unsigned char> scaled_ptr;
 
@@ -72,6 +75,12 @@ r2i::RuntimeError LoadImage(const std::string &path, int req_width,
     return error;
   }
 
+  if (channels_in_file == 3) {
+    input_image_format_id = r2i::ImageFormat::Id::RGB;
+  } else {
+    input_image_format_id = r2i::ImageFormat::Id::UNKNOWN_FORMAT;
+  }
+
   required_width = out_frame->GetWidth();
   required_height = out_frame->GetHeight();
   required_channels = out_frame->GetFormat().GetNumPlanes();
@@ -85,7 +94,7 @@ r2i::RuntimeError LoadImage(const std::string &path, int req_width,
                      required_height, 0, required_channels);
 
   error = in_frame->Configure (scaled, required_width, required_height,
-                               out_frame->GetFormat().GetId());
+                               input_image_format_id);
 
   error = preprocessing->Apply(in_frame, out_frame);
 
