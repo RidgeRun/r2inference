@@ -26,7 +26,7 @@ enum InferenceOutputType {
 class InferenceOutput {
  public:
   InferenceOutput() : type(InferenceOutputType::UNKNOWN_TYPE) {};
-  ~InferenceOutput() {};
+  virtual ~InferenceOutput() {};
 
   void SetType(InferenceOutputType type) {
     this->type = type;
