@@ -72,8 +72,9 @@ RuntimeError TopSortPostprocessing::Apply(
     if (error.IsError ()) {
       return error;
     }
-
     outputs.push_back(classification);
+    /* Clear contents of labels vector for reuse, size is now 0 again */
+    labels.clear();
   }
 
   return error;
