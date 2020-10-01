@@ -54,6 +54,7 @@ AM_LDFLAGS =                        \
         $(TESTS_LIBS)               \
         $(CODE_COVERAGE_LIBS)       \
         $(top_builddir)/r2i/libr2inference-@RR_PACKAGE_VERSION@.la     \
+        $(top_builddir)/r2i/preprocessing/libnormalize.la              \
         $(top_builddir)/r2i/preprocessing/libnormalize_facenetv1.la    \
         $(top_builddir)/r2i/preprocessing/libnormalize_inceptionv1.la  \
         $(top_builddir)/r2i/preprocessing/libnormalize_inceptionv3.la  \
