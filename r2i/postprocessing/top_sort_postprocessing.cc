@@ -42,6 +42,12 @@ RuntimeError TopSortPostprocessing::Apply(
   for (unsigned int i = 0; i < num_predictions; ++i) {
     /* Array of prediction values */
     prediction_data = static_cast<float *>(predictions.at(i)->GetResultData());
+    if (!prediction_data) {
+      error.Set (RuntimeError::Code::NULL_PARAMETER,
+                 "NULL Prediction data");
+      return error;
+    }
+
     /* Number of elements in the array */
     prediction_data_size = predictions.at(i)->GetResultSize() / sizeof(float);
 
