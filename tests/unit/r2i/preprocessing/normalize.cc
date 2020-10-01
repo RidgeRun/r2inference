@@ -24,6 +24,7 @@
 #define FRAME_SIZE CHANNELS * FRAME_WIDTH * FRAME_HEIGHT
 #define MEAN 5.5
 #define STD_DEV 3.45205253
+#define STD_DEV_ZERO 0.0
 #define UNSUPPORTED_FRAME_WIDTH 1
 #define UNSUPPORTED_FRAME_HEIGHT 1
 #define CHANNELS  3
@@ -111,8 +112,27 @@ class NormalizeMock : public r2i::Normalize {
     this->std_dev_blue = STD_DEV;
     return r2i::RuntimeError();
   }
+};
+
+class InvalidNormalizeMock : public r2i::Normalize {
+ public:
+  InvalidNormalizeMock () {
+    this->dimensions.push_back(std::tuple<int, int>(FRAME_WIDTH, FRAME_HEIGHT));
+  }
+
+  r2i::RuntimeError SetNormalizationParameters (unsigned char *
+      frame_data, int width, int height, int channels) override {
+    this->mean_red = MEAN;
+    this->mean_green = MEAN;
+    this->mean_blue = MEAN;
+    this->std_dev_red = STD_DEV_ZERO;
+    this->std_dev_green = STD_DEV_ZERO;
+    this->std_dev_blue = STD_DEV_ZERO;
+    return r2i::RuntimeError();
+  }
 
 };
+
 }
 
 TEST_GROUP(Normalize) {
@@ -164,6 +184,24 @@ TEST(Normalize, ApplySuccess) {
 
 }
 
+TEST(Normalize, ZeroStdDev) {
+  std::shared_ptr<r2i::IPreprocessing> invalid_preprocessing =
+    std::make_shared<mock::InvalidNormalizeMock>();
+
+  error = in_frame->Configure(in_data, FRAME_WIDTH, FRAME_HEIGHT,
+                              r2i::ImageFormat::Id::RGB);
+
+  std::shared_ptr<float> out_data = std::shared_ptr<float>
+                                    (new float[FRAME_WIDTH * FRAME_HEIGHT * CHANNELS],
+                                     std::default_delete<float[]>());
+  error = out_frame->Configure (out_data.get(), FRAME_WIDTH,
+                                FRAME_HEIGHT,
+                                r2i::ImageFormat::Id::RGB);
+
+  error = invalid_preprocessing->Apply(in_frame, out_frame);
+  LONGS_EQUAL(r2i::RuntimeError::Code::NULL_PARAMETER, error.GetCode());
+}
+
 TEST(Normalize, UnsupportedWidth) {
   error = in_frame->Configure(in_data, FRAME_WIDTH, FRAME_HEIGHT,
                               r2i::ImageFormat::Id::RGB);
@@ -194,7 +232,21 @@ TEST(Normalize, UnsupportedHeight) {
   LONGS_EQUAL(r2i::RuntimeError::Code::MODULE_ERROR, error.GetCode());
 }
 
-TEST(Normalize, UnsupportedFormatId) {
+TEST(Normalize, UnsupportedInputFormatId) {
+  error = in_frame->Configure(in_data, FRAME_WIDTH, FRAME_HEIGHT,
+                              r2i::ImageFormat::Id::BGR);
+
+  std::shared_ptr<float> out_data = std::shared_ptr<float>
+                                    (new float[FRAME_WIDTH * FRAME_HEIGHT * CHANNELS],
+                                     std::default_delete<float[]>());
+  error = out_frame->Configure (out_data.get(), FRAME_WIDTH,
+                                FRAME_HEIGHT,
+                                r2i::ImageFormat::Id::RGB);
+  error = preprocessing->Apply(in_frame, out_frame);
+  LONGS_EQUAL(r2i::RuntimeError::Code::MODULE_ERROR, error.GetCode());
+}
+
+TEST(Normalize, UnsupportedOutputFormatId) {
   error = in_frame->Configure(in_data, FRAME_WIDTH, FRAME_HEIGHT,
                               r2i::ImageFormat::Id::RGB);
 
