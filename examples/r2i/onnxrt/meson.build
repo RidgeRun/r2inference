@@ -1,6 +1,7 @@
 # Compile examples
 app_examples = [
   'inception',
+  'yolov2',
 ]
 
 foreach app : app_examples

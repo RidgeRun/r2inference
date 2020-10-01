@@ -13,7 +13,8 @@ AM_DEFAULT_SOURCE_EXT = .cc
 if ENABLE_EXAMPLES
 
 noinst_PROGRAMS =                  \
-        inception
+        inception                  \
+        yolov2
 
 AM_CXXFLAGS =                      \
         $(RR_CXXFLAGS)             \
