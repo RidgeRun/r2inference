@@ -42,6 +42,12 @@ RuntimeError TopSortPostprocessing::Apply(
   for (unsigned int i = 0; i < num_predictions; ++i) {
     /* Array of prediction values */
     prediction_data = static_cast<float *>(predictions.at(i)->GetResultData());
+    if (!prediction_data) {
+      error.Set (RuntimeError::Code::NULL_PARAMETER,
+                 "NULL Prediction data");
+      return error;
+    }
+
     /* Number of elements in the array */
     prediction_data_size = predictions.at(i)->GetResultSize() / sizeof(float);
 
@@ -66,8 +72,9 @@ RuntimeError TopSortPostprocessing::Apply(
     if (error.IsError ()) {
       return error;
     }
-
     outputs.push_back(classification);
+    /* Clear contents of labels vector for reuse, size is now 0 again */
+    labels.clear();
   }
 
   return error;
@@ -82,7 +89,7 @@ RuntimeError TopSortPostprocessing::SortPrediction (
     labels = classification->GetLabels();
 
     /* Sort indexes in descending order based on the prediction values */
-    std::stable_sort(labels.begin(), labels.end(), SortDesc);
+    std::sort(labels.begin(), labels.end(), SortDesc);
 
     error = classification->SetLabels(labels);
     if (error.IsError ()) {
