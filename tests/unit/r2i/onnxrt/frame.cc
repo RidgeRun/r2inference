@@ -27,6 +27,8 @@ TEST_GROUP (OnnxrtFrame) {
     std::make_shared<r2i::onnxrt::Frame>();
   std::shared_ptr<r2i::ImageFormat> format =
     std::make_shared<r2i::ImageFormat>(r2i::ImageFormat::Id::RGB);
+  std::shared_ptr<r2i::DataType> datatype =
+    std::make_shared<r2i::DataType>(r2i::DataType::Id::FLOAT);
   int width = FRAME_WIDTH;
   int height = FRAME_HEIGHT;
   float data[4] = {0.1, 0.2, 0.3, 0.4};
@@ -35,7 +37,8 @@ TEST_GROUP (OnnxrtFrame) {
 TEST (OnnxrtFrame, FrameConfigure) {
   r2i::RuntimeError error;
 
-  error = frame->Configure(data, width, height, format->GetId());
+  error = frame->Configure(data, width, height, format->GetId(),
+                           datatype->GetId());
 
   LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode());
 }
@@ -43,7 +46,8 @@ TEST (OnnxrtFrame, FrameConfigure) {
 TEST (OnnxrtFrame, FrameConfigureNullData) {
   r2i::RuntimeError error;
 
-  error = frame->Configure(nullptr, width, height, format->GetId());
+  error = frame->Configure(nullptr, width, height, format->GetId(),
+                           datatype->GetId());
 
   LONGS_EQUAL (r2i::RuntimeError::Code::NULL_PARAMETER, error.GetCode());
 }
@@ -51,7 +55,7 @@ TEST (OnnxrtFrame, FrameConfigureNullData) {
 TEST (OnnxrtFrame, FrameConfigureNegativeWidth) {
   r2i::RuntimeError error;
 
-  error = frame->Configure(data, -1, height, format->GetId());
+  error = frame->Configure(data, -1, height, format->GetId(), datatype->GetId());
 
   LONGS_EQUAL (r2i::RuntimeError::Code::WRONG_API_USAGE, error.GetCode());
 }
@@ -59,7 +63,7 @@ TEST (OnnxrtFrame, FrameConfigureNegativeWidth) {
 TEST (OnnxrtFrame, FrameConfigureNegativeHeight) {
   r2i::RuntimeError error;
 
-  error = frame->Configure(data, width, -1, format->GetId());
+  error = frame->Configure(data, width, -1, format->GetId(), datatype->GetId());
 
   LONGS_EQUAL (r2i::RuntimeError::Code::WRONG_API_USAGE, error.GetCode());
 }
@@ -68,7 +72,8 @@ TEST (OnnxrtFrame, FrameGetData) {
   r2i::RuntimeError error;
   void *local_data;
 
-  error = frame->Configure(data, width, height, format->GetId());
+  error = frame->Configure(data, width, height, format->GetId(),
+                           datatype->GetId());
   LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode());
 
   local_data = frame->GetData();
@@ -79,7 +84,8 @@ TEST (OnnxrtFrame, FrameGetWidth) {
   r2i::RuntimeError error;
   int local_width;
 
-  error = frame->Configure(data, width, height, format->GetId());
+  error = frame->Configure(data, width, height, format->GetId(),
+                           datatype->GetId());
   LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode());
 
   local_width = frame->GetWidth();
@@ -90,7 +96,8 @@ TEST (OnnxrtFrame, FrameGetHeight) {
   r2i::RuntimeError error;
   int local_height;
 
-  error = frame->Configure(data, width, height, format->GetId());
+  error = frame->Configure(data, width, height, format->GetId(),
+                           datatype->GetId());
   LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode());
 
   local_height = frame->GetHeight();
@@ -101,7 +108,8 @@ TEST (OnnxrtFrame, FrameGetFormat) {
   r2i::RuntimeError error;
   r2i::ImageFormat local_format;
 
-  error = frame->Configure(data, width, height, format->GetId());
+  error = frame->Configure(data, width, height, format->GetId(),
+                           datatype->GetId());
   LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode());
 
   local_format = frame->GetFormat();

@@ -20,9 +20,11 @@ Frame::Frame () :
 }
 
 RuntimeError Frame::Configure (void *in_data, int width,
-                               int height, r2i::ImageFormat::Id format) {
+                               int height, r2i::ImageFormat::Id format,
+                               r2i::DataType::Id datatype_id) {
   RuntimeError error;
   ImageFormat imageformat (format);
+  DataType datatype (datatype_id);
 
   if (nullptr == in_data) {
     error.Set (RuntimeError::Code::NULL_PARAMETER, "Received a NULL data pointer");
@@ -43,6 +45,7 @@ RuntimeError Frame::Configure (void *in_data, int width,
   this->frame_width = width;
   this->frame_height = height;
   this->frame_format = imageformat;
+  this->datatype = datatype;
 
   return error;
 }
@@ -64,7 +67,7 @@ ImageFormat Frame::GetFormat () {
 }
 
 DataType Frame::GetDataType () {
-  return r2i::DataType::Id::FLOAT;
+  return this->datatype;
 }
 
 }  // namespace onnxrt
