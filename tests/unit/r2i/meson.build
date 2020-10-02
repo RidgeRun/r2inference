@@ -1,4 +1,6 @@
 lib_r2inference_tests = [
+  ['classification.cc'],
+  ['detection.cc'],
   ['iframeworkfactory.cc'],
   ['loader.cc'],
 ]
