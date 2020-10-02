@@ -101,9 +101,10 @@ std::unique_ptr<uint8_t[]> PreProcessImage (const unsigned char *input,
 std::unique_ptr<uint8_t[]> LoadImage(const std::string &path, int reqwidth,
                                      int reqheight) {
   int channels = 3;
-  int width, height, cp;
+  int width, height, channels_in_file;
 
-  unsigned char *img = stbi_load(path.c_str(), &width, &height, &cp, channels);
+  unsigned char *img = stbi_load(path.c_str(), &width, &height, &channels_in_file,
+                                 channels);
   if (!img) {
     std::cerr << "The picture " << path << " could not be loaded";
     return nullptr;
