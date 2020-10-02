@@ -15,15 +15,21 @@ if ENABLE_EXAMPLES
 noinst_PROGRAMS =                  \
         inception
 
+if HAVE_OPENCV
+noinst_PROGRAMS += tf1-object-detection-api
+endif
+
 AM_CXXFLAGS =                      \
         $(RR_CXXFLAGS)             \
         $(CODE_COVERAGE_CXXFLAGS)  \
         $(GLIB_CFLAGS)             \
         $(GMODULE_CFLAGS)          \
+        $(OPENCV_CFLAGS)           \
         -I../common/
 
 AM_CFLAGS =                        \
         $(RR_CFLAGS)               \
+        $(OPENCV_CFLAGS)           \
         $(CODE_COVERAGE_CFLAGS)
 
 AM_CPPFLAGS =                      \
@@ -33,6 +39,7 @@ AM_CPPFLAGS =                      \
 AM_LDFLAGS =                       \
         $(RR_LIBS)                 \
         $(CODE_COVERAGE_LIBS)      \
+        $(OPENCV_LIBS)             \
         $(top_builddir)/r2i/libr2inference-@RR_PACKAGE_VERSION@.la
 
 endif # ENABLE_EXAMPLES

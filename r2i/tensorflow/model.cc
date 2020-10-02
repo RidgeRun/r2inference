@@ -17,10 +17,35 @@ namespace tensorflow {
 Model::Model () {
   this->graph = nullptr;
   this->buffer = nullptr;
-  this->out_operation = nullptr;
-  this->in_operation = nullptr;
+  this->run_inputs.clear();
+  this->run_outputs.clear();
   this->input_layer_name.clear ();
-  this->output_layer_name.clear ();
+  this->output_layers_names.clear();
+}
+
+static RuntimeError FillRuns (std::shared_ptr<TF_Graph> graph,
+			      const std::vector<std::string> &names,
+			      std::vector<TF_Output> &runs) {
+  RuntimeError error;
+
+  for (auto &name: names) {
+
+    if (name.empty()) {
+      error.Set (RuntimeError::Code::NULL_PARAMETER, "Invalid layer name " + name);
+      return error;
+    }
+
+    TF_Operation *operation = TF_GraphOperationByName(graph.get(), name.c_str ());
+    if (nullptr == operation) {
+      error.Set (RuntimeError::Code::INVALID_FRAMEWORK_PARAMETER,
+                 "No valid node for layer " + name);
+      return error;
+    }
+
+    runs.push_back({.oper = operation, .index = 0});
+  }
+
+  return error;
 }
 
 RuntimeError Model::Start (const std::string &name) {
@@ -32,33 +57,21 @@ RuntimeError Model::Start (const std::string &name) {
     return error;
   }
 
-  if (this->output_layer_name.empty()) {
+  if (this->output_layers_names.size() == 0) {
     error.Set (RuntimeError::Code::NULL_PARAMETER,
-               "Output layer name has not been set");
+               "Output layers names has not been set");
     return error;
   }
 
-  TF_Graph *graph = this->graph.get();
-
-  TF_Operation *in_operation = nullptr;
-  in_operation = TF_GraphOperationByName(graph, this->input_layer_name.c_str ());
-  if (nullptr == in_operation) {
-    error.Set (RuntimeError::Code::INVALID_FRAMEWORK_PARAMETER,
-               "No valid input node provided");
+  error = FillRuns (this->graph, this->output_layers_names, this->run_outputs);
+  if (error.IsError()) {
     return error;
   }
 
-  TF_Operation *out_operation = nullptr;
-  out_operation = TF_GraphOperationByName(graph,
-                                          this->output_layer_name.c_str ());
-  if (nullptr == out_operation) {
-    error.Set (RuntimeError::Code::INVALID_FRAMEWORK_PARAMETER,
-               "No valid output node provided");
+  error = FillRuns (this->graph, {this->input_layer_name}, this->run_inputs);
+  if (error.IsError()) {
     return error;
   }
-
-  this->in_operation = in_operation;
-  this->out_operation = out_operation;
 
   return error;
 }
@@ -71,12 +84,12 @@ std::shared_ptr<TF_Buffer> Model::GetBuffer () {
   return this->buffer;
 }
 
-TF_Operation *Model::GetInputOperation () {
-  return this->in_operation;
+std::vector<TF_Output> Model::GetRunInputs () {
+  return this->run_inputs;
 }
 
-TF_Operation *Model::GetOutputOperation () {
-  return this->out_operation;
+std::vector<TF_Output> Model::GetRunOutputs () {
+  return this->run_outputs;
 }
 
 RuntimeError Model::SetInputLayerName (const std::string &name) {
@@ -85,9 +98,8 @@ RuntimeError Model::SetInputLayerName (const std::string &name) {
   return RuntimeError ();
 }
 
-RuntimeError Model::SetOutputLayerName (const std::string &name) {
-  this->output_layer_name = name;
-
+RuntimeError Model::SetOutputLayersNames (std::vector< std::string > names) {
+  this->output_layers_names = names;
   return RuntimeError ();
 }
 
@@ -95,8 +107,8 @@ const std::string Model::GetInputLayerName () {
   return this->input_layer_name;
 }
 
-const std::string Model::GetOutputLayerName () {
-  return this->output_layer_name;
+std::vector< std::string > Model::GetOutputLayersNames () {
+  return this->output_layers_names;
 }
 
 RuntimeError Model::Load (std::shared_ptr<TF_Buffer> pbuffer) {

@@ -12,6 +12,7 @@
 #include <r2i/r2i.h>
 #include <r2i/tflite/engine.h>
 #include <r2i/tflite/frame.h>
+#include <r2i/tflite/model.h>
 #include <r2i/tflite/prediction.h>
 
 #include <CppUTest/CommandLineTestRunner.h>
@@ -197,6 +198,20 @@ TEST (TfLiteEngine, PredictEngine) {
   prediction = engine.Predict (frame, error);
   LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
 
+}
+
+TEST (TfLiteEngine, MultiplePredictsEngine) {
+  r2i::RuntimeError error;
+  std::vector<std::shared_ptr<r2i::IPrediction>> predictions;
+
+  error = engine.SetModel (model);
+  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
+
+  error = engine.Start ();
+  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
+
+  error = engine.Predict (frame, predictions);
+  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
 }
 
 int main (int ac, char **av) {

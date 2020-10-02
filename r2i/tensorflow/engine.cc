@@ -11,8 +11,8 @@
 
 #include "r2i/tensorflow/engine.h"
 #include <tensorflow/c/c_api.h>
-#include "r2i/tensorflow/prediction.h"
 #include "r2i/tensorflow/frame.h"
+#include "r2i/tensorflow/prediction.h"
 
 namespace r2i {
 namespace tensorflow {
@@ -31,6 +31,14 @@ const uint8_t _gpu_mem_config[10][RAM_ARRAY_SIZE] = {
   {0x32, 0x9, 0x9, 0x9a, 0x99, 0x99, 0x99, 0x99, 0x99, 0xe9, 0x3f},
   {0x32, 0x9, 0x9, 0xcd, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xec, 0x3f},
   {0x32, 0x9, 0x9, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0xf0, 0x3f}
+};
+
+struct TensorInfo {
+  int num_dims = 0;
+  std::vector<int64_t> dims;
+  TF_DataType type;
+  size_t type_size = 0;
+  size_t data_size = 0;
 };
 
 Engine::Engine () : state(State::STOPPED),
@@ -166,60 +174,80 @@ RuntimeError Engine::Stop () {
 
 std::shared_ptr<r2i::IPrediction> Engine::Predict (std::shared_ptr<r2i::IFrame>
     in_frame, r2i::RuntimeError &error) {
-  ImageFormat in_format;
+  std::vector< std::shared_ptr<r2i::IPrediction> > predictions;
 
-  error.Clean ();
+  error = this->Predict (in_frame, predictions);
+
+  if (predictions.size() > 0) {
+    return predictions.at(0);
+  } else {
+    return nullptr;
+  }
+}
+
+RuntimeError Engine::Predict (std::shared_ptr<r2i::IFrame> in_frame,
+                              std::vector< std::shared_ptr<r2i::IPrediction> > &predictions) {
+  RuntimeError error;
 
   if (State::STARTED != this->state) {
     error.Set (RuntimeError::Code::WRONG_ENGINE_STATE,
                "Engine not started");
-    return nullptr;
+    return error;
   }
-
-  /* These pointers are validated during load */
-  auto pgraph = this->model->GetGraph ();
-  auto out_operation = this->model->GetOutputOperation ();
-  auto in_operation = this->model->GetInputOperation ();
 
   auto frame = std::dynamic_pointer_cast<Frame, IFrame> (in_frame);
   if (nullptr == frame) {
     error.Set (RuntimeError::Code::INCOMPATIBLE_MODEL,
                "The provided frame is not an tensorflow frame");
-    return nullptr;
+    return error;
   }
 
-  auto pin_tensor = frame->GetTensor (pgraph, in_operation, error);
+  /* These pointers are validated during load */
+  auto graph = this->model->GetGraph ();
+
+  std::vector<TF_Output> run_outputs = this->model->GetRunOutputs();
+  std::vector<TF_Tensor *> out_tensors (run_outputs.size());
+
+  std::vector<TF_Output> run_inputs = this->model->GetRunInputs();
+  std::vector<TF_Tensor *> in_tensors;
+
+  if (0 == run_inputs.size()) {
+    error.Set(RuntimeError::Code::INVALID_FRAMEWORK_PARAMETER,
+              "No input layers provided");
+    return error;
+  }
+
+  TF_Operation *in_operation = run_inputs.at(0).oper;
+  auto in_tensor = frame->GetTensor (graph, in_operation, error);
   if (error.IsError ()) {
-    return nullptr;
+    return error;
+  }
+  in_tensors.push_back (in_tensor.get());
+
+  std::shared_ptr<TF_Status> status(TF_NewStatus(), TF_DeleteStatus);
+
+  TF_SessionRun(session.get(),
+                NULL,                                                       /* RunOptions */
+                run_inputs.data(), in_tensors.data(), in_tensors.size(),    /* Input tensors */
+                run_outputs.data(), out_tensors.data(), out_tensors.size(), /* Output tensors */
+                NULL, 0,                                                    /* Target operations */
+                NULL,                                                       /* RunMetadata */
+                status.get());
+  if (TF_GetCode(status.get()) != TF_OK) {
+    error.Set (RuntimeError::Code::FRAMEWORK_ERROR, TF_Message (status.get()));
+    return error;
   }
 
-  auto prediction = std::make_shared<Prediction>();
-  std::shared_ptr<TF_Status> pstatus(TF_NewStatus(), TF_DeleteStatus);
+  // Iterate over the multiple outputs
+  for (auto &tensor : out_tensors) {
+    std::shared_ptr<TF_Tensor> pout_tensor (tensor, TF_DeleteTensor);
+    auto prediction = std::make_shared<Prediction>();
 
-  auto *session = this->session.get ();
-  auto *in_tensor = pin_tensor.get ();
-  auto *status = pstatus.get ();
-
-  TF_Output run_outputs = {.oper = out_operation, .index = 0};
-  TF_Output run_inputs = {.oper = in_operation, .index = 0};
-  TF_Tensor *out_tensor = nullptr;
-
-  TF_SessionRun(session,
-                NULL,                         /* RunOptions */
-                &run_inputs, &in_tensor, 1,   /* Input tensors */
-                &run_outputs, &out_tensor, 1, /* Output tensors */
-                NULL, 0,                      /* Target operations */
-                NULL,                         /* RunMetadata */
-                status);
-  if (TF_GetCode(status) != TF_OK) {
-    error.Set (RuntimeError::Code::FRAMEWORK_ERROR, TF_Message (status));
-    return nullptr;
+    prediction->SetTensor(pout_tensor);
+    predictions.push_back(prediction);
   }
 
-  std::shared_ptr<TF_Tensor> pout_tensor (out_tensor, TF_DeleteTensor);
-  prediction->SetTensor (pgraph, out_operation, pout_tensor);
-
-  return prediction;
+  return error;
 }
 
 Engine::~Engine () {

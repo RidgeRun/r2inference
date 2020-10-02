@@ -242,6 +242,14 @@ std::shared_ptr<r2i::IPrediction> Engine::Predict (
   return prediction;
 }
 
+RuntimeError Engine::Predict (std::shared_ptr<r2i::IFrame> in_frame,
+                              std::vector< std::shared_ptr<r2i::IPrediction> > &predictions) {
+  RuntimeError error;
+  error.Set(RuntimeError::Code::NOT_IMPLEMENTED,
+            "Predict function for multiple outputs not implemented in ONNXRT backend.");
+  return error;
+}
+
 size_t Engine::GetSessionInputCount(std::shared_ptr<Ort::Session> session,
                                     RuntimeError &error) {
   if (nullptr == session) {

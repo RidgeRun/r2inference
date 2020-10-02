@@ -13,6 +13,7 @@
 #define R2I_TENSORFLOW_MODEL_H
 
 #include <memory>
+#include <vector>
 #include <tensorflow/c/c_api.h>
 
 #include <r2i/imodel.h>
@@ -29,22 +30,25 @@ class Model : public IModel {
 
   std::shared_ptr<TF_Graph> GetGraph ();
   std::shared_ptr<TF_Buffer> GetBuffer ();
-  TF_Operation *GetInputOperation ();
-  TF_Operation *GetOutputOperation ();
+
+  std::vector<TF_Output> GetRunInputs ();
+  std::vector<TF_Output> GetRunOutputs ();
+
   RuntimeError SetInputLayerName (const std::string &name);
-  RuntimeError SetOutputLayerName (const std::string &name);
   const std::string GetInputLayerName ();
-  const std::string GetOutputLayerName ();
+
+  RuntimeError SetOutputLayersNames (std::vector< std::string > names);
+  std::vector< std::string > GetOutputLayersNames ();
 
   RuntimeError Load (std::shared_ptr<TF_Buffer> buffer);
 
  private:
   std::shared_ptr<TF_Graph> graph;
   std::shared_ptr<TF_Buffer> buffer;
-  TF_Operation *in_operation;
-  TF_Operation *out_operation;
+  std::vector<TF_Output> run_inputs;
+  std::vector<TF_Output> run_outputs;
   std::string input_layer_name;
-  std::string output_layer_name;
+  std::vector<std::string> output_layers_names;
 };
 
 }

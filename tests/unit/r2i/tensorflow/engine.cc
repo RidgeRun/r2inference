@@ -12,6 +12,7 @@
 #include <r2i/r2i.h>
 #include <r2i/tensorflow/engine.h>
 #include <r2i/tensorflow/frame.h>
+#include <r2i/tensorflow/model.h>
 #include <r2i/tensorflow/prediction.h>
 
 #include <CppUTest/CommandLineTestRunner.h>
@@ -45,12 +46,15 @@ r2i::RuntimeError Model::Load (std::shared_ptr<TF_Buffer> pbuffer) {
 }
 std::shared_ptr<TF_Graph> Model::GetGraph () {return this->graph;}
 std::shared_ptr<TF_Buffer> Model::GetBuffer () {return this->buffer;}
-TF_Operation *Model::GetInputOperation () { return nullptr; }
-TF_Operation *Model::GetOutputOperation () { return nullptr; }
 RuntimeError Model::SetInputLayerName (const std::string &name) { return RuntimeError(); }
-RuntimeError Model::SetOutputLayerName (const std::string &name) { return RuntimeError(); }
 const std::string Model::GetInputLayerName () { return "inputLayer"; }
-const std::string Model::GetOutputLayerName () { return "outputLayer"; }
+std::vector<TF_Output> Model::GetRunInputs () {
+  TF_Output input = {.oper = nullptr, .index = 0};
+
+  std::vector<TF_Output> inputs;
+  inputs.push_back(input);
+  return inputs;
+}
 
 Frame::Frame () {}
 RuntimeError Frame::Configure (void *in_data, int width, int height,
@@ -66,8 +70,7 @@ Prediction::Prediction () {}
 double Prediction::At (unsigned int index,  r2i::RuntimeError &error) { return 0.0; }
 void *Prediction::GetResultData () { return nullptr; }
 unsigned int Prediction::GetResultSize () { return 0; }
-RuntimeError Prediction::SetTensor (std::shared_ptr<TF_Graph> graph,
-                                    TF_Operation *operation, std::shared_ptr<TF_Tensor> tensor) { return RuntimeError(); }
+RuntimeError Prediction::SetTensor (std::shared_ptr<TF_Tensor> tensor) { return RuntimeError(); }
 }
 }
 
@@ -83,7 +86,7 @@ TEST_GROUP (TensorflowEngine) {
     auto tf_model = std::dynamic_pointer_cast<r2i::tensorflow::Model, r2i::IModel>
                     (model);
     tf_model->SetInputLayerName("InputLayer");
-    tf_model->SetOutputLayerName("OutputLayer");
+    tf_model->SetOutputLayersNames({"OutputLayer"});
 
     inc_model = std::make_shared<MockModel> ();
     frame = std::make_shared<r2i::tensorflow::Frame> ();
@@ -205,6 +208,32 @@ TEST (TensorflowEngine, PredictEngine) {
   prediction = engine.Predict (frame, error);
   LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
 
+}
+
+TEST (TensorflowEngine, MultiplePredictsEngine) {
+  r2i::RuntimeError error;
+  std::string output_1 = "output-value-1";
+  std::string output_2 = "output-value-2";
+  std::string output_3 = "output-value-3";
+  std::vector< std::string > output_layers;
+  std::vector<std::shared_ptr<r2i::IPrediction>> predictions;
+
+  output_layers.push_back(output_1);
+  output_layers.push_back(output_2);
+  output_layers.push_back(output_3);
+
+  auto tf_model = static_cast<r2i::tensorflow::Model *>(model.get());
+  error = tf_model->SetOutputLayersNames(output_layers);
+  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
+
+  error = engine.SetModel (model);
+  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
+
+  error = engine.Start ();
+  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
+
+  error = engine.Predict (frame, predictions);
+  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
 }
 
 int main (int ac, char **av) {

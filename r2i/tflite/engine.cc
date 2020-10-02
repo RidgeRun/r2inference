@@ -157,17 +157,58 @@ std::shared_ptr<r2i::IPrediction> Engine::Predict (std::shared_ptr<r2i::IFrame>
 
   error.Clean ();
 
+  error = this->PredictAuxiliar(in_frame);
+
+  auto prediction = std::make_shared<Prediction>();
+
+  std::vector<float> tensor_data;
+  this->GetOutputTensorData(this->interpreter.get(), tensor_data, 0, error);
+  if (r2i::RuntimeError::EOK != error.GetCode()) {
+    return nullptr;
+  }
+
+  prediction->SetTensorValues(tensor_data.data(), tensor_data.size());
+
+  return prediction;
+}
+
+RuntimeError Engine::Predict (std::shared_ptr<r2i::IFrame> in_frame,
+                              std::vector< std::shared_ptr<r2i::IPrediction> > &predictions) {
+  RuntimeError error;
+
+  error = this->PredictAuxiliar(in_frame);
+
+  int num_outputs = interpreter->outputs().size();
+  for (int index = 0; index < num_outputs; index++) {
+    auto prediction = std::make_shared<Prediction>();
+
+    std::vector<float> tensor_data;
+    this->GetOutputTensorData(this->interpreter.get(), tensor_data, index, error);
+    if (r2i::RuntimeError::EOK != error.GetCode()) {
+      return error;
+    }
+
+    prediction->SetTensorValues(tensor_data.data(), tensor_data.size());
+    predictions.push_back(prediction);
+  }
+
+  return error;
+}
+
+RuntimeError Engine::PredictAuxiliar(std::shared_ptr<r2i::IFrame> in_frame) {
+  RuntimeError error;
+
   if (State::STARTED != this->state) {
     error.Set (RuntimeError::Code::WRONG_ENGINE_STATE,
                "Engine not started");
-    return nullptr;
+    return error;
   }
 
   auto frame = std::dynamic_pointer_cast<Frame, IFrame> (in_frame);
   if (nullptr == frame) {
     error.Set (RuntimeError::Code::FRAMEWORK_ERROR,
                "The provided frame is not an tensorflow lite frame");
-    return nullptr;
+    return error;
   }
 
   if (this->number_of_threads > 0) {
@@ -179,10 +220,8 @@ std::shared_ptr<r2i::IPrediction> Engine::Predict (std::shared_ptr<r2i::IFrame>
   if (this->interpreter->AllocateTensors() != kTfLiteOk) {
     error.Set (RuntimeError::Code::FRAMEWORK_ERROR,
                "Failed to allocate tensors!");
-    return nullptr;
+    return error;
   }
-
-  auto prediction = std::make_shared<Prediction>();
 
   int input = this->interpreter->inputs()[0];
   TfLiteIntArray *dims = this->interpreter->tensor(input)->dims;
@@ -194,30 +233,22 @@ std::shared_ptr<r2i::IPrediction> Engine::Predict (std::shared_ptr<r2i::IFrame>
       or (frame->GetHeight() != wanted_height)) {
     error.Set (RuntimeError::Code::FRAMEWORK_ERROR,
                "The provided frame input sizes are different to tensor sizes");
-    return nullptr;
+    return error;
   }
 
   this->PreprocessInputData(static_cast<float *>(frame->GetData()),
                             wanted_width * wanted_height * wanted_channels, this->interpreter.get(), error);
   if (r2i::RuntimeError::EOK != error.GetCode()) {
-    return nullptr;
+    return error;
   }
 
   if (this->interpreter->Invoke() != kTfLiteOk) {
     error.Set (RuntimeError::Code::FRAMEWORK_ERROR,
                "Failed to invoke tflite!");
-    return nullptr;
+    return error;
   }
 
-  std::vector<float> tensor_data;
-  this->GetOutputTensorData(this->interpreter.get(), tensor_data, error);
-  if (r2i::RuntimeError::EOK != error.GetCode()) {
-    return nullptr;
-  }
-
-  prediction->SetTensorValues(tensor_data.data(), tensor_data.size());
-
-  return prediction;
+  return error;
 }
 
 Engine::~Engine () {
@@ -290,10 +321,10 @@ void Engine::PreprocessInputData(const float *input_data, const int size,
 
 void Engine::GetOutputTensorData(::tflite::Interpreter *interpreter,
                                  std::vector<float> &output_data,
-                                 r2i::RuntimeError &error) {
+                                 int index, r2i::RuntimeError &error) {
 
   const auto &output_indices = interpreter->outputs();
-  const auto *out_tensor = interpreter->tensor(output_indices[0]);
+  const auto *out_tensor = interpreter->tensor(output_indices[index]);
 
   if (nullptr == out_tensor) {
     error.Set (RuntimeError::Code::FRAMEWORK_ERROR,
@@ -304,13 +335,13 @@ void Engine::GetOutputTensorData(::tflite::Interpreter *interpreter,
   if (kTfLiteUInt8 == out_tensor->type) {
     const int num_values = out_tensor->bytes;
     output_data.resize(num_values);
-    const uint8_t *output = interpreter->typed_output_tensor<uint8_t>(0);
+    const uint8_t *output = interpreter->typed_output_tensor<uint8_t>(index);
     ConvertArrayToFloatingPoint<float, uint8_t>(output, output_data, num_values,
         out_tensor->params.scale, out_tensor->params.zero_point);
   } else if (kTfLiteFloat32 == out_tensor->type) {
     const int num_values = out_tensor->bytes / sizeof(float);
     output_data.resize(num_values);
-    const float *output = interpreter->typed_output_tensor<float>(0);
+    const float *output = interpreter->typed_output_tensor<float>(index);
     memcpy(&output_data[0], output, num_values * sizeof(float));
   } else {
     error.Set (RuntimeError::Code::WRONG_API_USAGE,

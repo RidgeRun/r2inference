@@ -36,6 +36,8 @@ class Engine : public IEngine {
   std::shared_ptr<r2i::IPrediction> Predict (std::shared_ptr<r2i::IFrame>
       in_frame,
       r2i::RuntimeError &error) override;
+  RuntimeError Predict (std::shared_ptr<r2i::IFrame> in_frame,
+                        std::vector< std::shared_ptr<r2i::IPrediction> > &predictions) override;
   r2i::RuntimeError SetLoggingLevel (int logging_level);
   r2i::RuntimeError SetLogId (const std::string &log_id);
   r2i::RuntimeError SetIntraNumThreads (int intra_num_threads);
