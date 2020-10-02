@@ -27,5 +27,7 @@
 #include <r2i/parametermeta.h>
 #include <r2i/r2i.h>
 #include <r2i/runtimeerror.h>
+#include <r2i/classification.h>
+#include <r2i/inferenceoutput.h>
 
 #endif //R2I_R2I_H
