@@ -21,8 +21,8 @@ Detection::~Detection() {
   this->detections.clear();
 }
 
-RuntimeError Detection::SetDetections(std::vector< DetectionInstance >
-                                      detections) {
+RuntimeError Detection::SetDetections(const std::vector< DetectionInstance >
+                                      &detections) {
   this->detections = detections;
   return RuntimeError();
 }

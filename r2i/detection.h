@@ -37,7 +37,7 @@ class Detection: public InferenceOutput {
  public:
   Detection();
   ~Detection();
-  RuntimeError SetDetections(std::vector< DetectionInstance > detections);
+  RuntimeError SetDetections(const std::vector< DetectionInstance > &detections);
   std::vector< DetectionInstance > GetDetections();
 
  private:

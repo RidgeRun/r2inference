@@ -30,7 +30,7 @@ class Classification : public InferenceOutput {
  public:
   Classification();
   ~Classification();
-  RuntimeError SetLabels(std::vector< ClassificationInstance > labels);
+  RuntimeError SetLabels(const std::vector< ClassificationInstance > &labels);
   std::vector< ClassificationInstance> GetLabels();
 
  private:
@@ -38,7 +38,7 @@ class Classification : public InferenceOutput {
    * List of predicted labels, composed by a tuple of the label index
    * and the label proability.
    */
-  std::vector< std::tuple<int, double> > labels;
+  std::vector< ClassificationInstance > labels;
 };
 
 }

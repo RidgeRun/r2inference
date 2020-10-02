@@ -21,8 +21,9 @@ Classification::~Classification() {
   this->labels.clear();
 }
 
-RuntimeError Classification::SetLabels(std::vector< ClassificationInstance >
-                                       labels) {
+RuntimeError Classification::SetLabels(const
+                                       std::vector< ClassificationInstance >
+                                       &labels) {
   this->labels = labels;
   return RuntimeError();
 }
