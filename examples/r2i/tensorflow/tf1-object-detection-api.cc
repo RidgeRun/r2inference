@@ -32,7 +32,7 @@ void PrintTopPrediction (std::vector<std::shared_ptr<r2i::IPrediction>>
                          predictions, const std::string &path) {
   r2i::RuntimeError error;
   uint num_detections = predictions[0]->At(0, error);
-  const int bbox_border_width = 5;
+  const int bbox_border_width = 3;
 
   const int channels = 3;
   int width, height, cp;
