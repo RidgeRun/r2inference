@@ -1,6 +1,7 @@
 #Build postprocessing modules
 postprocessing_sources = [
-    'top_sort_postprocessing'
+    'top_sort_postprocessing',
+    'parse_bounding_boxes_tinyyolov2',
 ]
 
 foreach post_module : postprocessing_sources
