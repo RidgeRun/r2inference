@@ -89,7 +89,7 @@ RuntimeError TopSortPostprocessing::SortPrediction (
     labels = classification->GetLabels();
 
     /* Sort indexes in descending order based on the prediction values */
-    std::stable_sort(labels.begin(), labels.end(), SortDesc);
+    std::sort(labels.begin(), labels.end(), SortDesc);
 
     error = classification->SetLabels(labels);
     if (error.IsError ()) {
