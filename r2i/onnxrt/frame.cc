@@ -16,7 +16,8 @@ namespace onnxrt {
 
 Frame::Frame () :
   frame_data(nullptr), frame_width(0), frame_height(0),
-  frame_format(ImageFormat::Id::UNKNOWN_FORMAT) {
+  frame_format(ImageFormat::Id::UNKNOWN_FORMAT),
+  datatype(DataType::Id::UNKNOWN_DATATYPE) {
 }
 
 RuntimeError Frame::Configure (void *in_data, int width,
@@ -38,6 +39,16 @@ RuntimeError Frame::Configure (void *in_data, int width,
   if (height <= 0) {
     error.Set (RuntimeError::Code::WRONG_API_USAGE,
                "Received an invalid image height");
+    return error;
+  }
+  if (datatype_id == DataType::Id::UNKNOWN_DATATYPE) {
+    error.Set (RuntimeError::Code::WRONG_API_USAGE,
+               "Can not set Frame with unknown data type");
+    return error;
+  }
+  if (format == ImageFormat::Id::UNKNOWN_FORMAT) {
+    error.Set (RuntimeError::Code::WRONG_API_USAGE,
+               "Can not set Frame with unknown frame format");
     return error;
   }
 
