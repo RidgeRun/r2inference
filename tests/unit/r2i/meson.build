@@ -38,3 +38,9 @@ endif
 if cdata.get('HAVE_TENSORRT') == true
   subdir('tensorrt')
 endif
+
+#Preprocessing modules tests
+subdir('preprocessing')
+
+#Postprocessing modules tests
+subdir('postprocessing')

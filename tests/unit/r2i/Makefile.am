@@ -85,3 +85,7 @@ endif
 if HAVE_TENSORRT
 SUBDIRS += tensorrt
 endif
+
+SUBDIRS += preprocessing
+
+SUBDIRS += postprocessing

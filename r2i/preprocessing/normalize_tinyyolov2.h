@@ -9,37 +9,21 @@
  * back to RidgeRun without any encumbrance.
 */
 
-#ifndef R2I_INFERENCE_OUTPUT_H
-#define R2I_INFERENCE_OUTPUT_H
+#ifndef R2I_NORMALIZE_TINYYOLOV2_PREPROCESSING_H
+#define R2I_NORMALIZE_TINYYOLOV2_PREPROCESSING_H
 
-/**
- * R2Inference Namespace
- */
+#include <r2i/preprocessing/normalize.h>
+
 namespace r2i {
 
-enum InferenceOutputType {
-  CLASSIFICATION,
-  OBJECT_DETECTION,
-  UNKNOWN_TYPE
-};
-
-class InferenceOutput {
+class NormalizeTinyyoloV2: public r2i::Normalize {
  public:
-  InferenceOutput() : type(InferenceOutputType::UNKNOWN_TYPE) {};
-  virtual ~InferenceOutput() {};
-
-  void SetType(InferenceOutputType type) {
-    this->type = type;
-  }
-  InferenceOutputType GetType() {
-    return this->type;
-  }
-
- protected:
-  InferenceOutputType type;
+  NormalizeTinyyoloV2 ();
+ private:
+  r2i::RuntimeError SetNormalizationParameters (unsigned char *
+      frame_data, int width, int height, int channels) override;
 };
 
+}  // namespace r2i
 
-}
-
-#endif // R2I_INFERENCE_OUTPUT_H
+#endif  // R2I_NORMALIZE_TINYYOLOV2_PREPROCESSING_H

@@ -17,6 +17,7 @@
 #include <r2i/runtimeerror.h>
 
 #include <gmodule.h>
+#include <memory>
 #include <vector>
 
 /**
@@ -31,10 +32,12 @@ class IPreprocessing {
  public:
   /**
    * \brief Apply a custom preprocessin to the input data.
-   * \param data Frame input data.
+   * \param in_frame input Frame with data to be preprocessed.
+   * \param out_frame output Frame with processed data.
    * \return Error with a description message.
    */
-  virtual RuntimeError Apply(IFrame &data) = 0;
+  virtual RuntimeError Apply(std::shared_ptr<r2i::IFrame> in_frame,
+                             std::shared_ptr<r2i::IFrame> out_frame) = 0;
 
   /**
    * \brief Gets the available image formats that can be processed.
@@ -46,7 +49,7 @@ class IPreprocessing {
    * \brief Gets the available dimensions for the input images
    * \return Vector with tuples (width, height) of the available dimensions.
    */
-  virtual std::vector<std::vector<int>> GetAvailableDataSizes() = 0;
+  virtual std::vector<std::tuple<int, int>> GetAvailableDataSizes() = 0;
 
   /**
    * \brief Default destructor

@@ -37,7 +37,7 @@ class IPostprocessing {
    * \return Error with a description message.
    */
   virtual RuntimeError Apply(std::vector< std::shared_ptr<r2i::IPrediction> >
-                             &prediction,
+                             &predictions,
                              std::vector< std::shared_ptr<InferenceOutput> > &outputs) = 0;
 
   /**
