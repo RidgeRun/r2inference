@@ -41,6 +41,7 @@ void PrintTopPrediction (std::vector<std::shared_ptr<r2i::IPrediction>>
     return;
   }
   cv::Mat img_mat(height, width, CV_8UC3, img);
+  cv::cvtColor(img_mat, img_mat, cv::COLOR_RGB2BGR);
 
   std::cout << "Num of detections: " << num_detections << std::endl;
 
@@ -50,17 +51,18 @@ void PrintTopPrediction (std::vector<std::shared_ptr<r2i::IPrediction>>
               error) << " (" << predictions[3]->At(index, error) << ")" << std::endl;
 
     size_t bbox_index = index * 4;
-    double b_x =  predictions[1]->At(bbox_index, error);
-    double b_y = predictions[1]->At(bbox_index + 1, error);
-    double b_width = predictions[1]->At(bbox_index + 2, error);
-    double b_height = predictions[1]->At(bbox_index + 3, error);
+    double y_min = predictions[1]->At(bbox_index, error);
+    double x_min = predictions[1]->At(bbox_index + 1, error);
+    double y_max = predictions[1]->At(bbox_index + 2, error);
+    double x_max = predictions[1]->At(bbox_index + 3, error);
 
-    std::cout << "BBox: {x:" << b_x << ", y:" << b_y << ", width:" << b_width <<
-              ", height:" << b_height << "}" << std::endl;
+    std::cout << "BBox: {y_min:" << y_min << ", x_min:" << x_min << ", y_max:" <<
+              y_max << ", x_max:" << x_max << "}" << std::endl;
     std::cout << "==============================" << std::endl;
 
-    cv::Point p1(b_x * width, b_y * height);
-    cv::Point p2(b_x * width + width, b_y * height + height);
+    cv::Point p1(x_min * width, y_min * height);
+    cv::Point p2(x_max * width, y_max * height);
+
     cv::rectangle(img_mat, p1, p2, cv::Scalar(0, 0, 255), 5);
   }
 
@@ -94,9 +96,9 @@ std::unique_ptr<float[]> PreProcessImage (const unsigned char *input,
 
   for (int i = 0; i < scaled_size; i += channels) {
     /* RGB = (RGB - Mean)*StdDev */
-    adjusted[i + 0] = (static_cast<float>(scaled[i + 0]) - 128) / 128.0;
-    adjusted[i + 1] = (static_cast<float>(scaled[i + 1]) - 128) / 128.0;
-    adjusted[i + 2] = (static_cast<float>(scaled[i + 2]) - 128) / 128.0;
+    adjusted[i + 0] = (static_cast<float>(scaled[i + 0]) - 128.0) / 128.0;
+    adjusted[i + 1] = (static_cast<float>(scaled[i + 1]) - 128.0) / 128.0;
+    adjusted[i + 2] = (static_cast<float>(scaled[i + 2]) - 128.0) / 128.0;
   }
 
   return adjusted;
