@@ -19,9 +19,6 @@
 
 #include <r2i/runtimeerror.h>
 
-#define CLASS_LABEL_INDEX 0
-#define CLASS_SCORE_INDEX 1
-
 /**
  * R2Inference Namespace
  */
@@ -35,7 +32,6 @@ class Classification : public InferenceOutput {
   ~Classification();
   RuntimeError SetLabels(std::vector< ClassificationInstance > labels);
   std::vector< ClassificationInstance> GetLabels();
-  ClassificationInstance GetRank1();
 
  private:
   /**

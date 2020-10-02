@@ -31,21 +31,4 @@ std::vector< ClassificationInstance > Classification::GetLabels() {
   return this->labels;
 }
 
-ClassificationInstance Classification::GetRank1() {
-  ClassificationInstance max_scored_class;
-
-  max_scored_class = std::make_tuple(0, 0.0);
-
-  for (size_t index = 0; index < this->labels.size(); index++) {
-    double score = std::get<CLASS_SCORE_INDEX>(this->labels[index]);
-    double current_max_score = std::get<CLASS_SCORE_INDEX>(max_scored_class);
-
-    if (score > current_max_score) {
-      max_scored_class = this->labels[index];
-    }
-  }
-
-  return max_scored_class;
-}
-
 }

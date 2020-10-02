@@ -53,10 +53,6 @@ TEST (DetectionOutput, SetAndGetDetections) {
   LONGS_EQUAL (in_value[0].box.y, out_value[0].box.y);
   LONGS_EQUAL (in_value[0].box.width, out_value[0].box.width);
   LONGS_EQUAL (in_value[0].box.height, out_value[0].box.height);
-  LONGS_EQUAL (std::get<CLASS_LABEL_INDEX>(in_value[0].labels.GetRank1()),
-               std::get<CLASS_LABEL_INDEX>(out_value[0].labels.GetRank1()));
-  LONGS_EQUAL (std::get<CLASS_SCORE_INDEX>(in_value[0].labels.GetRank1()),
-               std::get<CLASS_SCORE_INDEX>(out_value[0].labels.GetRank1()));
 }
 
 int main (int ac, char **av) {

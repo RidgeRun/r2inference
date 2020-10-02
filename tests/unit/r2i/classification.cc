@@ -16,6 +16,9 @@
 #include <CppUTest/MemoryLeakDetectorMallocMacros.h>
 #include <CppUTest/TestHarness.h>
 
+#define CLASS_LABEL_INDEX 0
+#define CLASS_SCORE_INDEX 1
+
 TEST_GROUP (ClassificationOutput) {
   r2i::RuntimeError error;
   r2i::Classification classification;
@@ -45,22 +48,6 @@ TEST (ClassificationOutput, SetAndGetLabels) {
                std::get<CLASS_LABEL_INDEX>(out_value[1]));
   LONGS_EQUAL (std::get<CLASS_SCORE_INDEX>(in_value[1]),
                std::get<CLASS_SCORE_INDEX>(out_value[1]));
-}
-
-TEST (ClassificationOutput, GetRank1) {
-  std::vector< r2i::ClassificationInstance > in_value;
-  r2i::ClassificationInstance out_value;
-
-  in_value.push_back( std::make_tuple(0, 0.25) );
-  in_value.push_back( std::make_tuple(1, 0.5) );
-  in_value.push_back( std::make_tuple(2, 0.25) );
-
-  error = classification.SetLabels(in_value);
-  CHECK (r2i::RuntimeError::EOK == error.GetCode());
-
-  out_value = classification.GetRank1();
-  LONGS_EQUAL (1, std::get<CLASS_LABEL_INDEX>(out_value));
-  LONGS_EQUAL (0.5, std::get<CLASS_SCORE_INDEX>(out_value));
 }
 
 int main (int ac, char **av) {
