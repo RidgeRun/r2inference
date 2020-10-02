@@ -33,6 +33,14 @@ const uint8_t _gpu_mem_config[10][RAM_ARRAY_SIZE] = {
   {0x32, 0x9, 0x9, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0xf0, 0x3f}
 };
 
+struct TensorInfo {
+  int num_dims = 0;
+  std::vector<int64_t> dims;
+  TF_DataType type;
+  size_t type_size = 0;
+  size_t data_size = 0;
+};
+
 Engine::Engine () : state(State::STOPPED),
   session_memory_usage_index(RAM_ARRAY_DEFAULT_INDEX),
   session(nullptr), model(nullptr) {

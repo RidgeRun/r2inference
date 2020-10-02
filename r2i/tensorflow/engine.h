@@ -21,14 +21,6 @@
 namespace r2i {
 namespace tensorflow {
 
-struct TensorInfo {
-  int num_dims = 0;
-  std::vector<int64_t> dims;
-  TF_DataType type;
-  size_t type_size = 0;
-  size_t data_size = 0;
-};
-
 class Engine : public IEngine {
  public:
   Engine ();
