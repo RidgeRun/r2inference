@@ -29,19 +29,15 @@
 #include "stb_image_resize.h"
 
 void PrintTopPrediction (std::vector<std::shared_ptr<r2i::IPrediction>>
-                         predictions, const std::string &path) {
+                         predictions, std::shared_ptr<r2i::IFrame> frame) {
   r2i::RuntimeError error;
   uint num_detections = predictions[0]->At(0, error);
   const int bbox_border_width = 3;
 
-  const int channels = 3;
-  int width, height, cp;
-  unsigned char *img = stbi_load(path.c_str(), &width, &height, &cp, channels);
-  if (!img) {
-    std::cerr << "The picture " << path << " could not be loaded";
-    return;
-  }
-  cv::Mat img_mat(height, width, CV_8UC3, img);
+  int width = frame->GetWidth();
+  int height = frame->GetHeight();
+
+  cv::Mat img_mat(height, width, CV_8UC3, frame->GetData());
   cv::cvtColor(img_mat, img_mat, cv::COLOR_RGB2BGR);
 
   std::cout << "Num of detections: " << num_detections << std::endl;
@@ -76,8 +72,6 @@ void PrintTopPrediction (std::vector<std::shared_ptr<r2i::IPrediction>>
 
   cv::imshow("Prediction", img_mat);
   cv::waitKey(0);
-
-  free(img);
 }
 
 void PrintUsage() {
@@ -225,7 +219,7 @@ int main (int argc, char *argv[]) {
     exit(EXIT_FAILURE);
   }
 
-  PrintTopPrediction(predictions, image_path);
+  PrintTopPrediction(predictions, frame);
 
   std::cout << "Stopping engine" << std::endl;
   error = engine->Stop ();
