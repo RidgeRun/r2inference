@@ -32,6 +32,7 @@ void PrintTopPrediction (std::vector<std::shared_ptr<r2i::IPrediction>>
                          predictions, const std::string &path) {
   r2i::RuntimeError error;
   uint num_detections = predictions[0]->At(0, error);
+  const int bbox_border_width = 5;
 
   const int channels = 3;
   int width, height, cp;
@@ -62,8 +63,13 @@ void PrintTopPrediction (std::vector<std::shared_ptr<r2i::IPrediction>>
 
     cv::Point p1(x_min * width, y_min * height);
     cv::Point p2(x_max * width, y_max * height);
+    cv::rectangle(img_mat, p1, p2, cv::Scalar(0, 0, 255), bbox_border_width);
 
-    cv::rectangle(img_mat, p1, p2, cv::Scalar(0, 0, 255), 5);
+    std::string label = "Class " + std::to_string(predictions[2]->At(index, error));
+    cv::Point p3((x_min * width) + bbox_border_width,
+                 (y_max * height) - bbox_border_width);
+    cv::putText(img_mat, label, p3, cv::FONT_HERSHEY_PLAIN, 2, cv::Scalar(0, 0,
+                255), 3);
   }
 
   cv::imshow("Prediction", img_mat);

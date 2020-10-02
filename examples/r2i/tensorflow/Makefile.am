@@ -16,7 +16,7 @@ noinst_PROGRAMS =                  \
         inception
 
 if HAVE_OPENCV
-noinst_PROGRAMS += ssd-mobilenet
+noinst_PROGRAMS += tf1-object-detection-api
 endif
 
 AM_CXXFLAGS =                      \

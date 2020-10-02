@@ -8,7 +8,7 @@ example_dependencies = [
 ]
 
 if opencv_dep.found()
-  app_examples += ['ssd-mobilenet']
+  app_examples += ['tf1-object-detection-api']
   example_dependencies += [opencv_dep]
 endif
 
