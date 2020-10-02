@@ -90,10 +90,12 @@ TEST_GROUP (TensorflowFrame) {
   int height = FRAME_HEIGHT;
   float data[4] = {0.1, 0.2, 0.3, 0.4};
   r2i::ImageFormat format;
+  r2i::DataType datatype;
 
   void setup () {
     frame = r2i::tensorflow::Frame();
     format = r2i::ImageFormat(r2i::ImageFormat::Id::RGB);
+    datatype = r2i::DataType(r2i::DataType::Id::FLOAT);
     dummyprt = malloc(1);
   }
 
@@ -105,7 +107,7 @@ TEST_GROUP (TensorflowFrame) {
 TEST (TensorflowFrame, FrameConfigure) {
   r2i::RuntimeError error;
 
-  error = frame.Configure(data, width, height, format.GetId());
+  error = frame.Configure(data, width, height, format.GetId(), datatype.GetId());
 
   LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode());
 }
@@ -113,7 +115,8 @@ TEST (TensorflowFrame, FrameConfigure) {
 TEST (TensorflowFrame, FrameConfigureNullData) {
   r2i::RuntimeError error;
 
-  error = frame.Configure(nullptr, width, height, format.GetId());
+  error = frame.Configure(nullptr, width, height, format.GetId(),
+                          datatype.GetId());
 
   LONGS_EQUAL (r2i::RuntimeError::Code::NULL_PARAMETER, error.GetCode());
 }
@@ -121,7 +124,7 @@ TEST (TensorflowFrame, FrameConfigureNullData) {
 TEST (TensorflowFrame, FrameConfigureNegativeWidth) {
   r2i::RuntimeError error;
 
-  error = frame.Configure(data, -1, height, format.GetId());
+  error = frame.Configure(data, -1, height, format.GetId(), datatype.GetId());
 
   LONGS_EQUAL (r2i::RuntimeError::Code::WRONG_API_USAGE, error.GetCode());
 }
@@ -129,7 +132,7 @@ TEST (TensorflowFrame, FrameConfigureNegativeWidth) {
 TEST (TensorflowFrame, FrameConfigureNegativeHeight) {
   r2i::RuntimeError error;
 
-  error = frame.Configure(data, width, -1, format.GetId());
+  error = frame.Configure(data, width, -1, format.GetId(), datatype.GetId());
 
   LONGS_EQUAL (r2i::RuntimeError::Code::WRONG_API_USAGE, error.GetCode());
 }
@@ -138,7 +141,7 @@ TEST (TensorflowFrame, FrameGetData) {
   r2i::RuntimeError error;
   void *local_data;
 
-  error = frame.Configure(data, width, height, format.GetId());
+  error = frame.Configure(data, width, height, format.GetId(), datatype.GetId());
   LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode());
 
   local_data = frame.GetData();
@@ -149,7 +152,7 @@ TEST (TensorflowFrame, FrameGetWidth) {
   r2i::RuntimeError error;
   int local_width;
 
-  error = frame.Configure(data, width, height, format.GetId());
+  error = frame.Configure(data, width, height, format.GetId(), datatype.GetId());
   LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode());
 
   local_width = frame.GetWidth();
@@ -160,7 +163,7 @@ TEST (TensorflowFrame, FrameGetHeight) {
   r2i::RuntimeError error;
   int local_height;
 
-  error = frame.Configure(data, width, height, format.GetId());
+  error = frame.Configure(data, width, height, format.GetId(), datatype.GetId());
   LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode());
 
   local_height = frame.GetHeight();
@@ -171,7 +174,7 @@ TEST (TensorflowFrame, FrameGetFormat) {
   r2i::RuntimeError error;
   r2i::ImageFormat local_format;
 
-  error = frame.Configure(data, width, height, format.GetId());
+  error = frame.Configure(data, width, height, format.GetId(), datatype.GetId());
   LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode());
 
   local_format = frame.GetFormat();
@@ -185,7 +188,7 @@ TEST (TensorflowFrame, FrameGetTensor) {
                             data; /* Used to avoid passing a nullptr */
   std::shared_ptr<TF_Tensor> tensor(nullptr);
 
-  error = frame.Configure(data, width, height, format.GetId());
+  error = frame.Configure(data, width, height, format.GetId(), datatype.GetId());
   LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode());
 
   tensor = frame.GetTensor(pgraph, operation, error);
@@ -198,7 +201,7 @@ TEST (TensorflowFrame, FrameGetTensorNullGraph) {
                             data; /* Used to avoid passing a nullptr */
   std::shared_ptr<TF_Tensor> tensor(nullptr);
 
-  error = frame.Configure(data, width, height, format.GetId());
+  error = frame.Configure(data, width, height, format.GetId(), datatype.GetId());
   LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode());
 
   tensor = frame.GetTensor(nullptr, operation, error);
@@ -211,7 +214,7 @@ TEST (TensorflowFrame, FrameGetTensorNullOperation) {
   std::shared_ptr<TF_Graph> pgraph(TF_NewGraph(), TF_DeleteGraph);
   std::shared_ptr<TF_Tensor> tensor(nullptr);
 
-  error = frame.Configure(data, width, height, format.GetId());
+  error = frame.Configure(data, width, height, format.GetId(), datatype.GetId());
   LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode());
 
   tensor = frame.GetTensor(pgraph, nullptr, error);
@@ -228,7 +231,7 @@ TEST (TensorflowFrame, FrameGetTensorMultipleBatches) {
 
   multiple_batches = true;
 
-  error = frame.Configure(data, width, height, format.GetId());
+  error = frame.Configure(data, width, height, format.GetId(), datatype.GetId());
   LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode());
 
   /* R2I only support a batch of 1 image(s) in our frames */
@@ -248,7 +251,7 @@ TEST (TensorflowFrame, FrameGetTensorUnsupportedWidth) {
 
   invalid_width = true;
 
-  error = frame.Configure(data, width, height, format.GetId());
+  error = frame.Configure(data, width, height, format.GetId(), datatype.GetId());
   LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode());
 
   tensor = frame.GetTensor(pgraph, operation, error);
@@ -267,7 +270,7 @@ TEST (TensorflowFrame, FrameGetTensorUnsupportedHeight) {
 
   invalid_height = true;
 
-  error = frame.Configure(data, width, height, format.GetId());
+  error = frame.Configure(data, width, height, format.GetId(), datatype.GetId());
   LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode());
 
   tensor = frame.GetTensor(pgraph, operation, error);
@@ -286,7 +289,7 @@ TEST (TensorflowFrame, FrameGetTensorIncorrectChannels) {
 
   invalid_channels = true;
 
-  error = frame.Configure(data, width, height, format.GetId());
+  error = frame.Configure(data, width, height, format.GetId(), datatype.GetId());
   LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode());
 
   tensor = frame.GetTensor(pgraph, operation, error);
@@ -305,7 +308,7 @@ TEST (TensorflowFrame, FrameGetTensorNewTensorError) {
 
   new_tensor_error = true;
 
-  error = frame.Configure(data, width, height, format.GetId());
+  error = frame.Configure(data, width, height, format.GetId(), datatype.GetId());
   LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode());
 
   tensor = frame.GetTensor(pgraph, operation, error);

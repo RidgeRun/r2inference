@@ -58,7 +58,7 @@ std::vector<TF_Output> Model::GetRunInputs () {
 
 Frame::Frame () {}
 RuntimeError Frame::Configure (void *in_data, int width, int height,
-                               r2i::ImageFormat::Id format) { return RuntimeError(); }
+                               r2i::ImageFormat::Id format, r2i::DataType::Id datatype_id) { return RuntimeError(); }
 void *Frame::GetData () { return nullptr; }
 int Frame::GetWidth () { return 0; }
 int Frame::GetHeight () { return 0; }
