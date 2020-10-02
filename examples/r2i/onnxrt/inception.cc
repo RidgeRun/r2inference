@@ -51,6 +51,7 @@ r2i::RuntimeError LoadImage(const std::string &path, int req_width,
   unsigned char *scaled = nullptr;
   r2i::ImageFormat output_image_format;
   r2i::ImageFormat::Id input_image_format_id;
+  r2i::DataType::Id input_image_datatype_id;
   r2i::RuntimeError error;
   std::shared_ptr<unsigned char> scaled_ptr;
 
@@ -75,6 +76,8 @@ r2i::RuntimeError LoadImage(const std::string &path, int req_width,
     return error;
   }
 
+  input_image_datatype_id = r2i::DataType::Id::UINT8;
+
   if (channels_in_file == 3) {
     input_image_format_id = r2i::ImageFormat::Id::RGB;
   } else {
@@ -94,7 +97,7 @@ r2i::RuntimeError LoadImage(const std::string &path, int req_width,
                      required_height, 0, required_channels);
 
   error = in_frame->Configure (scaled, required_width, required_height,
-                               input_image_format_id);
+                               input_image_format_id, input_image_datatype_id);
 
   error = preprocessing->Apply(in_frame, out_frame);
 
@@ -216,7 +219,7 @@ int main (int argc, char *argv[]) {
                                      std::default_delete<float[]>());
   error = out_frame->Configure (out_data.get(), size,
                                 size,
-                                r2i::ImageFormat::Id::RGB);
+                                r2i::ImageFormat::Id::RGB, r2i::DataType::Id::FLOAT);
   error = LoadImage (image_path, size, size, preprocessing, in_frame,
                      out_frame);
   if (error.IsError ()) {
