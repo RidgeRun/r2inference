@@ -47,12 +47,14 @@ void PrintTopPrediction (std::vector<std::shared_ptr<r2i::IPrediction>>
   std::cout << "Num of detections: " << num_detections << std::endl;
 
   for (size_t index = 0; index < num_detections; index++) {
+    int label_value = predictions[2]->At(index, error);
+
     std::cout << "==============================" << std::endl;
-    std::cout << "Label: " << predictions[2]->At(index,
-              error) << " (" << predictions[3]->At(index, error) << ")" << std::endl;
+    std::cout << "Label: " << label_value << " (" << predictions[3]->At(index,
+              error) << ")" << std::endl;
 
     size_t bbox_index = index * 4;
-    double y_min = predictions[1]->At(bbox_index, error);
+    double y_min = predictions[1]->At(bbox_index + 0, error);
     double x_min = predictions[1]->At(bbox_index + 1, error);
     double y_max = predictions[1]->At(bbox_index + 2, error);
     double x_max = predictions[1]->At(bbox_index + 3, error);
@@ -65,7 +67,7 @@ void PrintTopPrediction (std::vector<std::shared_ptr<r2i::IPrediction>>
     cv::Point p2(x_max * width, y_max * height);
     cv::rectangle(img_mat, p1, p2, cv::Scalar(0, 0, 255), bbox_border_width);
 
-    std::string label = "Class " + std::to_string(predictions[2]->At(index, error));
+    std::string label = "Class " + std::to_string(label_value);
     cv::Point p3((x_min * width) + bbox_border_width,
                  (y_max * height) - bbox_border_width);
     cv::putText(img_mat, label, p3, cv::FONT_HERSHEY_PLAIN, 2, cv::Scalar(0, 0,
@@ -89,29 +91,21 @@ void PrintUsage() {
             << std::endl;
 }
 
-std::unique_ptr<float[]> PreProcessImage (const unsigned char *input,
+std::unique_ptr<uint8_t[]> PreProcessImage (const unsigned char *input,
     int width, int height, int reqwidth, int reqheight) {
 
   const int channels = 3;
   const int scaled_size = channels * reqwidth * reqheight;
   std::unique_ptr<unsigned char[]> scaled (new unsigned char[scaled_size]);
-  std::unique_ptr<float[]> adjusted (new float[scaled_size]);
 
   stbir_resize_uint8(input, width, height, 0, scaled.get(), reqwidth,
                      reqheight, 0, channels);
 
-  for (int i = 0; i < scaled_size; i += channels) {
-    /* RGB = (RGB - Mean)*StdDev */
-    adjusted[i + 0] = (static_cast<float>(scaled[i + 0]) - 128.0) / 128.0;
-    adjusted[i + 1] = (static_cast<float>(scaled[i + 1]) - 128.0) / 128.0;
-    adjusted[i + 2] = (static_cast<float>(scaled[i + 2]) - 128.0) / 128.0;
-  }
-
-  return adjusted;
+  return scaled;
 }
 
-std::unique_ptr<float[]> LoadImage(const std::string &path, int reqwidth,
-                                   int reqheight) {
+std::unique_ptr<uint8_t[]> LoadImage(const std::string &path, int reqwidth,
+                                     int reqheight) {
   int channels = 3;
   int width, height, cp;
 
@@ -207,8 +201,8 @@ int main (int argc, char *argv[]) {
   tf_params->Set ("output-layers", out_nodes);
 
   std::cout << "Loading image: " << image_path << std::endl;
-  std::unique_ptr<float[]> image_data = LoadImage (image_path, size,
-                                        size);
+  std::unique_ptr<uint8_t[]> image_data = LoadImage (image_path, size,
+                                          size);
 
   std::cout << "Configuring frame" << std::endl;
   std::shared_ptr<r2i::IFrame> frame = factory->MakeFrame (error);
