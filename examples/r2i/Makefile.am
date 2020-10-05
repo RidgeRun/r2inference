@@ -50,13 +50,16 @@ if HAVE_TFLITE
 SUBDIRS += tflite
 endif
 
-noinst_PROGRAMS = list_parameters
+noinst_PROGRAMS =                  \
+	classification              \
+	list_parameters
 
 AM_CXXFLAGS =                     \
         $(RR_CXXFLAGS)            \
         $(CODE_COVERAGE_CXXFLAGS) \
         $(GLIB_CFLAGS)            \
-        $(GMODULE_CFLAGS)
+        $(GMODULE_CFLAGS)         \
+        -Icommon/
 
 AM_CFLAGS =                       \
         $(RR_CFLAGS)              \
