@@ -14,6 +14,7 @@
 #include <iostream>
 #include <memory>
 #include <string>
+
 #include <r2i/r2i.h>
 
 #define WIDTH_OFFSET 0
@@ -38,7 +39,7 @@ void PrintUsage() {
             << "-I [Input Node] (TensorFlow only) "
             << "-O [Output Node] (TensorFlow only) \n"
             << " Example: "
-            << " ./classificaton -i cat.jpg -m graph_inceptionv2_tensorflow.pb "
+            << " ./classification -i cat.jpg -m graph_inceptionv2_tensorflow.pb "
             << "-s 224 -b tensorflow -e libnormalize_inceptionv1.so -o libtop_sort_postprocessing.so -I input -O Softmax"
             << std::endl;
 }
@@ -46,14 +47,15 @@ void PrintUsage() {
 std::unique_ptr<unsigned char[]> LoadImage(const std::string &path,
     int reqwidth, int reqheight, int channels) {
 
-  int cp;
+  int components_per_pixel;
   int width;
   int height;
   const int scaled_size = channels * reqwidth * reqheight;
   std::unique_ptr<unsigned char[]> scaled_ptr (new unsigned char[scaled_size]);
   unsigned char *scaled = nullptr;
 
-  unsigned char *img = stbi_load(path.c_str(), &width, &height, &cp, channels);
+  unsigned char *img = stbi_load(path.c_str(), &width, &height,
+                                 &components_per_pixel, channels);
   if (!img) {
     std::cerr << "The picture " << path << " could not be loaded" << std::endl;
     return nullptr;
@@ -114,7 +116,7 @@ std::string ToLowerCase(std::string string) {
   std::string lowercase = string;
 
   std::for_each(lowercase.begin(), lowercase.end(), [](char &c) {
-    c = ::tolower(c);
+    c = std::tolower(c);
   });
   return lowercase;
 }
@@ -201,10 +203,12 @@ int main (int argc, char *argv[]) {
 
   std::cout << "Preprocessing sizes supported: " << std::endl;
   for (uint i = 0 ; i < pre_sizes.size(); i++) {
-    auto size = pre_sizes.at(i);
+    auto supported_size = pre_sizes.at(i);
     std::cout << "  Size " << i << std::endl;
-    std::cout << "    Width: " << std::get<WIDTH_OFFSET>(size) << std::endl;
-    std::cout << "    Height: " << std::get<HEIGHT_OFFSET>(size) << std::endl;
+    std::cout << "    Width: " << std::get<WIDTH_OFFSET>(supported_size) <<
+              std::endl;
+    std::cout << "    Height: " << std::get<HEIGHT_OFFSET>(supported_size) <<
+              std::endl;
   }
 
   std::cout << "Using format " << DEFAULT_PRE_FORMAT << " and size " <<
