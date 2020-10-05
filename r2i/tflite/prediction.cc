@@ -60,7 +60,7 @@ double Prediction::At (unsigned int index,  r2i::RuntimeError &error) {
   }
 
   unsigned int n_results =  this->GetResultSize();
-  if (n_results < index ) {
+  if (n_results <= index ) {
     error.Set (RuntimeError::Code::MEMORY_ERROR,
                "Triying to access an non-existing index");
     return 0;
