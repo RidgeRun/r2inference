@@ -139,7 +139,8 @@ int main (int argc, char *argv[]) {
     exit (EXIT_FAILURE);
   }
 
-  if (image_path.empty() || model_path.empty ()) {
+  if (image_path.empty() || model_path.empty () || preprocess_path.empty()
+      || postprocess_path.empty()) {
     PrintUsage ();
     exit (EXIT_FAILURE);
   }
