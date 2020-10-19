@@ -47,28 +47,30 @@ void PrintUsage() {
 std::unique_ptr<unsigned char[]> LoadImage(const std::string &path,
     int reqwidth, int reqheight, int channels) {
 
-  int components_per_pixel;
-  int width;
-  int height;
+  int components_per_pixel = 0;
+  int width = 0;
+  int height = 0;
   const int scaled_size = channels * reqwidth * reqheight;
   std::unique_ptr<unsigned char[]> scaled_ptr (new unsigned char[scaled_size]);
   unsigned char *scaled = nullptr;
+  std::shared_ptr<unsigned char> img_ptr(stbi_load(path.c_str(), &width,
+                                         &height,
+                                         &components_per_pixel, channels), free);
 
-  unsigned char *img = stbi_load(path.c_str(), &width, &height,
-                                 &components_per_pixel, channels);
-  if (!img) {
+  if (!img_ptr) {
     std::cerr << "The picture " << path << " could not be loaded" << std::endl;
     return nullptr;
   }
 
   /* Scale image */
   scaled = scaled_ptr.get();
-  stbir_resize_uint8(img, width, height, 0, scaled, reqwidth, reqheight, 0,
+  stbir_resize_uint8(img_ptr.get(), width, height, 0, scaled,
+                     reqwidth, reqheight,
+                     0,
                      channels);
 
   std::cout << "  Image size: " << width << "x" << height << std::endl;
   std::cout << "  Scaling to: " << reqwidth << "x" << reqheight << std::endl;
-  free (img);
 
   return scaled_ptr;
 }
@@ -157,7 +159,7 @@ int main (int argc, char *argv[]) {
 
   if (backend_code == r2i::MAX_FRAMEWORK) {
     std::cerr << backend << " backend is not available"  << std::endl;
-    std::cout << "Available backends are: " << std::endl;
+    std::cerr << "Available backends are: " << std::endl;
     for (auto &meta : backends_available) {
       std::cout << "  " << meta.name << std::endl;
     }
@@ -307,7 +309,8 @@ int main (int argc, char *argv[]) {
 
     if (ioutput->GetType() != r2i::CLASSIFICATION) {
       std::cerr <<
-                "Wrong Inference Output type, this output is not classification type" <<
+                "Wrong inference output type, this model is not for classification, or an erroneous post-processing was used."
+                <<
                 std::endl;
       continue;
     }
