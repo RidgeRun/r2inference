@@ -14,8 +14,8 @@ foreach app : app_examples
     install: false)
 endforeach
 
-if cdata.get('HAVE_EDGETPU') == true
-  subdir('edgetpu')
+if cdata.get('HAVE_CORAL') == true
+  subdir('coral')
 endif
 
 if cdata.get('HAVE_ONNXRT') == true

@@ -36,7 +36,7 @@ common_deps = [glib, gmodule]
 # Initialize preprocessor definitions
 cdata.set('HAVE_TENSORFLOW', false)
 cdata.set('HAVE_TFLITE', false)
-cdata.set('HAVE_EDGETPU', false)
+cdata.set('HAVE_CORAL', false)
 cdata.set('HAVE_TENSORRT', false)
 cdata.set('HAVE_ONNXRT', false)
 cdata.set('HAVE_ONNXRT_ACL', false)
@@ -51,7 +51,7 @@ if get_option('enable-tensorflow')
 endif
 
 # Define library dependencies for Tensorflow Lite support
-if get_option('enable-tflite') or get_option('enable-edgetpu')
+if get_option('enable-tflite') or get_option('enable-coral')
   tensorflow_lite = cpp.find_library('tensorflow-lite', required: true)
   tensorflow_lite_dep = declare_dependency(dependencies: tensorflow_lite)
   thread_dep = dependency('threads')
@@ -60,14 +60,14 @@ if get_option('enable-tflite') or get_option('enable-edgetpu')
 endif
 
 # Define library dependencies for Tensorflow Lite support
-if get_option('enable-edgetpu')
-    edgetpu = cpp.find_library(':libedgetpu.so.1.0', required: true)
-    edgetpu_dep = declare_dependency(dependencies: edgetpu)
+if get_option('enable-coral')
+    coral = cpp.find_library(':libedgetpu.so.1.0', required: true)
+    coral_dep = declare_dependency(dependencies: coral)
     thread_dep = dependency('threads')
     dl_dep = cpp.find_library('dl', required : true)
     rt_dep = cpp.find_library('rt', required : true)
-    lib_edgetpu_dep = [edgetpu_dep, lib_tflite_dep, dl_dep, rt_dep, common_deps]
-    cdata.set('HAVE_EDGETPU', true)
+    lib_coral_dep = [coral_dep, lib_tflite_dep, dl_dep, rt_dep, common_deps]
+    cdata.set('HAVE_CORAL', true)
 endif
 
 # Define library dependencies for TensorRT support

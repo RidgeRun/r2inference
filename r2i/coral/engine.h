@@ -9,15 +9,15 @@
  * back to RidgeRun without any encumbrance.
 */
 
-#ifndef R2I_EDGETPU_ENGINE_H
-#define R2I_EDGETPU_ENGINE_H
+#ifndef R2I_CORAL_ENGINE_H
+#define R2I_CORAL_ENGINE_H
 
 #include <r2i/tflite/engine.h>
 
 #include <libedgetpu/edgetpu.h>
 
 namespace r2i {
-namespace edgetpu {
+namespace coral {
 
 class Engine : public r2i::tflite::Engine {
  public:
@@ -32,10 +32,10 @@ class Engine : public r2i::tflite::Engine {
   override;
 
  private:
-  std::shared_ptr<::edgetpu::EdgeTpuContext> edgetpu_context;
+  std::shared_ptr<::coral::EdgeTpuContext> coral_context;
 };
 
 }
 }
 
-#endif //R2I_EDGETPU_ENGINE_H
+#endif //R2I_CORAL_ENGINE_H
