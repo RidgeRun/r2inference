@@ -21,11 +21,11 @@ Engine::Engine () : tflite::Engine() {
 
 void Engine::SetupResolver(::tflite::ops::builtin::BuiltinOpResolver
                            &resolver) {
-  resolver.AddCustom(::coral::kCustomOp, ::coral::RegisterCustomOp());
+  resolver.AddCustom(::edgetpu::kCustomOp, ::edgetpu::RegisterCustomOp());
 }
 
 void Engine::SetInterpreterContext(::tflite::Interpreter *interpreter) {
-  this->coral_context = ::coral::EdgeTpuManager::GetSingleton()->OpenDevice();
+  this->coral_context = ::edgetpu::EdgeTpuManager::GetSingleton()->OpenDevice();
 
   interpreter->SetExternalContext(kTfLiteEdgeTpuContext,
                                   this->coral_context.get());

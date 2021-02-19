@@ -12,7 +12,7 @@
 #include "frameworkfactory.h"
 #include "engine.h"
 
-#include <libedgetpu/edgetpu.h>
+#include <edgetpu.h>
 
 namespace r2i {
 namespace coral {
@@ -31,7 +31,7 @@ r2i::FrameworkMeta FrameworkFactory::GetDescription (
     .name = "Coral",
     .label = "coral",
     .description = "TensorFlow Lite with Coral from Google support",
-    .version = ::coral::EdgeTpuManager::GetSingleton()->Version()
+    .version = ::edgetpu::EdgeTpuManager::GetSingleton()->Version()
   };
 
   error.Clean ();

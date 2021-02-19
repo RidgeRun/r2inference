@@ -14,7 +14,7 @@
 
 #include <r2i/tflite/engine.h>
 
-#include <libedgetpu/edgetpu.h>
+#include <edgetpu.h>
 
 namespace r2i {
 namespace coral {
@@ -32,7 +32,7 @@ class Engine : public r2i::tflite::Engine {
   override;
 
  private:
-  std::shared_ptr<::coral::EdgeTpuContext> coral_context;
+  std::shared_ptr<::edgetpu::EdgeTpuContext> coral_context;
 };
 
 }
