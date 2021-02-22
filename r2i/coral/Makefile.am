@@ -8,45 +8,45 @@
 # a software license from RidgeRun.  All source code changes must be provided
 # back to RidgeRun without any encumbrance.
 
-if HAVE_EDGETPU
+if HAVE_CORAL
 
-noinst_LTLIBRARIES = libedgetpu.la
+noinst_LTLIBRARIES = libcoral.la
 
 # Define a custom area for our headers
-tensorflowliteedgetpuincludedir = @R2IINCLUDEDIR@/r2i/edgetpu
+tensorflowlitecoralincludedir = @R2IINCLUDEDIR@/r2i/coral
 
-libedgetpu_la_SOURCES =                     \
+libcoral_la_SOURCES =                       \
     engine.cc                               \
     frameworkfactory.cc 
 
-libedgetpu_la_CPPFLAGS =                    \
+libcoral_la_CPPFLAGS =                      \
     $(RR_CPPFLAGS)                          \
     $(CODE_COVERAGE_CPPFLAGS)
 
-libedgetpu_la_CFLAGS =                      \
+libcoral_la_CFLAGS =                        \
     $(RR_CFLAGS)                            \
     $(TFLITE_CFLAGS)                        \
-    $(EDGETPU_CFLAGS)                       \
+    $(CORAL_CFLAGS)                         \
     $(CODE_COVERAGE_CFLAGS)
 
-libedgetpu_la_CXXFLAGS =                    \
+libcoral_la_CXXFLAGS =                      \
     $(RR_CXXFLAGS)                          \
     $(TFLITE_CFLAGS)                        \
-    $(EDGETPU_CFLAGS)                       \
+    $(CORAL_CFLAGS)                         \
     $(CODE_COVERAGE_CXXFLAGS)               \
     $(GLIB_CFLAGS)                          \ 
     $(GMODULE_CFLAGS)
 
-libedgetpu_la_LIBADD =                      \
+libcoral_la_LIBADD =                        \
     $(RR_LIBS)                              \
     $(TFLITE_LIBS)                          \
-    $(EDGETPU_LIBS)                         \
+    $(CORAL_LIBS)                           \
     $(CODE_COVERAGE_LIBS)                   \
     $(GLIB_LIBS)                            \ 
     $(GMODULE_LIBS)
 
-tensorflowliteedgetpuinclude_HEADERS =      \
+tensorflowlitecoralinclude_HEADERS =        \
     engine.h                                \
     frameworkfactory.h
 
-endif # HAVE_EDGETPU
+endif # HAVE_CORAL

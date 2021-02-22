@@ -57,11 +57,11 @@ RR_CHECK_FEATURE_LIB(TENSORFLOW, TensorFlow Installation,
 
 AC_LANG_PUSH([C++])
 
-if test x$enable_edgetpu = xyes; then
+if test x$enable_coral = xyes; then
     enable_tflite=yes
 fi
 
-RR_CHECK_FEATURE_LIB(EDGETPU, EdgeTPU with TensorFlow lite Installation,
+RR_CHECK_FEATURE_LIB(CORAL, Coral from Google with TensorFlow lite Installation,
                      :libedgetpu.so.1.0, edgetpu_version, edgetpu.h, no)
 
 RR_CHECK_FEATURE_LIB(TFLITE, TensorFlow lite Installation,
@@ -110,7 +110,7 @@ docs/api/Makefile
 docs/uml/Makefile
 examples/Makefile
 examples/r2i/Makefile
-examples/r2i/edgetpu/Makefile
+examples/r2i/coral/Makefile
 examples/r2i/ncsdk/Makefile
 examples/r2i/onnxrt/Makefile
 examples/r2i/onnxrt_acl/Makefile
@@ -119,7 +119,7 @@ examples/r2i/tensorflow/Makefile
 examples/r2i/tensorrt/Makefile
 examples/r2i/tflite/Makefile
 r2i/Makefile
-r2i/edgetpu/Makefile
+r2i/coral/Makefile
 r2i/ncsdk/Makefile
 r2i/onnxrt/Makefile
 r2i/onnxrt_acl/Makefile

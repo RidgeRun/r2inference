@@ -146,11 +146,11 @@ int main (int argc, char *argv[]) {
   }
 
   auto factory = r2i::IFrameworkFactory::MakeFactory(
-                   r2i::FrameworkCode::EDGETPU,
+                   r2i::FrameworkCode::CORAL,
                    error);
 
   if (nullptr == factory) {
-    std::cerr << "EdgeTPU backend is not built: " << error << std::endl;
+    std::cerr << "Coral from Google backend is not built: " << error << std::endl;
     exit(EXIT_FAILURE);
   }
 

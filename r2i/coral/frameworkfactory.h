@@ -9,13 +9,13 @@
  * back to RidgeRun without any encumbrance.
 */
 
-#ifndef R2I_EDGETPU_FRAMEWORK_FACTORY_H
-#define R2I_EDGETPU_FRAMEWORK_FACTORY_H
+#ifndef R2I_CORAL_FRAMEWORK_FACTORY_H
+#define R2I_CORAL_FRAMEWORK_FACTORY_H
 
 #include <r2i/tflite/frameworkfactory.h>
 
 namespace r2i {
-namespace edgetpu {
+namespace coral {
 
 class FrameworkFactory : public r2i::tflite::FrameworkFactory {
  public:
@@ -24,7 +24,7 @@ class FrameworkFactory : public r2i::tflite::FrameworkFactory {
   r2i::FrameworkMeta GetDescription (RuntimeError &error) override;
 };
 
-} // namespace edgetpu
-} // namespace r2k
+} // namespace coral
+} // namespace r2i
 
-#endif //R2I_EDGETPU_FRAMEWORK_FACTORY_H
+#endif //R2I_CORAL_FRAMEWORK_FACTORY_H

@@ -12,9 +12,9 @@ if cdata.get('HAVE_TFLITE') == true
   r2inference_internal_dep += [internal_tflite_dep]
 endif
 
-if cdata.get('HAVE_EDGETPU') == true
-  subdir('edgetpu')
-  r2inference_internal_dep += [internal_edgetpu_dep]
+if cdata.get('HAVE_CORAL') == true
+  subdir('coral')
+  r2inference_internal_dep += [internal_coral_dep]
 endif
 
 if cdata.get('HAVE_TENSORRT') == true

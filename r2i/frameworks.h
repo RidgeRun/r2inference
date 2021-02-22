@@ -23,9 +23,9 @@ namespace r2i {
 enum FrameworkCode {
 
   /**
-   * Google's EdgeTPU
+   * Coral from Google
    */
-  EDGETPU,
+  CORAL,
 
   /**
    * Intel Movidius Neural Compute software developer kit

@@ -10,8 +10,8 @@
 
 SUBDIRS =
 
-if HAVE_EDGETPU
-SUBDIRS += edgetpu
+if HAVE_CORAL
+SUBDIRS += coral
 endif
 
 if HAVE_NCSDK
@@ -43,7 +43,7 @@ SUBDIRS += tensorrt
 endif
 
 DIST_SUBDIRS =          \
-        edgetpu         \
+        coral           \
         ncsdk           \
         onnxrt          \
         onnxrt_acl      \
@@ -109,9 +109,9 @@ r2iinclude_HEADERS =         \
         runtimeerror.h
 
 
-if HAVE_EDGETPU
+if HAVE_CORAL
 libr2inference_@RR_PACKAGE_VERSION@_la_LIBADD +=    \
-        $(top_builddir)/r2i/edgetpu/libedgetpu.la
+        $(top_builddir)/r2i/coral/libcoral.la
 endif
 
 if HAVE_NCSDK

@@ -11,7 +11,7 @@
 AM_DEFAULT_SOURCE_EXT = .cc
 
 DIST_SUBDIRS =                    \
-        edgetpu                   \
+        coral                     \
         ncsdk                     \
         onnxrt                    \
         onnxrt_acl                \
@@ -22,8 +22,8 @@ SUBDIRS =
 
 if ENABLE_EXAMPLES
 
-if HAVE_EDGETPU
-SUBDIRS += edgetpu
+if HAVE_CORAL
+SUBDIRS += coral
 endif
 
 if HAVE_NCSDK
