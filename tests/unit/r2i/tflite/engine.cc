@@ -68,12 +68,14 @@ TEST_GROUP (TfLiteEngine) {
   std::shared_ptr<r2i::IModel> model;
   std::shared_ptr<r2i::IModel> inc_model;
   std::shared_ptr<r2i::IFrame> frame;
+  int channels = 3;
 
   void setup () {
     model = std::make_shared<r2i::tflite::Model> ();
     inc_model = std::make_shared<MockModel> ();
     frame = std::make_shared<r2i::tflite::Frame> ();
-    dummy = malloc(sizeof(float));
+    dummy = malloc(frame->GetWidth() * frame->GetHeight() * channels * sizeof(
+                     float));
   }
 
   void teardown () {
