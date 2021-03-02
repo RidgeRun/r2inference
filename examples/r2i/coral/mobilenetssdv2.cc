@@ -24,6 +24,8 @@
 #define STB_IMAGE_RESIZE_IMPLEMENTATION
 #include "stb_image_resize.h"
 
+#define PIXELS_MEAN 127.5
+
 /* Output signature of the architecture */
 #define LOCATION 0
 #define LABELS 1
@@ -96,9 +98,12 @@ std::unique_ptr<float[]> PreProcessImage (const unsigned char *input,
 
   for (int i = 0; i < scaled_size; i += channels) {
     /* RGB = (RGB - Mean)*StdDev */
-    adjusted[i + 0] = (static_cast<float>(scaled[i + 0]) - 127.5) / 127.5;
-    adjusted[i + 1] = (static_cast<float>(scaled[i + 1]) - 127.5) / 127.5;
-    adjusted[i + 2] = (static_cast<float>(scaled[i + 2]) - 127.5) / 127.5;
+    adjusted[i + 0] = (static_cast<float>(scaled[i + 0]) - PIXELS_MEAN) /
+                      PIXELS_MEAN;
+    adjusted[i + 1] = (static_cast<float>(scaled[i + 1]) - PIXELS_MEAN) /
+                      PIXELS_MEAN;
+    adjusted[i + 2] = (static_cast<float>(scaled[i + 2]) - PIXELS_MEAN) /
+                      PIXELS_MEAN;
   }
 
   return adjusted;
