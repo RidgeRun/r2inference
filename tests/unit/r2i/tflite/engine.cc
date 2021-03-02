@@ -55,6 +55,7 @@ void *Frame::GetData () {
 }
 int Frame::GetWidth () { return 224; }
 int Frame::GetHeight () { return 224; }
+ImageFormat Frame::GetFormat () {return ImageFormat::Id::RGB; }
 
 Prediction::Prediction () {}
 double Prediction::At (unsigned int index,  r2i::RuntimeError &error) { return 0.0; }
@@ -68,14 +69,13 @@ TEST_GROUP (TfLiteEngine) {
   std::shared_ptr<r2i::IModel> model;
   std::shared_ptr<r2i::IModel> inc_model;
   std::shared_ptr<r2i::IFrame> frame;
-  int channels = 3;
 
   void setup () {
     model = std::make_shared<r2i::tflite::Model> ();
     inc_model = std::make_shared<MockModel> ();
     frame = std::make_shared<r2i::tflite::Frame> ();
-    dummy = malloc(frame->GetWidth() * frame->GetHeight() * channels * sizeof(
-                     float));
+    dummy = malloc(frame->GetWidth() * frame->GetHeight() *
+                   frame->GetFormat().GetNumPlanes() * sizeof(float));
   }
 
   void teardown () {
