@@ -26,7 +26,7 @@
 
 void PrintTopPrediction (std::shared_ptr<r2i::IPrediction> prediction) {
   r2i::RuntimeError error;
-  int num_labels = prediction->GetResultSize();
+  int num_labels = prediction->GetResultSize() / sizeof(float);
 
   std::vector<double> results;
   results.resize(num_labels);
