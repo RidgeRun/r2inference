@@ -37,9 +37,15 @@
 
 void PrintBoxes (std::vector<std::shared_ptr<r2i::IPrediction>> predictions,
                  int width, int height) {
-  r2i::RuntimeError error;
+  /* The ssd mobilenetv2 model has 4 output tensors:
+    0: [N,4] tensor with the location of the N bounding boxes (top-left and
+      right-bottom corners). This tensor is flattened so the output we get here
+      is of shape [N * 4]
+    1: [N] tensor with the number of labels for the N bounding boxes
+    2: [N] tensor with the probabilities of those N labels
+    3: [1] tensor with the number of detected boxes */
 
-  /* The 4th tensor of shape [1] contains the number of detected boxes */
+  r2i::RuntimeError error;
   int num_boxes = predictions[NUM_BOXES]->At(0, error);
   int cur_box = 0;
   int index = 0;
