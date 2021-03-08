@@ -9,33 +9,21 @@
  * back to RidgeRun without any encumbrance.
 */
 
-#ifndef R2I_EDGETPU_ENGINE_H
-#define R2I_EDGETPU_ENGINE_H
+#ifndef R2I_NORMALIZE_INCEPTIONV1_PREPROCESSING_H
+#define R2I_NORMALIZE_INCEPTIONV1_PREPROCESSING_H
 
-#include <r2i/tflite/engine.h>
-
-#include <libedgetpu/edgetpu.h>
+#include <r2i/preprocessing/normalize.h>
 
 namespace r2i {
-namespace edgetpu {
 
-class Engine : public r2i::tflite::Engine {
+class NormalizeInceptionV1: public r2i::Normalize {
  public:
-  Engine ();
-  ~Engine ();
-
- protected:
-
-  void SetupResolver(::tflite::ops::builtin::BuiltinOpResolver &resolver)
-  override;
-  void SetInterpreterContext(::tflite::Interpreter *interpreter)
-  override;
-
+  NormalizeInceptionV1 ();
  private:
-  std::shared_ptr<::edgetpu::EdgeTpuContext> edgetpu_context;
+  r2i::RuntimeError SetNormalizationParameters (unsigned char *
+      frame_data, int width, int height, int channels) override;
 };
 
-}
-}
+}  // namespace r2i
 
-#endif //R2I_EDGETPU_ENGINE_H
+#endif  // R2I_NORMALIZE_INCEPTIONV1_PREPROCESSING_H

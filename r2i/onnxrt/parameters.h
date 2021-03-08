@@ -20,6 +20,7 @@
 #include <r2i/runtimeerror.h>
 #include <r2i/onnxrt/engine.h>
 #include <r2i/onnxrt/model.h>
+#include <r2i/onnxrt/parameteraccessors.h>
 
 namespace r2i {
 namespace onnxrt {
@@ -40,90 +41,20 @@ class Parameters: public IParameters {
   RuntimeError Set (const std::string &in_parameter, int in_value) override;
   RuntimeError Set (const std::string &in_parameter, double in_value) override;
   RuntimeError List (std::vector<ParameterMeta> &metas) override;
+  /* To set/get Parameters of the internal Engine instance */
+  RuntimeError SetLogLevel (int value);
+  RuntimeError GetLogLevel (int &value);
+  RuntimeError SetIntraNumThreads (int value);
+  RuntimeError GetIntraNumThreads (int &value);
+  RuntimeError SetGraphOptLevel (int value);
+  RuntimeError GetGraphOptLevel (int &value);
+  RuntimeError SetLogId (const std::string &value);
+  RuntimeError GetLogId (std::string &value);
 
- private:
+ protected:
   std::shared_ptr <Engine> engine;
-  std::shared_ptr <Model> model;
-
-  friend class Accessor;
-
-  class Accessor {
-   public:
-    Accessor (Parameters *target) : target(target) {}
-    virtual RuntimeError Set () = 0;
-    virtual RuntimeError Get () = 0;
-    virtual ~Accessor() {}
-
-   public:
-    Parameters *target;
-  };
-
-  class StringAccessor : public Accessor {
-   public:
-    StringAccessor (Parameters *target) : Accessor(target) {}
-    std::string value;
-  };
-
-  class IntAccessor : public Accessor {
-   public:
-    IntAccessor (Parameters *target) : Accessor(target) {}
-    int value;
-  };
-
-  class LoggingLevelAccessor : public IntAccessor {
-   public:
-    LoggingLevelAccessor (Parameters *target) : IntAccessor(target) {}
-
-    RuntimeError Set () {
-      return target->engine->SetLoggingLevel(this->value);
-    }
-
-    RuntimeError Get () {
-      this->value = target->engine->GetLoggingLevel();
-      return RuntimeError ();
-    }
-  };
-
-  class LogIdAccessor : public StringAccessor {
-   public:
-    LogIdAccessor (Parameters *target) : StringAccessor(target) {}
-    RuntimeError Set () {
-      return target->engine->SetLogId(this->value);
-    }
-
-    RuntimeError Get () {
-      this->value = target->engine->GetLogId();
-      return RuntimeError ();
-    }
-  };
-
-  class IntraNumThreadsAccessor : public IntAccessor {
-   public:
-    IntraNumThreadsAccessor (Parameters *target) : IntAccessor(target) {}
-
-    RuntimeError Set () {
-      return target->engine->SetIntraNumThreads(this->value);
-    }
-
-    RuntimeError Get () {
-      this->value = target->engine->GetIntraNumThreads();
-      return RuntimeError ();
-    }
-  };
-
-  class GraphOptLevelAccessor : public IntAccessor {
-   public:
-    GraphOptLevelAccessor (Parameters *target) : IntAccessor(target) {}
-
-    RuntimeError Set () {
-      return target->engine->SetGraphOptLevel(this->value);
-    }
-
-    RuntimeError Get () {
-      this->value = target->engine->GetGraphOptLevel();
-      return RuntimeError ();
-    }
-  };
+  std::shared_ptr <IModel> model;
+  std::shared_ptr<r2i::onnxrt::Accessor> accessor;
 
   struct ParamDesc {
     ParameterMeta meta;
@@ -131,10 +62,35 @@ class Parameters: public IParameters {
   };
 
   typedef std::unordered_map<std::string, ParamDesc> ParamMap;
-  const ParamMap parameter_map;
+  ParamMap parameter_map;
 
   ParamDesc Validate (const std::string &in_parameter, int type,
                       const std::string &stype, RuntimeError &error);
+
+  ParameterMeta logging_level_meta = {
+    .name = "logging-level",
+    .description = "ONNXRT Logging Level",
+    .flags = r2i::ParameterMeta::Flags::READWRITE | r2i::ParameterMeta::Flags::WRITE_BEFORE_START,
+    .type = r2i::ParameterMeta::Type::INTEGER
+  };
+  ParameterMeta log_id_meta = {
+    .name = "log-id",
+    .description = "String identification for ONNXRT environment",
+    .flags = r2i::ParameterMeta::Flags::READWRITE | r2i::ParameterMeta::Flags::WRITE_BEFORE_START,
+    .type = r2i::ParameterMeta::Type::STRING
+  };
+  ParameterMeta intra_num_threads_meta = {
+    .name = "intra-num-threads",
+    .description = "Number of threads to parallelize execution within model nodes",
+    .flags = r2i::ParameterMeta::Flags::READWRITE | r2i::ParameterMeta::Flags::WRITE_BEFORE_START,
+    .type = r2i::ParameterMeta::Type::INTEGER
+  };
+  ParameterMeta graph_optimization_level_meta = {
+    .name = "graph-optimization-level",
+    .description = "ONNXRT graph optimization level",
+    .flags = r2i::ParameterMeta::Flags::READWRITE | r2i::ParameterMeta::Flags::WRITE_BEFORE_START,
+    .type = r2i::ParameterMeta::Type::INTEGER
+  };
 
 };
 

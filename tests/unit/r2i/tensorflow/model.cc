@@ -39,7 +39,7 @@ TEST_GROUP (TensorflowModel) {
   void setup () {
     buffer = std::shared_ptr<TF_Buffer> (nullptr);
     model.SetInputLayerName("input-value");
-    model.SetOutputLayerName("output-value");
+    model.SetOutputLayersNames({"output-value"});
     invalid_input_node = false;
     invalid_output_node = false;
   }
@@ -60,7 +60,7 @@ TEST (TensorflowModel, StartEmptyInputName) {
 }
 
 TEST (TensorflowModel, StartEmptyOutputName) {
-  model.SetOutputLayerName("");
+  model.SetOutputLayersNames({""});
   error = model.Start ("");
   LONGS_EQUAL (r2i::RuntimeError::Code::NULL_PARAMETER, error.GetCode());
 }
@@ -95,16 +95,16 @@ TEST (TensorflowModel, SetAndGetInputLayerName) {
 
 TEST (TensorflowModel, SetAndGetOutputLayerName) {
   std::string in_value;
-  std::string out_value;
+  std::vector<std::string> out_value;
 
   in_value = "myoutputlayer";
-  error = model.SetOutputLayerName(in_value);
+  error = model.SetOutputLayersNames({in_value});
 
   LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
 
-  out_value = model.GetOutputLayerName();
+  out_value = model.GetOutputLayersNames();
 
-  STRCMP_EQUAL(in_value.c_str(), out_value.c_str());
+  STRCMP_EQUAL(in_value.c_str(), out_value.at(0).c_str());
 }
 
 TEST (TensorflowModel, LoadNullBuffer) {
@@ -115,6 +115,44 @@ TEST (TensorflowModel, LoadNullBuffer) {
 TEST (TensorflowModel, LoadSuccess) {
   error = model.Load (buffer);
   LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode());
+}
+
+TEST (TensorflowModel, SetMultipleOutputs) {
+  std::string output_1 = "output-value-1";
+  std::string output_2 = "output-value-2";
+  std::string output_3 = "output-value-3";
+  std::vector< std::string > output_layers;
+
+  output_layers.push_back(output_1);
+  output_layers.push_back(output_2);
+  output_layers.push_back(output_3);
+
+  error = model.SetOutputLayersNames(output_layers);
+  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode());
+
+  error = model.Start("");
+  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode());
+}
+
+TEST (TensorflowModel, CheckMultipleOutputs) {
+  std::string output_1 = "output-value-1";
+  std::string output_2 = "output-value-2";
+  std::string output_3 = "output-value-3";
+  std::vector< std::string > output_layers;
+  std::vector< std::string > output_layers_test;
+
+  output_layers.push_back(output_1);
+  output_layers.push_back(output_2);
+  output_layers.push_back(output_3);
+
+  error = model.SetOutputLayersNames(output_layers);
+  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode());
+
+  output_layers_test = model.GetOutputLayersNames();
+  LONGS_EQUAL (output_layers.size(), output_layers_test.size());
+  STRCMP_EQUAL(output_layers_test[0].c_str(), output_1.c_str());
+  STRCMP_EQUAL(output_layers_test[1].c_str(), output_2.c_str());
+  STRCMP_EQUAL(output_layers_test[2].c_str(), output_3.c_str());
 }
 
 int main (int ac, char **av) {

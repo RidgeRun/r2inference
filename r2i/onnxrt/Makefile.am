@@ -22,6 +22,7 @@ libonnxrt_la_SOURCES =           \
     loader.cc                    \
     model.cc                     \
     parameters.cc                \
+    parameteraccessors.cc        \
     prediction.cc
 
 libonnxrt_la_CPPFLAGS =          \
@@ -36,12 +37,16 @@ libonnxrt_la_CFLAGS =            \
 libonnxrt_la_CXXFLAGS =          \
     $(RR_CXXFLAGS)               \
     $(ONNXRT_CFLAGS)             \
-    $(CODE_COVERAGE_CXXFLAGS)
+    $(CODE_COVERAGE_CXXFLAGS)    \
+    $(GLIB_CFLAGS)               \ 
+    $(GMODULE_CFLAGS)
 
 libonnxrt_la_LIBADD =            \
     $(RR_LIBS)                   \
     $(ONNXRT_LIBS)               \
-    $(CODE_COVERAGE_LIBS)
+    $(CODE_COVERAGE_LIBS)        \
+    $(GLIB_LIBS)                 \ 
+    $(GMODULE_LIBS)
 
 onnxrtinclude_HEADERS =          \
     engine.h                     \
@@ -50,6 +55,7 @@ onnxrtinclude_HEADERS =          \
     loader.h                     \
     model.h                      \
     parameters.h                 \
+    parameteraccessors.h         \
     prediction.h
 
 endif # HAVE_ONNXRT

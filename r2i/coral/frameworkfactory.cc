@@ -12,10 +12,10 @@
 #include "frameworkfactory.h"
 #include "engine.h"
 
-#include <libedgetpu/edgetpu.h>
+#include <edgetpu.h>
 
 namespace r2i {
-namespace edgetpu {
+namespace coral {
 
 std::unique_ptr<r2i::IEngine> FrameworkFactory::MakeEngine (
   RuntimeError &error) {
@@ -27,10 +27,10 @@ std::unique_ptr<r2i::IEngine> FrameworkFactory::MakeEngine (
 r2i::FrameworkMeta FrameworkFactory::GetDescription (
   RuntimeError &error) {
   const FrameworkMeta meta {
-    .code = r2i::FrameworkCode::EDGETPU,
-    .name = "EdgeTPU",
-    .label = "edgetpu",
-    .description = "Google's TensorFlow Lite with EdgeTPU support",
+    .code = r2i::FrameworkCode::CORAL,
+    .name = "Coral",
+    .label = "coral",
+    .description = "TensorFlow Lite with Coral from Google support",
     .version = ::edgetpu::EdgeTpuManager::GetSingleton()->Version()
   };
 

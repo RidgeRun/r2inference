@@ -1,5 +1,5 @@
 project('r2inference', ['cpp'], default_options : ['cpp_std=c++11'],
-  version : '0.9.0',
+  version : '0.10.0',
   meson_version : '>= 0.50',)
 
 # Set project information
@@ -27,10 +27,16 @@ cpp_args = ['-DHAVE_CONFIG_H']
 # Create an empty configuration object to set config.h information
 cdata = configuration_data()
 
+# define common dependencies
+opencv_dep = dependency('opencv4', version : ['>= 4.0.0', '< 4.3.0'], required : false)
+glib = dependency('glib-2.0', version:'>= 2.0.0', required: true)
+gmodule = dependency('gmodule-2.0', version:'>= 2.0.0', required: true)
+common_deps = [glib, gmodule]
+
 # Initialize preprocessor definitions
 cdata.set('HAVE_TENSORFLOW', false)
 cdata.set('HAVE_TFLITE', false)
-cdata.set('HAVE_EDGETPU', false)
+cdata.set('HAVE_CORAL', false)
 cdata.set('HAVE_TENSORRT', false)
 cdata.set('HAVE_ONNXRT', false)
 cdata.set('HAVE_ONNXRT_ACL', false)
@@ -40,28 +46,28 @@ cdata.set('HAVE_ONNXRT_OPENVINO', false)
 if get_option('enable-tensorflow')
   tensorflow = cpp.find_library('tensorflow', required: true)
   tensorflow_dep = declare_dependency(dependencies: tensorflow)
-  lib_tf_dep = [tensorflow_dep]
+  lib_tf_dep = [tensorflow_dep, common_deps]
   cdata.set('HAVE_TENSORFLOW', true)
 endif
 
 # Define library dependencies for Tensorflow Lite support
-if get_option('enable-tflite') or get_option('enable-edgetpu')
+if get_option('enable-tflite') or get_option('enable-coral')
   tensorflow_lite = cpp.find_library('tensorflow-lite', required: true)
   tensorflow_lite_dep = declare_dependency(dependencies: tensorflow_lite)
   thread_dep = dependency('threads')
-  lib_tflite_dep = [tensorflow_lite_dep, thread_dep]
+  lib_tflite_dep = [tensorflow_lite_dep, thread_dep, common_deps]
   cdata.set('HAVE_TFLITE', true)
 endif
 
 # Define library dependencies for Tensorflow Lite support
-if get_option('enable-edgetpu')
-    edgetpu = cpp.find_library(':libedgetpu.so.1.0', required: true)
-    edgetpu_dep = declare_dependency(dependencies: edgetpu)
+if get_option('enable-coral')
+    coral = cpp.find_library(':libedgetpu.so.1.0', required: true)
+    coral_dep = declare_dependency(dependencies: coral)
     thread_dep = dependency('threads')
     dl_dep = cpp.find_library('dl', required : true)
     rt_dep = cpp.find_library('rt', required : true)
-    lib_edgetpu_dep = [edgetpu_dep, lib_tflite_dep, dl_dep, rt_dep]
-    cdata.set('HAVE_EDGETPU', true)
+    lib_coral_dep = [coral_dep, lib_tflite_dep, dl_dep, rt_dep, common_deps]
+    cdata.set('HAVE_CORAL', true)
 endif
 
 # Define library dependencies for TensorRT support
@@ -89,7 +95,7 @@ if get_option('enable-tensorrt')
 
   tensorrt = cpp.find_library('nvinfer', required: true)
   tensorrt_dep = declare_dependency(dependencies: tensorrt)
-  lib_trt_dep = [tensorrt_dep, cuda_dep, cudart_dep]
+  lib_trt_dep = [tensorrt_dep, cuda_dep, cudart_dep, common_deps]
   cdata.set('HAVE_TENSORRT', true)
 endif
 
@@ -97,7 +103,7 @@ endif
 if get_option('enable-onnxrt') or get_option('enable-onnxrt-acl') or get_option('enable-onnxrt-openvino')
   onnxrt = cpp.find_library('onnxruntime', required: true)
   onnxrt_dep = declare_dependency(dependencies: onnxrt)
-  lib_onnxrt_dep = [onnxrt_dep]
+  lib_onnxrt_dep = [onnxrt_dep, common_deps]
   cdata.set('HAVE_ONNXRT', true)
 endif
 
@@ -109,7 +115,7 @@ if get_option('enable-onnxrt-acl')
   arm_compute_core_dep = declare_dependency(dependencies: arm_compute_core)
   arm_compute_graph = cpp.find_library('arm_compute_graph', required: true)
   arm_compute_graph_dep = declare_dependency(dependencies: arm_compute_graph)
-  lib_onnxrt_acl_dep = [arm_compute_dep, arm_compute_core_dep, arm_compute_graph_dep, lib_onnxrt_dep]
+  lib_onnxrt_acl_dep = [arm_compute_dep, arm_compute_core_dep, arm_compute_graph_dep, lib_onnxrt_dep, common_deps]
   lib_onnxrt_dep += [lib_onnxrt_acl_dep]
   cdata.set('HAVE_ONNXRT_ACL', true)
 endif

@@ -1,8 +1,10 @@
 r2inference_internal_dep = []
+internal_preprocessing_dep = []
+internal_postprocessing_dep = []
 
 if cdata.get('HAVE_TENSORFLOW') == true
   subdir('tensorflow')
-  r2inference_internal_dep = [internal_tf_dep]
+  r2inference_internal_dep += [internal_tf_dep]
 endif
 
 if cdata.get('HAVE_TFLITE') == true
@@ -10,9 +12,9 @@ if cdata.get('HAVE_TFLITE') == true
   r2inference_internal_dep += [internal_tflite_dep]
 endif
 
-if cdata.get('HAVE_EDGETPU') == true
-  subdir('edgetpu')
-  r2inference_internal_dep += [internal_edgetpu_dep]
+if cdata.get('HAVE_CORAL') == true
+  subdir('coral')
+  r2inference_internal_dep += [internal_coral_dep]
 endif
 
 if cdata.get('HAVE_TENSORRT') == true
@@ -37,14 +39,19 @@ endif
 
 # Define source code
 r2inference_sources = [
+  'classification.cc',
   'datatype.cc',
+  'detection.cc',
   'iframeworkfactory.cc',
   'imageformat.cc',
+  'loader.cc',
   'runtimeerror.cc',
 ]
 
 r2inference_headers = [
+  'classification.h',
   'datatype.h',
+  'detection.h',
   'frameworkmeta.h',
   'frameworks.h',
   'iengine.h',
@@ -53,8 +60,12 @@ r2inference_headers = [
   'iloader.h',
   'imageformat.h',
   'imodel.h',
+  'inferenceoutput.h',
   'iparameters.h',
+  'ipostprocessing.h',
   'iprediction.h',
+  'ipreprocessing.h',
+  'loader.h',
   'parametermeta.h',
   'r2i.h',
   'runtimeerror.h',
@@ -92,3 +103,11 @@ pkgconfig.generate(libraries : r2inference_lib,
 
 # Define the library as an internal dependency to the current build
 r2inference_lib_dep = declare_dependency(link_with: r2inference_lib, dependencies: r2inference_internal_dep)
+
+#Preprocessing modules
+subdir('preprocessing')
+r2inference_internal_dep += [internal_preprocessing_dep]
+
+#Postprocessing modules
+subdir('postprocessing')
+r2inference_internal_dep += [internal_postprocessing_dep]

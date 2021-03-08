@@ -92,7 +92,7 @@ TEST (TfLitePrediction, PredictionNonExistentIndex) {
   error = prediction.SetTensorValues(tensordata, INPUTS);
   LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode());
 
-  prediction.At (5, error);
+  prediction.At (12, error);
   LONGS_EQUAL (r2i::RuntimeError::Code::MEMORY_ERROR, error.GetCode());
 }
 

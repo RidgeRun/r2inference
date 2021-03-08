@@ -1,5 +1,8 @@
 lib_r2inference_tests = [
+  ['classification.cc'],
+  ['detection.cc'],
   ['iframeworkfactory.cc'],
+  ['loader.cc'],
 ]
 
 # Build and run tests
@@ -20,6 +23,10 @@ if cdata.get('HAVE_ONNXRT') == true
   subdir('onnxrt')
 endif
 
+if cdata.get('HAVE_ONNXRT_OPENVINO') == true
+  subdir('onnxrt_openvino')
+endif
+
 if cdata.get('HAVE_TENSORFLOW') == true
   subdir('tensorflow')
 endif
@@ -31,3 +38,9 @@ endif
 if cdata.get('HAVE_TENSORRT') == true
   subdir('tensorrt')
 endif
+
+#Preprocessing modules tests
+subdir('preprocessing')
+
+#Postprocessing modules tests
+subdir('postprocessing')

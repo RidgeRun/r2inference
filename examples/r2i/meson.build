@@ -1,20 +1,21 @@
-# Define common headers directory for examples
+# Define common path for headers in examples directory
 common_inc_dir = include_directories('common')
 
 # Compile examples
 app_examples = [
+  'classification',
   'list_parameters',
 ]
 
 foreach app : app_examples
   executable(app, '@0@.cc'.format(app),
-    include_directories: [configinc],
+    include_directories: [configinc, common_inc_dir],
     dependencies : [r2inference_lib_dep],
     install: false)
 endforeach
 
-if cdata.get('HAVE_EDGETPU') == true
-  subdir('edgetpu')
+if cdata.get('HAVE_CORAL') == true
+  subdir('coral')
 endif
 
 if cdata.get('HAVE_ONNXRT') == true

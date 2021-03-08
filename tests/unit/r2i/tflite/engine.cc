@@ -12,6 +12,7 @@
 #include <r2i/r2i.h>
 #include <r2i/tflite/engine.h>
 #include <r2i/tflite/frame.h>
+#include <r2i/tflite/model.h>
 #include <r2i/tflite/prediction.h>
 
 #include <CppUTest/CommandLineTestRunner.h>
@@ -54,6 +55,7 @@ void *Frame::GetData () {
 }
 int Frame::GetWidth () { return 224; }
 int Frame::GetHeight () { return 224; }
+ImageFormat Frame::GetFormat () {return ImageFormat::Id::RGB; }
 
 Prediction::Prediction () {}
 double Prediction::At (unsigned int index,  r2i::RuntimeError &error) { return 0.0; }
@@ -72,7 +74,8 @@ TEST_GROUP (TfLiteEngine) {
     model = std::make_shared<r2i::tflite::Model> ();
     inc_model = std::make_shared<MockModel> ();
     frame = std::make_shared<r2i::tflite::Frame> ();
-    dummy = malloc(sizeof(float));
+    dummy = malloc(frame->GetWidth() * frame->GetHeight() *
+                   frame->GetFormat().GetNumPlanes() * sizeof(float));
   }
 
   void teardown () {
@@ -197,6 +200,20 @@ TEST (TfLiteEngine, PredictEngine) {
   prediction = engine.Predict (frame, error);
   LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
 
+}
+
+TEST (TfLiteEngine, MultiplePredictsEngine) {
+  r2i::RuntimeError error;
+  std::vector<std::shared_ptr<r2i::IPrediction>> predictions;
+
+  error = engine.SetModel (model);
+  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
+
+  error = engine.Start ();
+  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
+
+  error = engine.Predict (frame, predictions);
+  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
 }
 
 int main (int ac, char **av) {

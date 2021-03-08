@@ -38,6 +38,8 @@ class Engine : public r2i::IEngine {
   };
   virtual std::shared_ptr<r2i::IPrediction> Predict (std::shared_ptr<r2i::IFrame>
       in_frame, r2i::RuntimeError &error) { return nullptr; }
+  virtual r2i::RuntimeError Predict (std::shared_ptr<r2i::IFrame> in_frame,
+                                     std::vector< std::shared_ptr<r2i::IPrediction> > &predictions) { return r2i::RuntimeError(); }
 };
 }
 
@@ -54,18 +56,11 @@ RuntimeError Model::Load (std::shared_ptr<TF_Buffer> pbuffer) {
 
 std::shared_ptr<TF_Graph> Model::GetGraph () {return this->graph;}
 std::shared_ptr<TF_Buffer> Model::GetBuffer () {return this->buffer;}
-TF_Operation *Model::GetInputOperation () { return nullptr; }
-TF_Operation *Model::GetOutputOperation () { return nullptr; }
 RuntimeError Model::SetInputLayerName (const std::string &name) {
   this->input_layer_name = name;
   return RuntimeError();
 }
-RuntimeError Model::SetOutputLayerName (const std::string &name) {
-  this->output_layer_name = name;
-  return RuntimeError();
-}
 const std::string Model::GetInputLayerName () { return this->input_layer_name; }
-const std::string Model::GetOutputLayerName () { return this->output_layer_name; }
 
 Engine::Engine ()  { }
 RuntimeError Engine::SetModel (std::shared_ptr<IModel> in_model) { return RuntimeError(); }
@@ -219,6 +214,38 @@ TEST (TensorflowParameters, SetAndGetOutputLayerName) {
   error = parameters.Get("output-layer", out_value);
 
   STRCMP_EQUAL(in_value.c_str(), out_value.c_str());
+}
+
+TEST (TensorflowParameters, SetAndGetOutputLayersNames) {
+  r2i::RuntimeError error;
+  r2i::tensorflow::Parameters parameters;
+  std::vector< std::string > in_value;
+  std::string output_1 = "output-value-1";
+  std::string output_2 = "output-value-2";
+  std::string output_3 = "output-value-3";
+  std::vector< std::string > out_value;
+
+  in_value.push_back(output_1);
+  in_value.push_back(output_2);
+  in_value.push_back(output_3);
+
+  std::shared_ptr<r2i::IEngine> engine(new r2i::tensorflow::Engine);
+  std::shared_ptr<r2i::IModel> model(new r2i::tensorflow::Model);
+
+  error = parameters.Configure(engine, model);
+
+  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
+
+  error = parameters.Set("output-layers", in_value);
+
+  LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
+
+  error = parameters.Get("output-layers", out_value);
+
+  LONGS_EQUAL (in_value.size(), out_value.size());
+  STRCMP_EQUAL(out_value[0].c_str(), output_1.c_str());
+  STRCMP_EQUAL(out_value[1].c_str(), output_2.c_str());
+  STRCMP_EQUAL(out_value[2].c_str(), output_3.c_str());
 }
 
 TEST (TensorflowParameters, GetVersion) {

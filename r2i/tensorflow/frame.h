@@ -24,7 +24,8 @@ class Frame : public IFrame {
   Frame ();
 
   RuntimeError Configure (void *in_data, int width,
-                          int height, r2i::ImageFormat::Id format) override;
+                          int height, r2i::ImageFormat::Id format,
+                          r2i::DataType::Id datatype_id) override;
 
   void *GetData () override;
 
@@ -45,6 +46,7 @@ class Frame : public IFrame {
   int frame_height;
   ImageFormat frame_format;
   std::shared_ptr<TF_Tensor> tensor;
+  DataType datatype;
 
   RuntimeError GetTensorShape (std::shared_ptr<TF_Graph> graph,
                                TF_Operation *operation,
@@ -53,6 +55,7 @@ class Frame : public IFrame {
   RuntimeError CreateTensor (TF_DataType type, int64_t dims[], int64_t num_dims,
                              int64_t size);
   RuntimeError Validate (int64_t dims[], int64_t num_dims);
+  void HandleGenericDimensions (int64_t dims[], int64_t num_dims);
 };
 
 }

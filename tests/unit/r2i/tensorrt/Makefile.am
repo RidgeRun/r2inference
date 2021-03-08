@@ -40,6 +40,8 @@ AM_CXXFLAGS =                       \
         $(TESTS_CFLAGS)             \
         $(TENSORRT_CFLAGS)          \
         $(CODE_COVERAGE_CXXFLAGS)   \
+        $(GLIB_CFLAGS)              \
+        $(GMODULE_CFLAGS)           \
         -I$(CUDA_INCDIR)
 
 AM_CFLAGS =                         \

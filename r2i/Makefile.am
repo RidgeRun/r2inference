@@ -10,8 +10,8 @@
 
 SUBDIRS =
 
-if HAVE_EDGETPU
-SUBDIRS += edgetpu
+if HAVE_CORAL
+SUBDIRS += coral
 endif
 
 if HAVE_NCSDK
@@ -43,7 +43,7 @@ SUBDIRS += tensorrt
 endif
 
 DIST_SUBDIRS =          \
-        edgetpu         \
+        coral           \
         ncsdk           \
         onnxrt          \
         onnxrt_acl      \
@@ -58,8 +58,11 @@ lib_LTLIBRARIES = libr2inference-@RR_PACKAGE_VERSION@.la
 r2iincludedir = @R2IINCLUDEDIR@/r2i
 
 libr2inference_@RR_PACKAGE_VERSION@_la_SOURCES =    \
+        classification.cc                           \
         datatype.cc                                 \
+        detection.cc                                \
         iframeworkfactory.cc                        \
+        loader.cc                                   \
         runtimeerror.cc                             \
         imageformat.cc
 
@@ -73,14 +76,20 @@ libr2inference_@RR_PACKAGE_VERSION@_la_CFLAGS =     \
 
 libr2inference_@RR_PACKAGE_VERSION@_la_CXXFLAGS =   \
         $(RR_CXXFLAGS)                              \
-        $(CODE_COVERAGE_CXXFLAGS)
+        $(CODE_COVERAGE_CXXFLAGS)                   \
+        $(GLIB_CFLAGS)                              \ 
+        $(GMODULE_CFLAGS)
 
 libr2inference_@RR_PACKAGE_VERSION@_la_LIBADD =     \
         $(RR_LIBS)                                  \
-        $(CODE_COVERAGE_LIBS)
+        $(CODE_COVERAGE_LIBS)                       \
+        $(GLIB_LIBS)                                \ 
+        $(GMODULE_LIBS)
 
 r2iinclude_HEADERS =         \
+        classification.h     \
         datatype.h           \
+        detection.h          \
         frameworkmeta.h      \
         frameworks.h         \
         iengine.h            \
@@ -89,16 +98,20 @@ r2iinclude_HEADERS =         \
         iloader.h            \
         imageformat.h        \
         imodel.h             \
+        inferenceoutput.h    \
         iparameters.h        \
+        ipostprocessing.h    \
         iprediction.h        \
+        ipreprocessing.h     \
+        loader.h             \
         parametermeta.h      \
         r2i.h                \
         runtimeerror.h
 
 
-if HAVE_EDGETPU
+if HAVE_CORAL
 libr2inference_@RR_PACKAGE_VERSION@_la_LIBADD +=    \
-        $(top_builddir)/r2i/edgetpu/libedgetpu.la
+        $(top_builddir)/r2i/coral/libcoral.la
 endif
 
 if HAVE_NCSDK
@@ -135,3 +148,8 @@ if HAVE_TFLITE
 libr2inference_@RR_PACKAGE_VERSION@_la_LIBADD +=    \
         $(top_builddir)/r2i/tflite/libtflite.la
 endif
+
+#Build pre/post processing modules
+SUBDIRS += preprocessing
+
+SUBDIRS += postprocessing

@@ -13,11 +13,14 @@ AM_DEFAULT_SOURCE_EXT = .cc
 if ENABLE_EXAMPLES
 
 noinst_PROGRAMS =                  \
-        inception
+        inception                  \
+        mobilenetssdv2
 
 AM_CXXFLAGS =                      \
         $(RR_CXXFLAGS)             \
         $(CODE_COVERAGE_CXXFLAGS)  \
+        $(GLIB_CFLAGS)             \
+        $(GMODULE_CFLAGS)          \
         -I../common/
 
 AM_CFLAGS =                        \

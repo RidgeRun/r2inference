@@ -25,7 +25,7 @@ void PrintTopPrediction (std::shared_ptr<r2i::IPrediction> prediction) {
   r2i::RuntimeError error;
   int index = 0;
   double max = -1;
-  int num_labels = prediction->GetResultSize();
+  int num_labels = prediction->GetResultSize() / sizeof(float);
 
   for (int i = 0; i < num_labels; ++i) {
     double current = prediction->At(i, error);
@@ -172,7 +172,7 @@ int main (int argc, char *argv[]) {
   std::shared_ptr<r2i::IFrame> frame = factory->MakeFrame (error);
 
   error = frame->Configure (image_data.get(), size, size,
-                            r2i::ImageFormat::Id::RGB);
+                            r2i::ImageFormat::Id::RGB, r2i::DataType::Id::FLOAT);
 
   std::cout << "Starting engine" << std::endl;
   error = engine->Start ();

@@ -148,6 +148,14 @@ std::shared_ptr<r2i::IPrediction> Engine::Predict (std::shared_ptr<r2i::IFrame>
   return prediction;
 }
 
+RuntimeError Engine::Predict (std::shared_ptr<r2i::IFrame> in_frame,
+                              std::vector< std::shared_ptr<r2i::IPrediction> > &predictions) {
+  RuntimeError error;
+  error.Set(RuntimeError::Code::NOT_IMPLEMENTED,
+            "Predict function for multiple outputs not implemented in TensorRT backend.");
+  return error;
+}
+
 r2i::RuntimeError Engine::SetBatchSize (const int batch_size) {
   r2i::RuntimeError error;
   if (this->model == nullptr) {

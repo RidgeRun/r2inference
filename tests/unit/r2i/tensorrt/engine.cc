@@ -97,7 +97,8 @@ TEST_GROUP (TensorRTEngine) {
 
     inc_model = std::make_shared<MockModel> ();
     frame = std::make_shared<r2i::tensorrt::Frame> ();
-    frame->Configure(matrix, INPUTS, 1, r2i::ImageFormat::RGB);
+    frame->Configure(matrix, INPUTS, 1, r2i::ImageFormat::RGB,
+                     r2i::DataType::Id::FLOAT);
 
   }
 };

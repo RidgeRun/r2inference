@@ -11,7 +11,7 @@
 AM_DEFAULT_SOURCE_EXT = .cc
 
 DIST_SUBDIRS =                    \
-        edgetpu                   \
+        coral                     \
         ncsdk                     \
         onnxrt                    \
         onnxrt_acl                \
@@ -22,8 +22,8 @@ SUBDIRS =
 
 if ENABLE_EXAMPLES
 
-if HAVE_EDGETPU
-SUBDIRS += edgetpu
+if HAVE_CORAL
+SUBDIRS += coral
 endif
 
 if HAVE_NCSDK
@@ -50,11 +50,16 @@ if HAVE_TFLITE
 SUBDIRS += tflite
 endif
 
-noinst_PROGRAMS = list_parameters
+noinst_PROGRAMS =                  \
+	classification              \
+	list_parameters
 
 AM_CXXFLAGS =                     \
         $(RR_CXXFLAGS)            \
-        $(CODE_COVERAGE_CXXFLAGS)
+        $(CODE_COVERAGE_CXXFLAGS) \
+        $(GLIB_CFLAGS)            \
+        $(GMODULE_CFLAGS)         \
+        -Icommon/
 
 AM_CFLAGS =                       \
         $(RR_CFLAGS)              \

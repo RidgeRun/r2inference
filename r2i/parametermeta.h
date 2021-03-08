@@ -67,7 +67,12 @@ struct ParameterMeta {
     /**
      * System dependent double
      */
-    DOUBLE
+    DOUBLE,
+
+    /**
+     * Standard vector
+     */
+    VECTOR
   };
 
   /**

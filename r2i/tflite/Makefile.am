@@ -30,18 +30,22 @@ libtflite_la_CPPFLAGS =              \
 
 libtflite_la_CFLAGS =                \
     $(RR_CFLAGS)                     \
-    $(TFLITE_CFLAGS)         \
+    $(TFLITE_CFLAGS)                 \
     $(CODE_COVERAGE_CFLAGS)
 
 libtflite_la_CXXFLAGS =              \
     $(RR_CXXFLAGS)                   \
-    $(TFLITE_CFLAGS)         \
-    $(CODE_COVERAGE_CXXFLAGS)
+    $(TFLITE_CFLAGS)                 \
+    $(CODE_COVERAGE_CXXFLAGS)        \
+    $(GLIB_CFLAGS)                   \ 
+    $(GMODULE_CFLAGS)
 
 libtflite_la_LIBADD =                \
     $(RR_LIBS)                       \
-    $(TFLITE_LIBS)           \
-    $(CODE_COVERAGE_LIBS)
+    $(TFLITE_LIBS)                   \
+    $(CODE_COVERAGE_LIBS)            \
+    $(GLIB_LIBS)                     \ 
+    $(GMODULE_LIBS)
 
 tensorflowliteinclude_HEADERS =      \
     model.h                          \

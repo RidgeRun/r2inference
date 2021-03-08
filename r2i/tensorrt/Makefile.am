@@ -36,13 +36,17 @@ libtensorrt_la_CFLAGS =          \
 libtensorrt_la_CXXFLAGS =        \
     $(RR_CXXFLAGS)               \
     $(TENSORRT_CFLAGS)           \
-    $(CODE_COVERAGE_CXXFLAGS)
+    $(CODE_COVERAGE_CXXFLAGS)    \
+    $(GLIB_CFLAGS)               \ 
+    $(GMODULE_CFLAGS)
 
 libtensorrt_la_LIBADD =          \
     $(RR_LIBS)                   \
     $(TENSORRT_LIBS)             \
     $(CODE_COVERAGE_LIBS)        \
-    $(CUDA_LIBS)
+    $(CUDA_LIBS)                 \
+    $(GLIB_LIBS)                 \ 
+    $(GMODULE_LIBS)
 
 tensorrtinclude_HEADERS =        \
     engine.h                     \

@@ -52,6 +52,10 @@ Parameters::Parameters () :
         r2i::ParameterMeta::Flags::READWRITE | r2i::ParameterMeta::Flags::WRITE_BEFORE_START,
         r2i::ParameterMeta::Type::STRING,
         std::make_shared<OutputLayerAccessor>(this)),
+  PARAM("output-layers", "Names of the output layers in the graph",
+        r2i::ParameterMeta::Flags::READWRITE | r2i::ParameterMeta::Flags::WRITE_BEFORE_START,
+        r2i::ParameterMeta::Type::VECTOR,
+        std::make_shared<OutputLayersAccessor>(this)),
 }) {
 }
 
@@ -197,6 +201,32 @@ RuntimeError Parameters::Get (const std::string &in_parameter,
   return error;
 }
 
+RuntimeError Parameters::Get (const std::string &in_parameter,
+                              std::vector< std::string > &value) {
+  RuntimeError error;
+
+  ParamDesc param = this->Validate (in_parameter,
+                                    r2i::ParameterMeta::Type::VECTOR, "vector", error);
+  if (error.IsError ()) {
+    return error;
+  }
+
+  auto accessor = std::dynamic_pointer_cast<VectorAccessor>(param.accessor);
+  if (nullptr == model) {
+    error.Set (RuntimeError::Code::INCOMPATIBLE_MODEL,
+               "The provided engine is not an tensorflow model");
+    return error;
+  }
+
+  error = accessor->Get ();
+  if (error.IsError ()) {
+    return error;
+  }
+
+  value = accessor->value;
+  return error;
+}
+
 RuntimeError Parameters::Set (const std::string &in_parameter,
                               const std::string &in_value) {
   RuntimeError error;
@@ -251,6 +281,28 @@ RuntimeError Parameters::Set (const std::string &in_parameter, int in_value) {
   }
 
   accessor->value = in_value;
+  return accessor->Set ();
+}
+
+RuntimeError Parameters::Set (const std::string &in_parameter,
+                              std::vector< std::string > value) {
+  RuntimeError error;
+
+  ParamDesc param = this->Validate (in_parameter,
+                                    r2i::ParameterMeta::Type::VECTOR, "vector", error);
+
+  if (error.IsError ()) {
+    return error;
+  }
+
+  auto accessor = std::dynamic_pointer_cast<VectorAccessor>(param.accessor);
+  if (nullptr == model) {
+    error.Set (RuntimeError::Code::INCOMPATIBLE_MODEL,
+               "The provided engine is not an tensorflow model");
+    return error;
+  }
+
+  accessor->value = value;
   return accessor->Set ();
 }
 

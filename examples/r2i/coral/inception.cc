@@ -26,7 +26,7 @@
 
 void PrintTopPrediction (std::shared_ptr<r2i::IPrediction> prediction) {
   r2i::RuntimeError error;
-  int num_labels = prediction->GetResultSize();
+  int num_labels = prediction->GetResultSize() / sizeof(float);
 
   std::vector<double> results;
   results.resize(num_labels);
@@ -146,11 +146,11 @@ int main (int argc, char *argv[]) {
   }
 
   auto factory = r2i::IFrameworkFactory::MakeFactory(
-                   r2i::FrameworkCode::EDGETPU,
+                   r2i::FrameworkCode::CORAL,
                    error);
 
   if (nullptr == factory) {
-    std::cerr << "EdgeTPU backend is not built: " << error << std::endl;
+    std::cerr << "Coral from Google backend is not built: " << error << std::endl;
     exit(EXIT_FAILURE);
   }
 
@@ -173,7 +173,8 @@ int main (int argc, char *argv[]) {
   std::shared_ptr<r2i::IFrame> frame = factory->MakeFrame (error);
 
   error = frame->Configure (image_data.get(), size, size,
-                            r2i::ImageFormat::Id::RGB);
+                            r2i::ImageFormat::Id::RGB,
+                            r2i::DataType::Id::FLOAT);
 
   std::cout << "Starting engine" << std::endl;
   error = engine->Start ();

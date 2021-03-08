@@ -15,7 +15,7 @@
 #include <unordered_map>
 
 #include "config.h"
-#include "edgetpu/frameworkfactory.h"
+#include "coral/frameworkfactory.h"
 #include "ncsdk/frameworkfactory.h"
 #include "onnxrt/frameworkfactory.h"
 #include "onnxrt_acl/frameworkfactory.h"
@@ -26,13 +26,13 @@
 
 namespace r2i {
 
-#ifdef HAVE_EDGETPU
+#ifdef HAVE_CORAL
 static std::unique_ptr<IFrameworkFactory>
-MakeEdgeTPUFactory (RuntimeError &error) {
-  return std::unique_ptr<edgetpu::FrameworkFactory> (new
-         edgetpu::FrameworkFactory);
+MakeCoralFactory (RuntimeError &error) {
+  return std::unique_ptr<coral::FrameworkFactory> (new
+         coral::FrameworkFactory);
 }
-#endif // HAVE_EDGETPU
+#endif // HAVE_CORAL
 
 #ifdef HAVE_NCSDK
 static std::unique_ptr<IFrameworkFactory>
@@ -93,9 +93,9 @@ typedef std::function<std::unique_ptr<IFrameworkFactory>(RuntimeError &)>
 MakeFactory;
 const std::unordered_map<int, MakeFactory> frameworks ({
 
-#ifdef HAVE_EDGETPU
-  {FrameworkCode::EDGETPU, MakeEdgeTPUFactory},
-#endif //HAVE_EDGETPU
+#ifdef HAVE_CORAL
+  {FrameworkCode::CORAL, MakeCoralFactory},
+#endif //HAVE_CORAL
 
 #ifdef HAVE_NCSDK
   {FrameworkCode::NCSDK, MakeNcsdkFactory},

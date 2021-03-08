@@ -20,9 +20,14 @@
 #include <r2i/imageformat.h>
 #include <r2i/imodel.h>
 #include <r2i/iparameters.h>
+#include <r2i/ipostprocessing.h>
 #include <r2i/iprediction.h>
+#include <r2i/ipreprocessing.h>
+#include <r2i/loader.h>
 #include <r2i/parametermeta.h>
 #include <r2i/r2i.h>
 #include <r2i/runtimeerror.h>
+#include <r2i/classification.h>
+#include <r2i/inferenceoutput.h>
 
 #endif //R2I_R2I_H

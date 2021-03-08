@@ -20,33 +20,8 @@ Prediction::Prediction () :
   tensor(nullptr), result_size(0) {
 }
 
-int64_t Prediction::GetRequiredBufferSize (TF_Output output, int64_t *dims,
-    int64_t num_dims) {
-  int64_t size = 1;
-
-  /* For each dimension, multiply the amount of entries */
-  for (int dim = 0; dim < num_dims; ++dim) {
-    size *= dims[dim];
-  }
-
-  return size;
-}
-
-RuntimeError Prediction::SetTensor (std::shared_ptr<TF_Graph> pgraph,
-                                    TF_Operation *operation, std::shared_ptr<TF_Tensor> tensor) {
+RuntimeError Prediction::SetTensor (std::shared_ptr<TF_Tensor> tensor) {
   RuntimeError error;
-
-  if (nullptr == pgraph) {
-    error.Set (RuntimeError::Code::NULL_PARAMETER,
-               "Invalid graph passed to prediction");
-    return error;
-  }
-
-  if (nullptr == operation) {
-    error.Set (RuntimeError::Code::NULL_PARAMETER,
-               "Invalid operation passed to prediction");
-    return error;
-  }
 
   if (nullptr == tensor) {
     error.Set (RuntimeError::Code::NULL_PARAMETER,
@@ -54,41 +29,8 @@ RuntimeError Prediction::SetTensor (std::shared_ptr<TF_Graph> pgraph,
     return error;
   }
 
-  std::shared_ptr<TF_Status> pstatus (TF_NewStatus(), TF_DeleteStatus);
-  TF_Status *status = pstatus.get ();
-  TF_Graph *graph = pgraph.get ();
-  TF_Output output = { .oper = operation, .index = 0 };
-
-  int num_dims = TF_GraphGetTensorNumDims(graph, output, status);
-  if (TF_GetCode(status) != TF_OK) {
-    error.Set (RuntimeError::Code::FRAMEWORK_ERROR, TF_Message (status));
-    return error;
-  }
-
-  int64_t dims[num_dims];
-  TF_GraphGetTensorShape(graph, output, dims, num_dims, status);
-  if (TF_GetCode(status) != TF_OK) {
-    error.Set (RuntimeError::Code::FRAMEWORK_ERROR, TF_Message (status));
-    return error;
-  }
-
-  /* R2Inference uses a batch size of 1 but some tensors have this value set to
-   * generic (-1) or greater than 1.
-   * Batch size set to 1 for general compatibility support. */
-  dims[0] = 1;
-
-  TF_DataType type = TF_OperationOutputType(output);
-  size_t type_size = TF_DataTypeSize(type);
-  size_t data_size = this->GetRequiredBufferSize (output, dims, num_dims);
-
-  if (TF_FLOAT != type) {
-    error.Set (RuntimeError::Code::INCOMPATIBLE_MODEL,
-               "The output of this model is not floating point");
-    return error;
-  }
-
   this->tensor = tensor;
-  this->result_size = data_size * type_size;
+  this->result_size = TF_TensorByteSize (tensor.get());
 
   return error;
 }

@@ -9,6 +9,7 @@
  * back to RidgeRun without any encumbrance.
 */
 
+#include <r2i/classification.h>
 #include <r2i/r2i.h>
 
 #include <getopt.h>
@@ -22,78 +23,92 @@
 #define STB_IMAGE_RESIZE_IMPLEMENTATION
 #include "stb_image_resize.h"
 
-void PrintTopPrediction (std::shared_ptr<r2i::IPrediction> prediction) {
-  r2i::RuntimeError error;
-  int index = 0;
-  double max = -1;
-  int num_labels = prediction->GetResultSize();
-
-  for (int i = 0; i < num_labels; ++i) {
-    double current = prediction->At(i, error);
-    if (current > max) {
-      max = current;
-      index = i;
-    }
-  }
-
-  std::cout << "Highest probability is label "
-            << index << " (" << max << ")" << std::endl;
-}
-
 void PrintUsage() {
   std::cerr << "Required arguments: "
             << "-i [JPG input_image] "
             << "-m [Inception ONNX Model] "
             << "-s [Model Input Size] "
-            << "-I [Input Node] "
-            << "-O [Output Node] \n"
+            << "-I [Preprocess Module] "
+            << "-O [Postprocess Module] \n"
             << " Example: "
             << " ./inception -i cat.jpg -m graph_inceptionv2.onnx "
             << "-s 224"
             << std::endl;
 }
 
-std::unique_ptr<float[]> PreProcessImage (const unsigned char *input,
-    int width, int height, int reqwidth, int reqheight) {
-
-  const int channels = 3;
-  const int scaled_size = channels * reqwidth * reqheight;
-  std::unique_ptr<unsigned char[]> scaled (new unsigned char[scaled_size]);
-  std::unique_ptr<float[]> adjusted (new float[scaled_size]);
-
-  stbir_resize_uint8(input, width, height, 0, scaled.get(), reqwidth,
-                     reqheight, 0, channels);
-
-  for (int i = 0; i < scaled_size; i += channels) {
-    /* RGB = (RGB - Mean)*StdDev */
-    adjusted[i + 0] = (static_cast<float>(scaled[i + 0]) - 128) / 128.0;
-    adjusted[i + 1] = (static_cast<float>(scaled[i + 1]) - 128) / 128.0;
-    adjusted[i + 2] = (static_cast<float>(scaled[i + 2]) - 128) / 128.0;
-  }
-
-  return adjusted;
-}
-
-std::unique_ptr<float[]> LoadImage(const std::string &path, int reqwidth,
-                                   int reqheight) {
+r2i::RuntimeError LoadImage(const std::string &path, int req_width,
+                            int req_height,
+                            std::shared_ptr<r2i::IPreprocessing> preprocessing,
+                            std::shared_ptr<r2i::IFrame> in_frame,
+                            std::shared_ptr<r2i::IFrame> out_frame) {
   int channels = 3;
-  int width, height, cp;
+  int width = 0;
+  int height = 0;
+  int channels_in_file = 0;
+  int required_width = 0;
+  int required_height = 0;
+  int required_channels = 0;
+  unsigned char *scaled = nullptr;
+  r2i::ImageFormat output_image_format;
+  r2i::ImageFormat::Id input_image_format_id;
+  r2i::DataType::Id input_image_datatype_id;
+  r2i::RuntimeError error;
+  std::shared_ptr<unsigned char> scaled_ptr;
 
-  unsigned char *img = stbi_load(path.c_str(), &width, &height, &cp, channels);
-  if (!img) {
-    std::cerr << "The picture " << path << " could not be loaded";
-    return nullptr;
+  if (!in_frame) {
+    error.Set (r2i::RuntimeError::Code::NULL_PARAMETER,
+               "Null IFrame object");
+    return error;
   }
 
-  auto ret = PreProcessImage(img, width, height, reqwidth, reqheight);
+  if (!preprocessing) {
+    error.Set (r2i::RuntimeError::Code::NULL_PARAMETER,
+               "Null Preprocessing object");
+    return error;
+  }
+
+  unsigned char *img = stbi_load(path.c_str(), &width, &height, &channels_in_file,
+                                 channels);
+  if (!img) {
+    error.Set (r2i::RuntimeError::Code::NULL_PARAMETER,
+               "Error while loading the image file");
+    std::cerr << "The picture " << path << " could not be loaded";
+    return error;
+  }
+
+  input_image_datatype_id = r2i::DataType::Id::UINT8;
+
+  if (channels_in_file == 3) {
+    input_image_format_id = r2i::ImageFormat::Id::RGB;
+  } else {
+    input_image_format_id = r2i::ImageFormat::Id::UNKNOWN_FORMAT;
+  }
+
+  required_width = out_frame->GetWidth();
+  required_height = out_frame->GetHeight();
+  required_channels = out_frame->GetFormat().GetNumPlanes();
+
+  scaled_ptr = std::shared_ptr<unsigned char>(new unsigned char[required_width
+               * required_height * required_channels],
+               std::default_delete<const unsigned char[]>());
+  scaled = scaled_ptr.get();
+
+  stbir_resize_uint8(img, width, height, 0, scaled, required_width,
+                     required_height, 0, required_channels);
+
+  error = in_frame->Configure (scaled, required_width, required_height,
+                               input_image_format_id, input_image_datatype_id);
+
+  error = preprocessing->Apply(in_frame, out_frame);
+
   free (img);
 
-  return ret;
+  return error;
 }
 
 bool ParseArgs (int &argc, char *argv[], std::string &image_path,
                 std::string &model_path, int &index, int &size,
-                std::string &in_node, std::string &out_node) {
+                std::string &preprocess_module, std::string &postprocess_module) {
   int option = 0;
   while ((option = getopt(argc, argv, "i:m:p:s:I:O:")) != -1) {
     switch (option) {
@@ -110,10 +125,10 @@ bool ParseArgs (int &argc, char *argv[], std::string &image_path,
         size = std::stoi (optarg);
         break;
       case 'I' :
-        in_node = optarg;
+        preprocess_module = optarg;
         break;
       case 'O' :
-        out_node = optarg;
+        postprocess_module = optarg;
         break;
       default:
         return false;
@@ -123,16 +138,20 @@ bool ParseArgs (int &argc, char *argv[], std::string &image_path,
 }
 
 int main (int argc, char *argv[]) {
+  double max = 0;
+  int Index = 0;
+  int size = 0;
+  int max_index = 0;
   r2i::RuntimeError error;
   std::string model_path;
   std::string image_path;
-  std::string in_node;
-  std::string out_node;
-  int Index = 0;
-  int size = 0;
+  std::string preprocess_module;
+  std::string postprocess_module;
+  std::vector<std::shared_ptr<r2i::InferenceOutput>> outputs;
+  std::vector<std::shared_ptr<r2i::IPrediction>> predictions;
 
   if (false == ParseArgs (argc, argv, image_path, model_path, Index,
-                          size, in_node, out_node)) {
+                          size, preprocess_module, postprocess_module)) {
     PrintUsage ();
     exit (EXIT_FAILURE);
   }
@@ -159,6 +178,20 @@ int main (int argc, char *argv[]) {
     exit(EXIT_FAILURE);
   }
 
+  std::shared_ptr<r2i::IPreprocessing> preprocessing = loader->LoadPreprocessing(
+        preprocess_module, error);
+  if (error.IsError ()) {
+    std::cerr << "Loader error: " << error << std::endl;
+    exit(EXIT_FAILURE);
+  }
+
+  std::shared_ptr<r2i::IPostprocessing> postprocessing =
+    loader->LoadPostprocessing(postprocess_module, error);
+  if (error.IsError ()) {
+    std::cerr << "Loader error: " << error << std::endl;
+    exit(EXIT_FAILURE);
+  }
+
   std::cout << "Setting model to engine" << std::endl;
   std::shared_ptr<r2i::IEngine> engine = factory->MakeEngine (error);
   error = engine->SetModel (model);
@@ -179,14 +212,20 @@ int main (int argc, char *argv[]) {
   }
 
   std::cout << "Loading image: " << image_path << std::endl;
-  std::unique_ptr<float[]> image_data = LoadImage (image_path, size,
-                                        size);
-
-  std::cout << "Configuring frame" << std::endl;
-  std::shared_ptr<r2i::IFrame> frame = factory->MakeFrame (error);
-
-  error = frame->Configure (image_data.get(), size, size,
-                            r2i::ImageFormat::Id::RGB);
+  std::shared_ptr<r2i::IFrame> in_frame = factory->MakeFrame (error);
+  std::shared_ptr<r2i::IFrame> out_frame = factory->MakeFrame (error);
+  std::shared_ptr<float> out_data = std::shared_ptr<float>
+                                    (new float[size * size * 3],
+                                     std::default_delete<float[]>());
+  error = out_frame->Configure (out_data.get(), size,
+                                size,
+                                r2i::ImageFormat::Id::RGB, r2i::DataType::Id::FLOAT);
+  error = LoadImage (image_path, size, size, preprocessing, in_frame,
+                     out_frame);
+  if (error.IsError ()) {
+    std::cerr << error.GetDescription() << std::endl;
+    exit(EXIT_FAILURE);
+  }
 
   std::cout << "Starting engine" << std::endl;
   error = engine->Start ();
@@ -196,13 +235,37 @@ int main (int argc, char *argv[]) {
   }
 
   std::cout << "Predicting..." << std::endl;
-  auto prediction = engine->Predict (frame, error);
+  /* Inception models just give one output */
+  auto prediction = engine->Predict (out_frame, error);
+  predictions.push_back(prediction);
   if (error.IsError ()) {
     std::cerr << "Engine prediction error: " << error << std::endl;
     exit(EXIT_FAILURE);
   }
 
-  PrintTopPrediction (prediction);
+  std::cout << "Postprocessing..." << std::endl;
+  /* Sort and print top prediction */
+  error = postprocessing->Apply(predictions, outputs);
+  if (error.IsError ()) {
+    std::cerr << "Postprocessing error: " << error << std::endl;
+    exit(EXIT_FAILURE);
+  }
+  /* Top score is at the beginning */
+  auto output =
+    std::dynamic_pointer_cast<r2i::Classification, r2i::InferenceOutput>
+    (outputs.at(0));
+  if (!output) {
+    error.Set (r2i::RuntimeError::Code::FRAMEWORK_ERROR,
+               "The provided output is not a Classification type");
+    std::cerr << "Postprocessing error: " << error << std::endl;
+    exit(EXIT_FAILURE);
+  }
+
+  std::tuple<int, double> label = output->GetLabels().at(0);
+  max_index = std::get<0>(label);
+  max = std::get<1>(label);
+  std::cout << "Highest probability is label "
+            << max_index << " (" << max << ")" << std::endl;
 
   std::cout << "Stopping engine" << std::endl;
   error = engine->Stop ();

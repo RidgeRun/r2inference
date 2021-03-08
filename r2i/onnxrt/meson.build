@@ -6,6 +6,7 @@ onnxrt_sources = [
   'loader.cc',
   'model.cc',
   'parameters.cc',
+  'parameteraccessors.cc',
   'prediction.cc',
 ]
 
@@ -16,6 +17,7 @@ onnxrt_headers = [
   'loader.h',
   'model.h',
   'parameters.h',
+  'parameteraccessors.h',
   'prediction.h',
 ]
 

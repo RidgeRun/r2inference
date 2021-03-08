@@ -11,6 +11,7 @@
 
 #include "frameworkfactory.h"
 #include "engine.h"
+#include "parameters.h"
 
 namespace r2i {
 namespace onnxrt_openvino {
@@ -20,6 +21,13 @@ std::unique_ptr<r2i::IEngine> FrameworkFactory::MakeEngine (
   error.Clean ();
 
   return std::unique_ptr<IEngine> (new Engine);
+}
+
+std::unique_ptr<r2i::IParameters> FrameworkFactory::MakeParameters (
+  RuntimeError &error) {
+  error.Clean ();
+
+  return std::unique_ptr<IParameters> (new Parameters);
 }
 
 r2i::FrameworkMeta FrameworkFactory::GetDescription (

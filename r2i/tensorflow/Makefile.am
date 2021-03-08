@@ -36,12 +36,16 @@ libtf_la_CFLAGS =                \
 libtf_la_CXXFLAGS =              \
     $(RR_CXXFLAGS)               \
     $(TENSORFLOW_CFLAGS)         \
-    $(CODE_COVERAGE_CXXFLAGS)
+    $(CODE_COVERAGE_CXXFLAGS)    \
+    $(GLIB_CFLAGS)               \ 
+    $(GMODULE_CFLAGS)
 
 libtf_la_LIBADD =                \
     $(RR_LIBS)                   \
     $(TENSORFLOW_LIBS)           \
-    $(CODE_COVERAGE_LIBS)
+    $(CODE_COVERAGE_LIBS)        \
+    $(GLIB_LIBS)                 \ 
+    $(GMODULE_LIBS)
 
 tensorflowinclude_HEADERS =      \
     engine.h                     \

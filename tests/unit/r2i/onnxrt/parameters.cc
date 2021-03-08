@@ -39,6 +39,8 @@ class Engine : public r2i::IEngine {
   };
   virtual std::shared_ptr<r2i::IPrediction> Predict (std::shared_ptr<r2i::IFrame>
       in_frame, r2i::RuntimeError &error) { return nullptr; }
+  virtual r2i::RuntimeError Predict (std::shared_ptr<r2i::IFrame> in_frame,
+                                     std::vector< std::shared_ptr<r2i::IPrediction> > &predictions) { return r2i::RuntimeError(); }
 };
 }
 
@@ -51,7 +53,6 @@ RuntimeError Engine::Start () {
   this->state = State::STARTED;
   return error;
 }
-
 }
 }
 
@@ -280,7 +281,7 @@ TEST (OnnxrtParameters, SetAndGetIntraNumThreads) {
   LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());
 
   /* Value different from the default */
-  in_value = 0;
+  in_value = 1;
   error = parameters.Set("intra-num-threads", in_value);
 
   LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode ());

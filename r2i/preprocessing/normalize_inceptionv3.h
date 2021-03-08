@@ -9,22 +9,21 @@
  * back to RidgeRun without any encumbrance.
 */
 
-#ifndef R2I_EDGETPU_FRAMEWORK_FACTORY_H
-#define R2I_EDGETPU_FRAMEWORK_FACTORY_H
+#ifndef R2I_NORMALIZE_INCEPTIONV3_PREPROCESSING_H
+#define R2I_NORMALIZE_INCEPTIONV3_PREPROCESSING_H
 
-#include <r2i/tflite/frameworkfactory.h>
+#include <r2i/preprocessing/normalize.h>
 
 namespace r2i {
-namespace edgetpu {
 
-class FrameworkFactory : public r2i::tflite::FrameworkFactory {
+class NormalizeInceptionV3: public r2i::Normalize {
  public:
-  std::unique_ptr<r2i::IEngine> MakeEngine (RuntimeError &error) override;
-
-  r2i::FrameworkMeta GetDescription (RuntimeError &error) override;
+  NormalizeInceptionV3 ();
+ private:
+  r2i::RuntimeError SetNormalizationParameters (unsigned char *
+      frame_data, int width, int height, int channels) override;
 };
 
-} // namespace edgetpu
-} // namespace r2k
+}  // namespace r2i
 
-#endif //R2I_EDGETPU_FRAMEWORK_FACTORY_H
+#endif  // R2I_NORMALIZE_INCEPTIONV3_PREPROCESSING_H

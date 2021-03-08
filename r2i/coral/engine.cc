@@ -9,14 +9,14 @@
  * back to RidgeRun without any encumbrance.
  */
 
-#include "r2i/edgetpu/engine.h"
+#include "r2i/coral/engine.h"
 
 namespace r2i {
-namespace edgetpu {
+namespace coral {
 
 Engine::Engine () : tflite::Engine() {
   this->number_of_threads = 1;
-  this->edgetpu_context = nullptr;
+  this->coral_context = nullptr;
 }
 
 void Engine::SetupResolver(::tflite::ops::builtin::BuiltinOpResolver
@@ -25,17 +25,17 @@ void Engine::SetupResolver(::tflite::ops::builtin::BuiltinOpResolver
 }
 
 void Engine::SetInterpreterContext(::tflite::Interpreter *interpreter) {
-  this->edgetpu_context = ::edgetpu::EdgeTpuManager::GetSingleton()->OpenDevice();
+  this->coral_context = ::edgetpu::EdgeTpuManager::GetSingleton()->OpenDevice();
 
   interpreter->SetExternalContext(kTfLiteEdgeTpuContext,
-                                  this->edgetpu_context.get());
+                                  this->coral_context.get());
 }
 
 Engine::~Engine() {
   this->Stop();
   this->interpreter.reset();
-  this->edgetpu_context.reset();
+  this->coral_context.reset();
 }
 
-} //namespace edgetpu
+} //namespace coral
 } //namespace r2i

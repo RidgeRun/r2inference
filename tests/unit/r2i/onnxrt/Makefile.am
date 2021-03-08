@@ -19,6 +19,7 @@ TESTS =                   \
         frameworkfactory  \
         loader            \
         model             \
+        parameters        \
         prediction
 
 check_PROGRAMS=$(TESTS)
@@ -38,7 +39,9 @@ AM_CXXFLAGS =                       \
         $(RR_CXXFLAGS)              \
         $(TESTS_CFLAGS)             \
         $(ONNXRT_CFLAGS)            \
-        $(CODE_COVERAGE_CXXFLAGS)
+        $(CODE_COVERAGE_CXXFLAGS)   \
+        $(GLIB_CFLAGS)              \
+        $(GMODULE_CFLAGS)
 
 AM_CFLAGS =                         \
         $(RR_CFLAGS)                \
