@@ -250,7 +250,7 @@ int main (int argc, char *argv[]) {
   std::shared_ptr<r2i::IFrame> in_frame = factory->MakeFrame (error);
 
   error = in_frame->Configure (image_data.get(), pre_width, pre_height,
-                               pre_format_id);
+                               pre_format_id, r2i::DataType::Id::FLOAT);
   if (error.IsError ()) {
     std::cerr << "Output frame configuration error: " << error << std::endl;
     exit(EXIT_FAILURE);
@@ -263,7 +263,7 @@ int main (int argc, char *argv[]) {
                                      std::default_delete<float[]>());
 
   error = out_frame->Configure (out_data.get(), pre_width, pre_height,
-                                pre_format_id);
+                                pre_format_id, r2i::DataType::Id::FLOAT);
   if (error.IsError ()) {
     std::cerr << "Input frame configuration error: " << error << std::endl;
     exit(EXIT_FAILURE);

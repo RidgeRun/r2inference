@@ -35,10 +35,12 @@ TEST_GROUP (TfLiteFrame) {
   int height = FRAME_HEIGHT;
   float data[4] = {0.1, 0.2, 0.3, 0.4};
   r2i::ImageFormat format;
+  r2i::DataType datatype;
 
   void setup () {
     frame = r2i::tflite::Frame();
     format = r2i::ImageFormat(r2i::ImageFormat::Id::RGB);
+    datatype = r2i::DataType(r2i::DataType::Id::FLOAT);
   }
 
   void teardown () {
@@ -48,7 +50,7 @@ TEST_GROUP (TfLiteFrame) {
 TEST (TfLiteFrame, FrameConfigure) {
   r2i::RuntimeError error;
 
-  error = frame.Configure(data, width, height, format.GetId());
+  error = frame.Configure(data, width, height, format.GetId(), datatype.GetId());
 
   LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode());
 }
@@ -56,7 +58,8 @@ TEST (TfLiteFrame, FrameConfigure) {
 TEST (TfLiteFrame, FrameConfigureNullData) {
   r2i::RuntimeError error;
 
-  error = frame.Configure(nullptr, width, height, format.GetId());
+  error = frame.Configure(nullptr, width, height, format.GetId(),
+                          datatype.GetId());
 
   LONGS_EQUAL (r2i::RuntimeError::Code::NULL_PARAMETER, error.GetCode());
 }
@@ -64,7 +67,7 @@ TEST (TfLiteFrame, FrameConfigureNullData) {
 TEST (TfLiteFrame, FrameConfigureNegativeWidth) {
   r2i::RuntimeError error;
 
-  error = frame.Configure(data, -1, height, format.GetId());
+  error = frame.Configure(data, -1, height, format.GetId(), datatype.GetId());
 
   LONGS_EQUAL (r2i::RuntimeError::Code::WRONG_API_USAGE, error.GetCode());
 }
@@ -72,7 +75,7 @@ TEST (TfLiteFrame, FrameConfigureNegativeWidth) {
 TEST (TfLiteFrame, FrameConfigureNegativeHeight) {
   r2i::RuntimeError error;
 
-  error = frame.Configure(data, width, -1, format.GetId());
+  error = frame.Configure(data, width, -1, format.GetId(), datatype.GetId());
 
   LONGS_EQUAL (r2i::RuntimeError::Code::WRONG_API_USAGE, error.GetCode());
 }
@@ -81,7 +84,7 @@ TEST (TfLiteFrame, FrameGetData) {
   r2i::RuntimeError error;
   void *local_data;
 
-  error = frame.Configure(data, width, height, format.GetId());
+  error = frame.Configure(data, width, height, format.GetId(), datatype.GetId());
   LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode());
 
   local_data = frame.GetData();
@@ -92,7 +95,7 @@ TEST (TfLiteFrame, FrameGetWidth) {
   r2i::RuntimeError error;
   int local_width;
 
-  error = frame.Configure(data, width, height, format.GetId());
+  error = frame.Configure(data, width, height, format.GetId(), datatype.GetId());
   LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode());
 
   local_width = frame.GetWidth();
@@ -103,7 +106,7 @@ TEST (TfLiteFrame, FrameGetHeight) {
   r2i::RuntimeError error;
   int local_height;
 
-  error = frame.Configure(data, width, height, format.GetId());
+  error = frame.Configure(data, width, height, format.GetId(), datatype.GetId());
   LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode());
 
   local_height = frame.GetHeight();
@@ -114,7 +117,7 @@ TEST (TfLiteFrame, FrameGetFormat) {
   r2i::RuntimeError error;
   r2i::ImageFormat local_format;
 
-  error = frame.Configure(data, width, height, format.GetId());
+  error = frame.Configure(data, width, height, format.GetId(), datatype.GetId());
   LONGS_EQUAL (r2i::RuntimeError::Code::EOK, error.GetCode());
 
   local_format = frame.GetFormat();

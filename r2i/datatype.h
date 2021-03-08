@@ -35,6 +35,10 @@ class DataType {
      */
     INT32,
 
+    /**
+     * Unsigned integer 32 bits per pixel
+     */
+    UINT32,
 
     /**
      * Float 32 bits per pixel
@@ -58,6 +62,11 @@ class DataType {
      * Integer 8 bits per pixel
      */
     INT8,
+
+    /**
+     * Unsigned integer 8 bits per pixel
+     */
+    UINT8,
 
     UNKNOWN_DATATYPE,
   };

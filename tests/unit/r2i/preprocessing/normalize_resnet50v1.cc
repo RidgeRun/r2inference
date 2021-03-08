@@ -36,10 +36,12 @@ class Frame : public r2i::IFrame {
  public:
   Frame () {}
   r2i::RuntimeError Configure (void *in_data, int width,
-                               int height, r2i::ImageFormat::Id format) {
+                               int height, r2i::ImageFormat::Id format,
+                               r2i::DataType::Id datatype_id) {
 
     r2i::RuntimeError error;
     r2i::ImageFormat imageformat (format);
+    r2i::DataType datatype (datatype_id);
 
     if (nullptr == in_data) {
       error.Set (r2i::RuntimeError::Code::NULL_PARAMETER,
@@ -61,6 +63,7 @@ class Frame : public r2i::IFrame {
     this->frame_width = width;
     this->frame_height = height;
     this->frame_format = imageformat;
+    this->datatype = datatype;
 
     return error;
   }
@@ -82,7 +85,7 @@ class Frame : public r2i::IFrame {
   }
 
   r2i::DataType GetDataType () {
-    return r2i::DataType::Id::FLOAT;
+    return this->datatype;
   }
 
  private:
@@ -90,6 +93,7 @@ class Frame : public r2i::IFrame {
   int frame_width;
   int frame_height;
   r2i::ImageFormat frame_format;
+  r2i::DataType datatype;
 };
 }
 
@@ -129,7 +133,7 @@ TEST_GROUP(NormalizeResnet50V1) {
     }
 
     error = in_frame->Configure(in_data, FRAME_WIDTH, FRAME_HEIGHT,
-                                r2i::ImageFormat::Id::RGB);
+                                r2i::ImageFormat::Id::RGB, r2i::DataType::Id::FLOAT);
 
     std::shared_ptr<float> out_data_resnet50v1 = std::shared_ptr<float>
         (new float[FRAME_WIDTH * FRAME_HEIGHT * CHANNELS],
@@ -137,7 +141,7 @@ TEST_GROUP(NormalizeResnet50V1) {
 
     error = out_frame_resnet50v1->Configure (out_data_resnet50v1.get(), FRAME_WIDTH,
             FRAME_HEIGHT,
-            r2i::ImageFormat::Id::RGB);
+            r2i::ImageFormat::Id::RGB, r2i::DataType::Id::FLOAT);
 
   }
 };

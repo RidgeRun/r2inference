@@ -353,7 +353,8 @@ int main (int argc, char *argv[]) {
   std::cout << "Configuring frame" << std::endl;
   std::shared_ptr<r2i::IFrame> frame = factory->MakeFrame (error);
   error = frame->Configure (image_data.get(), DIM, DIM,
-                            r2i::ImageFormat::Id::RGB);
+                            r2i::ImageFormat::Id::RGB,
+                            r2i::DataType::Id::FLOAT);
 
   std::cout << "Starting engine" << std::endl;
   error = engine->Start ();
