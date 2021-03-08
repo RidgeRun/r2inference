@@ -1,6 +1,7 @@
 # Compile examples
 app_examples = [
   'inception',
+  'mobilenetssdv2'
 ]
 
 foreach app : app_examples
