@@ -47,7 +47,9 @@ class Engine : public r2i::IEngine {
 namespace r2i {
 namespace onnxrt {
 
-Engine::Engine ()  {}
+Engine::Engine ()  {
+  this->state = State::STOPPED;
+}
 RuntimeError Engine::Start () {
   RuntimeError error;
   this->state = State::STARTED;
