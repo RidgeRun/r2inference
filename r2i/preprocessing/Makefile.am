@@ -24,21 +24,33 @@ libnormalize_la_SOURCES =                     \
 
 libnormalize_inceptionv1_la_SOURCES =         \
     normalize_inceptionv1.cc
+libnormalize_inceptionv1_la_LIBADD =          \
+    $(noinst_LTLIBRARIES)
 
 libnormalize_inceptionv3_la_SOURCES =         \
     normalize_inceptionv3.cc
+libnormalize_inceptionv3_la_LIBADD =          \
+    $(noinst_LTLIBRARIES)
 
 libnormalize_resnet50v1_la_SOURCES =          \
     normalize_resnet50v1.cc
+libnormalize_resnet50v1_la_LIBADD =           \
+    $(noinst_LTLIBRARIES)
 
 libnormalize_tinyyolov2_la_SOURCES =          \
     normalize_tinyyolov2.cc
+libnormalize_tinyyolov2_la_LIBADD =           \
+    $(noinst_LTLIBRARIES)
 
 libnormalize_tinyyolov3_la_SOURCES =          \
     normalize_tinyyolov3.cc
+libnormalize_tinyyolov3_la_LIBADD =           \
+    $(noinst_LTLIBRARIES)
 
 libnormalize_facenetv1_la_SOURCES =           \
     normalize_facenetv1.cc
+libnormalize_facenetv1_la_LIBADD =            \
+    $(noinst_LTLIBRARIES)
 
 AM_CPPFLAGS =                                 \
     $(RR_CPPFLAGS)                            \
@@ -58,9 +70,7 @@ AM_CXXFLAGS =                                 \
 AM_LIBADD =                                   \
     $(RR_LIBS)                                \
     $(CODE_COVERAGE_LIBS)                     \
-    $(GLIB_LIBS)                              \
-    $(GMODULE_LIBS)                           \
-    $(top_builddir)/r2i/preprocessing/libnormalize.la
+    $(GMODULE_LIBS)
 
 #Indicate libtool this is a module (dlopened library)
 AM_CPPFLAGS_LDFLAGS =                         \

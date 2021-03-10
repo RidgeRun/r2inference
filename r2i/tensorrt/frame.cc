@@ -20,7 +20,7 @@ namespace tensorrt {
 Frame::Frame () :
   frame_data(nullptr), frame_width(0), frame_height(0),
   frame_format(ImageFormat::Id::UNKNOWN_FORMAT),
-  datatype(DataType::Id::UNKNOWN_DATATYPE) {
+  data_type(DataType::Id::UNKNOWN_DATATYPE) {
 }
 
 RuntimeError Frame::Configure (void *in_data, int width,
