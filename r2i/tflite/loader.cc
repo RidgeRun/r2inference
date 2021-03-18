@@ -39,11 +39,10 @@ std::shared_ptr<r2i::IModel> Loader::Load (const std::string &in_path,
   graphdef_file.close ();
 
   std::unique_ptr<::tflite::FlatBufferModel> tflite_model;
-  ::tflite::ErrorReporter *error_reporter = ::tflite::DefaultErrorReporter();
+  std::unique_ptr<::tflite::ErrorReporter> error_reporter (
+    new ::tflite::StderrReporter);
   tflite_model = ::tflite::FlatBufferModel::BuildFromFile(in_path.c_str(),
-                 error_reporter);
-
-  delete error_reporter;
+                 error_reporter.get());
 
   if (nullptr == tflite_model) {
     error.Set (RuntimeError::Code::INCOMPATIBLE_MODEL,
