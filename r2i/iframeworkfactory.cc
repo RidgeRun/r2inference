@@ -16,7 +16,6 @@
 
 #include "config.h"
 #include "coral/frameworkfactory.h"
-#include "ncsdk/frameworkfactory.h"
 #include "onnxrt/frameworkfactory.h"
 #include "onnxrt_acl/frameworkfactory.h"
 #include "onnxrt_openvino/frameworkfactory.h"
@@ -33,13 +32,6 @@ MakeCoralFactory (RuntimeError &error) {
          coral::FrameworkFactory);
 }
 #endif // HAVE_CORAL
-
-#ifdef HAVE_NCSDK
-static std::unique_ptr<IFrameworkFactory>
-MakeNcsdkFactory (RuntimeError &error) {
-  return std::unique_ptr<ncsdk::FrameworkFactory> (new ncsdk::FrameworkFactory);
-}
-#endif // HAVE_NCSDK
 
 #ifdef HAVE_ONNXRT
 static std::unique_ptr<IFrameworkFactory>
@@ -96,10 +88,6 @@ const std::unordered_map<int, MakeFactory> frameworks ({
 #ifdef HAVE_CORAL
   {FrameworkCode::CORAL, MakeCoralFactory},
 #endif //HAVE_CORAL
-
-#ifdef HAVE_NCSDK
-  {FrameworkCode::NCSDK, MakeNcsdkFactory},
-#endif //HAVE_NCSDK
 
 #ifdef HAVE_ONNXRT
   {FrameworkCode::ONNXRT, MakeOnnxrtFactory},
