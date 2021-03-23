@@ -182,13 +182,15 @@ int main (int argc, char *argv[]) {
   }
 
   std::cout << "Predicting..." << std::endl;
-  auto prediction = engine->Predict (frame, error);
+  std::vector<std::shared_ptr<r2i::IPrediction>> predictions;
+  error = engine->Predict (frame, predictions);
   if (error.IsError ()) {
     std::cerr << "Engine prediction error: " << error << std::endl;
     exit(EXIT_FAILURE);
   }
 
-  PrintTopPrediction (prediction);
+  /* This model only has one output */
+  PrintTopPrediction (predictions[0]);
 
   std::cout << "Stopping engine" << std::endl;
   error = engine->Stop ();
