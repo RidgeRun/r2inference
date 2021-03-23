@@ -76,6 +76,7 @@ if get_option('enable-tensorrt')
   # CUDA versions supported
   cuda_versions = [
     '10.0',
+    '10.2'
   ]
 
   # Find CUDA version
