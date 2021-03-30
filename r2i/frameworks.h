@@ -28,11 +28,6 @@ enum FrameworkCode {
   CORAL,
 
   /**
-   * Intel Movidius Neural Compute software developer kit
-   */
-  NCSDK,
-
-  /**
    * Open Neural Network Exchange Runtime
    */
   ONNXRT,

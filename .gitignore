@@ -46,7 +46,5 @@ cscope.out
 # Examples
 examples/external/list-backends
 examples/r2i/list_parameters
-examples/r2i/ncsdk/inception
-examples/r2i/ncsdk/tinyyolov2
 examples/r2i/tensorflow/inception
 examples/r2i/tensorrt/yolov2
