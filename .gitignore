@@ -4,35 +4,7 @@
 \#*
 *.orig
 
-# Autotools cruft
-aclocal.m4
-autom4te.cache/
-compile
-config.guess
-config.h
-config.h.in
-config.status
-config.sub
-configure
-install-sh
-missing
-Makefile
-Makefile.in
-depcomp
-libtool
-ltmain.sh
-m4/
-.deps/
-.libs/
-stamp-h*
-r2inference-*.pc
-*.dirstamp
-
 # Build outputs
-.deps/
-.libs/
-*.la
-*.lo
 *.o
 
 # Git conflict files
@@ -40,9 +12,6 @@ r2inference-*.pc
 
 # Doxygen outputs
 docs/api/out/
-
-# Do not ignore our M4 macros
-!common/m4
 
 # Coverage cruft
 RidgeRun inference library-0.1.0-coverage*
@@ -77,7 +46,5 @@ cscope.out
 # Examples
 examples/external/list-backends
 examples/r2i/list_parameters
-examples/r2i/ncsdk/inception
-examples/r2i/ncsdk/tinyyolov2
 examples/r2i/tensorflow/inception
 examples/r2i/tensorrt/yolov2

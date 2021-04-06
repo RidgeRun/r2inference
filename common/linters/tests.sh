@@ -16,7 +16,7 @@ test_driver="common/rr-test-driver.py"
 
 run_tests()
 {
-    make -s check
+    ninja -C build test
     ret=$?
     
     return $ret

@@ -14,14 +14,9 @@ sudo apt install pkg-config
 sudo apt install g++
 ```
 
-## Building the Examples
-
-```
-make
-```
-
 ## Testing the examples
 
 ```
+cd ../../build/examples/external
 ./list-backends
 ```

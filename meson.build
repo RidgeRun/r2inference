@@ -1,5 +1,5 @@
 project('r2inference', ['cpp'], default_options : ['cpp_std=c++11'],
-  version : '0.10.2',
+  version : '0.11.0',
   meson_version : '>= 0.50',)
 
 # Set project information
@@ -76,6 +76,7 @@ if get_option('enable-tensorrt')
   # CUDA versions supported
   cuda_versions = [
     '10.0',
+    '10.2'
   ]
 
   # Find CUDA version
@@ -192,7 +193,7 @@ pkgconfig = import('pkgconfig')
 
 # Install git hooks
 python3 = import('python').find_installation()
-run_command(python3, '-c', 'import shutil; shutil.copy("hooks/pre-commit.hook", ".git/hooks/pre-commit")')
+run_command(python3, '-c', 'import shutil; shutil.copy("common/hooks/pre-commit-hook.sh", ".git/hooks/pre-commit")')
 
 # Meson will generate a header file all the entries in the configuration data object
 configure_file(output : 'config.h', configuration : cdata)
