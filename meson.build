@@ -52,10 +52,12 @@ endif
 
 # Define library dependencies for Tensorflow Lite support
 if get_option('enable-tflite') or get_option('enable-coral')
+  dl = cpp.find_library('dl', required: true)
+  dl_dep = declare_dependency(dependencies: dl)
   tensorflow_lite = cpp.find_library('tensorflow-lite', required: true)
   tensorflow_lite_dep = declare_dependency(dependencies: tensorflow_lite)
   thread_dep = dependency('threads')
-  lib_tflite_dep = [tensorflow_lite_dep, thread_dep, common_deps]
+  lib_tflite_dep = [tensorflow_lite_dep, thread_dep, dl_dep, common_deps]
   cdata.set('HAVE_TFLITE', true)
 endif
 
