@@ -241,6 +241,7 @@ RuntimeError Engine::PredictAuxiliar(std::shared_ptr<r2i::IFrame> in_frame) {
                "The provided frame input sizes are different to tensor sizes");
     return error;
   }
+  
   this->PreprocessInputData(static_cast<float *>(frame->GetData()),
                             wanted_width * wanted_height * wanted_channels, this->interpreter.get(), error);
   if (r2i::RuntimeError::EOK != error.GetCode()) {
