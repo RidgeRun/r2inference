@@ -62,6 +62,7 @@ class Engine : public IEngine {
 
   virtual void SetupResolver(::tflite::ops::builtin::BuiltinOpResolver &resolver);
   virtual void SetInterpreterContext(::tflite::Interpreter *interpreter);
+  virtual void ConfigureDelegate(::tflite::Interpreter *interpreter);
 
  private:
   RuntimeError PredictAuxiliar(std::shared_ptr<r2i::IFrame> in_frame);

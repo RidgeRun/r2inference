@@ -20,3 +20,5 @@ option('enable-onnxrt-acl', type : 'boolean', value: false,
        description : 'Enable ONNX Runtime backend with ACL execution provider support')
 option('enable-onnxrt-openvino', type : 'boolean', value: false,
        description : 'Enable ONNX Runtime backend with OpenVINO execution provider support')
+option('enable-nnapi', type : 'boolean', value : false,
+       description : 'Enable NNAPI delegate for NPU inference execution support')

@@ -7,7 +7,7 @@
  * RidgeRun, LLC.  The user is free to modify the source code after obtaining
  * a software license from RidgeRun.  All source code changes must be provided
  * back to RidgeRun without any encumbrance.
-*/
+ */
 
 #ifndef R2I_FRAMEWORKS_H
 #define R2I_FRAMEWORKS_H
@@ -60,9 +60,14 @@ enum FrameworkCode {
   /**
    * Number of supported frameworks, mostly for testing purposes.
    */
-  MAX_FRAMEWORK
+  MAX_FRAMEWORK,
+
+  /**
+   * Android's NPU delegate
+   */
+  NNAPI
 };
 
-} //namespace r2i
+}  // namespace r2i
 
-#endif //R2I_FRAMEWORKS
+#endif  // R2I_FRAMEWORKS

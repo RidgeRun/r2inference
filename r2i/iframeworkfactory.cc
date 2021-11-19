@@ -22,6 +22,7 @@
 #include "tensorflow/frameworkfactory.h"
 #include "tensorrt/frameworkfactory.h"
 #include "tflite/frameworkfactory.h"
+#include "nnapi/frameworkfactory.h"
 
 namespace r2i {
 
@@ -81,6 +82,14 @@ MakeTensorRTFactory (RuntimeError &error) {
 }
 #endif // HAVE_TENSORRT
 
+#ifdef HAVE_NNAPI
+static std::unique_ptr<IFrameworkFactory>
+MakeNNAPIFactory (RuntimeError &error) {
+  return std::unique_ptr<nnapi::FrameworkFactory> (new
+         nnapi::FrameworkFactory);
+}
+#endif
+
 typedef std::function<std::unique_ptr<IFrameworkFactory>(RuntimeError &)>
 MakeFactory;
 const std::unordered_map<int, MakeFactory> frameworks ({
@@ -112,6 +121,10 @@ const std::unordered_map<int, MakeFactory> frameworks ({
 #ifdef HAVE_TENSORRT
   {FrameworkCode::TENSORRT, MakeTensorRTFactory},
 #endif //HAVE_TENSORRT
+
+#ifdef HAVE_NNAPI
+  {FrameworkCode::NNAPI, MakeNNAPIFactory},
+#endif
 
 });
 

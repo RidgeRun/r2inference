@@ -61,7 +61,7 @@ class RuntimeError {
     INCOMPATIBLE_MODEL,
 
     /**
-     * The provided Parameters is incompatible with the current operation
+     * The provided Parameters are incompatible with the current operation
      */
     INCOMPATIBLE_PARAMETERS,
 
@@ -104,6 +104,11 @@ class RuntimeError {
      * An unknown error has ocurred
      */
     UNKNOWN_ERROR,
+
+    /**
+     * The delegate was not builded properly
+     */
+    DELEGATE_ERROR,
   };
 
   /**
