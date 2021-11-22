@@ -51,7 +51,9 @@ if get_option('enable-tensorflow')
 endif
 
 # Define library dependencies for Tensorflow Lite support
-if get_option('enable-tflite') or get_option('enable-coral')
+if get_option('enable-tflite') or get_option('enable-coral') or get_option('enable-nnapi')
+  configinc += include_directories('../recipe-sysroot/usr/include/tensorflow/lite')
+  configinc += include_directories('../recipe-sysroot/usr/include/tensorflow/lite/tools/make/downloads/flatbuffers/include')
   dl = cpp.find_library('dl', required: true)
   dl_dep = declare_dependency(dependencies: dl)
   tensorflow_lite = cpp.find_library('tensorflow-lite', required: true)
@@ -70,6 +72,12 @@ if get_option('enable-coral')
     rt_dep = cpp.find_library('rt', required : true)
     lib_coral_dep = [coral_dep, lib_tflite_dep, dl_dep, rt_dep, common_deps]
     cdata.set('HAVE_CORAL', true)
+endif
+
+# Define library dependencies for NNAPI TensorFlow Lite delegate
+if get_option('enable-nnapi')
+    lib_nnapi_dep = [tensorflow_lite_dep, thread_dep, dl_dep, rt_dep, common_deps]
+    cdata.set('HAVE_NNAPI', true)
 endif
 
 # Define library dependencies for TensorRT support
