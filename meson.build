@@ -41,6 +41,7 @@ cdata.set('HAVE_TENSORRT', false)
 cdata.set('HAVE_ONNXRT', false)
 cdata.set('HAVE_ONNXRT_ACL', false)
 cdata.set('HAVE_ONNXRT_OPENVINO', false)
+cdata.set('HAVE_NNAPI', false)
 
 # Define library dependencies for Tensorflow support
 if get_option('enable-tensorflow')
