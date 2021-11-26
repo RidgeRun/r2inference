@@ -53,8 +53,6 @@ endif
 
 # Define library dependencies for Tensorflow Lite support
 if get_option('enable-tflite') or get_option('enable-coral') or get_option('enable-nnapi')
-  configinc += include_directories('../recipe-sysroot/usr/include/tensorflow/lite')
-  configinc += include_directories('../recipe-sysroot/usr/include/tensorflow/lite/tools/make/downloads/flatbuffers/include')
   dl = cpp.find_library('dl', required: true)
   dl_dep = declare_dependency(dependencies: dl)
   tensorflow_lite = cpp.find_library('tensorflow-lite', required: true)
