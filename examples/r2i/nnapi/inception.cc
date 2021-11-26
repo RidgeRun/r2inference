@@ -144,7 +144,8 @@ int main(int argc, char *argv[]) {
       r2i::IFrameworkFactory::MakeFactory(r2i::FrameworkCode::NNAPI, error);
 
   if (nullptr == factory) {
-    std::cerr << "TensorFlow backend is not built: " << error << std::endl;
+    std::cerr << "TFLite NNAPI backend could not be built " << error
+              << std::endl;
     exit(EXIT_FAILURE);
   }
 
