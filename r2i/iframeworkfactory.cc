@@ -16,13 +16,13 @@
 
 #include "config.h"
 #include "coral/frameworkfactory.h"
+#include "nnapi/frameworkfactory.h"
 #include "onnxrt/frameworkfactory.h"
 #include "onnxrt_acl/frameworkfactory.h"
 #include "onnxrt_openvino/frameworkfactory.h"
 #include "tensorflow/frameworkfactory.h"
 #include "tensorrt/frameworkfactory.h"
 #include "tflite/frameworkfactory.h"
-#include "nnapi/frameworkfactory.h"
 
 namespace r2i {
 
@@ -124,7 +124,7 @@ const std::unordered_map<int, MakeFactory> frameworks ({
 
 #ifdef HAVE_NNAPI
   {FrameworkCode::NNAPI, MakeNNAPIFactory},
-#endif
+#endif // HAVE_NNAPI
 
 });
 

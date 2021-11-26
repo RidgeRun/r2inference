@@ -58,14 +58,14 @@ enum FrameworkCode {
   TENSORRT,
 
   /**
-   * Number of supported frameworks, mostly for testing purposes.
-   */
-  MAX_FRAMEWORK,
-
-  /**
    * Android's NPU delegate
    */
-  NNAPI
+  NNAPI,
+
+  /**
+   * Number of supported frameworks, mostly for testing purposes.
+   */
+  MAX_FRAMEWORK
 };
 
 }  // namespace r2i

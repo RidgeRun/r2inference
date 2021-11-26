@@ -7,35 +7,32 @@
  * RidgeRun, LLC.  The user is free to modify the source code after obtaining
  * a software license from RidgeRun.  All source code changes must be provided
  * back to RidgeRun without any encumbrance.
-*/
+ */
 
 #include "frameworkfactory.h"
 #include "engine.h"
 
-
 namespace r2i {
 namespace nnapi {
 
-std::unique_ptr<r2i::IEngine> FrameworkFactory::MakeEngine (
-  RuntimeError &error) {
-  error.Clean ();
+std::unique_ptr<r2i::IEngine> FrameworkFactory::MakeEngine(
+    RuntimeError &error) {
+  error.Clean();
 
-  return std::unique_ptr<IEngine> (new Engine);
+  return std::unique_ptr<IEngine>(new Engine);
 }
 
-r2i::FrameworkMeta FrameworkFactory::GetDescription (
-  RuntimeError &error) {
-  const FrameworkMeta meta {
-    .code = r2i::FrameworkCode::NNAPI,
-    .name = "NNAPI",
-    .label = "nnapi",
-    .description = "TensorFlow Lite with NNAPI delegate from Android"
-  };
+r2i::FrameworkMeta FrameworkFactory::GetDescription(RuntimeError &error) {
+  const FrameworkMeta meta{
+      .code = r2i::FrameworkCode::NNAPI,
+      .name = "NNAPI",
+      .label = "nnapi",
+      .description = "TensorFlow Lite with NNAPI delegate from Android"};
 
-  error.Clean ();
+  error.Clean();
 
   return meta;
 }
 
-} // namespace tflite
-} // namespace r2i
+}  // namespace nnapi
+}  // namespace r2i

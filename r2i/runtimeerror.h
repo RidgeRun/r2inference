@@ -101,14 +101,14 @@ class RuntimeError {
     UNSUPPORTED_FRAMEWORK,
 
     /**
+     * The delegate was not built properly
+     */
+    DELEGATE_ERROR,
+
+    /**
      * An unknown error has ocurred
      */
     UNKNOWN_ERROR,
-
-    /**
-     * The delegate was not builded properly
-     */
-    DELEGATE_ERROR,
   };
 
   /**
