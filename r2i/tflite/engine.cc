@@ -357,6 +357,7 @@ void Engine::GetOutputTensorData(::tflite::Interpreter *interpreter,
 
 RuntimeError Engine::ConfigureDelegate(::tflite::Interpreter * /*interpreter*/) {
   // No implementation for tflite engine
+  return  RuntimeError{};
 }
 
 } //namespace tflite
