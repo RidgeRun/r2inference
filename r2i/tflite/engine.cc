@@ -235,7 +235,7 @@ RuntimeError Engine::PredictAuxiliar(std::shared_ptr<r2i::IFrame> in_frame) {
   int frame_channels = frame->GetFormat().GetNumPlanes();
   int total_frame_size = frame_height * frame_width * frame_channels;
 
-  if (total_size != total_frame_size) {
+  if (total_wanted_size != total_frame_size) {
     error.Set (RuntimeError::Code::FRAMEWORK_ERROR,
                "The provided frame input sizes are different to tensor sizes");
     return error;
