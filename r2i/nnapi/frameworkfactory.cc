@@ -8,9 +8,8 @@
  * a software license from RidgeRun.  All source code changes must be provided
  * back to RidgeRun without any encumbrance.
  */
-
-#include "frameworkfactory.h"
 #include "engine.h"
+#include "frameworkfactory.h"
 
 namespace r2i {
 namespace nnapi {
