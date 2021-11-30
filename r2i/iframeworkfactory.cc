@@ -88,7 +88,7 @@ MakeNNAPIFactory (RuntimeError &error) {
   return std::unique_ptr<nnapi::FrameworkFactory> (new
          nnapi::FrameworkFactory);
 }
-#endif
+#endif // HAVE_NNAPI
 
 typedef std::function<std::unique_ptr<IFrameworkFactory>(RuntimeError &)>
 MakeFactory;
@@ -124,7 +124,7 @@ const std::unordered_map<int, MakeFactory> frameworks ({
 
 #ifdef HAVE_NNAPI
   {FrameworkCode::NNAPI, MakeNNAPIFactory},
-#endif // HAVE_NNAPI
+#endif //HAVE_NNAPI
 
 });
 
