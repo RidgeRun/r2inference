@@ -61,7 +61,7 @@ class RuntimeError {
     INCOMPATIBLE_MODEL,
 
     /**
-     * The provided Parameters is incompatible with the current operation
+     * The provided Parameters are incompatible with the current operation
      */
     INCOMPATIBLE_PARAMETERS,
 
@@ -99,6 +99,11 @@ class RuntimeError {
      * The requested framework is not supported in the current system
      */
     UNSUPPORTED_FRAMEWORK,
+
+    /**
+     * The delegate was not built properly
+     */
+    DELEGATE_ERROR,
 
     /**
      * An unknown error has ocurred

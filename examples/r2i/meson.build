@@ -41,3 +41,7 @@ endif
 if cdata.get('HAVE_TENSORRT') == true
   subdir('tensorrt')
 endif
+
+if cdata.get('HAVE_NNAPI') == true
+  subdir('nnapi')
+endif

@@ -37,6 +37,11 @@ if cdata.get('HAVE_ONNXRT_OPENVINO') == true
   r2inference_internal_dep += [internal_onnxrt_openvino_dep]
 endif
 
+if cdata.get('HAVE_NNAPI') == true
+  subdir('nnapi')
+  r2inference_internal_dep += [internal_nnapi_dep]
+endif
+
 # Define source code
 r2inference_sources = [
   'classification.cc',
