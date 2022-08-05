@@ -91,6 +91,7 @@ RuntimeError Engine::Start ()  {
     }
 
     this->SetInterpreterContext(interpreter.get());
+    this->ConfigureDelegate(interpreter.get());
 
     std::shared_ptr<::tflite::Interpreter> tflite_interpreter_shared{std::move(interpreter)};
 
@@ -228,14 +229,18 @@ RuntimeError Engine::PredictAuxiliar(std::shared_ptr<r2i::IFrame> in_frame) {
   int wanted_height = dims->data[1];
   int wanted_width = dims->data[2];
   int wanted_channels = dims->data[3];
+  int total_wanted_size = wanted_height * wanted_width * wanted_channels;
 
-  if ((frame->GetWidth() != wanted_width)
-      or (frame->GetHeight() != wanted_height)) {
+  int frame_height = frame->GetHeight();
+  int frame_width = frame->GetWidth();
+  int frame_channels = frame->GetFormat().GetNumPlanes();
+  int total_frame_size = frame_height * frame_width * frame_channels;
+
+  if (total_wanted_size != total_frame_size) {
     error.Set (RuntimeError::Code::FRAMEWORK_ERROR,
                "The provided frame input sizes are different to tensor sizes");
     return error;
   }
-
   this->PreprocessInputData(static_cast<float *>(frame->GetData()),
                             wanted_width * wanted_height * wanted_channels, this->interpreter.get(), error);
   if (r2i::RuntimeError::EOK != error.GetCode()) {
@@ -348,6 +353,11 @@ void Engine::GetOutputTensorData(::tflite::Interpreter *interpreter,
                "Output tensor has unsupported output type");
     return;
   }
+}
+
+RuntimeError Engine::ConfigureDelegate(::tflite::Interpreter * /*interpreter*/) {
+  // No implementation for tflite engine
+  return  RuntimeError{};
 }
 
 } //namespace tflite
