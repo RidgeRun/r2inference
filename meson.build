@@ -1,5 +1,5 @@
 project('r2inference', ['cpp'], default_options : ['cpp_std=c++11'],
-  version : '0.12.0',
+  version : '0.12.1',
   meson_version : '>= 0.50',)
 
 # Set project information
