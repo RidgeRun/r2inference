@@ -1,5 +1,5 @@
 project('r2inference', ['cpp'], default_options : ['cpp_std=c++11'],
-  version : '0.12.0',
+  version : '0.12.1',
   meson_version : '>= 0.50',)
 
 # Set project information
@@ -28,7 +28,7 @@ cpp_args = ['-DHAVE_CONFIG_H']
 cdata = configuration_data()
 
 # define common dependencies
-opencv_dep = dependency('opencv4', version : ['>= 4.0.0', '< 4.3.0'], required : false)
+opencv_dep = dependency('opencv4', version : ['>= 4.0.0'], required : false)
 glib = dependency('glib-2.0', version:'>= 2.0.0', required: true)
 gmodule = dependency('gmodule-2.0', version:'>= 2.0.0', required: true)
 common_deps = [glib, gmodule]
